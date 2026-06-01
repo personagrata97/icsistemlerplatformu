@@ -1,0 +1,9 @@
+﻿C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.controller.ts
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.service.ts
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\prisma\dev.db
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\prisma\schema.prisma
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\frontend\app\audit\sampling\page.tsx
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\frontend\components\sampling\AdvancedSamplingModal.tsx
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\frontend\components\ui\CustomSelect.tsx
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\frontend\lib\audit-api.ts
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\frontend\lib\audit-utils.ts

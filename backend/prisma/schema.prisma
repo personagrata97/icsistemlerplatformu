@@ -1,0 +1,1459 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Musteri {
+  musteri_id  String     @id @default(cuid())
+  ad_soyad    String
+  segment     String
+  bolge       String
+  sube        String
+  created_at  DateTime   @default(now())
+  sozlesmeler Sozlesme[]
+
+  @@map("musteri")
+}
+
+model Sozlesme {
+  sozlesme_id               String          @id @default(cuid())
+  musteri_id                String
+  toplam_tutar              Decimal
+  vade                      Int
+  taksit_tutari             Decimal
+  baslangic_tarihi          DateTime
+  teslim_tarihi_planlanan   DateTime?
+  teslim_tarihi_gerceklesen DateTime?
+  durum                     String
+  iptal_durumu              Boolean         @default(false)
+  iptal_tarihi              DateTime?
+  iptal_nedeni              String?
+  created_at                DateTime        @default(now())
+  odeme_hareketleri         OdemeHareketi[]
+  musteri                   Musteri         @relation(fields: [musteri_id], references: [musteri_id])
+  teslimatlar               Teslimat[]
+
+  @@map("sozlesme")
+}
+
+model OdemeHareketi {
+  hareket_id  String   @id @default(cuid())
+  sozlesme_id String
+  tarih       DateTime
+  tutar       Decimal
+  tip         String
+  gecikme_gun Int      @default(0)
+  created_at  DateTime @default(now())
+  sozlesme    Sozlesme @relation(fields: [sozlesme_id], references: [sozlesme_id])
+
+  @@map("odeme_hareketi")
+}
+
+model Teslimat {
+  teslimat_id   String   @id @default(cuid())
+  sozlesme_id   String
+  teslim_tarihi DateTime
+  teslim_tutar  Decimal
+  teslim_tipi   String
+  created_at    DateTime @default(now())
+  sozlesme      Sozlesme @relation(fields: [sozlesme_id], references: [sozlesme_id])
+
+  @@map("teslimat")
+}
+
+model LikiditePozisyonu {
+  id                         String   @id @default(cuid())
+  tarih                      DateTime @unique
+  nakit                      Decimal
+  likit_varlik               Decimal
+  kisa_vadeli_yukumluluk     Decimal
+  teslimat_yukumlulugu_30gun Decimal
+  created_at                 DateTime @default(now())
+
+  @@map("likidite_pozisyonu")
+}
+
+model RiskKpi {
+  kpi_kodu   String           @id
+  aciklama   String
+  birim      String
+  created_at DateTime         @default(now())
+  ozetler    GunlukRiskOzet[]
+  limitler   RiskLimit[]
+  uyarilar   Uyari[]
+
+  @@map("risk_kpi")
+}
+
+model RiskLimit {
+  id            String   @id @default(cuid())
+  kpi_kodu      String
+  esik_deger    Decimal
+  karsilastirma String
+  seviye        String
+  created_at    DateTime @default(now())
+  kpi           RiskKpi  @relation(fields: [kpi_kodu], references: [kpi_kodu])
+
+  @@map("risk_limit")
+}
+
+model Senaryo {
+  senaryo_kodu String           @id
+  ad           String
+  parametreler String
+  created_at   DateTime         @default(now())
+  ozetler      GunlukRiskOzet[]
+  uyarilar     Uyari[]
+
+  @@map("senaryo")
+}
+
+model GunlukRiskOzet {
+  id            String   @id @default(cuid())
+  tarih         DateTime
+  senaryo_kodu  String
+  kpi_kodu      String
+  deger         Decimal
+  risk_seviyesi String
+  created_at    DateTime @default(now())
+  kpi           RiskKpi  @relation(fields: [kpi_kodu], references: [kpi_kodu])
+  senaryo       Senaryo  @relation(fields: [senaryo_kodu], references: [senaryo_kodu])
+
+  @@unique([tarih, senaryo_kodu, kpi_kodu])
+  @@map("gunluk_risk_ozet")
+}
+
+model Uyari {
+  uyari_id          String   @id @default(cuid())
+  tarih             DateTime @default(now())
+  kpi_kodu          String
+  senaryo_kodu      String
+  esik_deger        Decimal
+  gerceklesen_deger Decimal
+  risk_seviyesi     String
+  durum             String
+  mesaj             String?
+  created_at        DateTime @default(now())
+  senaryo           Senaryo  @relation(fields: [senaryo_kodu], references: [senaryo_kodu])
+  kpi               RiskKpi  @relation(fields: [kpi_kodu], references: [kpi_kodu])
+
+  @@map("uyari")
+}
+
+model LikiditeStresSonucu {
+  id            String   @id @default(cuid())
+  tarih         DateTime @default(now())
+  senaryo_ad    String
+  lcr_deger     Decimal
+  risk_seviyesi String
+  created_at    DateTime @default(now())
+
+  @@map("likidite_stres_sonucu")
+}
+
+model Holiday {
+  id          String   @id @default(cuid())
+  date        DateTime
+  name        String
+  type        String   @default("Resmi Tatil") // Resmi Tatil, Dini Bayram, Ulusal Bayram
+  isRecurring Boolean  @default(false) // Her yıl tekrarlayan mı?
+  created_at  DateTime @default(now())
+
+  @@unique([date])
+  @@map("holiday")
+}
+
+model Audit {
+  id                  String                    @id @default(cuid())
+  title               String
+  type                String
+  status              String
+  progress            Int                       @default(0)
+  startDate           String
+  endDate             String?
+  team                String?
+  supervisor          String?
+  supervisorId        String?
+  auditCode           String?
+  department          String?
+  creatorId           String?
+  created_at          DateTime                  @default(now())
+  updated_at          DateTime                  @updatedAt
+  // workpapers          String? // REMOVED: Use AuditWorkpaper instead
+  scope               String?
+  objective           String?
+  methodology         String?
+  criteria            String?
+  period              String?
+  description         String?
+  opinion             String?
+  riskLevel           String?
+  plannedStartDate    DateTime?
+  plannedEndDate      DateTime?
+  actualStartDate     DateTime?
+  actualEndDate       DateTime?
+  isDeleted           Boolean                   @default(false)
+  deletedAt           DateTime?
+  deletedById         String?
+  unitId              String?
+  processId           String?
+  deletionComment     String?
+  deletionReason      String?
+  isConfidential      Boolean                   @default(false) // KVKK: Gizli soruşturma/denetim
+  confidentialityNote String?                                    // Gizlilik gerekçesi
+  linkedEthicsReports EthicsReport[]            @relation("AuditToEthics")
+  samples             AuditSample[]
+  AuditTest           AuditTest[]
+  timesheets          AuditTimesheet[]
+  workpaperFiles      AuditWorkpaper[]
+  findings            Finding[]
+  declarations        IndependenceDeclaration[] @relation("AuditDeclarations")
+  auditExtensions     AuditExtensionRequest[]
+  communications      AuditCommunication[]
+  meetings            AuditMeeting[]
+  
+  // Tebliğ ve Kabul Süreci
+  acknowledgedAt      DateTime?
+  acknowledgedBy      String?
+
+  // Supervisor Relation (Explicit)
+  supervisorUser User? @relation("AuditSupervisor", fields: [supervisorId], references: [id])
+  deletedBy      User? @relation("DeletedAudits", fields: [deletedById], references: [id])
+
+  // Note: creatorId mapping missing in User model, skipping for now to avoid errors if not defined there.
+  // Actually, let's keep it simple and clean. If User model has relation("AuditSupervisor"), we need it here.
+  // In User model (line 550): supervisedAudits Audit[] @relation("AuditSupervisor")
+  // In User model (line 549): deletedAudits Audit[] @relation("DeletedAudits")
+  AuditableUnit   AuditableUnit? @relation(fields: [auditableUnitId], references: [id])
+  auditableUnitId String?
+
+  @@index([auditCode])
+  @@index([creatorId])
+  @@index([unitId])
+  @@index([status])
+  @@index([isDeleted])
+  @@map("audit")
+}
+
+model Finding {
+  id                          String                @id @default(cuid())
+  auditId                     String
+  code                        String?               @unique
+  title                       String
+  risk                        String
+  category                    String?
+  status                      String
+  dueDate                     DateTime?
+  description                 String?
+  evidence                    String?
+  financialImpact             Decimal?
+  departmentResponse          String?
+  department                  String?
+  criteria                    String?
+  rootCause                   String?
+  recommendation              String?
+  actionPlan                  String?
+  isAgreed                    Boolean?
+  disagreementReason          String?
+  closingRemarks              String?
+  // reviewNotes                 String? // REMOVED: Use ReviewNote relation
+  notes                       ReviewNote[]
+  reviewerId                  String?
+  verifiedAt                  DateTime?
+  verifiedBy                  String?
+  assignedUserId              String?
+  notificationDate            DateTime?
+  responseDate                DateTime?
+  created_at                  DateTime              @default(now())
+  updated_at                  DateTime              @updatedAt
+  lastEditedAt                DateTime?
+  isRiskAccepted              Boolean?              @default(false)
+  riskAcceptanceJustification String?
+  riskAcceptedBy              String?
+  riskAcceptedAt              DateTime?
+  escalationLevel             Int                   @default(0)
+  supervisorId                String?
+  processId                   String?
+  riskId                      String?
+  controlId                   String?
+  linkedEthicsReportId        String?
+  isRecurring                 Boolean               @default(false)
+  recurringFindingId          String?
+  recurringNote               String?
+  isConfidential              Boolean               @default(false) // KVKK: Gizli bulgu
+  confidentialityNote         String?
+  isDeleted                   Boolean               @default(false)
+  deletedAt                   DateTime?
+  deletedById                 String?
+  auditTestId                 String?
+  workpaperId                 String?
+  deletionComment             String?
+  deletionReason              String?
+  conciliation                AuditConciliation?
+  conciliationMessages        ConciliationMessage[]
+  followUps                   AuditFollowUp[]
+  extensionRequests           ExtensionRequest[]
+  auditTest                   AuditTest?            @relation(fields: [auditTestId], references: [id])
+  workpaper                   AuditWorkpaper?       @relation(fields: [workpaperId], references: [id])
+  audit                       Audit                 @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  deletedBy                   User?                 @relation("DeletedFindings", fields: [deletedById], references: [id])
+  linkedEthicsReport          EthicsReport?         @relation("EthicsToFinding", fields: [linkedEthicsReportId], references: [id])
+  reviewer                    User?                 @relation("FindingReviewer", fields: [reviewerId], references: [id])
+  supervisor                  User?                 @relation("FindingSupervisor", fields: [supervisorId], references: [id])
+  assignedUser                User?                 @relation("FindingAssignee", fields: [assignedUserId], references: [id])
+
+  @@index([auditId])
+  @@index([status])
+  @@index([risk])
+  @@index([isDeleted])
+  @@index([assignedUserId])
+  @@map("finding")
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String
+  type        String   @default("info")
+  category    String   @default("Genel")
+  isRead      Boolean  @default(false)
+  link        String?
+  createdAt   DateTime @default(now())
+  user        User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notification")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  date       DateTime @default(now())
+  user       String
+  action     String
+  details    String
+  targetType String
+  targetId   String?
+  auditId    String?
+  changeData String?
+  ipAddress  String?
+  previousHash String?
+  hash       String?
+
+  @@index([targetType, targetId])
+  @@index([auditId])
+  @@map("audit_log")
+}
+
+model AuditPlan {
+  id                 String    @id @default(cuid())
+  title              String
+  type               String
+  quarter            String
+  year               Int
+  status             String    @default("Planlandı")
+  priority           String
+  assignedTo         String?
+  startDate          String?
+  endDate            String?
+  approvedBy         String?
+  approvedAt         DateTime?
+  signedDocumentPath String?
+  description        String?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  @@map("audit_plan")
+}
+
+model AuditableUnit {
+  id                   String              @id @default(cuid())
+  name                 String
+  code                 String?
+  type                 String
+  parentId             String?
+  riskLevel            String
+  description          String?
+  manager              String?
+  location             String?
+  employeeCount        Int?
+  transactionVolume    String?
+  financialImpact      String?
+  riskScore            Int?
+  impactScore          Int?                @default(1) // Etki (1-5)
+  likelihoodScore      Int?                @default(1) // Olasılık (1-5)
+  residualRiskScore    Int?
+  auditCycle           Int?
+  lastAuditDate        String?
+  lastAuditId          String?
+  nextAuditDate        String?
+  estimatedDays        Int?
+  status               String              @default("Aktif")
+  notes                String?
+  strategicAlignment   String?
+  businessCriticality  String?
+  regulations          String?
+  mandatoryAudit       Boolean?
+  lastAuditResult      String?
+  openFindingsCount    Int?                @default(0)
+  inherentRisk         String?
+  controlEffectiveness String?
+  changeRisk           Boolean?            @default(false)
+  requiredExpertise    String?
+  previousAuditDays    Int?
+  created_at           DateTime            @default(now())
+  updated_at           DateTime            @updatedAt
+  audits               Audit[]
+  multiYearItems       MultiYearPlanItem[]
+  ethicsReports        EthicsReport[]      @relation("UnitEthics")
+  processes            Process[]
+
+  @@map("auditable_unit")
+}
+
+model Process {
+  id          String        @id @default(cuid())
+  unitId      String
+  name        String
+  description String?
+  owner       String?
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  unit        AuditableUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  risks       Risk[]
+
+  @@map("process")
+}
+
+model Risk {
+  id          String    @id @default(cuid())
+  processId   String
+  code        String?
+  name        String
+  description String?
+  category    String
+  level       String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  controls    Control[]
+  process     Process   @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@map("risk")
+}
+
+model Control {
+  id          String      @id @default(cuid())
+  riskId      String
+  code        String?
+  name        String
+  description String?
+  owner       String?
+  type        String?
+  frequency   String?
+  source      String?
+  method      String?
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+  tests       AuditTest[]
+  risk        Risk        @relation(fields: [riskId], references: [id], onDelete: Cascade)
+
+  @@map("control")
+}
+
+model AuditTest {
+  id                     String    @id @default(cuid())
+  auditId                String
+  controlId              String
+  title                  String?
+  procedure              String?
+  sampleSize             Int?
+  designEffectiveness    String?
+  operatingEffectiveness String?
+  testResult             String?
+  testedBy               String?
+  testDate               DateTime?
+  supervisorId           String?
+  supervisorApprovedAt   DateTime?
+  // notes                  String? // DELETED: Use ReviewNote relation
+  evidence               String?
+  created_at             DateTime  @default(now())
+  updated_at             DateTime  @updatedAt
+  audit                  Audit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  control                Control   @relation(fields: [controlId], references: [id], onDelete: Cascade)
+
+  findings Finding[]
+
+  // Soft Delete
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+  deletedById    String?
+  deletionReason String?
+  deletedBy      User?     @relation("DeletedTests", fields: [deletedById], references: [id])
+
+  // Approval Fields
+  status     String       @default("Taslak") // Taslak, Onay Bekliyor, Onaylandı, Revize İste, Reddedildi
+  reviewerId String?
+  reviewedAt DateTime?
+  // revisionNotes String? // REMOVED: Use ReviewNote relation
+  notes      ReviewNote[]
+  reviewer   User?        @relation("TestReviewer", fields: [reviewerId], references: [id])
+  supervisor User?        @relation("TestSupervisor", fields: [supervisorId], references: [id])
+
+  @@map("audit_test")
+}
+
+model AuditEducation {
+  id              String   @id @default(cuid())
+  title           String
+  provider        String
+  date            String
+  duration        String
+  attendees       Int      @default(0)
+  status          String   @default("Planlandı")
+  description     String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  participantList String?
+
+  @@map("audit_education")
+}
+
+model AuditFollowUp {
+  id              String    @id @default(cuid())
+  findingId       String?
+  action          String
+  deadline        String
+  priority        String
+  assignee        String
+  status          String    @default("Açık")
+  escalationLevel Int       @default(0) // Eskalasyon seviyesi (0 = Yok, 1 = 1. Seviye, 2 = 2. Seviye...)
+  lastEscalatedAt DateTime? // Son eskalasyon tarihi
+  notes           String?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  finding         Finding?  @relation(fields: [findingId], references: [id])
+
+  @@map("audit_follow_up")
+}
+
+model AuditConciliation {
+  id                 String   @id @default(cuid())
+  findingId          String   @unique
+  status             String   @default("Bekliyor")
+  response           String?
+  responseDate       String?
+  isAgreed           Boolean?
+  disagreementReason String?
+  rootCause          String?
+  actionPlan         String?
+  evidencePath       String?
+  digitalSeal        String?
+  signedBy           String?
+  signedAt           DateTime?
+  signedIp           String?
+  magicToken         String?
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+  finding            Finding  @relation(fields: [findingId], references: [id], onDelete: Cascade)
+
+  @@map("audit_conciliation")
+}
+
+model ConciliationMessage {
+  id           String   @id @default(cuid())
+  findingId    String
+  senderId     String
+  senderName   String
+  senderRole   String // e.g. "Auditor", "Department"
+  message      String
+  isAgreed     Boolean? // if sent by department
+  actionPlan   String? // if sent by department
+  evidencePath String? // if sent by department
+  status       String? // "Submitted", "Rejected", "Approved"
+  created_at   DateTime @default(now())
+
+  finding Finding @relation(fields: [findingId], references: [id], onDelete: Cascade)
+
+  @@map("conciliation_message")
+}
+
+model ExtensionRequest {
+  id                String   @id @default(cuid())
+  findingId         String
+  followUpId        String?
+  currentDeadline   String
+  requestedDeadline String
+  reason            String
+  status            String   @default("Beklemede")
+  notes             String?
+  requestorId       String
+  requestorName     String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  finding           Finding  @relation(fields: [findingId], references: [id], onDelete: Cascade)
+
+  @@map("extension_request")
+}
+
+model AuditExtensionRequest {
+  id               String    @id @default(cuid())
+  auditId          String
+  currentEndDate   DateTime
+  requestedEndDate DateTime
+  reason           String
+  notes            String?
+  status           String    @default("Beklemede")
+  requestedById    String
+  reviewedById     String?
+  reviewedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  audit       Audit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  requestedBy User  @relation("AuditExtRequester", fields: [requestedById], references: [id])
+  reviewedBy  User? @relation("AuditExtReviewer", fields: [reviewedById], references: [id])
+
+  @@map("audit_extension_request")
+}
+
+model SanctionLog {
+  id        String   @id @default(cuid())
+  user      String
+  category  String
+  action    String
+  details   String
+  timestamp DateTime @default(now())
+
+  @@map("sanction_log")
+}
+
+model SanctionScan {
+  id         String               @id @default(cuid())
+  scanType   String
+  scanSource String
+  query      String?
+  status     String               @default("Tamamlandı")
+  user       String
+  timestamp  DateTime             @default(now())
+  results    SanctionScanResult[]
+
+  @@map("sanction_scan")
+}
+
+model SanctionScanResult {
+  id          String       @id @default(cuid())
+  scanId      String
+  matchName   String
+  matchSource String
+  matchScore  Float
+  details     String?
+  scan        SanctionScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  @@map("sanction_scan_result")
+}
+
+model SuspiciousTransaction {
+  id              String   @id @default(cuid())
+  type            String
+  customerName    String
+  customerId      String?
+  transactionType String
+  amount          Decimal?
+  description     String
+  status          String   @default("Beklemede")
+  user            String
+  trackingCode    String   @unique
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("suspicious_transaction")
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  username            String    @unique
+  email               String?
+  passwordHash        String?
+  displayName         String
+  department          String?
+  isActive            Boolean   @default(true)
+  isDeleted           Boolean   @default(false)
+  deletedAt           DateTime?
+  deletionReason      String?
+  isAdUser            Boolean   @default(false)
+  lastLoginAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  certifications      String?
+  jobStartDate        String?
+  phoneNumber         String?
+  registerNumber      String?
+  title               String?
+  photoUrl            String?
+  summary             String?
+  skills              String? // JSON string or comma separated
+  jobDescription      String?
+
+  deletedAudits      Audit[]                   @relation("DeletedAudits")
+  supervisedAudits   Audit[]                   @relation("AuditSupervisor")
+  timesheets         AuditTimesheet[]
+  workpapersReviewed AuditWorkpaper[]          @relation("WorkpaperReviewer")
+  workpapersPrepared AuditWorkpaper[]          @relation("WorkpaperPreparer")
+  workpapersLocked   AuditWorkpaper[]          @relation("WorkpaperLocker")
+  workpapersApproved AuditWorkpaper[]          @relation("WorkpaperSupervisor")
+  deletedWorkpapers  AuditWorkpaper[]          @relation("DeletedWorkpapers")
+  approvedTimesheets AuditTimesheet[]          @relation("TimesheetApprover")
+  testsReviewed      AuditTest[]               @relation("TestReviewer")
+  testsSupervised    AuditTest[]               @relation("TestSupervisor")
+  deletedTests       AuditTest[]               @relation("DeletedTests")
+  deletedFindings    Finding[]                 @relation("DeletedFindings")
+  reviewedFindings   Finding[]                 @relation("FindingReviewer")
+  supervisedFindings Finding[]                 @relation("FindingSupervisor")
+  assignedFindings   Finding[]                 @relation("FindingAssignee")
+  declarations       IndependenceDeclaration[] @relation("UserDeclarations")
+  reportedEthics     EthicsReport[]            @relation("ReportedEthics")
+  assignedEthics     EthicsReport[]            @relation("AssignedEthics")
+  ethicsMessages     EthicsMessage[]
+  refreshTokens      RefreshToken[]
+  roles              UserRole[]
+  promotions         UserPromotion[]
+  experiences        UserExperience[]
+  education          UserEducation[]
+  certificates       UserCertificate[]
+  trainings          UserTraining[]
+  reviewNotes        ReviewNote[]              @relation("UserReviewNotes")
+
+  EthicsInvestigationNote EthicsInvestigationNote[]
+  createdSamples          AuditSample[]             @relation("SampleCreator")
+  auditExtRequests        AuditExtensionRequest[]   @relation("AuditExtRequester")
+  auditExtReviews         AuditExtensionRequest[]   @relation("AuditExtReviewer")
+
+  notifications       Notification[]            @relation("UserNotifications")
+  sentCommunications  AuditCommunication[]      @relation("LetterSender")
+
+  @@map("user")
+}
+
+model AuditTimesheet {
+  id           String    @id @default(cuid())
+  userId       String
+  auditId      String?
+  date         String
+  hours        Decimal
+  activityType String
+  description  String?
+  status       String    @default("Taslak") // Taslak, Onay Bekliyor, Onaylandı
+  approvedById String?
+  approvedAt   DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  audit        Audit?    @relation(fields: [auditId], references: [id])
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  approvedBy   User?     @relation("TimesheetApprover", fields: [approvedById], references: [id])
+
+  @@index([userId, date])
+  @@index([status])
+  @@map("audit_timesheet")
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  name        String
+  description String?
+  isSystem    Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  permissions RolePermission[]
+  users       UserRole[]
+
+  @@map("role")
+}
+
+model UserRole {
+  id         String   @id @default(cuid())
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_role")
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  module      String
+  action      String
+  description String?
+  roles       RolePermission[]
+
+  @@unique([module, action])
+  @@map("permission")
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  scope        String     @default("ALL")
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permission")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_token")
+}
+
+model AiDocument {
+  id             String            @id @default(cuid())
+  title          String
+  category       String
+  fileName       String
+  fileSize       Int
+  mimeType       String
+  uploadedBy     String
+  uploadedAt     DateTime          @default(now())
+  isIndexed      Boolean           @default(false)
+  indexedAt      DateTime?
+  chunkCount     Int               @default(0)
+  version        Int               @default(1)
+  rootId         String?
+  isLatest       Boolean           @default(true)
+  storedFileName String?
+  history        DocumentHistory[]
+  chunks         DocumentChunk[]
+
+  @@index([rootId, version])
+  @@map("ai_document")
+}
+
+// Kalıcı Vektör Deposu (RAG)
+// SQLite'ta pgvector çalışmadığı için vektörler JSON string olarak saklanır.
+// Cosine similarity hesaplaması uygulama seviyesinde yapılır.
+model DocumentChunk {
+  id         String      @id @default(cuid())
+  documentId String?
+  text       String
+  vector     String      // JSON serialized float array (384-dim for all-MiniLM-L6-v2)
+  source     String      // Kaynak dosya adı
+  chunkIndex Int         // Dosya içindeki sıra numarası
+  category   String?     // Mevzuat / Çalışma Kağıdı / Genel vb.
+  created_at DateTime    @default(now())
+
+  document AiDocument? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([source])
+  @@index([category])
+  @@map("document_chunk")
+}
+
+model DocumentHistory {
+  id             String     @id @default(cuid())
+  documentId     String
+  version        Int
+  fileName       String
+  fileSize       Int
+  mimeType       String
+  uploadedBy     String
+  uploadedAt     DateTime   @default(now())
+  changeReason   String?
+  storedFileName String?
+  document       AiDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("document_history")
+}
+
+model AuditWorkpaper {
+  id         String       @id @default(cuid())
+  auditId    String
+  title      String
+  fileUrl    String
+  fileType   String?
+  category   String?
+  status     String       @default("Taslak")
+  version    Int          @default(1)
+  preparerId String?
+  preparedAt DateTime?
+  reviewerId String?
+  reviewedAt DateTime?
+  // revisionNotes String? // REMOVED: Use ReviewNote relation
+  notes      ReviewNote[]
+
+  // Kilitleme Mekanizması
+  lockedById String?
+  lockedAt   DateTime?
+  lockedBy   User?     @relation("WorkpaperLocker", fields: [lockedById], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Soft Delete
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+  deletedById    String?
+  deletionReason String?
+  deletedBy      User?     @relation("DeletedWorkpapers", fields: [deletedById], references: [id])
+
+  // Supervisor Onay Kademesi
+  supervisorId         String?
+  supervisorApprovedAt DateTime?
+  supervisor           User?     @relation("WorkpaperSupervisor", fields: [supervisorId], references: [id])
+
+  reviewer User? @relation("WorkpaperReviewer", fields: [reviewerId], references: [id])
+  preparer User? @relation("WorkpaperPreparer", fields: [preparerId], references: [id])
+  audit    Audit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  findings Finding[]
+
+  history AuditWorkpaperHistory[]
+
+  @@map("audit_workpaper")
+}
+
+model AuditWorkpaperHistory {
+  id             String         @id @default(cuid())
+  workpaperId    String
+  workpaper      AuditWorkpaper @relation(fields: [workpaperId], references: [id], onDelete: Cascade)
+  version        Int
+  fileUrl        String
+  fileType       String?
+  storedFileName String?
+  changeReason   String?
+  createdBy      String? // Değişikliği yapan kullanıcı ID veya adı
+  createdAt      DateTime       @default(now())
+
+  @@index([workpaperId, version])
+  @@map("audit_workpaper_history")
+}
+
+model QualityMetric {
+  id         String   @id @default(cuid())
+  name       String
+  category   String
+  target     Decimal
+  actual     Decimal
+  unit       String
+  trend      String   @default("stable")
+  status     String
+  period     String
+  notes      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+  deletedById    String?
+  deletionReason String?
+
+  @@map("quality_metric")
+}
+
+model QualityAssessment {
+  id          String          @id @default(cuid())
+  type        String
+  date        DateTime
+  assessor    String
+  assessorOrg String?             // Dış değerlendirici kuruluşu
+  assessorTitle String?           // Dış değerlendirici unvanı
+  assessorCertifications String?  // Sertifikaları (CIA, CISA vb.)
+  assessorExperience String?      // Mesleki deneyim özeti
+  result      String
+  score       Int
+  nextDueDate DateTime?
+  reportPath  String?
+  findings    String?
+  actionItems String?
+  notes       String?
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+  actions     QualityAction[]
+
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+  deletedById    String?
+  deletionReason String?
+
+  @@map("quality_assessment")
+}
+
+model QualityAction {
+  id           String             @id @default(cuid())
+  assessmentId String?
+  title        String
+  description  String?
+  assignee     String
+  dueDate      DateTime
+  status       String             @default("Açık")
+  priority     String
+  completedAt  DateTime?
+  notes        String?
+  created_at   DateTime           @default(now())
+  updated_at   DateTime           @updatedAt
+  assessment   QualityAssessment? @relation(fields: [assessmentId], references: [id])
+
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+  deletedById    String?
+  deletionReason String?
+
+  @@map("quality_action")
+}
+
+model IndependenceDeclaration {
+  id                  String    @id @default(cuid())
+  userId              String
+  auditId             String?
+  year                Int?
+  declarationType     String
+  status              String    @default("Bekliyor")
+  hasConflict         Boolean   @default(false)
+  conflictDetails     String?
+  hasFinancialLink    Boolean   @default(false)
+  financialDetails    String?
+  hasFamilyLink       Boolean   @default(false)
+  familyDetails       String?
+  hasPreviousRole     Boolean   @default(false)
+  previousRoleDetails String?
+  hasOtherIssue       Boolean   @default(false)
+  otherIssueDetails   String?
+  declaredAt          DateTime?
+  reviewedBy          String?
+  reviewedAt          DateTime?
+  reviewNotes         String?
+  signaturePath       String?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+  audit               Audit?    @relation("AuditDeclarations", fields: [auditId], references: [id])
+  user                User      @relation("UserDeclarations", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("independence_declaration")
+}
+
+model AuditSample {
+  id                String   @id @default(cuid())
+  auditId           String
+  title             String
+  method            String
+  populationSize    Int
+  sampleSize        Int
+  confidenceLevel   Decimal?
+  errorRate         Decimal?
+  expectedErrorRate Decimal? // Beklenen hata oranı (denetçi tahmini)
+  status            String   @default("Planlandı")
+  samplingDate      DateTime @default(now())
+
+  // Selection results
+  selectedItems String? // JSON array of selected item IDs or descriptions
+
+  // Test results
+  testResult      String?
+  deviationsFound Int?    @default(0)
+  conclusions     String?
+  notes           String?
+
+  // İstatistiksel Değerlendirme Sonuçları
+  observedDeviationRate     Decimal? // Gözlemlenen sapma oranı (bulunan sapma / örneklem)
+  upperDeviationRate        Decimal? // Üst sapma oranı
+  precisionRate             Decimal? // Kesinlik (hassasiyet)
+  confidenceIntervalLower   Decimal? // Güven aralığı alt sınır
+  confidenceIntervalUpper   Decimal? // Güven aralığı üst sınır
+  projectedPopulationErrors Int? // Popülasyona projekte edilen tahmini hata sayısı
+  sampleAdequacy            String? // Örneklem yeterliliği: Yeterli / Yetersiz
+  findingId                 String? // BRIDGE: Sample to Finding
+  populationWorkpaperId     String? // LINK: Population source file
+
+  audit Audit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  creatorId   String?
+  creatorName String?
+
+  creator User? @relation("SampleCreator", fields: [creatorId], references: [id])
+
+  @@map("audit_sample")
+}
+
+model EthicsReport {
+  id           String  @id @default(cuid())
+  type         String
+  anonymous    Boolean @default(true)
+  name         String?
+  email        String?
+  phone        String?
+  description  String
+  priority     String
+  status       String  @default("Beklemede")
+  source       String? @default("Web Form")
+  trackingCode String  @unique
+
+  // Whistleblower info (if not anonymous)
+  reporterId   String?
+  reporter     User?   @relation("ReportedEthics", fields: [reporterId], references: [id])
+  reporterName String? // If external user
+
+  // Investigation info
+  assigneeId    String?
+  assignee      User?     @relation("AssignedEthics", fields: [assigneeId], references: [id])
+  assignedAt    DateTime?
+  internalNotes String?
+
+  // SLA Tracking (NEW)
+  slaDeadline     DateTime? // Calculated deadline based on priority
+  escalationLevel Int       @default(0) // 0=Normal, 1=Eskalasyon, 2=Üst Yönetim
+  escalatedAt     DateTime?
+
+  // Investigation Outcome (NEW)
+  investigationOutcome String? // Doğrulandı, Reddedildi, Kısmen Doğrulandı, Kanıt Yetersiz
+  closingSummary       String? // Closing summary text
+  disciplinaryAction   Boolean? // Was disciplinary action taken
+  closedAt             DateTime?
+  closedById           String?
+
+  // Conflict of Interest (NEW)
+  assigneeConflictDeclared Boolean @default(false) // Müfettiş çıkar çatışması yok beyanı
+
+  // Finding & Audit Connection (NEW)
+  linkedFindingId String?
+  targetUnitId    String?
+  targetUnit      AuditableUnit? @relation("UnitEthics", fields: [targetUnitId], references: [id])
+
+  // Email Integration (NEW)
+  emailMessageId            String? // Original email Message-ID for threading
+  emailThreadId             String? // Email thread ID
+  emailOriginalContent      String? // Original email body for reference
+  disciplinaryActionDetails String? // Details of disciplinary action taken
+
+  messages           EthicsMessage[]
+  evidences          EthicsEvidence[]
+  ipLogs             EthicsIpLog[]
+  investigationNotes EthicsInvestigationNote[]
+  linkedFindings     Finding[]                 @relation("EthicsToFinding")
+  linkedAudits       Audit[]                   @relation("AuditToEthics")
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("ethics_report")
+}
+
+model EthicsEvidence {
+  id         String       @id @default(cuid())
+  reportId   String
+  report     EthicsReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  fileUrl    String
+  fileName   String
+  fileType   String?
+  fileSize   Int?
+  uploadedBy String? // Null if from reporter
+  isInternal Boolean      @default(false)
+
+  created_at DateTime @default(now())
+
+  @@map("ethics_evidence")
+}
+
+model EthicsMessage {
+  id             String       @id @default(cuid())
+  reportId       String
+  report         EthicsReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  senderId       String? // If Null, it's from the reporter (anonymous)
+  sender         User?        @relation(fields: [senderId], references: [id])
+  isFromReporter Boolean      @default(false)
+  isInternal     Boolean      @default(false)
+  content        String
+  attachments    String? // JSON array of file URLs or IDs
+
+  created_at DateTime @default(now())
+
+  @@map("ethics_message")
+}
+
+// Investigation Notes with history (author + date)
+model EthicsInvestigationNote {
+  id       String       @id @default(cuid())
+  reportId String
+  report   EthicsReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User         @relation(fields: [authorId], references: [id])
+  content  String
+
+  created_at DateTime @default(now())
+
+  @@map("ethics_investigation_note")
+}
+
+// IP Hash Retention for Abuse Detection (7-day auto-purge)
+model EthicsIpLog {
+  id        String       @id @default(cuid())
+  hashedIp  String
+  reportId  String
+  report    EthicsReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@index([hashedIp, createdAt])
+  @@map("ethics_ip_log")
+}
+
+model MultiYearPlan {
+  id          String              @id @default(cuid())
+  title       String
+  startYear   Int
+  endYear     Int
+  status      String              @default("Taslak")
+  approvedBy  String?
+  approvedAt  DateTime?
+  description String?
+  created_at  DateTime            @default(now())
+  updated_at  DateTime            @updatedAt
+  items       MultiYearPlanItem[]
+
+  @@map("multi_year_plan")
+}
+
+model MultiYearPlanItem {
+  id            String        @id @default(cuid())
+  planId        String
+  unitId        String
+  year          Int
+  quarter       String?
+  priority      String
+  estimatedDays Int?
+  notes         String?
+  status        String        @default("Planlandı")
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  unit          AuditableUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  plan          MultiYearPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, unitId, year])
+  @@map("multi_year_plan_item")
+}
+
+model ReportTemplate {
+  id           String            @id @default(cuid())
+  name         String
+  type         String
+  format       String            @default("PDF")
+  templatePath String?
+  sections     String?
+  isActive     Boolean           @default(true)
+  created_at   DateTime          @default(now())
+  updated_at   DateTime          @updatedAt
+  reports      GeneratedReport[]
+
+  @@map("report_template")
+}
+
+model GeneratedReport {
+  id          String          @id @default(cuid())
+  templateId  String?
+  title       String
+  type        String
+  period      String
+  filePath    String
+  generatedBy String
+  generatedAt DateTime        @default(now())
+  parameters  String?
+  template    ReportTemplate? @relation(fields: [templateId], references: [id])
+
+  @@map("generated_report")
+}
+
+model WorkpaperTemplate {
+  id           String   @id @default(cuid())
+  name         String
+  code         String?
+  category     String
+  description  String?
+  templatePath String
+  format       String
+  isActive     Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("workpaper_template")
+}
+
+model UserTraining {
+  id          String         @id @default(cuid())
+  userId      String
+  batchId     String? // Linked to a group training if it was a bulk action
+  name        String // Training name
+  provider    String? // Institution
+  startDate   DateTime
+  endDate     DateTime
+  hours       Int? // Certificate/CPE hours
+  status      String         @default("Planlandı") // Planlandı, Tamamlandı, İptal Edildi
+  description String?
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batch       TrainingBatch? @relation(fields: [batchId], references: [id])
+
+  @@map("user_training")
+}
+
+model TrainingBatch {
+  id                String         @id @default(cuid())
+  name              String
+  provider          String?
+  startDate         DateTime
+  endDate           DateTime
+  status            String         @default("Planlandı")
+  cancellationNotes String?
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  trainings         UserTraining[]
+
+  @@map("training_batch")
+}
+
+model UserPromotion {
+  id            String    @id @default(cuid())
+  userId        String
+  title         String // New Title
+  previousTitle String? // Old Title
+  department    String? // New Department (or the one they are assigned to)
+  type          String?   @default("Terfi") // Terfi, Atama, Geçici Görev
+  passiveReason String? // If status became passive, store reason
+  promotionDate DateTime
+  endDate       DateTime? // Bitiş tarihi (varsa)
+  notes         String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_promotion")
+}
+
+model UserExperience {
+  id          String    @id @default(cuid())
+  userId      String
+  companyName String
+  position    String
+  department  String?
+  startDate   DateTime
+  endDate     DateTime?
+  description String?
+  careerPaths String?   @default("[]") // JSON string for role transitions
+  isCurrent   Boolean   @default(false)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_experience")
+}
+
+model UserEducation {
+  id             String    @id @default(cuid())
+  userId         String
+  schoolName     String
+  faculty        String?
+  department     String
+  degree         String? // Lisans, Yüksek Lisans, Doktora vb.
+  graduationYear Int?
+  startDate      DateTime?
+  endDate        DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_education")
+}
+
+model UserCertificate {
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  provider   String?
+  date       String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_certificate")
+}
+
+model ReviewNote {
+  id          String   @id @default(cuid())
+  text        String
+  authorId    String
+  authorName  String
+  type        String // "BULGU", "TEST", "CALISMA_KAGIDI"
+  findingId   String?
+  testId      String?
+  workpaperId String?
+  created_at  DateTime @default(now())
+
+  finding   Finding?        @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  test      AuditTest?      @relation(fields: [testId], references: [id], onDelete: Cascade)
+  workpaper AuditWorkpaper? @relation(fields: [workpaperId], references: [id], onDelete: Cascade)
+  author    User?           @relation("UserReviewNotes", fields: [authorId], references: [id])
+
+  @@index([findingId])
+  @@index([testId])
+  @@index([workpaperId])
+  @@map("review_note")
+}
+
+model AuditCommunication {
+  id          String   @id @default(cuid())
+  auditId     String
+  type        String   // NOTIFICATION, DRAFT_REPORT, FINAL_REPORT
+  subject     String
+  content     String
+  status      String   @default("Taslak") // Taslak, Gönderildi, Onaylandı vs.
+  sentAt      DateTime?
+  sentById    String?
+  readAt      DateTime?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  audit       Audit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  sentBy      User? @relation("LetterSender", fields: [sentById], references: [id])
+
+  @@index([auditId])
+  @@map("audit_communication")
+}
+
+model AuditMeeting {
+  id          String   @id @default(cuid())
+  auditId     String
+  type        String   // OPENING, CLOSING, INTERIM
+  title       String?  // Gündem/Toplantı Başlığı
+  meetingDate DateTime?
+  location    String?
+  agenda      String?
+  minutes     String?  // Tutanak özeti
+  attendees   String?  // JSON listesi [{"id": "xyz", "role": "Auditor"}]
+  status      String   @default("Planlandı") // Planlandı, Gerçekleşti, İptal
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  audit       Audit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId])
+  @@map("audit_meeting")
+}
+

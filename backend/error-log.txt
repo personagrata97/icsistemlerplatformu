@@ -1,0 +1,1235 @@
+[2026-02-23T08:15:56.120Z] Unexpected token 'S', "Selim Kaya"... is not valid JSON
+SyntaxError: Unexpected token 'S', "Selim Kaya"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\dist\src\audit\audit.service.js:133:54
+    at Array.map (<anonymous>)
+    at AuditService.getAllAudits (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\dist\src\audit\audit.service.js:128:43)
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-02-23T10:54:02.391Z] Unexpected token 'S', "Selim Kaya"... is not valid JSON
+SyntaxError: Unexpected token 'S', "Selim Kaya"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at AuditService.getAudit (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\dist\src\audit\audit.service.js:189:37)
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-02-23T10:54:02.406Z] Unexpected token 'S', "Selim Kaya"... is not valid JSON
+SyntaxError: Unexpected token 'S', "Selim Kaya"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at AuditService.getAudit (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\dist\src\audit\audit.service.js:189:37)
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-02-23T10:54:05.101Z] Unexpected token 'S', "Selim Kaya"... is not valid JSON
+SyntaxError: Unexpected token 'S', "Selim Kaya"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at AuditService.getAudit (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\dist\src\audit\audit.service.js:189:37)
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-02-23T10:54:05.111Z] Unexpected token 'S', "Selim Kaya"... is not valid JSON
+SyntaxError: Unexpected token 'S', "Selim Kaya"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at AuditService.getAudit (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\dist\src\audit\audit.service.js:189:37)
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-02-23T10:54:10.814Z] Unexpected token 'S', "Selim Kaya"... is not valid JSON
+SyntaxError: Unexpected token 'S', "Selim Kaya"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at AuditService.getAudit (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\dist\src\audit\audit.service.js:189:37)
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-02-23T10:54:10.823Z] Unexpected token 'S', "Selim Kaya"... is not valid JSON
+SyntaxError: Unexpected token 'S', "Selim Kaya"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at AuditService.getAudit (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\dist\src\audit\audit.service.js:189:37)
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-02-23T12:00:20.413Z] Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+Error: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+    at SamplingService.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.service.ts:193:49)
+
+[2026-02-23T12:45:20.132Z] Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+HttpException: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+    at SamplingController.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.controller.ts:72:19)
+
+[2026-02-23T12:50:24.620Z] Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+HttpException: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+    at SamplingController.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.controller.ts:72:19)
+
+[2026-02-23T13:06:07.828Z] Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+HttpException: Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+    at SamplingController.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.controller.ts:72:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+[2026-02-23T13:07:28.667Z] Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+HttpException: Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+    at SamplingController.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.controller.ts:72:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+[2026-02-25T10:59:13.475Z] Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+Error: Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+    at SamplingService.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.service.ts:351:19)
+    at SamplingController.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.controller.ts:63:37)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-03-05T07:17:29.185Z] Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+Error: Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+    at SamplingService.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.service.ts:401:19)
+    at SamplingController.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.controller.ts:63:37)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-03-05T08:06:23.510Z] Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+Error: Örneklem oluşturulamadı. Sunucu Hatası: Kurallar uygulandıktan sonra veri setinde hiçbir satır kalmadı. Kuralları esnetin.
+    at SamplingService.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.service.ts:401:19)
+    at SamplingController.generateAdvancedSample (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.controller.ts:63:37)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-03-16T11:11:54.835Z] Rapor oluşturma hatası: Maximum call stack size exceeded
+HttpException: Rapor oluşturma hatası: Maximum call stack size exceeded
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:147:19)
+
+[2026-03-16T11:12:04.030Z] Rapor oluşturma hatası: Maximum call stack size exceeded
+HttpException: Rapor oluşturma hatası: Maximum call stack size exceeded
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:147:19)
+
+[2026-03-16T11:13:06.904Z] Rapor oluşturma hatası: Maximum call stack size exceeded
+HttpException: Rapor oluşturma hatası: Maximum call stack size exceeded
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:147:19)
+
+[2026-03-16T11:13:12.740Z] Rapor oluşturma hatası: Maximum call stack size exceeded
+HttpException: Rapor oluşturma hatası: Maximum call stack size exceeded
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:147:19)
+
+[2026-03-16T11:13:39.548Z] Rapor oluşturma hatası: Maximum call stack size exceeded
+HttpException: Rapor oluşturma hatası: Maximum call stack size exceeded
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:147:19)
+
+[2026-03-16T11:16:29.804Z] Rapor hatası (DEBUG): RangeError: Maximum call stack size exceeded
+    at _addListener (node:events:536:22)
+    at LineWrapper.addListener (node:events:600:10)
+    at new constructor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:44:10)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:86:19)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:156:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:89:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:156:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:89:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+HttpException: Rapor hatası (DEBUG): RangeError: Maximum call stack size exceeded
+    at _addListener (node:events:536:22)
+    at LineWrapper.addListener (node:events:600:10)
+    at new constructor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:44:10)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:86:19)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:156:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:89:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:156:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:89:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:139:19)
+
+[2026-03-16T11:18:15.891Z] Rapor hatası (DEBUG): RangeError: Maximum call stack size exceeded
+    at new ReadableState (node:internal/streams/readable:260:23)
+    at Deflate.Duplex (node:internal/streams/duplex:86:25)
+    at Deflate.Transform (node:internal/streams/transform:102:10)
+    at Deflate.ZlibBase (node:zlib:257:3)
+    at Deflate.Zlib (node:zlib:683:3)
+    at new Deflate (node:zlib:726:3)
+    at Object.syncBufferWrapper [as deflateSync] (node:zlib:789:29)
+    at PDFReference.finalize (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\reference.js:55:28)
+    at PDFReference.end (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\reference.js:42:10)
+    at PDFPage.end (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:194:25)
+    at PDFDocument.flushPages (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:206:12)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:145:12)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:156:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:89:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+HttpException: Rapor hatası (DEBUG): RangeError: Maximum call stack size exceeded
+    at new ReadableState (node:internal/streams/readable:260:23)
+    at Deflate.Duplex (node:internal/streams/duplex:86:25)
+    at Deflate.Transform (node:internal/streams/transform:102:10)
+    at Deflate.ZlibBase (node:zlib:257:3)
+    at Deflate.Zlib (node:zlib:683:3)
+    at new Deflate (node:zlib:726:3)
+    at Object.syncBufferWrapper [as deflateSync] (node:zlib:789:29)
+    at PDFReference.finalize (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\reference.js:55:28)
+    at PDFReference.end (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\reference.js:42:10)
+    at PDFPage.end (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:194:25)
+    at PDFDocument.flushPages (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:206:12)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:145:12)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:156:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:89:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:139:19)
+
+[2026-03-16T11:20:06.007Z] RangeError: Maximum call stack size exceeded
+    at PDFDocument.sizeToPoint (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\fonts.js:137:14)
+    at x (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:95:23)
+    at normalizeSides (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\utils.js:101:10)
+    at new constructor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:92:20)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:149:17)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:166:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:166:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+HttpException: RangeError: Maximum call stack size exceeded
+    at PDFDocument.sizeToPoint (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\fonts.js:137:14)
+    at x (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:95:23)
+    at normalizeSides (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\utils.js:101:10)
+    at new constructor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:92:20)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:149:17)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:166:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:166:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:141:19)
+
+[2026-03-16T11:21:02.605Z] RangeError: Maximum call stack size exceeded
+    at get byteLength (<anonymous>)
+    at Buffer.latin1Write (node:internal/buffer:1051:37)
+    at Object.write (node:buffer:676:46)
+    at fromStringFast (node:buffer:480:22)
+    at fromString (node:buffer:504:51)
+    at Buffer.from (node:buffer:310:12)
+    at PDFReference.write (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\reference.js:24:22)
+    at PDFPage.write (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:176:25)
+    at PDFDocument.addContent (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:264:15)
+    at PDFDocument._setColorSpace (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:85:17)
+    at PDFDocument._setColorCore (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:71:10)
+    at PDFDocument._setColor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:60:17)
+    at PDFDocument.strokeColor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:109:22)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:158:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+HttpException: RangeError: Maximum call stack size exceeded
+    at get byteLength (<anonymous>)
+    at Buffer.latin1Write (node:internal/buffer:1051:37)
+    at Object.write (node:buffer:676:46)
+    at fromStringFast (node:buffer:480:22)
+    at fromString (node:buffer:504:51)
+    at Buffer.from (node:buffer:310:12)
+    at PDFReference.write (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\reference.js:24:22)
+    at PDFPage.write (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:176:25)
+    at PDFDocument.addContent (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:264:15)
+    at PDFDocument._setColorSpace (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:85:17)
+    at PDFDocument._setColorCore (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:71:10)
+    at PDFDocument._setColor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:60:17)
+    at PDFDocument.strokeColor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:109:22)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:158:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:141:19)
+
+[2026-03-16T11:22:44.708Z] RangeError: Maximum call stack size exceeded
+    at fromString (node:buffer:494:20)
+    at Buffer.from (node:buffer:310:12)
+    at PDFReference.write (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\reference.js:24:22)
+    at PDFPage.write (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:176:25)
+    at PDFDocument.addContent (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:264:15)
+    at PDFDocument._setColorSpace (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:85:17)
+    at PDFDocument._setColorCore (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:71:10)
+    at PDFDocument._setColor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:60:17)
+    at PDFDocument.strokeColor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:109:22)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:158:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:166:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+HttpException: RangeError: Maximum call stack size exceeded
+    at fromString (node:buffer:494:20)
+    at Buffer.from (node:buffer:310:12)
+    at PDFReference.write (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\reference.js:24:22)
+    at PDFPage.write (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\page.js:176:25)
+    at PDFDocument.addContent (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:264:15)
+    at PDFDocument._setColorSpace (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:85:17)
+    at PDFDocument._setColorCore (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:71:10)
+    at PDFDocument._setColor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:60:17)
+    at PDFDocument.strokeColor (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\color.js:109:22)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:158:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at PDFDocument.continueOnNewPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:174:10)
+    at LineWrapper.nextSection (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:347:21)
+    at LineWrapper.wrap (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\line_wrapper.js:204:12)
+    at PDFDocument._text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:93:15)
+    at PDFDocument.text (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\mixins\text.js:110:17)
+    at ReportGeneratorService.drawPageTemplate (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:166:13)
+    at PDFDocument.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:90:22)
+    at PDFDocument.emit (node:events:508:28)
+    at PDFDocument.addPage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdfkit\lib\document.js:166:10)
+    at ReportGeneratorService.generateReport (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\report-generator.service.ts:141:19)
+
+[2026-03-16T11:23:25.498Z] Dosya yüklenmedi!
+Error: Dosya yüklenmedi!
+    at DocumentsController.uploadFile (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\documents\documents.controller.ts:40:19)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+
+[2026-03-16T11:26:57.587Z] Dosya yüklenmedi!
+Error: Dosya yüklenmedi!
+    at DocumentsController.uploadFile (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\documents\documents.controller.ts:40:19)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+
+[2026-03-24T13:13:01.807Z] The "path" argument must be of type string. Received null
+TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string. Received null
+    at validateString (node:internal/validators:162:11)
+    at Object.join (node:path:433:7)
+    at DocumentsService.serveFile (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\documents\documents.service.ts:216:31)
+    at DocumentsController.viewFile (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\documents\documents.controller.ts:51:26)
+
+[2026-03-25T09:14:38.977Z] 
+Invalid `this.prisma.auditableUnit.update()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.ts:2768:42
+
+  2765     else if (data.riskScore >= 8) data.riskCategory = 'Orta';
+  2766     else data.riskCategory = 'Düşük';
+  2767 }
+→ 2768 return this.prisma.auditableUnit.update({
+         where: {
+           id: "cmltgyuiy0011xgel8bvpoag4"
+         },
+         data: {
+           name: "Operasyon Servisi",
+           code: "",
+           type: "Süreç",
+           riskLevel: "Düşük",
+           description: "Proje açılışı ve müşteri kabul süreçlerinin yürütülerek kontrollerinin sağlandığı birimdir.",
+           manager: "Zehra Gökyiğit Diler",
+           location: "Genel Müdürlük",
+           employeeCount: 5,
+           transactionVolume: "Yüksek",
+           financialImpact: "Orta",
+           riskScore: 1,
+           auditCycle: 5,
+           estimatedDays: 30,
+           status: "Aktif",
+           notes: "",
+           strategicAlignment: "",
+           businessCriticality: "Yüksek",
+           regulations: "BDDK, KVKK",
+           mandatoryAudit: false,
+           lastAuditResult: "Olumlu",
+           openFindingsCount: 0,
+           inherentRisk: "Yüksek",
+           controlEffectiveness: "Orta",
+           changeRisk: false,
+           requiredExpertise: "",
+           previousAuditDays: null,
+           lastAuditDate: null,
+           nextAuditDate: null,
+           impactScore: 1,
+           likelihoodScore: 1,
+           riskCategory: "Düşük",
+           ~~~~~~~~~~~~
+       ?   id?: String | StringFieldUpdateOperationsInput,
+       ?   parentId?: String | NullableStringFieldUpdateOperationsInput | Null,
+       ?   residualRiskScore?: Int | NullableIntFieldUpdateOperationsInput | Null,
+       ?   lastAuditId?: String | NullableStringFieldUpdateOperationsInput | Null,
+       ?   created_at?: DateTime | DateTimeFieldUpdateOperationsInput,
+       ?   updated_at?: DateTime | DateTimeFieldUpdateOperationsInput,
+       ?   audits?: AuditUpdateManyWithoutAuditableUnitNestedInput,
+       ?   multiYearItems?: MultiYearPlanItemUpdateManyWithoutUnitNestedInput,
+       ?   ethicsReports?: EthicsReportUpdateManyWithoutTargetUnitNestedInput,
+       ?   processes?: ProcessUpdateManyWithoutUnitNestedInput
+         }
+       })
+
+Unknown argument `riskCategory`. Available options are marked with ?.
+PrismaClientValidationError: 
+Invalid `this.prisma.auditableUnit.update()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.ts:2768:42
+
+  2765     else if (data.riskScore >= 8) data.riskCategory = 'Orta';
+  2766     else data.riskCategory = 'Düşük';
+  2767 }
+→ 2768 return this.prisma.auditableUnit.update({
+         where: {
+           id: "cmltgyuiy0011xgel8bvpoag4"
+         },
+         data: {
+           name: "Operasyon Servisi",
+           code: "",
+           type: "Süreç",
+           riskLevel: "Düşük",
+           description: "Proje açılışı ve müşteri kabul süreçlerinin yürütülerek kontrollerinin sağlandığı birimdir.",
+           manager: "Zehra Gökyiğit Diler",
+           location: "Genel Müdürlük",
+           employeeCount: 5,
+           transactionVolume: "Yüksek",
+           financialImpact: "Orta",
+           riskScore: 1,
+           auditCycle: 5,
+           estimatedDays: 30,
+           status: "Aktif",
+           notes: "",
+           strategicAlignment: "",
+           businessCriticality: "Yüksek",
+           regulations: "BDDK, KVKK",
+           mandatoryAudit: false,
+           lastAuditResult: "Olumlu",
+           openFindingsCount: 0,
+           inherentRisk: "Yüksek",
+           controlEffectiveness: "Orta",
+           changeRisk: false,
+           requiredExpertise: "",
+           previousAuditDays: null,
+           lastAuditDate: null,
+           nextAuditDate: null,
+           impactScore: 1,
+           likelihoodScore: 1,
+           riskCategory: "Düşük",
+           ~~~~~~~~~~~~
+       ?   id?: String | StringFieldUpdateOperationsInput,
+       ?   parentId?: String | NullableStringFieldUpdateOperationsInput | Null,
+       ?   residualRiskScore?: Int | NullableIntFieldUpdateOperationsInput | Null,
+       ?   lastAuditId?: String | NullableStringFieldUpdateOperationsInput | Null,
+       ?   created_at?: DateTime | DateTimeFieldUpdateOperationsInput,
+       ?   updated_at?: DateTime | DateTimeFieldUpdateOperationsInput,
+       ?   audits?: AuditUpdateManyWithoutAuditableUnitNestedInput,
+       ?   multiYearItems?: MultiYearPlanItemUpdateManyWithoutUnitNestedInput,
+       ?   ethicsReports?: EthicsReportUpdateManyWithoutTargetUnitNestedInput,
+       ?   processes?: ProcessUpdateManyWithoutUnitNestedInput
+         }
+       })
+
+Unknown argument `riskCategory`. Available options are marked with ?.
+    at wn (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+
+[2026-03-25T09:14:41.321Z] 
+Invalid `this.prisma.auditableUnit.update()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.ts:2768:42
+
+  2765     else if (data.riskScore >= 8) data.riskCategory = 'Orta';
+  2766     else data.riskCategory = 'Düşük';
+  2767 }
+→ 2768 return this.prisma.auditableUnit.update({
+         where: {
+           id: "cmltgyuiy0011xgel8bvpoag4"
+         },
+         data: {
+           name: "Operasyon Servisi",
+           code: "",
+           type: "Süreç",
+           riskLevel: "Düşük",
+           description: "Proje açılışı ve müşteri kabul süreçlerinin yürütülerek kontrollerinin sağlandığı birimdir.",
+           manager: "Zehra Gökyiğit Diler",
+           location: "Genel Müdürlük",
+           employeeCount: 5,
+           transactionVolume: "Yüksek",
+           financialImpact: "Orta",
+           riskScore: 1,
+           auditCycle: 5,
+           estimatedDays: 30,
+           status: "Aktif",
+           notes: "",
+           strategicAlignment: "",
+           businessCriticality: "Yüksek",
+           regulations: "BDDK, KVKK",
+           mandatoryAudit: false,
+           lastAuditResult: "Olumlu",
+           openFindingsCount: 0,
+           inherentRisk: "Yüksek",
+           controlEffectiveness: "Orta",
+           changeRisk: false,
+           requiredExpertise: "",
+           previousAuditDays: null,
+           lastAuditDate: null,
+           nextAuditDate: null,
+           impactScore: 1,
+           likelihoodScore: 1,
+           riskCategory: "Düşük",
+           ~~~~~~~~~~~~
+       ?   id?: String | StringFieldUpdateOperationsInput,
+       ?   parentId?: String | NullableStringFieldUpdateOperationsInput | Null,
+       ?   residualRiskScore?: Int | NullableIntFieldUpdateOperationsInput | Null,
+       ?   lastAuditId?: String | NullableStringFieldUpdateOperationsInput | Null,
+       ?   created_at?: DateTime | DateTimeFieldUpdateOperationsInput,
+       ?   updated_at?: DateTime | DateTimeFieldUpdateOperationsInput,
+       ?   audits?: AuditUpdateManyWithoutAuditableUnitNestedInput,
+       ?   multiYearItems?: MultiYearPlanItemUpdateManyWithoutUnitNestedInput,
+       ?   ethicsReports?: EthicsReportUpdateManyWithoutTargetUnitNestedInput,
+       ?   processes?: ProcessUpdateManyWithoutUnitNestedInput
+         }
+       })
+
+Unknown argument `riskCategory`. Available options are marked with ?.
+PrismaClientValidationError: 
+Invalid `this.prisma.auditableUnit.update()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.ts:2768:42
+
+  2765     else if (data.riskScore >= 8) data.riskCategory = 'Orta';
+  2766     else data.riskCategory = 'Düşük';
+  2767 }
+→ 2768 return this.prisma.auditableUnit.update({
+         where: {
+           id: "cmltgyuiy0011xgel8bvpoag4"
+         },
+         data: {
+           name: "Operasyon Servisi",
+           code: "",
+           type: "Süreç",
+           riskLevel: "Düşük",
+           description: "Proje açılışı ve müşteri kabul süreçlerinin yürütülerek kontrollerinin sağlandığı birimdir.",
+           manager: "Zehra Gökyiğit Diler",
+           location: "Genel Müdürlük",
+           employeeCount: 5,
+           transactionVolume: "Yüksek",
+           financialImpact: "Orta",
+           riskScore: 1,
+           auditCycle: 5,
+           estimatedDays: 30,
+           status: "Aktif",
+           notes: "",
+           strategicAlignment: "",
+           businessCriticality: "Yüksek",
+           regulations: "BDDK, KVKK",
+           mandatoryAudit: false,
+           lastAuditResult: "Olumlu",
+           openFindingsCount: 0,
+           inherentRisk: "Yüksek",
+           controlEffectiveness: "Orta",
+           changeRisk: false,
+           requiredExpertise: "",
+           previousAuditDays: null,
+           lastAuditDate: null,
+           nextAuditDate: null,
+           impactScore: 1,
+           likelihoodScore: 1,
+           riskCategory: "Düşük",
+           ~~~~~~~~~~~~
+       ?   id?: String | StringFieldUpdateOperationsInput,
+       ?   parentId?: String | NullableStringFieldUpdateOperationsInput | Null,
+       ?   residualRiskScore?: Int | NullableIntFieldUpdateOperationsInput | Null,
+       ?   lastAuditId?: String | NullableStringFieldUpdateOperationsInput | Null,
+       ?   created_at?: DateTime | DateTimeFieldUpdateOperationsInput,
+       ?   updated_at?: DateTime | DateTimeFieldUpdateOperationsInput,
+       ?   audits?: AuditUpdateManyWithoutAuditableUnitNestedInput,
+       ?   multiYearItems?: MultiYearPlanItemUpdateManyWithoutUnitNestedInput,
+       ?   ethicsReports?: EthicsReportUpdateManyWithoutTargetUnitNestedInput,
+       ?   processes?: ProcessUpdateManyWithoutUnitNestedInput
+         }
+       })
+
+Unknown argument `riskCategory`. Available options are marked with ?.
+    at wn (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+
+[2026-03-25T13:18:58.376Z] 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+
+[2026-03-25T13:18:58.426Z] 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+
+[2026-03-25T13:19:25.055Z] 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+
+[2026-03-25T13:19:25.093Z] 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+
+[2026-03-25T13:19:32.610Z] 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+
+[2026-03-25T13:19:32.655Z] 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `this.prisma.finding.findMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-trash.service.ts:18:36
+
+  15 }
+  16 
+  17 async getDeletedFindings() {
+→ 18     return this.prisma.finding.findMany(
+The column `main.finding.escalationLevel` does not exist in the current database.
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+
+[2026-03-26T14:06:04.155Z] Açık aksiyonlar (1) varken bulgu kapatılamaz!
+Error: Açık aksiyonlar (1) varken bulgu kapatılamaz!
+    at FindingService.updateFinding (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\finding.service.ts:269:23)
+
+[2026-03-27T10:04:36.307Z] Rapor Bütünlüğü Zafiyeti (Sealing): Tamamlanmış, İptal edilmiş veya Raporlanmış bir denetime geçmişe dönük gizlice yeni bulgu eklenemez.
+Error: Rapor Bütünlüğü Zafiyeti (Sealing): Tamamlanmış, İptal edilmiş veya Raporlanmış bir denetime geçmişe dönük gizlice yeni bulgu eklenemez.
+    at FindingService.createFinding (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\finding.service.ts:142:23)
+
+[2026-03-27T10:04:42.507Z] Rapor Bütünlüğü Zafiyeti (Sealing): Tamamlanmış, İptal edilmiş veya Raporlanmış bir denetime geçmişe dönük gizlice yeni bulgu eklenemez.
+Error: Rapor Bütünlüğü Zafiyeti (Sealing): Tamamlanmış, İptal edilmiş veya Raporlanmış bir denetime geçmişe dönük gizlice yeni bulgu eklenemez.
+    at FindingService.createFinding (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\finding.service.ts:142:23)
+
+[2026-03-27T14:56:41.565Z] Rapor Bütünlüğü Zafiyeti (Sealing): Tamamlanmış, İptal edilmiş veya Raporlanmış bir denetime geçmişe dönük gizlice yeni bulgu eklenemez.
+Error: Rapor Bütünlüğü Zafiyeti (Sealing): Tamamlanmış, İptal edilmiş veya Raporlanmış bir denetime geçmişe dönük gizlice yeni bulgu eklenemez.
+    at FindingService.createFinding (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\finding.service.ts:142:23)
+
+[2026-04-01T14:53:33.824Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T14:53:33.858Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T14:53:36.671Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T14:53:36.703Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T14:53:49.715Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T14:53:49.755Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T14:53:49.794Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T14:53:49.830Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T14:53:57.064Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T14:53:57.097Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T15:04:34.413Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-01T15:04:34.461Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-02T05:37:56.970Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-02T05:37:56.998Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-02T05:38:28.742Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-02T05:38:28.763Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-02T05:41:12.442Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-02T05:41:12.468Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-02T05:41:19.388Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-02T05:41:19.406Z] this.auditService.getStaff is not a function
+TypeError: this.auditService.getStaff is not a function
+    at AuditController.getStaff (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.controller.ts:226:34)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at InterceptorsConsumer.transformDeferred (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:31:33)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\interceptors\interceptors-consumer.js:18:86
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at bound (node:async_hooks:238:16)
+    at Observable._subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\defer.ts:54:15)
+    at Observable.Observable._trySubscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:235:19)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:225:18)
+    at Object.errorContext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\util\errorContext.ts:29:5)
+    at Observable.Observable.subscribe (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Observable.ts:211:5)
+    at doInnerSub (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:71:40)
+    at outerNext (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\mergeInternals.ts:53:58)
+    at OperatorSubscriber.OperatorSubscriber._this._next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\operators\OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.Subscriber.next (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\Subscriber.ts:71:12)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\rxjs\src\internal\observable\innerFrom.ts:90:24)
+
+[2026-04-04T16:48:37.628Z] 
+Invalid `this.prisma.ethicsMessage.create()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\ethics.service.ts:423:57
+
+  420 }
+  421 
+  422 async addMessage(reportId: string, content: string, senderId?: string, isFromReporter = false) {
+→ 423     const message = await this.prisma.ethicsMessage.create({
+            data: {
+              reportId: "cmnkkgdot003rj485plse9f6t",
+              senderId: null,
+              isFromReporter: true,
+              created_at: new Date("2026-04-04T16:48:37.518Z"),
+          +   content: String
+            }
+          })
+
+Argument `content` is missing.
+PrismaClientValidationError: 
+Invalid `this.prisma.ethicsMessage.create()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\ethics.service.ts:423:57
+
+  420 }
+  421 
+  422 async addMessage(reportId: string, content: string, senderId?: string, isFromReporter = false) {
+→ 423     const message = await this.prisma.ethicsMessage.create({
+            data: {
+              reportId: "cmnkkgdot003rj485plse9f6t",
+              senderId: null,
+              isFromReporter: true,
+              created_at: new Date("2026-04-04T16:48:37.518Z"),
+          +   content: String
+            }
+          })
+
+Argument `content` is missing.
+    at wn (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+    at EthicsService.addMessage (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\ethics.service.ts:423:25)
+
+[2026-04-04T16:53:35.596Z] "undefined" is not valid JSON
+SyntaxError: "undefined" is not valid JSON
+    at parse (<anonymous>)
+    at JSON.parse (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\pdf-parse\node_modules\pdfjs-dist\legacy\build\pdf.mjs:4852:56)
+    at SamplingController.generateAdvancedWithFile (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\sampling.controller.ts:83:29)
+    at C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+
+[2026-04-08T13:15:31.441Z] 
+Invalid `this.prisma.userRole.createMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\admin\admin.service.ts:75:37
+
+  72     where: { userId }
+  73 });
+  74 
+→ 75 return this.prisma.userRole.createMany(
+Unique constraint failed on the fields: (`userId`,`roleId`)
+PrismaClientKnownRequestError: 
+Invalid `this.prisma.userRole.createMany()` invocation in
+C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\admin\admin.service.ts:75:37
+
+  72     where: { userId }
+  73 });
+  74 
+→ 75 return this.prisma.userRole.createMany(
+Unique constraint failed on the fields: (`userId`,`roleId`)
+    at $n.handleRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at <anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\prisma.service.ts:53:28)
+

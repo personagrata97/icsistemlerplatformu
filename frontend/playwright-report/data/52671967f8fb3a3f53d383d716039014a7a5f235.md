@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img "Emlak Katılım Logo" [ref=e8]
+          - heading "İç Sistemler Yönetim Sistemi" [level=1] [ref=e9]
+          - paragraph [ref=e10]: Emlak Katılım Tasarruf Finansman
+        - generic [ref=e11]:
+          - generic [ref=e12]:
+            - generic [ref=e13]:
+              - generic:
+                - img
+              - textbox "Kullanıcı Adı" [ref=e14]: wrong_user
+            - generic [ref=e15]:
+              - generic:
+                - img
+              - textbox "Şifre" [ref=e16]: wrong_pass
+              - button [ref=e17] [cursor=pointer]:
+                - img [ref=e18]
+          - button "Şifremi Unuttum" [ref=e22] [cursor=pointer]
+          - button "Giriş Yap" [ref=e23] [cursor=pointer]:
+            - text: Giriş Yap
+            - img [ref=e24]
+          - paragraph [ref=e27]:
+            - text: "Demo Kullanıcılar: admin, risk_user, audit_user, compliance_user"
+            - text: "Şifreler: admin = Admin123!, diğerleri = Test123!"
+        - generic [ref=e29]:
+          - generic [ref=e31]:
+            - img [ref=e33]
+            - heading "Etik ve İhbar Portalı" [level=3] [ref=e37]
+          - button "PORTALA GİT" [ref=e38] [cursor=pointer]:
+            - text: PORTALA GİT
+            - img [ref=e39]
+      - paragraph [ref=e41]:
+        - text: © 2026 Emlak Katılım Tasarruf Finansman AŞ
+        - text: İç Sistemler Yönetim Sistemi
+  - alert [ref=e42]
+```

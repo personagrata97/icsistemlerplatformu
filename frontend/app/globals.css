@@ -1,0 +1,525 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* LEGACY DESIGN TOKENS RESTORATION */
+:root {
+    --primary: #009c45;
+    --primary-hover: #007a36;
+    --secondary: #f3f4f6;
+    --text-main: #000000;
+    --text-light: #6b7280;
+    --white: #ffffff;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #10b981;
+    --info: #3b82f6;
+    --review: #8b5cf6;
+    --border: #e5e7eb;
+    --font-family: var(--font-poppins), sans-serif;
+    --sidebar-width: 260px;
+    --header-height: 64px;
+}
+
+body {
+    color: var(--text-main);
+    background: #f9fafb;
+    font-family: var(--font-family);
+}
+
+/* COMPONENT RESTORATION */
+@layer components {
+    .card {
+        background: var(--white);
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+        font-family: var(--font-family);
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: var(--white);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        box-shadow: 0 4px 6px -1px rgba(0, 156, 69, 0.2);
+    }
+
+    .btn-secondary {
+        background-color: #f3f4f6;
+        color: #4b5563;
+        border: 1px solid #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+    }
+}
+
+/* UTILITIES & BADGES */
+@layer utilities {
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        font-family: var(--font-family);
+        font-size: 0.9375rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: #f8fafc;
+        color: #1e293b;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        outline: none;
+        background-color: var(--white);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(0, 156, 69, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+        transform: translateY(-1px);
+    }
+
+    /* Premium Tabs */
+    .tabs-container {
+        @apply flex items-center bg-gray-100/50 p-1.5 rounded-xl w-fit mb-6;
+    }
+
+    .tab-item {
+        @apply px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer select-none;
+        color: #64748b;
+    }
+
+    .tab-item:hover {
+        @apply bg-white/50 text-gray-900;
+    }
+
+    .tab-item-active {
+        @apply bg-white text-primary shadow-sm;
+    }
+
+    /* Modals */
+    .modal-overlay {
+        @apply fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm transition-opacity duration-300;
+    }
+
+    .modal {
+        background: var(--white);
+        border-radius: 1.5rem;
+        width: 95%;
+        max-width: 800px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #f1f5f9;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .close-modal {
+        color: var(--text-light);
+        transition: color 0.2s;
+    }
+
+    .close-modal:hover {
+        color: var(--danger);
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .badge-gray {
+        background-color: #f3f4f6;
+        color: #374151;
+    }
+
+    .badge-blue {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .badge-warning {
+        background-color: #fef3c7;
+        color: #b45309;
+    }
+
+    .badge-success {
+        background-color: #dcfce7;
+        color: #15803d;
+    }
+
+    .badge-danger {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .badge-orange {
+        background-color: #ffedd5;
+        color: #c2410c;
+    }
+
+    .badge-yellow {
+        background-color: #fef9c3;
+        color: #a16207;
+    }
+
+    .badge-green {
+        background-color: #dcfce7;
+        color: #15803d;
+    }
+
+    /* Tables */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .data-table th {
+        background: #f9fafb;
+        font-weight: 600;
+        color: var(--text-light);
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .data-table tr:hover {
+        background-color: #f9fafb;
+    }
+
+    /* Button Size Variants */
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    /* Button Color Variants */
+    .btn-success {
+        background-color: var(--success);
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #059669;
+    }
+
+    .btn-danger {
+        background-color: var(--danger);
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #dc2626;
+    }
+
+    .btn-warning {
+        background-color: var(--warning);
+        color: white;
+    }
+
+    .btn-warning:hover {
+        background-color: #d97706;
+    }
+
+    .btn-info {
+        background-color: var(--info);
+        color: white;
+    }
+
+    .btn-info:hover {
+        background-color: #2563eb;
+    }
+
+    /* Search Input with Icon Fix */
+    .search-input-wrapper {
+        position: relative;
+    }
+
+    .search-input-wrapper .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        pointer-events: none;
+    }
+
+    .search-input-wrapper .form-input {
+        padding-left: 3rem;
+    }
+
+    /* General form input with icon support */
+    .form-input.with-icon {
+        padding-left: 3rem !important;
+    }
+
+    /* Action Column Styles */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    /* Status Badge Colors (solid) */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.625rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: none;
+        white-space: nowrap;
+    }
+
+    /* Risk Badge Colors (solid background) */
+    .risk-badge-kritik {
+        background-color: #dc2626;
+        color: white;
+    }
+
+    .risk-badge-yuksek {
+        background-color: #ea580c;
+        color: white;
+    }
+
+    .risk-badge-orta {
+        background-color: #f59e0b;
+        color: white;
+    }
+
+    .risk-badge-dusuk {
+        background-color: #16a34a;
+        color: white;
+    }
+
+    /* Page Header */
+    .page-header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .page-header p {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    /* Toolbar Layout */
+    .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Centralized Action Buttons */
+    /* Centralized Action Buttons - Explicit Styles for Reliability */
+    /* Modal Overlay is already defined above in @layer components */
+
+    .btn-action {
+        @apply inline-flex items-center justify-center rounded-lg border border-transparent transition-all duration-200 active:scale-95 shadow-sm font-medium whitespace-nowrap overflow-hidden;
+    }
+
+    .btn-action-view {
+        @apply bg-[#F0F7FF] text-[#0061D1] border-[#CDE3FF] hover:bg-[#D1E9FF] hover:border-[#A3CFFF] hover:shadow-sm;
+    }
+
+    .btn-action-edit {
+        @apply bg-[#F5F8FF] text-[#444CE7] border-[#D1E9FF] hover:bg-[#EEF2FF] hover:border-[#C7D2FE] hover:shadow-sm;
+    }
+
+    .btn-action-delete {
+        @apply bg-[#FFF1F0] text-[#D92D20] border-[#FEE4E2] hover:bg-[#FEE4E2] hover:border-[#FDA29B] hover:shadow-sm;
+    }
+
+    .btn-action-success {
+        @apply bg-[#079455] text-white border-transparent hover:bg-[#067647] hover:shadow-md;
+    }
+
+    .btn-action-secondary {
+        @apply bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 shadow-sm;
+    }
+
+    .btn-action-primary {
+        @apply bg-[#009c45] text-white border-transparent hover:bg-[#007a36] hover:shadow-md;
+    }
+
+    .btn-action-warning {
+        @apply bg-amber-50 text-amber-600 border border-amber-100 hover:bg-amber-100 hover:text-amber-700;
+    }
+
+    .btn-action-secondary {
+        @apply bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 hover:text-gray-800;
+    }
+
+    .btn-action-primary {
+        @apply bg-primary text-white border border-primary-hover hover:brightness-110;
+    }
+
+    /* 
+     * CENTRALIZED TABLE STYLES (Semantic & Consistent)
+     * Bu sınıflar tüm proje genelinde tablo tutarlılığını sağlamak için kullanılır.
+     * Her alanın (ID, Başlık, Tarih, Kişi) kendine has standart bir stili vardır.
+     */
+
+    /* Tablo Başlığı (Standart) */
+    .tbl-header {
+        @apply py-4 px-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50 border-b border-gray-200 select-none;
+    }
+
+    /* Tablo Satırı (Yeşil Hover Efekti) */
+    .tbl-row {
+        @apply hover:bg-primary/5 transition-colors last:border-0;
+    }
+
+    /* Hücre: ID / Kod Alanı (Monospace, Belirgin, Genellikle Badge içinde) */
+    .cell-id {
+        @apply font-mono text-xs font-bold text-gray-700;
+    }
+
+    /* Hücre: Ana Başlık / İsim (Güçlü, Okunaklı, Hover'da Renklenen) */
+    .cell-title {
+        @apply text-sm font-semibold text-gray-900 leading-snug group-hover:text-primary transition-colors;
+    }
+
+    /* Hücre: Alt Metin / Açıklama (Daha soluk, küçük) */
+    .cell-subtitle {
+        @apply text-xs text-gray-500 mt-0.5 line-clamp-1;
+    }
+
+    /* Hücre: Tarih / Zaman (Sabit Genişlikli, Gri) */
+    .cell-date {
+        @apply text-xs font-medium text-gray-500 tabular-nums whitespace-nowrap;
+    }
+
+    /* Hücre: Kişi / Kullanıcı (Hafif Vurgulu) */
+    .cell-user {
+        @apply text-sm font-medium text-gray-700 flex items-center gap-2;
+    }
+
+    /* Hücre: User Role / Title (Küçük) */
+    .cell-user-role {
+        @apply text-xs text-gray-400;
+    }
+
+    /* Tooltip Animations */
+    @keyframes tooltip-in {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(4px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .animate-tooltip-in {
+        animation: tooltip-in 0.2s cubic-bezier(0, 0, 0.2, 1) forwards;
+    }
+}

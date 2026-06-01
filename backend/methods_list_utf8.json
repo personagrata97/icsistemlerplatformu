@@ -1,0 +1,450 @@
+﻿[
+  {
+    "name": "getAllAudits",
+    "line": 46
+  },
+  {
+    "name": "getAudit",
+    "line": 148
+  },
+  {
+    "name": "validateIndependence",
+    "line": 192
+  },
+  {
+    "name": "checkParallelAudit",
+    "line": 227
+  },
+  {
+    "name": "createAudit",
+    "line": 251
+  },
+  {
+    "name": "updateAudit",
+    "line": 338
+  },
+  {
+    "name": "deleteAudit",
+    "line": 475
+  },
+  {
+    "name": "approveDeleteAudit",
+    "line": 530
+  },
+  {
+    "name": "rejectDeleteAudit",
+    "line": 546
+  },
+  {
+    "name": "uploadWorkpaper",
+    "line": 563
+  },
+  {
+    "name": "getWorkpaperPath",
+    "line": 616
+  },
+  {
+    "name": "getAllFindings",
+    "line": 626
+  },
+  {
+    "name": "getFinding",
+    "line": 695
+  },
+  {
+    "name": "checkRecurringFindings",
+    "line": 760
+  },
+  {
+    "name": "createFinding",
+    "line": 822
+  },
+  {
+    "name": "updateFinding",
+    "line": 966
+  },
+  {
+    "name": "getConciliationMessages",
+    "line": 1209
+  },
+  {
+    "name": "addConciliationMessage",
+    "line": 1216
+  },
+  {
+    "name": "deleteFinding",
+    "line": 1256
+  },
+  {
+    "name": "approveDeleteFinding",
+    "line": 1316
+  },
+  {
+    "name": "rejectDeleteFinding",
+    "line": 1340
+  },
+  {
+    "name": "acceptRisk",
+    "line": 1357
+  },
+  {
+    "name": "notifyFinding",
+    "line": 1389
+  },
+  {
+    "name": "getExtensionRequests",
+    "line": 1527
+  },
+  {
+    "name": "createExtensionRequest",
+    "line": 1535
+  },
+  {
+    "name": "handleExtensionRequest",
+    "line": 1550
+  },
+  {
+    "name": "getStaff",
+    "line": 1580
+  },
+  {
+    "name": "createStaff",
+    "line": 1660
+  },
+  {
+    "name": "updateStaff",
+    "line": 1721
+  },
+  {
+    "name": "addStaffPromotion",
+    "line": 1807
+  },
+  {
+    "name": "updateStaffPromotion",
+    "line": 1855
+  },
+  {
+    "name": "deleteStaffPromotion",
+    "line": 1890
+  },
+  {
+    "name": "getStaffProfile",
+    "line": 1913
+  },
+  {
+    "name": "addStaffTraining",
+    "line": 2001
+  },
+  {
+    "name": "updateStaffTraining",
+    "line": 2012
+  },
+  {
+    "name": "deleteStaffTraining",
+    "line": 2023
+  },
+  {
+    "name": "createTrainingBatch",
+    "line": 2029
+  },
+  {
+    "name": "cancelTrainingBatch",
+    "line": 2061
+  },
+  {
+    "name": "addStaffExperience",
+    "line": 2083
+  },
+  {
+    "name": "updateStaffExperience",
+    "line": 2115
+  },
+  {
+    "name": "deleteStaffExperience",
+    "line": 2150
+  },
+  {
+    "name": "addStaffEducation",
+    "line": 2172
+  },
+  {
+    "name": "updateStaffEducation",
+    "line": 2203
+  },
+  {
+    "name": "deleteStaffEducation",
+    "line": 2237
+  },
+  {
+    "name": "deleteStaff",
+    "line": 2258
+  },
+  {
+    "name": "getDeletedStaff",
+    "line": 2293
+  },
+  {
+    "name": "restoreStaff",
+    "line": 2321
+  },
+  {
+    "name": "uploadStaffPhoto",
+    "line": 2342
+  },
+  {
+    "name": "getEthicsReports",
+    "line": 2362
+  },
+  {
+    "name": "createEthicsReport",
+    "line": 2366
+  },
+  {
+    "name": "updateEthicsReportStatus",
+    "line": 2421
+  },
+  {
+    "name": "getReportWithHistory",
+    "line": 2431
+  },
+  {
+    "name": "updateEthicsReport",
+    "line": 2476
+  },
+  {
+    "name": "closeEthicsReport",
+    "line": 2507
+  },
+  {
+    "name": "generateReport",
+    "line": 2543
+  },
+  {
+    "name": "getPlans",
+    "line": 2599
+  },
+  {
+    "name": "getPlan",
+    "line": 2607
+  },
+  {
+    "name": "createPlan",
+    "line": 2612
+  },
+  {
+    "name": "updatePlan",
+    "line": 2615
+  },
+  {
+    "name": "deletePlan",
+    "line": 2618
+  },
+  {
+    "name": "uploadPlanDocument",
+    "line": 2622
+  },
+  {
+    "name": "reviewWorkpaper",
+    "line": 2653
+  },
+  {
+    "name": "getPlanDocumentPath",
+    "line": 2703
+  },
+  {
+    "name": "getUnits",
+    "line": 2712
+  },
+  {
+    "name": "createUnit",
+    "line": 2727
+  },
+  {
+    "name": "updateUnit",
+    "line": 2747
+  },
+  {
+    "name": "deleteUnit",
+    "line": 2760
+  },
+  {
+    "name": "getEducations",
+    "line": 2765
+  },
+  {
+    "name": "createEducation",
+    "line": 2768
+  },
+  {
+    "name": "updateEducation",
+    "line": 2779
+  },
+  {
+    "name": "deleteEducation",
+    "line": 2791
+  },
+  {
+    "name": "getFollowUps",
+    "line": 2808
+  },
+  {
+    "name": "createFollowUp",
+    "line": 2824
+  },
+  {
+    "name": "updateFollowUp",
+    "line": 2827
+  },
+  {
+    "name": "deleteFollowUp",
+    "line": 2830
+  },
+  {
+    "name": "getConciliations",
+    "line": 2835
+  },
+  {
+    "name": "createConciliation",
+    "line": 2851
+  },
+  {
+    "name": "updateConciliation",
+    "line": 2986
+  },
+  {
+    "name": "deleteConciliation",
+    "line": 2990
+  },
+  {
+    "name": "getExecutiveStats",
+    "line": 2995
+  },
+  {
+    "name": "getDeletedAudits",
+    "line": 3020
+  },
+  {
+    "name": "getDeletedFindings",
+    "line": 3024
+  },
+  {
+    "name": "restoreAudit",
+    "line": 3028
+  },
+  {
+    "name": "restoreFinding",
+    "line": 3032
+  },
+  {
+    "name": "permanentDeleteAudit",
+    "line": 3036
+  },
+  {
+    "name": "permanentDeleteFinding",
+    "line": 3040
+  },
+  {
+    "name": "handleTrashCleanup",
+    "line": 3046
+  },
+  {
+    "name": "uploadFindingEvidence",
+    "line": 3053
+  },
+  {
+    "name": "uploadConciliationEvidence",
+    "line": 3093
+  },
+  {
+    "name": "getFindingEvidencePath",
+    "line": 3115
+  },
+  {
+    "name": "getProcesses",
+    "line": 3128
+  },
+  {
+    "name": "createProcess",
+    "line": 3134
+  },
+  {
+    "name": "updateProcess",
+    "line": 3137
+  },
+  {
+    "name": "deleteProcess",
+    "line": 3140
+  },
+  {
+    "name": "getRisks",
+    "line": 3145
+  },
+  {
+    "name": "createRisk",
+    "line": 3151
+  },
+  {
+    "name": "updateRisk",
+    "line": 3154
+  },
+  {
+    "name": "deleteRisk",
+    "line": 3157
+  },
+  {
+    "name": "getAllControls",
+    "line": 3162
+  },
+  {
+    "name": "getControls",
+    "line": 3168
+  },
+  {
+    "name": "createControl",
+    "line": 3171
+  },
+  {
+    "name": "updateControl",
+    "line": 3174
+  },
+  {
+    "name": "deleteControl",
+    "line": 3177
+  },
+  {
+    "name": "getAuditTests",
+    "line": 3182
+  },
+  {
+    "name": "createAuditTest",
+    "line": 3188
+  },
+  {
+    "name": "updateAuditTest",
+    "line": 3191
+  },
+  {
+    "name": "deleteAuditTest",
+    "line": 3194
+  },
+  {
+    "name": "deleteWorkpaper",
+    "line": 3219
+  },
+  {
+    "name": "getLogs",
+    "line": 3249
+  },
+  {
+    "name": "getAuditExtensions",
+    "line": 3261
+  },
+  {
+    "name": "requestAuditExtension",
+    "line": 3282
+  },
+  {
+    "name": "handleAuditExtension",
+    "line": 3319
+  }
+]

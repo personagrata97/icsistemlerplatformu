@@ -1,0 +1,111 @@
+16: constructor(
+45: async getAllAudits(user: any) {
+147: async getAudit(id: string, user: any) {
+250: async createAudit(data: any, user: any) {
+337: async updateAudit(id: string, data: any, user: any) {
+474: async deleteAudit(id: string, user: any, reason?: string, comment?: string) {
+529: async approveDeleteAudit(id: string, user: any) {
+545: async rejectDeleteAudit(id: string, user: any) {
+562: async uploadWorkpaper(auditId: string, file: any, user: any) {
+615: async getWorkpaperPath(auditId: string, filename: string) {
+625: async getAllFindings(user: any) {
+694: async getFinding(id: string, user: any) {
+759: async checkRecurringFindings(unitId?: string, department?: string, category?: string, title?: string) {
+821: async createFinding(data: any, user: any) {
+965: async updateFinding(id: string, data: any, user: any) {
+1208: async getConciliationMessages(findingId: string) {
+1215: async addConciliationMessage(findingId: string, data: any, user: any) {
+1255: async deleteFinding(id: string, user: any, reason?: string, comment?: string) {
+1315: async approveDeleteFinding(id: string, user: any) {
+1339: async rejectDeleteFinding(id: string, user: any) {
+1356: async acceptRisk(id: string, justification: string, file: any, user: any) {
+1388: async notifyFinding(id: string, email: string, user: any) {
+1526: async getExtensionRequests(findingId?: string) {
+1534: async createExtensionRequest(data: any, user: any) {
+1549: async handleExtensionRequest(requestId: string, status: string, notes: string, user: any) {
+1579: async getStaff() {
+1659: async createStaff(data: any) {
+1720: async updateStaff(id: string, data: any, user: any) {
+1806: async addStaffPromotion(id: string, data: any, user: any) {
+1854: async updateStaffPromotion(id: string, data: any, user: any) {
+1889: async deleteStaffPromotion(id: string, user: any) {
+1912: async getStaffProfile(id: string) {
+2000: async addStaffTraining(userId: string, data: any) {
+2011: async updateStaffTraining(id: string, data: any) {
+2022: async deleteStaffTraining(id: string) {
+2028: async createTrainingBatch(data: any) {
+2060: async cancelTrainingBatch(batchId: string, notes: string) {
+2082: async addStaffExperience(userId: string, data: any, user: any) {
+2114: async updateStaffExperience(id: string, data: any, user: any) {
+2149: async deleteStaffExperience(id: string, user: any) {
+2171: async addStaffEducation(userId: string, data: any, user: any) {
+2202: async updateStaffEducation(id: string, data: any, user: any) {
+2236: async deleteStaffEducation(id: string, user: any) {
+2257: async deleteStaff(id: string) {
+2292: async getDeletedStaff() {
+2320: async restoreStaff(id: string) {
+2341: async uploadStaffPhoto(file: any) {
+2361: async getEthicsReports() {
+2365: async createEthicsReport(data: any) {
+2420: async updateEthicsReportStatus(id: string, status: string) {
+2430: async getReportWithHistory(id: string) {
+2475: async updateEthicsReport(id: string, data: any, user: any) {
+2506: async closeEthicsReport(id: string, data: any, user: any) {
+2542: async generateReport(type: string, period: string) {
+2598: async getPlans() {
+2606: async getPlan(id: string) {
+2611: async createPlan(data: any) {
+2614: async updatePlan(id: string, data: any) {
+2617: async deletePlan(id: string) {
+2621: async uploadPlanDocument(planId: string, file: any, user: any) {
+2652: async reviewWorkpaper(workpaperId: string, action: 'Approve' | 'Reject' | 'RequestRevision', user: any, notes?: string) {
+2702: async getPlanDocumentPath(planId: string, filename: string): Promise<string> {
+2711: async getUnits(user: any) {
+2726: async createUnit(data: any) {
+2746: async updateUnit(id: string, data: any) {
+2759: async deleteUnit(id: string) {
+2764: async getEducations() {
+2767: async createEducation(data: any, user: any) {
+2778: async updateEducation(id: string, data: any, user: any) {
+2790: async deleteEducation(id: string, user: any) {
+2807: async getFollowUps(user: any) {
+2823: async createFollowUp(data: any) {
+2826: async updateFollowUp(id: string, data: any) {
+2829: async deleteFollowUp(id: string) {
+2834: async getConciliations(user: any) {
+2850: async createConciliation(data: any) {
+2985: async updateConciliation(id: string, data: any) {
+2989: async deleteConciliation(id: string) {
+2994: async getExecutiveStats(user: any) {
+3019: async getDeletedAudits() {
+3023: async getDeletedFindings() {
+3027: async restoreAudit(id: string) {
+3031: async restoreFinding(id: string) {
+3035: async permanentDeleteAudit(id: string, user: any) {
+3039: async permanentDeleteFinding(id: string, user: any) {
+3045: async handleTrashCleanup() {
+3052: async uploadFindingEvidence(findingId: string, file: any, user: any) {
+3092: async uploadConciliationEvidence(findingId: string, file: any, user: any) {
+3114: async getFindingEvidencePath(findingId: string, filename: string): Promise<string> {
+3127: async getProcesses(unitId: string) {
+3133: async createProcess(data: any) {
+3136: async updateProcess(id: string, data: any) {
+3139: async deleteProcess(id: string) {
+3144: async getRisks(processId: string) {
+3150: async createRisk(data: any) {
+3153: async updateRisk(id: string, data: any) {
+3156: async deleteRisk(id: string) {
+3161: async getAllControls() {
+3167: async getControls(riskId: string) {
+3170: async createControl(data: any) {
+3173: async updateControl(id: string, data: any) {
+3176: async deleteControl(id: string) {
+3181: async getAuditTests(auditId: string) {
+3187: async createAuditTest(data: any) {
+3190: async updateAuditTest(id: string, data: any) {
+3193: async deleteAuditTest(id: string, user: any) {
+3218: async deleteWorkpaper(id: string, user: any) {
+3248: async getLogs() {
+3260: async getAuditExtensions(user: any) {
+3281: async requestAuditExtension(data: any, user: any) {
+3318: async handleAuditExtension(id: string, data: any, user: any) {

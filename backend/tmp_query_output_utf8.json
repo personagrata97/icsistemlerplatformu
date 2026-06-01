@@ -1,0 +1,71 @@
+{
+  "users": [
+    {
+      "id": "cmkktlcwm001xnf6lu5f9nt83",
+      "username": "admin",
+      "displayName": "Sistem Yöneticisi",
+      "department": "Bilgi Teknolojileri"
+    },
+    {
+      "id": "cmkktlcxv0020nf6l8fkq1at0",
+      "username": "risk_user",
+      "displayName": "Risk Uzmanı",
+      "department": "Risk Yönetimi"
+    },
+    {
+      "id": "cmkktlcz60023nf6l7rhfq0fe",
+      "username": "audit_user",
+      "displayName": "undefined undefined",
+      "department": "İç Denetim"
+    },
+    {
+      "id": "cmkktld0q0026nf6lh4mamx2v",
+      "username": "compliance_user",
+      "displayName": "Uyum Uzmanı",
+      "department": "Uyum"
+    },
+    {
+      "id": "cmkktzid90002unitzyz8xnio",
+      "username": "SK36",
+      "displayName": "Selim Kaya",
+      "department": "Teftiş Kurulu"
+    },
+    {
+      "id": "cml7wxsky000910x2xlbq2uha",
+      "username": "yk43",
+      "displayName": "Yasin Köktaş",
+      "department": "Teftiş Kurulu"
+    },
+    {
+      "id": "cmnprc2330003hi8za5fa6n6i",
+      "username": "mufettis",
+      "displayName": "Selim Kaya (Müfettiş)",
+      "department": "Teftiş Kurulu"
+    },
+    {
+      "id": "cmnprc23p0006hi8z7lufwiws",
+      "username": "gozetmen",
+      "displayName": "Yasin Köktaş (Gözetmen)",
+      "department": "Teftiş Kurulu Merkezi"
+    },
+    {
+      "id": "cmnpreqer00018cdo4kjffiq2",
+      "username": "mudur",
+      "displayName": "Teftiş Kurulu Müdürü",
+      "department": "Teftiş Kurulu Başkanlığı"
+    },
+    {
+      "id": "cmnpt6kk600011t3xnwnyh4um",
+      "username": "ykoktas",
+      "displayName": "Yasin Köktaş",
+      "department": null
+    }
+  ],
+  "units": [
+    {
+      "id": "cmltgyuiy0011xgel8bvpoag4",
+      "name": "Operasyon Servisi",
+      "type": "Süreç"
+    }
+  ]
+}

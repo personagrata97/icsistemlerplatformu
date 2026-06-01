@@ -1,0 +1,20 @@
+# Teknik klasörler (GitHub'a atılmaz, çok büyüktür)
+node_modules/
+.next/
+dist/
+build/
+.vscode/
+
+# Az önce aldığımız devasa yedek klasörü (Bunu internete atmaya gerek yok)
+1hazirangitoncesiyedek/
+
+# Çevresel değişkenler (ileride şifre koyarsan diye şimdiden önlem)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# İşletim sistemi kalıntıları
+.DS_Store
+Thumbs.db

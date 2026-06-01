@@ -1,0 +1,122 @@
+[
+    {
+        "name": "Osama Bin Laden",
+        "list": "UN Consolidated",
+        "type": "Individual",
+        "originalId": "1"
+    },
+    {
+        "name": "Vladimir Putin",
+        "list": "OFAC SDN",
+        "type": "Individual",
+        "originalId": "2"
+    },
+    {
+        "name": "Saddam Hussein",
+        "list": "OFAC SDN",
+        "type": "Individual",
+        "originalId": "3"
+    },
+    {
+        "name": "Al-Qaida",
+        "list": "UN Consolidated",
+        "type": "Entity",
+        "originalId": "4"
+    },
+    {
+        "name": "Taliban",
+        "list": "UN Consolidated",
+        "type": "Entity",
+        "originalId": "5"
+    },
+    {
+        "name": "North Korea Trading Corp",
+        "list": "OFAC SDN",
+        "type": "Entity",
+        "originalId": "6"
+    },
+    {
+        "name": "Iran Nuclear Energy Agency",
+        "list": "EU Financial Sanctions",
+        "type": "Entity",
+        "originalId": "7"
+    },
+    {
+        "name": "Pablo Escobar",
+        "list": "OFAC SDN",
+        "type": "Individual",
+        "originalId": "8"
+    },
+    {
+        "name": "El Chapo",
+        "list": "OFAC SDN",
+        "type": "Individual",
+        "originalId": "9"
+    },
+    {
+        "name": "Hamas",
+        "list": "EU Financial Sanctions",
+        "type": "Entity",
+        "originalId": "10"
+    },
+    {
+        "name": "Hezbollah",
+        "list": "OFAC SDN",
+        "type": "Entity",
+        "originalId": "11"
+    },
+    {
+        "name": "ISIS",
+        "list": "UN Consolidated",
+        "type": "Entity",
+        "originalId": "12"
+    },
+    {
+        "name": "Boko Haram",
+        "list": "UN Consolidated",
+        "type": "Entity",
+        "originalId": "13"
+    },
+    {
+        "name": "Al-Shabaab",
+        "list": "UN Consolidated",
+        "type": "Entity",
+        "originalId": "14"
+    },
+    {
+        "name": "Kim Jong Un",
+        "list": "OFAC SDN",
+        "type": "Individual",
+        "originalId": "15"
+    },
+    {
+        "name": "Bashar Al-Assad",
+        "list": "OFAC SDN",
+        "type": "Individual",
+        "originalId": "16"
+    },
+    {
+        "name": "Muammar Gaddafi",
+        "list": "UN Consolidated",
+        "type": "Individual",
+        "originalId": "17"
+    },
+    {
+        "name": "Robert Mugabe",
+        "list": "EU Financial Sanctions",
+        "type": "Individual",
+        "originalId": "18"
+    },
+    {
+        "name": "Nicolas Maduro",
+        "list": "OFAC SDN",
+        "type": "Individual",
+        "originalId": "19"
+    },
+    {
+        "name": "Viktor Bout",
+        "list": "OFAC SDN",
+        "type": "Individual",
+        "originalId": "20"
+    }
+]

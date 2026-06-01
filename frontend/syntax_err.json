@@ -1,0 +1,251 @@
+{
+  "audit": [
+    {
+      "line": 1283,
+      "col": 133,
+      "code": 1382,
+      "length": 1,
+      "msg": "Unexpected token. Did you mean `{'>'}` or `&gt;`?"
+    },
+    {
+      "line": 1285,
+      "col": 63,
+      "code": 17002,
+      "length": 6,
+      "msg": "Expected corresponding JSX closing tag for 'Tooltip'."
+    },
+    {
+      "line": 1286,
+      "col": 3,
+      "code": 17002,
+      "length": 7,
+      "msg": "Expected corresponding JSX closing tag for 'div'."
+    },
+    {
+      "line": 1287,
+      "col": 59,
+      "code": 17002,
+      "length": 3,
+      "msg": "Expected corresponding JSX closing tag for 'td'."
+    },
+    {
+      "line": 1288,
+      "col": 55,
+      "code": 17002,
+      "length": 2,
+      "msg": "Expected corresponding JSX closing tag for 'tr'."
+    },
+    {
+      "line": 1289,
+      "col": 49,
+      "code": 1005,
+      "length": 2,
+      "msg": "')' expected."
+    },
+    {
+      "line": 1289,
+      "col": 51,
+      "code": 17002,
+      "length": 2,
+      "msg": "Expected corresponding JSX closing tag for 'tbody'."
+    },
+    {
+      "line": 1290,
+      "col": 47,
+      "code": 1381,
+      "length": 1,
+      "msg": "Unexpected token. Did you mean `{'}'}` or `&rbrace;`?"
+    },
+    {
+      "line": 1291,
+      "col": 43,
+      "code": 17002,
+      "length": 5,
+      "msg": "Expected corresponding JSX closing tag for 'table'."
+    },
+    {
+      "line": 1292,
+      "col": 39,
+      "code": 17002,
+      "length": 5,
+      "msg": "Expected corresponding JSX closing tag for 'div'."
+    },
+    {
+      "line": 1293,
+      "col": 33,
+      "code": 1005,
+      "length": 2,
+      "msg": "')' expected."
+    },
+    {
+      "line": 1297,
+      "col": 17,
+      "code": 1381,
+      "length": 1,
+      "msg": "Unexpected token. Did you mean `{'}'}` or `&rbrace;`?"
+    },
+    {
+      "line": 1445,
+      "col": 15,
+      "code": 17015,
+      "length": 3,
+      "msg": "Expected corresponding closing tag for JSX fragment."
+    },
+    {
+      "line": 1450,
+      "col": 26,
+      "code": 1136,
+      "length": 1,
+      "msg": "Property assignment expected."
+    },
+    {
+      "line": 1450,
+      "col": 29,
+      "code": 1005,
+      "length": 2,
+      "msg": "';' expected."
+    },
+    {
+      "line": 1454,
+      "col": 47,
+      "code": 1005,
+      "length": 2,
+      "msg": "',' expected."
+    },
+    {
+      "line": 1456,
+      "col": 14,
+      "code": 1109,
+      "length": 1,
+      "msg": "Expression expected."
+    },
+    {
+      "line": 1461,
+      "col": 26,
+      "code": 1136,
+      "length": 1,
+      "msg": "Property assignment expected."
+    },
+    {
+      "line": 1461,
+      "col": 29,
+      "code": 1005,
+      "length": 2,
+      "msg": "';' expected."
+    },
+    {
+      "line": 1461,
+      "col": 62,
+      "code": 1128,
+      "length": 1,
+      "msg": "Declaration or statement expected."
+    },
+    {
+      "line": 1463,
+      "col": 14,
+      "code": 1109,
+      "length": 1,
+      "msg": "Expression expected."
+    },
+    {
+      "line": 1627,
+      "col": 13,
+      "code": 2657,
+      "length": 1116,
+      "msg": "JSX expressions must have one parent element."
+    },
+    {
+      "line": 1646,
+      "col": 9,
+      "code": 1128,
+      "length": 2,
+      "msg": "Declaration or statement expected."
+    },
+    {
+      "line": 1646,
+      "col": 11,
+      "code": 1109,
+      "length": 1,
+      "msg": "Expression expected."
+    },
+    {
+      "line": 1647,
+      "col": 5,
+      "code": 1109,
+      "length": 1,
+      "msg": "Expression expected."
+    },
+    {
+      "line": 1648,
+      "col": 1,
+      "code": 1128,
+      "length": 1,
+      "msg": "Declaration or statement expected."
+    }
+  ],
+  "plan": [
+    {
+      "line": 320,
+      "col": 150,
+      "code": 1382,
+      "length": 1,
+      "msg": "Unexpected token. Did you mean `{'>'}` or `&gt;`?"
+    },
+    {
+      "line": 322,
+      "col": 23,
+      "code": 17002,
+      "length": 6,
+      "msg": "Expected corresponding JSX closing tag for 'Tooltip'."
+    },
+    {
+      "line": 323,
+      "col": 3,
+      "code": 17002,
+      "length": 7,
+      "msg": "Expected corresponding JSX closing tag for 'div'."
+    },
+    {
+      "line": 325,
+      "col": 156,
+      "code": 1382,
+      "length": 1,
+      "msg": "Unexpected token. Did you mean `{'>'}` or `&gt;`?"
+    },
+    {
+      "line": 327,
+      "col": 23,
+      "code": 17002,
+      "length": 6,
+      "msg": "Expected corresponding JSX closing tag for 'Tooltip'."
+    },
+    {
+      "line": 328,
+      "col": 3,
+      "code": 17002,
+      "length": 7,
+      "msg": "Expected corresponding JSX closing tag for 'div'."
+    },
+    {
+      "line": 330,
+      "col": 13,
+      "code": 1005,
+      "length": 2,
+      "msg": "')' expected."
+    },
+    {
+      "line": 601,
+      "col": 9,
+      "code": 1128,
+      "length": 2,
+      "msg": "Declaration or statement expected."
+    },
+    {
+      "line": 602,
+      "col": 5,
+      "code": 1109,
+      "length": 1,
+      "msg": "Expression expected."
+    }
+  ]
+}

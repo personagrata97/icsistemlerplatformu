@@ -1,0 +1,10 @@
+﻿src/audit/audit-staff.service.ts(157,19): error TS2339: Property 'isAdmin' does not exist on type 'AuditStaffService'.
+src/audit/audit-staff.service.ts(157,44): error TS2304: Cannot find name 'ForbiddenException'.
+src/audit/audit-staff.service.ts(160,31): error TS2304: Cannot find name 'NotFoundException'.
+src/audit/audit-staff.service.ts(243,19): error TS2339: Property 'isAdmin' does not exist on type 'AuditStaffService'.
+src/audit/audit-staff.service.ts(243,44): error TS2304: Cannot find name 'ForbiddenException'.
+src/audit/audit-staff.service.ts(246,31): error TS2304: Cannot find name 'NotFoundException'.
+src/audit/audit-staff.service.ts(292,31): error TS2304: Cannot find name 'NotFoundException'.
+src/audit/audit-staff.service.ts(294,19): error TS2339: Property 'isAdmin' does not exist on type 'AuditStaffService'.
+src/audit/audit-staff.service.ts(294,44): error TS2304: Cannot find name 'ForbiddenException'.
+src/audit/audit-staff.service.ts(327,31): error TS2304: Cannot find name 'NotFoundException'.

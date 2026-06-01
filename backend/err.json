@@ -1,0 +1,12 @@
+[
+  "﻿src/audit/audit.controller.ts(226,34): error TS2339: Property 'getStaff' does not exist on type 'AuditService'.\r",
+  "src/audit/audit.controller.ts(232,34): error TS2339: Property 'createStaff' does not exist on type 'AuditService'.\r",
+  "src/audit/audit.controller.ts(244,34): error TS2339: Property 'updateStaff' does not exist on type 'AuditService'.\r",
+  "src/audit/audit.controller.ts(250,34): error TS2339: Property 'addStaffPromotion' does not exist on type 'AuditService'.\r",
+  "src/audit/audit.controller.ts(256,34): error TS2339: Property 'updateStaffPromotion' does not exist on type 'AuditService'.\r",
+  "src/audit/audit.controller.ts(262,34): error TS2339: Property 'deleteStaffPromotion' does not exist on type 'AuditService'.\r",
+  "src/audit/audit.controller.ts(268,34): error TS2339: Property 'deleteStaff' does not exist on type 'AuditService'.\r",
+  "src/audit/audit.controller.ts(275,34): error TS2339: Property 'uploadStaffPhoto' does not exist on type 'AuditService'.\r",
+  "src/audit/audit.controller.ts(542,79): error TS2339: Property 'getStaffProfile' does not exist on type 'AuditService'.\r",
+  "src/audit/audit.controller.ts(548,34): error TS2339: Property 'addStaffTraining' does not exist on type 'AuditService'.\r"
+]

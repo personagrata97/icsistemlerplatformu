@@ -1,0 +1,654 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denetim Yönetim Sistemi</title>
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <!-- Mammoth.js for Word extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <!-- PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app">
+        <!--  Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="/logo.png" alt="Emlak Katılım" class="logo"
+                    onerror="this.src='https://placehold.co/150x50?text=LOGO'">
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a class="nav-link active" data-page="dashboard" onclick="navigateTo('dashboard')">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Denetim Özeti</span>
+                    </a>
+                </li>
+
+                <hr style="margin: 0.5rem 0; border: 0; border-top: 1px solid #e5e7eb;">
+
+                <li class="nav-item">
+                    <a class="nav-link" data-page="audit-plan" onclick="navigateTo('audit-plan')">
+                        <i data-lucide="calendar"></i>
+                        <span>Denetim Planı</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="audit-universe" onclick="navigateTo('audit-universe')">
+                        <i data-lucide="globe"></i>
+                        <span>Denetim Evreni</span>
+                    </a>
+                </li>
+
+                <hr style="margin: 0.5rem 0; border: 0; border-top: 1px solid #e5e7eb;">
+
+                <li class="nav-item">
+                    <a class="nav-link" data-page="audits" onclick="navigateTo('audits')">
+                        <i data-lucide="clipboard-check"></i>
+                        <span>Denetimler</span>
+                    </a>
+                </li>
+
+                <hr style="margin: 0.5rem 0; border: 0; border-top: 1px solid #e5e7eb;">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)"
+                        onclick="toggleSubmenu('findings-submenu'); return false;" style="cursor: pointer;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i data-lucide="alert-circle"></i>
+                                <span>Bulgular</span>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; transition: transform 0.2s;"></i>
+                        </div>
+                    </a>
+                    <ul class="nav-submenu" id="findings-submenu"
+                        style="display: none; padding-left: 1.5rem; margin-top: 0.5rem;">
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="findings" onclick="navigateTo('findings')"
+                                style="font-size: 0.9rem;">
+                                <i data-lucide="list" style="width: 16px;"></i>
+                                <span>Tüm Bulgular</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="conciliation" onclick="navigateTo('conciliation')"
+                                style="font-size: 0.9rem;">
+                                <i data-lucide="handshake" style="width: 16px;"></i>
+                                <span>Tebliğ ve Mutabakat</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="follow-up-findings"
+                                onclick="navigateTo('follow-up-findings')" style="font-size: 0.9rem;">
+                                <i data-lucide="clock" style="width: 16px;"></i>
+                                <span>Takip Edilecekler</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" data-page="education" onclick="navigateTo('education')">
+                        <i data-lucide="graduation-cap"></i>
+                        <span>Eğitim Faaliyetleri</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)"
+                        onclick="toggleSubmenu('documents-submenu'); return false;" style="cursor: pointer;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i data-lucide="file-text"></i>
+                                <span>Dokümanlar</span>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; transition: transform 0.2s;"></i>
+                        </div>
+                    </a>
+                    <ul class="nav-submenu" id="documents-submenu"
+                        style="display: none; padding-left: 1.5rem; margin-top: 0.5rem;">
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="documents-audit" onclick="navigateTo('documents-audit')"
+                                style="font-size: 0.9rem;">
+                                <i data-lucide="shield-check" style="width: 16px;"></i>
+                                <span>Teftiş Kurulu</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="documents-other" onclick="navigateTo('documents-other')"
+                                style="font-size: 0.9rem;">
+                                <i data-lucide="building-2" style="width: 16px;"></i>
+                                <span>Diğer Birimler</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="documents-legislation"
+                                onclick="navigateTo('documents-legislation')" style="font-size: 0.9rem;">
+                                <i data-lucide="scale" style="width: 16px;"></i>
+                                <span>Mevzuat</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)"
+                        onclick="toggleSubmenu('ethics-submenu'); return false;" style="cursor: pointer;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i data-lucide="shield-alert"></i>
+                                <span>Etik Hattı</span>
+                            </div>
+                            <i data-lucide="chevron-down" style="width: 16px; transition: transform 0.2s;"></i>
+                        </div>
+                    </a>
+                    <ul class="nav-submenu" id="ethics-submenu"
+                        style="display: none; padding-left: 1.5rem; margin-top: 0.5rem;">
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="ethics-submit" onclick="navigateTo('ethics-submit')"
+                                style="font-size: 0.9rem;">
+                                <i data-lucide="send" style="width: 16px;"></i>
+                                <span>Bildirim Ver</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="ethics-view" onclick="navigateTo('ethics-view')"
+                                style="font-size: 0.9rem;">
+                                <i data-lucide="list" style="width: 16px;"></i>
+                                <span>Bildirimleri Görüntüle</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="ethics-reports" onclick="navigateTo('ethics-reports')"
+                                style="font-size: 0.9rem;">
+                                <i data-lucide="file-bar-chart" style="width: 16px;"></i>
+                                <span>Etik Raporları</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <hr style="margin: 0.5rem 0; border: 0; border-top: 1px solid #e5e7eb;">
+
+                <li class="nav-item">
+                    <a class="nav-link" data-page="audit-logs" onclick="navigateTo('audit-logs')">
+                        <i data-lucide="history"></i>
+                        <span>İz Kayıtları</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div style="display: flex; align-items: center;">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h1 class="page-title" id="page-title">Genel Bakış</h1>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <!-- Rol Değiştirici -->
+                    <div
+                        style="display: flex; align-items: center; gap: 0.75rem; padding-right: 1.5rem; border-right: 1px solid var(--border);">
+                        <i data-lucide="shield-check" style="width: 18px; height: 18px; color: var(--primary);"></i>
+                        <select id="role-switcher" class="form-select"
+                            style="width: 160px; padding: 0.375rem 0.75rem; font-size: 0.875rem;"
+                            onchange="switchRole(this.value)">
+                            <option value="Müfettiş">Müfettiş</option>
+                            <option value="Gözden Geçiren">Gözden Geçiren</option>
+                            <option value="Kral Müfettiş">Kral Müfettiş</option>
+                        </select>
+                    </div>
+
+                    <!-- Trash Button (Separated) -->
+                    <button onclick="navigateTo('trash')" style="
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+                        position: relative;
+                        padding: 0.5rem;
+                        color: var(--text-light);
+                        transition: color 0.2s;
+                        margin-right: 1rem;
+                        border-right: 1px solid var(--border);
+                        padding-right: 1.5rem;
+                    " onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-light)'"
+                        title="Silinen Kayıtlar">
+                        <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>
+                        <span id="trash-count" style="
+                            position: absolute;
+                            top: 0;
+                            right: 1rem;
+                            background: var(--danger);
+                            color: white;
+                            border-radius: 999px;
+                            font-size: 0.65rem;
+                            min-width: 16px;
+                            height: 16px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 600;
+                            display: none;
+                        ">0</span>
+                    </button>
+
+                    <!-- User Profile -->
+                    <div class="user-profile" style="text-align: right;">
+                        <div style="font-weight: 600; font-size: 0.9rem; color: #111827;">Sistem Yöneticisi</div>
+                        <div style="font-size: 0.8rem; color: #6b7280;">admin</div>
+                    </div>
+
+                    <!-- Icons Group -->
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <!-- Home Button -->
+                        <button onclick="window.top.location.href='/'"
+                            style="background:none; border:none; cursor:pointer; padding:0.5rem; color:var(--text-light);"
+                            title="Ana Ekrana Dön">
+                            <i data-lucide="home" style="width: 20px; height: 20px;"></i>
+                        </button>
+
+                        <!-- Settings Button -->
+                        <button onclick="navigateTo('settings')"
+                            style="background:none; border:none; cursor:pointer; padding:0.5rem; color:var(--text-light);"
+                            title="Ayarlar">
+                            <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
+                        </button>
+
+                        <!-- Logout Button -->
+                        <button onclick="logout()"
+                            style="background:none; border:none; cursor:pointer; padding:0.5rem; color:var(--text-light);"
+                            onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text-light)'"
+                            title="Çıkış Yap">
+                            <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area" id="main-view">
+                <!-- Content injected via JS -->
+            </div>
+        </main>
+    </div>
+
+    <div id="global-modals">
+        <div class="modal-overlay" id="audit-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 class="modal-title">Yeni Denetim Oluştur</h2><button class="close-modal"
+                        onclick="closeModal('audit-modal')"><i data-lucide="x" style="width: 24px;"></i></button>
+                </div>
+                <form onsubmit="handleCreateAudit(event)">
+                    <input type="hidden" name="id">
+                    <div class="form-group"><label class="form-label">Denetim Numarası</label><input type="text"
+                            class="form-input" name="auditCode" placeholder="Örn: DNT-2024-001" required></div>
+                    <div class="form-group"><label class="form-label">Denetim Başlığı</label><input type="text"
+                            class="form-input" name="title" required></div>
+                    <div class="form-group"><label class="form-label">Denetim Türü</label><select class="form-select"
+                            name="type" required>
+                            <option value="Şube">Şube</option>
+                            <option value="IT">IT</option>
+                            <option value="Süreç">Süreç</option>
+                            <option value="İnceleme">İnceleme</option>
+                            <option value="Soruşturma">Soruşturma</option>
+                        </select></div>
+                    <div class="form-group"><label class="form-label">Durum</label><select class="form-select"
+                            name="status" required>
+                            <option value="Taslak">Taslak</option>
+                            <option value="Planlandı">Planlandı</option>
+                            <option value="Devam Ediyor">Devam Ediyor</option>
+                        </select></div>
+                    <div class="form-group"><label class="form-label">Başlangıç Tarihi</label><input type="date"
+                            class="form-input" name="startDate" required></div>
+                    <div class="form-group"><label class="form-label">Bitiş Tarihi</label><input type="date"
+                            class="form-input" name="endDate" required></div>
+                    <div class="form-group"><label class="form-label">Denetim Ekibi (Müfettiş)</label><select
+                            class="form-select" name="team" id="audit-team-select" required>
+                            <option value="">Müfettiş Seçin</option>
+                        </select></div>
+                    <div class="form-group"><label class="form-label">Gözetim Sorumlusu</label><select
+                            class="form-select" name="supervisor" id="audit-supervisor-select">
+                            <option value="">Gözetim Sorumlusu Seçin</option>
+                        </select></div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;"><button
+                            type="button" class="btn btn-secondary"
+                            onclick="closeModal('audit-modal')">İptal</button><button type="submit"
+                            class="btn btn-primary">Oluştur</button></div>
+                </form>
+            </div>
+        </div>
+        <div class="modal-overlay" id="finding-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 class="modal-title">Yeni Bulgu Ekle</h2><button class="close-modal"
+                        onclick="closeModal('finding-modal')"><i data-lucide="x" style="width: 24px;"></i></button>
+                </div>
+                <form onsubmit="handleCreateFinding(event)">
+                    <input type="hidden" name="id">
+                    <div class="form-group"><label class="form-label">Denetim</label><select class="form-select"
+                            name="auditId" required>
+                            <option value="">Denetim Seçin</option>
+                        </select></div>
+                    <div class="form-group"><label class="form-label">Bulgu Numarası</label><input type="text"
+                            class="form-input" name="findingCode" placeholder="Örn: BLG-001" required></div>
+                    <div class="form-group"><label class="form-label">Bulgu Başlığı</label><input type="text"
+                            class="form-input" name="title" id="finding-title-input" required
+                            oninput="triggerAiAnalysis()"></div>
+                    <div class="form-group"><label class="form-label">Risk Seviyesi</label><select class="form-select"
+                            name="risk" required>
+                            <option value="Kritik">Kritik</option>
+                            <option value="Yüksek">Yüksek</option>
+                            <option value="Orta">Orta</option>
+                            <option value="Düşük">Düşük</option>
+                        </select></div>
+                    <div class="form-group"><label class="form-label">Kriter-Dayanak</label><textarea class="form-input"
+                            name="criterion" rows="3"
+                            placeholder="Kriterleri ve dayanakları buraya yazın..."></textarea></div>
+                    <div class="form-group"><label class="form-label">Bulgu İçeriği</label><textarea class="form-input"
+                            name="content" id="finding-content-input" rows="4"
+                            placeholder="Bulgu detaylarını buraya yazın..." required
+                            oninput="triggerAiAnalysis()"></textarea>
+                    </div>
+                    <div class="form-group"><label class="form-label">Müfettiş Önerisi</label><textarea
+                            class="form-input" name="inspectorRecommendation" rows="3"
+                            placeholder="Önerileri buraya yazın..."></textarea></div>
+
+                    <div class="form-group">
+                        <label class="form-label">Kanıt Yükle</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" name="evidence" class="file-upload-input" multiple
+                                onchange="updateFileLabel(this)">
+                            <div class="file-upload-label">
+                                <i data-lucide="upload-cloud" class="file-upload-icon"></i>
+                                <span class="file-upload-text">Dosyaları seçmek için tıklayın veya sürükleyin</span>
+                                <span class="file-upload-hint">PDF, Word, Excel, Resim</span>
+                            </div>
+                        </div>
+                        <div id="file-list-preview"
+                            style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Aksiyon Tarihi</label><input type="date"
+                            class="form-input" name="dueDate"></div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;"><button
+                            type="button" class="btn btn-secondary"
+                            onclick="closeModal('finding-modal')">İptal</button><button type="submit"
+                            class="btn btn-primary">Oluştur</button></div>
+                </form>
+            </div>
+        </div>
+        <div class="modal-overlay" id="action-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 class="modal-title">Yeni Aksiyon Ekle</h2><button class="close-modal"
+                        onclick="closeModal('action-modal')"><i data-lucide="x" style="width: 24px;"></i></button>
+                </div>
+                <form onsubmit="handleAddAction(event)">
+                    <input type="hidden" name="findingId">
+                    <div class="form-group"><label class="form-label">Sorumlu Kişi</label><input type="text"
+                            class="form-input" name="responsible" placeholder="Örn: Ahmet Yılmaz" required></div>
+                    <div class="form-group"><label class="form-label">Termin Tarihi</label><input type="date"
+                            class="form-input" name="dueDate" required></div>
+                    <div class="form-group"><label class="form-label">Yapılacak İş</label><textarea class="form-input"
+                            name="description" rows="3" placeholder="Aksiyon detaylarını buraya yazın..."
+                            required></textarea></div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;"><button
+                            type="button" class="btn btn-secondary"
+                            onclick="closeModal('action-modal')">İptal</button><button type="submit"
+                            class="btn btn-primary">Ekle</button></div>
+                </form>
+            </div>
+        </div>
+        <div class="modal-overlay" id="customize-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 class="modal-title">Hızlı İşlemleri Özelleştir</h2><button class="close-modal"
+                        onclick="closeModal('customize-modal')"><i data-lucide="x" style="width: 24px;"></i></button>
+                </div>
+                <div style="padding: 0 2rem; overflow-y: auto; flex: 1;">
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: var(--text-light); font-size: 0.9rem;">Görmek istediğiniz butonları seçin ve
+                            sıralayın:</p>
+                    </div>
+                    <div id="customize-list"
+                        style="display: flex; flex-direction: column; gap: 0.5rem; padding-bottom: 1rem;"></div>
+                </div>
+                <div
+                    style="display: flex; gap: 1rem; justify-content: flex-end; padding: 1.5rem 2rem; border-top: 1px solid var(--border); background: var(--white); position: sticky; bottom: 0; z-index: 10;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('customize-modal')">İptal</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCustomization()">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Universe Modal -->
+    <div id="audit-universe-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="uni-modal-title">Yeni Varlık Ekle</h3>
+                <button class="btn-icon" onclick="closeModal('audit-universe-modal')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form onsubmit="handleUniverseSubmit(event)">
+                <input type="hidden" name="id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Varlık Adı</label>
+                        <input type="text" name="name" class="form-input" required
+                            placeholder="Örn: Krediler Müdürlüğü">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tür</label>
+                        <select name="type" class="form-select" required>
+                            <option value="Birim">Birim (Genel Müdürlük)</option>
+                            <option value="Şube">Şube</option>
+                            <option value="Süreç">Süreç</option>
+                            <option value="İştirak">İştirak</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Üst Birim (Opsiyonel)</label>
+                        <select name="parentId" class="form-select" id="uni-parent-select">
+                            <option value="">- Yok (Ana Varlık) -</option>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Risk Skoru (0-100)</label>
+                        <input type="number" name="riskScore" class="form-input" min="0" max="100" value="50">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Son Denetim Tarihi</label>
+                        <input type="date" name="lastAuditDate" class="form-input">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('audit-universe-modal')">İptal</button>
+                    <button type="submit" class="btn btn-primary" id="uni-modal-btn">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Education Modal -->
+    <div id="education-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="education-modal-title">Yeni Eğitim Ekle</h3>
+                    <button class="btn-icon" onclick="closeModal('education-modal')">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <form onsubmit="handleAddEducation(event)">
+                    <input type="hidden" name="id">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">Eğitim Başlığı</label>
+                            <input type="text" name="title" class="form-input" required
+                                placeholder="Örn: İç Denetim Teknikleri">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Kategori</label>
+                            <select name="category" class="form-select" required>
+                                <option value="Mesleki Gelişim">Mesleki Gelişim</option>
+                                <option value="Mevzuat">Mevzuat</option>
+                                <option value="Kişisel Gelişim">Kişisel Gelişim</option>
+                                <option value="Teknik">Teknik</option>
+                                <option value="Sertifikasyon">Sertifikasyon</option>
+                                <option value="Diğer">Diğer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Eğitim Veren Kurum/Kişi</label>
+                            <input type="text" name="instructor" class="form-input" required
+                                placeholder="Örn: TİDE, BDDK">
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-label">Başlangıç Tarihi</label>
+                                    <input type="date" name="date" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-label">Bitiş Tarihi</label>
+                                    <input type="date" name="endDate" class="form-input" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-label">Süre (Saat)</label>
+                                    <input type="number" name="duration" class="form-input" min="0" step="0.5" required>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-label">CPE Kazanımı</label>
+                                    <input type="number" name="cpe" class="form-input" min="0" max="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Katılımcılar</label>
+                            <input type="text" name="attendees" class="form-input"
+                                placeholder="Virgül ile ayırın (Örn: Ahmet Yılmaz, Ayşe Demir)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Durum</label>
+                            <select name="status" class="form-select" required>
+                                <option value="Planlandı">Planlandı</option>
+                                <option value="Tamamlandı">Tamamlandı</option>
+                                <option value="İptal">İptal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notlar</label>
+                            <textarea name="notes" class="form-input" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="closeModal('education-modal')">İptal</button>
+                        <button type="submit" class="btn btn-primary" id="education-modal-btn">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <datalist id="ldap-users">
+        <!-- Populated by JS -->
+    </datalist>
+
+    <!-- Scripts -->
+    <script src="api.js"></script>
+    <script src="modal-helpers.js"></script>
+    <script src="app.js?v=65"></script>
+    <script>
+        // ⚠️ CRITICAL FIX: Override refreshData to prevent data wipe
+        // The original refreshData() calls backend API which returns empty,
+        // then sets state.audits = [] wiping all localStorage data.
+        window.refreshData = async function () {
+            console.log("ℹ️ refreshData DEVRE DIŞI - Backend API kullanılmıyor, localStorage korunuyor.");
+            return Promise.resolve();
+        };
+
+        // ⚠️ FIX: Ensure correct handleCreateFinding (localStorage version)
+        // In case duplicate was defined later, re-define it here.
+        window.handleCreateFinding = function (event) {
+            event.preventDefault();
+            console.log("📝 handleCreateFinding (FIXED) called");
+            const form = event.target;
+            const formData = new FormData(form);
+            const findingId = formData.get('id');
+            const isEdit = findingId && findingId.trim() !== '';
+            const findingData = {
+                id: isEdit ? findingId : Date.now().toString(),
+                auditId: formData.get('auditId'),
+                findingCode: formData.get('findingCode'),
+                title: formData.get('title'),
+                risk: formData.get('risk'),
+                criterion: formData.get('criterion') || '',
+                content: formData.get('content'),
+                inspectorRecommendation: formData.get('inspectorRecommendation') || '',
+                dueDate: formData.get('dueDate') || '',
+                status: 'Taslak',
+                createdAt: new Date().toISOString(),
+                processLog: []
+            };
+            if (!state.findings) state.findings = [];
+            if (isEdit) {
+                const index = state.findings.findIndex(f => String(f.id) === String(findingId));
+                if (index !== -1) {
+                    const oldFinding = state.findings[index];
+                    state.findings[index] = { ...oldFinding, ...findingData, status: oldFinding.status, processLog: oldFinding.processLog || [] };
+                    showToast('Bulgu başarıyla güncellendi!', 'success');
+                } else {
+                    showToast('Güncellenecek bulgu bulunamadı!', 'error');
+                    return;
+                }
+            } else {
+                findingData.processLog = [{ action: 'Bulgu Oluşturuldu', user: state.currentUser || 'Sistem', timestamp: new Date().toISOString() }];
+                state.findings.push(findingData);
+                showToast('Bulgu başarıyla oluşturuldu!', 'success');
+            }
+            saveToStorage();
+            closeModal('finding-modal');
+            if (state.currentPage === 'audits' && state.currentAuditId) { renderAuditDetail(); } else { renderFindings(); }
+            console.log("✅ Finding saved. Total findings:", state.findings.length);
+        };
+        console.log("✅ OVERRIDE APPLIED - refreshData devre dışı, handleCreateFinding düzeltildi.");
+    </script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

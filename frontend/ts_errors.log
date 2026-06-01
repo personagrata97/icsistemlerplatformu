@@ -1,0 +1,24 @@
+﻿app/audit/audits/[id]/page.tsx(143,9): error TS2657: JSX expressions must have one parent element.
+app/audit/audits/[id]/page.tsx(145,5): error TS1128: Declaration or statement expected.
+app/audit/audits/[id]/page.tsx(146,15): error TS1005: ',' expected.
+app/audit/audits/[id]/page.tsx(176,13): error TS1128: Declaration or statement expected.
+app/audit/audits/[id]/page.tsx(177,9): error TS1109: Expression expected.
+app/audit/audits/[id]/page.tsx(178,1): error TS1109: Expression expected.
+app/audit/audits/[id]/page.tsx(179,13): error TS1109: Expression expected.
+app/audit/audits/[id]/page.tsx(424,34): error TS17008: JSX element 'Tooltip' has no corresponding closing tag.
+app/audit/audits/[id]/page.tsx(768,13): error TS2657: JSX expressions must have one parent element.
+app/audit/audits/[id]/page.tsx(787,9): error TS1128: Declaration or statement expected.
+app/audit/audits/[id]/page.tsx(787,11): error TS1109: Expression expected.
+app/audit/audits/[id]/page.tsx(788,5): error TS1109: Expression expected.
+app/audit/audits/[id]/page.tsx(789,1): error TS1128: Declaration or statement expected.
+app/audit/universe/[unitId]/page.tsx(350,39): error TS17002: Expected corresponding JSX closing tag for 'div'.
+app/audit/universe/[unitId]/page.tsx(370,29): error TS1005: ')' expected.
+app/audit/universe/[unitId]/page.tsx(371,29): error TS1005: ',' expected.
+app/audit/universe/[unitId]/page.tsx(371,46): error TS1005: ',' expected.
+app/audit/universe/[unitId]/page.tsx(405,66): error TS17008: JSX element 'Tooltip' has no corresponding closing tag.
+app/audit/universe/[unitId]/page.tsx(497,30): error TS1005: ',' expected.
+app/audit/universe/[unitId]/page.tsx(501,17): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+app/audit/universe/[unitId]/page.tsx(504,13): error TS1005: ')' expected.
+app/audit/universe/[unitId]/page.tsx(505,13): error TS2657: JSX expressions must have one parent element.
+app/audit/universe/[unitId]/page.tsx(834,9): error TS1128: Declaration or statement expected.
+app/audit/universe/[unitId]/page.tsx(835,5): error TS1109: Expression expected.

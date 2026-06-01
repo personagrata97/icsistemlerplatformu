@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Teftiş Raporu - Örnek</title>
+    <style>
+        /* Reset & Basics */
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #000;
+            margin: 0;
+            padding: 0;
+            background: white;
+        }
+
+        /* Screen View Container */
+        .screen-container {
+            max-width: 210mm;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 10mm;
+        }
+
+        /* Main Border Frame */
+        .report-frame {
+            border: 3px double #000;
+            padding: 20px;
+            min-height: 95vh;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Arial', sans-serif;
+            font-size: 14pt;
+            font-weight: bold;
+            color: #000;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-family: 'Arial', sans-serif;
+            font-size: 12pt;
+            font-weight: bold;
+            color: #333;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            font-weight: bold;
+            color: #444;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        /* Logo */
+        .logo-img {
+            height: 45px;
+            width: auto;
+            vertical-align: middle;
+        }
+
+        .header-text {
+            font-size: 14pt;
+            font-weight: bold;
+            float: left;
+            line-height: 45px;
+        }
+
+        /* Screen Header Helper */
+        .screen-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            text-align: center;
+            margin-top: 120px;
+            margin-bottom: 50px;
+        }
+
+        .cover-title {
+            font-size: 26pt;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: none;
+            display: block;
+        }
+
+        .cover-subtitle {
+            font-size: 18pt;
+            margin-bottom: 60px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .cover-meta table {
+            margin: 0 auto;
+            width: 90%;
+            border: none;
+        }
+
+        .cover-meta td {
+            border: none;
+            padding: 8px;
+            text-align: left;
+            font-size: 12pt;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .cover-meta .label {
+            font-weight: bold;
+            width: 35%;
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .cover-meta .value {
+            font-weight: normal;
+        }
+
+        /* Confidential Stamp */
+        .confidential {
+            border: 4px solid #d00;
+            color: #d00;
+            font-size: 16pt;
+            font-weight: bold;
+            display: inline-block;
+            padding: 10px 30px;
+            margin-bottom: 50px;
+            transform: rotate(-5deg);
+            text-transform: uppercase;
+            border-radius: 8px;
+        }
+
+        /* Tables */
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 10pt;
+        }
+
+        table.data-table th,
+        table.data-table td {
+            border: 1px solid #000;
+            padding: 6px;
+            vertical-align: top;
+        }
+
+        table.data-table th {
+            background: #eee;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Tags */
+        .risk-tag {
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 9pt;
+            border: 1px solid #ccc;
+        }
+
+        .risk-High {
+            background: #ffebeb;
+            color: #d00;
+            border-color: #d00;
+        }
+
+        .risk-Medium {
+            background: #fff5e6;
+            color: #e67e22;
+            border-color: #e67e22;
+        }
+
+        .risk-Low {
+            background: #e8f5e9;
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        /* Finding Layout */
+        .finding-box {
+            border: 1px solid #000;
+            padding: 10px;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+            background: #fff;
+        }
+
+        .finding-header {
+            background: #f0f0f0;
+            padding: 8px;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 9pt;
+            color: #555;
+            background: white;
+            padding: 10px;
+            border-top: 2px solid #000;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="screen-container">
+        <div class="report-frame">
+
+            <!-- Header -->
+            <div class="screen-header">
+                <div class="header-text">TEFTİŞ KURULU</div>
+                <span style="font-weight:bold; border:2px solid #000; padding:5px;">LOGO</span>
+            </div>
+
+            <!-- COVER PAGE CONTENT -->
+            <div class="cover-page">
+                <div class="confidential">GİZLİDİR</div>
+
+                <div class="cover-title">TEFTİŞ RAPORU</div>
+                <div class="cover-subtitle">Kadıköy Şube Denetimi</div>
+
+                <div class="cover-meta">
+                    <table>
+                        <tr>
+                            <td class="label">Rapor Kodu:</td>
+                            <td class="value">DNT-2024-042</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Rapor Tarihi:</td>
+                            <td class="value">14.12.2025</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Denetim Dönemi:</td>
+                            <td class="value">01.01.2025 - 30.06.2025</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Denetim Ekibi:</td>
+                            <td class="value">Ahmet Yılmaz, Selin Şahin</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Denetim Türü:</td>
+                            <td class="value">Şube Denetimi</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-wrapper">
+                <h1 style="margin-top: 50px;">1. Yönetici Özeti</h1>
+                <p>Bu rapor, <strong>Kadıköy Şube Denetimi</strong> kapsamında Teftiş Kurulu tarafından
+                    gerçekleştirilen denetim faaliyetlerinin sonuçlarını içermektedir.</p>
+
+                <h3>1.1. Denetim Amacı ve Kapsamı</h3>
+                <p>Bu denetimin amacı, şube operasyonlarının bankacılık mevzuatına ve kurum içi politikalara
+                    uygunluğunun kontrol edilmesidir. Kapsam dahilinde 01.01.2025 ile 30.06.2025 tarihleri arasındaki
+                    işlemler incelenmiştir.</p>
+
+                <h3>1.2. Genel Değerlendirme ve Risk İstatistikleri</h3>
+                <table class="data-table" style="width: 50%; margin: 20px auto;">
+                    <tr>
+                        <th>Risk Grubu</th>
+                        <th>Adet</th>
+                    </tr>
+                    <tr>
+                        <td>Yüksek Risk</td>
+                        <td style="text-align: center; color: #d00; font-weight: bold;">1</td>
+                    </tr>
+                    <tr>
+                        <td>Orta Risk</td>
+                        <td style="text-align: center; color: #e67e22; font-weight: bold;">1</td>
+                    </tr>
+                    <tr style="background: #f9f9f9; font-weight: bold;">
+                        <td>TOPLAM</td>
+                        <td style="text-align: center;">2</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- DETAILED FINDINGS -->
+            <div style="margin-top: 40px;">
+                <h1>2. Bulgu Detayları</h1>
+
+                <!-- Finding 1 -->
+                <div class="finding-box">
+                    <div class="finding-header">
+                        <span>1. Kredi Dosyalarında Eksik İmzalar</span>
+                        <span class="risk-tag risk-High">Yüksek</span>
+                    </div>
+                    <div style="padding: 10px;">
+                        <div style="margin-bottom: 10px;"><span class="bold">Tespit:</span> 15 adet ticari kredi
+                            dosyasının kefil imzaları eksiktir.</div>
+                        <div style="margin-bottom: 5px; font-size:9pt; color:#444;"><span class="bold">Etki:</span>
+                            Yasal risk oluşturmaktadır.</div>
+
+                        <div
+                            style="margin-top: 15px; border-left: 4px solid #000; padding-left: 10px; background: #f9f9f9;">
+                            <span class="bold">Müfettiş Önerisi:</span>
+                            <div style="margin-top: 5px;">İmzalar ivedilikle tamamlanmalıdır.</div>
+                        </div>
+
+                        <div style="margin-top: 15px; border: 1px dashed #666; padding: 10px; background: #fff;">
+                            <span class="bold">Yönetim Cevabı / Aksiyon:</span>
+                            <div style="margin-top: 5px;">3 iş günü içinde tamamlanacaktır.</div>
+                            <div style="margin-top:5px; font-size:9pt;"><strong>Termin:</strong> 20.12.2025</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                Teftiş Raporu | 14.12.2025 | Sayfa <span class="page-number"></span>
+            </div>
+
+        </div> <!-- End Frame -->
+    </div> <!-- End Screen Container -->
+</body>
+
+</html>

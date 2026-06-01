@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Teftiş Raporu - Şube Denetimi - 2024</title>
+    <style>
+        /* Page Setup */
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            /* Fixed Header for Print */
+            .print-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 40px;
+                text-align: right;
+                background: white;
+                z-index: 1000;
+                padding: 10px 20px;
+            }
+
+            /* Push content down */
+            .content-wrapper {
+                margin-top: 60px;
+            }
+
+            /* Borders for print */
+            .report-frame {
+                border: 2px solid #000;
+                min-height: 98vh;
+                position: relative;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+        }
+
+        /* Screen View Container */
+        .screen-container {
+            max-width: 210mm;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 10mm;
+        }
+
+        /* Main Border Frame */
+        .report-frame {
+            border: 3px double #000;
+            padding: 20px;
+            min-height: 95vh;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Arial', sans-serif;
+            font-size: 14pt;
+            font-weight: bold;
+            color: #000;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-family: 'Arial', sans-serif;
+            font-size: 12pt;
+            font-weight: bold;
+            color: #333;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            font-weight: bold;
+            color: #444;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        /* Logo - Center for Cover */
+        .logo-img {
+            height: 45px;
+            width: auto;
+            vertical-align: middle;
+        }
+
+        /* Header Text removed/replaced by Confidential */
+        .header-text {
+            font-size: 12pt;
+            font-weight: bold;
+            float: right;
+            color: #d00;
+            text-transform: uppercase;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .cover-logo-container {
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .cover-logo-img {
+            height: 100px;
+            width: auto;
+        }
+
+        .cover-title {
+            font-size: 26pt;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: none;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .cover-subtitle {
+            font-size: 18pt;
+            margin-bottom: 60px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .cover-meta table {
+            margin: 0 auto;
+            width: 95%;
+            border: none;
+        }
+
+        .cover-meta td {
+            border: none;
+            padding: 8px;
+            text-align: left;
+            font-size: 11pt;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .cover-meta .label {
+            font-weight: bold;
+            width: 35%;
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .cover-meta .value {
+            font-weight: normal;
+        }
+
+        /* Small Confidential Mark (Header) */
+        .confidential-header {
+            font-weight: bold;
+            color: #d00;
+            border: 2px solid #d00;
+            padding: 2px 8px;
+            display: inline-block;
+        }
+
+        /* Table of Contents */
+        .toc {
+            margin-top: 40px;
+        }
+
+        .toc-item {
+            border-bottom: 1px dotted #ccc;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        /* Tables */
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 10pt;
+        }
+
+        table.data-table th,
+        table.data-table td {
+            border: 1px solid #000;
+            padding: 6px;
+            vertical-align: top;
+        }
+
+        table.data-table th {
+            background: #eee;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Org Chart Placeholder */
+        .org-chart-placeholder {
+            border: 2px dashed #999;
+            background: #f9f9f9;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        /* Tags */
+        .risk-tag {
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 9pt;
+            border: 1px solid #ccc;
+        }
+
+        .risk-Yüksek {
+            background: #ffebeb;
+            color: #d00;
+            border-color: #d00;
+        }
+
+        .risk-Orta {
+            background: #fff5e6;
+            color: #e67e22;
+            border-color: #e67e22;
+        }
+
+        .risk-Düşük {
+            background: #e8f5e9;
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        /* Finding Layout */
+        .finding-box {
+            border: 1px solid #000;
+            padding: 10px;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+            background: #fff;
+        }
+
+        .finding-header {
+            background: #f0f0f0;
+            padding: 8px;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 9pt;
+            color: #555;
+            background: white;
+            padding: 10px;
+            border-top: 2px solid #000;
+            z-index: 1000;
+        }
+
+        /* Print Header Helper for Screen Preview */
+        .screen-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="screen-container">
+        <div class="report-frame">
+            <!-- Fixed Header -->
+            <div class="print-header screen-header">
+                <div class="confidential-header">GİZLİDİR</div>
+            </div>
+
+            <div class="content-wrapper">
+                <!-- COVER PAGE CONTENT -->
+                <div class="cover-page">
+                    <div class="cover-logo-container">
+                        <img src="./logo.png" alt="EMLAK KATILIM" class="cover-logo-img"
+                            onerror="this.onerror=null;this.src='https://www.emlakkatilim.com.tr/assets/images/logo.svg';">
+                    </div>
+                    <div class="cover-title">TEFTİŞ RAPORU</div>
+                    <div class="cover-subtitle">İstanbul Merkez Şubesi Olağan Denetimi</div>
+                    <div class="cover-meta">
+                        <table>
+                            <tr>
+                                <td class="label">Rapor Numarası:</td>
+                                <td class="value">DNT-2024-001</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Rapor Tarihi:</td>
+                                <td class="value">14.12.2024</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Denetim Dönemi:</td>
+                                <td class="value">01.01.2024 - 31.03.2024</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Denetim Ekibi:</td>
+                                <td class="value">Ahmet Yılmaz (Müfettiş), Mehmet Demir (Müfettiş Yrd.)</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Gözetim Sorumlusu:</td>
+                                <td class="value">Ayşe Kaya (Başmüfettiş)</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Denetim Türü:</td>
+                                <td class="value">Şube Denetimi</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Denetim Görüşü:</td>
+                                <td class="value"><strong>Gelişime Açık (Bazı eksiklikler bulunmaktadır)</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="page-break"></div>
+                <!-- TABLE OF CONTENTS -->
+                <div style="margin-top: 40px;">
+                    <h1>İçindekiler</h1>
+                    <div class="toc">
+                        <div class="toc-item"><span>1. Yönetici Özeti</span> <span>3</span></div>
+                        <div class="toc-item"><span>1.1. Denetim Amacı ve Kapsamı</span> <span>3</span></div>
+                        <div class="toc-item"><span>1.2. Organizasyon Şeması</span> <span>3</span></div>
+                        <div class="toc-item"><span>1.3. Genel Değerlendirme</span> <span>3</span></div>
+                        <div class="toc-item"><span>2. Bulgu Detayları</span> <span>4</span></div>
+                    </div>
+                </div>
+                <div class="page-break"></div>
+                <!-- EXECUTIVE SUMMARY -->
+                <div style="margin-top: 40px;">
+                    <h1>1. Yönetici Özeti</h1>
+                    <p>Bu rapor, <strong>İstanbul Merkez Şubesi Olağan Denetimi</strong> kapsamında Teftiş Kurulu
+                        tarafından gerçekleştirilen denetim faaliyetlerinin sonuçlarını içermektedir.</p>
+                    <h3>1.1. Denetim Amacı ve Kapsamı</h3>
+                    <p>
+                        Bu denetimin amacı, şube iş süreçlerinin etkinliğini değerlendirmek, riskleri belirlemek ve
+                        <strong>Tasarruf Finansman Mevzuatı</strong>na uyumu kontrol etmektir. Denetim kapsamında
+                        <strong>belirlenen örneklem dahilindeki tasarruf finansman dosyaları ve şubenin iş süreçleri
+                            incelenmiştir.</strong>
+                    </p>
+                    <h3>1.2. Organizasyon Şeması</h3>
+                    <div class="org-chart-placeholder">[Birim Organizasyon Şeması Buraya Gelecek]</div>
+                    <h3>1.3. Genel Değerlendirme ve Risk İstatistikleri</h3>
+                    <p>Denetim neticesinde toplam <strong>2</strong> adet bulgu tespit edilmiştir. Bulguların risk
+                        düzeylerine göre dağılımı aşağıdaki tabloda sunulmuştur.</p>
+                    <table class="data-table" style="width: 60%; margin: 20px auto;">
+                        <tr>
+                            <th>Risk Grubu</th>
+                            <th>Adet</th>
+                        </tr>
+                        <tr>
+                            <td>Yüksek Risk</td>
+                            <td style="text-align: center; color: #d00; font-weight: bold;">1</td>
+                        </tr>
+                        <tr>
+                            <td>Orta Risk</td>
+                            <td style="text-align: center; color: #e67e22; font-weight: bold;">1</td>
+                        </tr>
+                        <tr>
+                            <td>Düşük Risk</td>
+                            <td style="text-align: center; color: #27ae60; font-weight: bold;">0</td>
+                        </tr>
+                        <tr style="background: #f9f9f9; font-weight: bold;">
+                            <td>TOPLAM</td>
+                            <td style="text-align: center;">2</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="page-break"></div>
+                <!-- DETAILED FINDINGS -->
+                <div style="margin-top: 40px;">
+                    <h1>2. Bulgu Detayları</h1>
+
+                    <div class="finding-box">
+                        <div class="finding-header">
+                            <span>1. Kredi Tahsis Sürecinde Eksik Belge</span>
+                            <span class="risk-tag risk-Yüksek">Yüksek</span>
+                        </div>
+                        <div style="padding: 10px;">
+                            <div style="margin-bottom: 10px;"><span class="bold">Tespit:</span> 123456 nolu müşteri
+                                dosyasında gelir belgesi eksik olmasına rağmen kredi tahsisi yapılmıştır.</div>
+                            <div style="margin-bottom: 5px; font-size:9pt; color:#444;"><span
+                                    class="bold">Kriter:</span> Kredi Politikaları Prosedürü Madde 4.2</div>
+                            <div style="margin-bottom: 5px; font-size:9pt; color:#444;"><span class="bold">Kök
+                                    Neden:</span> Operasyonel dikkatsizlik ve kontrol eksikliği.</div>
+                            <div style="margin-bottom: 5px; font-size:9pt; color:#444;"><span class="bold">Etki:</span>
+                                Kredi riskinin doğru değerlendirilememesi ve yasal uyumsuzluk riski.</div>
+                            <div
+                                style="margin-top: 15px; border-left: 4px solid #000; padding-left: 10px; background: #f9f9f9;">
+                                <span class="bold">Müfettiş Önerisi:</span>
+                                <div style="margin-top: 5px;">İlgili personelin uyarılması ve eksik belgenin ivedilikle
+                                    tamamlanması gerekmektedir.</div>
+                            </div>
+                            <div style="margin-top: 15px; border: 1px dashed #666; padding: 10px; background: #fff;">
+                                <span class="bold">Birim Cevabı:</span>
+                                <div style="margin-top: 5px;">Müşteriden belge talep edilmiştir, en kısa sürede
+                                    tamamlanacaktır.</div>
+                                <div style="margin-top:5px; font-size:9pt;"><strong>Aksiyon Tarihi:</strong> 20.12.2024
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="finding-box">
+                        <div class="finding-header">
+                            <span>2. Gişe İşlemlerinde Limit Aşımı</span>
+                            <span class="risk-tag risk-Orta">Orta</span>
+                        </div>
+                        <div style="padding: 10px;">
+                            <div style="margin-bottom: 10px;"><span class="bold">Tespit:</span> Gişe yetkilisinin günlük
+                                işlem limiti 50.000 TL olmasına rağmen, onay almadan 75.000 TL tutarında işlem
+                                gerçekleştirmiştir.</div>
+                            <div style="margin-bottom: 5px; font-size:9pt; color:#444;"><span
+                                    class="bold">Kriter:</span> Gişe İşlemleri Yönetmeliği</div>
+
+                            <div style="margin-bottom: 5px; font-size:9pt; color:#444;"><span class="bold">Etki:</span>
+                                Operasyonel risk artışı.</div>
+                            <div
+                                style="margin-top: 15px; border-left: 4px solid #000; padding-left: 10px; background: #f9f9f9;">
+                                <span class="bold">Müfettiş Önerisi:</span>
+                                <div style="margin-top: 5px;">Sistem üzerindeki limit kontrollerinin gözden geçirilmesi
+                                    önerilir.</div>
+                            </div>
+                            <div style="margin-top: 15px; border: 1px dashed #666; padding: 10px; background: #fff;">
+                                <span class="bold">Birim Cevabı:</span>
+                                <div style="margin-top: 5px;">(Cevap Bekleniyor)</div>
+
+                            </div>
+                        </div>
+                    </div>
+                    </p>
+                </div>
+            </div>
+            <div class="footer">Teftiş Raporu | 14.12.2024 | Sayfa <span class="page-number"></span></div>
+        </div>
+    </div>
+</body>
+
+</html>

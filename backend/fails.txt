@@ -1,0 +1,57 @@
+Risk kabulü (acceptRisk) işlemi loglanmalı ve yetki kontrolü yapılmalı
+Error: expect(jest.fn()).toHaveBeenCalled()
+
+Expected number of calls: >= 1
+Received number of calls:    0
+    at Object.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.spec.ts:481:51)
+
+Süre uzatma onaylandığında bulgunun bitiş tarihi (dueDate) otomatik güncellenmeli
+Error: expect(jest.fn()).toHaveBeenCalled()
+
+Expected number of calls: >= 1
+Received number of calls:    0
+    at Object.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.spec.ts:513:51)
+
+Durum değiştiğinde log atılmalı ve risk sayısı güncellenmeli
+Error: Eksik Bilgi: Bulguyu onaya göndermeden önce Kök Neden ve Denetçi Önerisi alanları doldurulmalıdır.
+    at AuditService.updateFinding (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.ts:1039:23)
+    at Object.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.spec.ts:590:28)
+
+Tamamlandı durumuna alırken açık aksiyon varsa hata fırlatılmalı
+Error: expect(received).rejects.toThrow(expected)
+
+Expected substring: "Açık aksiyonlar (1) varken bulgu kapatılamaz!"
+Received message:   "Denetim Zafiyeti (IIA 2500): Bu bulguya ait 1 adet AÇIK aksiyon (Follow-Up) bulunmaktadır. Aksiyonlar kapanmadan bulgu kapatılamaz! (Zorunluysa Risk Kabul işlemi yapılmalıdır)"
+
+    [0m [90m 1086 |[39m
+     [90m 1087 |[39m             [36mif[39m (openActions [33m>[39m [35m0[39m [33m&&[39m [33m![39mfinalRiskAccepted) {
+    [31m[1m>[22m[39m[90m 1088 |[39m                 [36mthrow[39m [36mnew[39m [33mError[39m([32m`Denetim Zafiyeti (IIA 2500): Bu bulguya ait ${openActions} adet AÇIK aksiyon (Follow-Up) bulunmaktadır. Aksiyonlar kapanmadan bulgu kapatılamaz! (Zorunluysa Risk Kabul işlemi yapılmalıdır)`[39m)[33m;[39m
+     [90m      |[39m                       [31m[1m^[22m[39m
+     [90m 1089 |[39m             }
+     [90m 1090 |[39m             [36mif[39m (finalRiskAccepted [33m&&[39m [33m![39mfinalRiskAcceptanceJust) {
+     [90m 1091 |[39m                 [36mthrow[39m [36mnew[39m [33mError[39m([32m'Risk Kabul Zafiyeti: Kalan açık aksiyonlar için riski kabul ediyorsanız, Yönetim Gerekçesini yazmanız zorunludur.'[39m)[33m;[39m[0m
+
+      at AuditService.updateFinding (src/audit/audit.service.ts:1088:23)
+      at Object.<anonymous> (src/audit/audit.service.spec.ts:609:13)
+    at Object.toThrow (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\expect\build\index.js:218:22)
+    at Object.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.spec.ts:609:99)
+    at Promise.then.completed (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\utils.js:231:10)
+    at _callCircusTest (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\run.js:316:40)
+    at _runTest (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\run.js:252:3)
+    at _runTestsForDescribeBlock (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\run.js:126:9)
+    at _runTestsForDescribeBlock (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\run.js:121:9)
+    at _runTestsForDescribeBlock (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\run.js:121:9)
+    at run (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\run.js:71:3)
+    at runAndTransformResultsToJestFormat (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+    at jestAdapter (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+    at runTestInternal (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-runner\build\runTest.js:367:16)
+    at runTest (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\node_modules\jest-runner\build\runTest.js:444:34)
+
+Kurum içi e-posta ile başarıyla bildirim gönderilmeli, log atılmalı
+Error: expect(jest.fn()).toHaveBeenCalled()
+
+Expected number of calls: >= 1
+Received number of calls:    0
+    at Object.<anonymous> (C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.spec.ts:677:47)

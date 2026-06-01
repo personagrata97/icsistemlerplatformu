@@ -1,0 +1,1 @@
+window.MASAK_DATA = [];

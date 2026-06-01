@@ -1,0 +1,4 @@
+﻿app/audit/findings/[id]/page.tsx(85,5): error TS18004: No value exists in scope for the shorthand property 'PlayCircle'. Either declare one or provide an initializer.
+app/audit/findings/[id]/page.tsx(85,17): error TS18004: No value exists in scope for the shorthand property 'FileSearch'. Either declare one or provide an initializer.
+app/audit/findings/page.tsx(22,31): error TS2307: Cannot find module '@/components/audit/AiSuggestionPanel' or its corresponding type declarations.
+components/audit/modals/ConciliationViewModal.tsx(105,68): error TS2339: Property 'departmentResponse' does not exist on type 'Finding'.

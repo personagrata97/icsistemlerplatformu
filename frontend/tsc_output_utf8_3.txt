@@ -1,0 +1,16 @@
+﻿components/audit/modals/CreateEthicsReportModal.tsx(131,29): error TS2322: Type '{ value: string; label: string; }' is not assignable to type 'string | string[]'.
+components/audit/modals/CreateEthicsReportModal.tsx(132,73): error TS2322: Type 'string' is not assignable to type '{ value: string; label: string; }'.
+components/audit/modals/CreateEthicsReportModal.tsx(133,29): error TS2322: Type '{ value: { value: string; label: string; }; label: { value: string; label: string; }; }[]' is not assignable to type 'Option[]'.
+  Type '{ value: { value: string; label: string; }; label: { value: string; label: string; }; }' is not assignable to type 'Option'.
+    Types of property 'value' are incompatible.
+      Type '{ value: string; label: string; }' is not assignable to type 'string'.
+lib/audit-api.ts(1495,38): error TS2551: Property 'json_to_sheet' does not exist on type 'IUtils'. Did you mean 'aoa_to_sheet'?
+lib/audit-api.ts(1496,37): error TS2339: Property 'book_new' does not exist on type 'IUtils'.
+lib/audit-api.ts(1497,20): error TS2339: Property 'book_append_sheet' does not exist on type 'IUtils'.
+lib/audit-api.ts(1527,21): error TS2322: Type 'unknown[][]' is not assignable to type 'RowInput[]'.
+  Type 'unknown[]' is not assignable to type 'RowInput'.
+    Type 'unknown[]' is not assignable to type 'CellInput[]'.
+      Type 'unknown' is not assignable to type 'CellInput'.
+lib/audit-api.ts(1647,5): error TS1117: An object literal cannot have multiple properties with the same name.
+lib/audit-api.ts(1651,5): error TS1117: An object literal cannot have multiple properties with the same name.
+lib/audit-api.ts(1659,5): error TS1117: An object literal cannot have multiple properties with the same name.

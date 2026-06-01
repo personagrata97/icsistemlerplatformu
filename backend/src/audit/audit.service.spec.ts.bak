@@ -1,0 +1,227 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { AuditService } from './audit.service';
+import { PrismaService } from '../common/prisma.service';
+import { AuditLogService } from './audit-log.service';
+import { AuditRiskService } from './audit-risk.service';
+import { FindingService } from './finding.service';
+import { AuditTrashService } from './audit-trash.service';
+import { AuditronService } from '../auditron/auditron.service';
+import { ForbiddenException, NotFoundException, ConflictException } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+
+jest.mock('fs');
+
+const mockAdminUser = { id: 'admin1', roles: ['ADMIN'], displayName: 'Admin' };
+
+const mockPrismaService = {
+    audit: { findMany: jest.fn(), create: jest.fn(), findFirst: jest.fn(), findUnique: jest.fn(), update: jest.fn(), count: jest.fn() },
+    role: { findFirst: jest.fn() },
+    userRole: { findFirst: jest.fn(), deleteMany: jest.fn(), create: jest.fn() },
+    userPromotion: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn(), findUnique: jest.fn() },
+    auditExtensionRequest: { create: jest.fn(), findUnique: jest.fn(), update: jest.fn(), findMany: jest.fn() },
+    finding: { findMany: jest.fn(), count: jest.fn(), findUnique: jest.fn(), create: jest.fn(), update: jest.fn() },
+    auditLog: { findMany: jest.fn() },
+    independenceDeclaration: { findFirst: jest.fn() },
+    auditFollowUp: { count: jest.fn(), create: jest.fn(), findMany: jest.fn(), update: jest.fn(), deleteMany: jest.fn() },
+    conciliationMessage: { findMany: jest.fn(), create: jest.fn() },
+    auditConciliation: { upsert: jest.fn() },
+    extensionRequest: { create: jest.fn(), findUnique: jest.fn(), update: jest.fn(), findMany: jest.fn() },
+    user: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn(), findMany: jest.fn() },
+    userExperience: { create: jest.fn(), update: jest.fn(), delete: jest.fn(), findUnique: jest.fn() },
+    userEducation: { create: jest.fn(), update: jest.fn(), delete: jest.fn(), findUnique: jest.fn() },
+    userCertificate: { create: jest.fn(), update: jest.fn(), delete: jest.fn() },
+    userTraining: { create: jest.fn(), update: jest.fn(), delete: jest.fn() },
+    trainingBatch: { create: jest.fn(), update: jest.fn() },
+    ethicsReport: { findMany: jest.fn(), create: jest.fn(), findUnique: jest.fn(), update: jest.fn() },
+    ethicsMessage: { create: jest.fn(), findMany: jest.fn() },
+    auditableUnit: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn(), findUnique: jest.fn() },
+    process: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn(), findUnique: jest.fn() },
+    risk: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn() },
+    control: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn() },
+    auditTest: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn(), findUnique: jest.fn() },
+    auditWorkpaper: { findUnique: jest.fn(), update: jest.fn() },
+    auditEducation: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn(), findUnique: jest.fn() },
+    $transaction: jest.fn((cb) => cb(mockPrismaService))
+};
+
+const mockAuditLogService = { createLog: jest.fn(), getLogs: jest.fn() };
+const mockAuditRiskService = { calculateAuditRisk: jest.fn() };
+const mockFindingService = { createFinding: jest.fn(), updateFinding: jest.fn() };
+const mockAuditTrashService = { getDeletedAudits: jest.fn(), getDeletedFindings: jest.fn(), restoreAudit: jest.fn(), restoreFinding: jest.fn(), permanentDeleteAudit: jest.fn(), permanentDeleteFinding: jest.fn(), emptyTrash: jest.fn() };
+const mockAuditronService = { processDocument: jest.fn() };
+
+describe('AuditService', () => {
+    let service: AuditService;
+
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [
+                AuditService,
+                { provide: PrismaService, useValue: mockPrismaService },
+                { provide: AuditLogService, useValue: mockAuditLogService },
+                { provide: AuditRiskService, useValue: mockAuditRiskService },
+                { provide: FindingService, useValue: mockFindingService },
+                { provide: AuditTrashService, useValue: mockAuditTrashService },
+                { provide: AuditronService, useValue: mockAuditronService },
+            ],
+        }).compile();
+
+        service = module.get<AuditService>(AuditService);
+    });
+
+    it('should be defined', () => {
+        expect(service).toBeDefined();
+    });
+
+    describe('Personel Yönetimi (Staff Management)', () => {
+        const mockStaffData = { username: 'staff1', displayName: 'Test', email: 's@t.com' };
+
+        it('getStaff: Personel listesi getirilmeli', async () => {
+            mockPrismaService.user.findMany.mockResolvedValue([{ id: 'u1', ...mockStaffData }]);
+            const result = await service.getStaff();
+            expect(result).toBeDefined();
+        });
+
+        it('createStaff: Yeni personel eklenmeli', async () => {
+            mockPrismaService.role.findFirst.mockResolvedValue({ id: 'r1' });
+            mockPrismaService.user.create.mockResolvedValue({ id: 'u2' });
+            await service.createStaff({ employeeId: 'e1', firstName: 'A', lastName: 'B', ...mockStaffData });
+            expect(mockPrismaService.user.create).toHaveBeenCalled();
+        });
+
+        it('updateStaff: Bilgiler güncellenmeli', async () => {
+            mockPrismaService.user.findUnique.mockResolvedValue({ id: 'u1' });
+            mockPrismaService.user.update.mockResolvedValue({ id: 'u1' });
+            await service.updateStaff('u1', { displayName: 'Yeni' }, mockAdminUser);
+            expect(mockPrismaService.user.update).toHaveBeenCalled();
+        });
+
+        it('addStaffPromotion: Terfi kaydı eklenmeli', async () => {
+            mockPrismaService.user.findUnique.mockResolvedValue({ id: 'u1' });
+            mockPrismaService.userPromotion.create.mockResolvedValue({ id: 'p1', title: 'Müdür' });
+            const result = await service.addStaffPromotion('u1', { title: 'Müdür', promotionDate: new Date() }, mockAdminUser);
+            expect(result.title).toBe('Müdür');
+        });
+
+        it('addStaffTraining: Eğitim kaydı eklenmeli', async () => {
+            mockPrismaService.userTraining.create.mockResolvedValue({ id: 't1' });
+            const result = await service.addStaffTraining('u1', { name: 'Test', startDate: new Date(), endDate: new Date() });
+            expect(result.id).toBe('t1');
+        });
+
+        it('addStaffExperience: Deneyim kaydı eklenmeli', async () => {
+            mockPrismaService.userExperience.create.mockResolvedValue({ id: 'e1' });
+            const result = await service.addStaffExperience('u1', { companyName: 'X', position: 'Y', startDate: new Date() }, mockAdminUser);
+            expect(result.id).toBe('e1');
+        });
+
+        it('deleteStaff: Soft delete yapılmalı', async () => {
+            mockPrismaService.user.findUnique.mockResolvedValue({ id: 'u1' });
+            mockPrismaService.user.update.mockResolvedValue({ id: 'u1' });
+            const result = await service.deleteStaff('u1');
+            expect(result.success).toBe(true);
+        });
+    });
+
+    describe('Etik Raporlama (Ethics)', () => {
+        it('createEthicsReport: Rapor oluşturulmalı', async () => {
+            mockPrismaService.ethicsReport.create.mockResolvedValue({ id: 'er1', trackingCode: 'T1' });
+            const result = await service.createEthicsReport({ type: 'Test', description: 'desc' });
+            expect(result.trackingCode).toBe('T1');
+        });
+
+        it('updateEthicsReportStatus: Durum güncellenmeli', async () => {
+            mockPrismaService.ethicsReport.findUnique.mockResolvedValue({ id: 'er1' });
+            mockPrismaService.ethicsReport.update.mockResolvedValue({ id: 'er1', status: 'OK' });
+            const result = await service.updateEthicsReportStatus('er1', 'OK');
+            expect(result.status).toBe('OK');
+        });
+    });
+
+    describe('Denetim Evreni (Audit Universe)', () => {
+        it('getUnits: Birimler getirilmeli', async () => {
+            mockPrismaService.auditableUnit.findMany.mockResolvedValue([]);
+            await service.getUnits(mockAdminUser);
+            expect(mockPrismaService.auditableUnit.findMany).toHaveBeenCalled();
+        });
+
+        it('createUnit: Birim oluşturulmalı', async () => {
+            mockPrismaService.auditableUnit.create.mockResolvedValue({ id: 'un1', riskScore: 10 });
+            const result = await service.createUnit({ name: 'U1', impactScore: 2, likelihoodScore: 5 });
+            expect(result.riskScore).toBe(10);
+        });
+
+        it('updateUnit: Birim güncellenmeli', async () => {
+            mockPrismaService.auditableUnit.update.mockResolvedValue({ id: 'un1', name: 'U2' });
+            const result = await service.updateUnit('un1', { name: 'U2' });
+            expect(result.name).toBe('U2');
+        });
+
+        it('deleteUnit: Birim silinmeli', async () => {
+            mockPrismaService.auditableUnit.delete.mockResolvedValue({ id: 'un1' });
+            const result = await service.deleteUnit('un1');
+            expect(result.id).toBe('un1');
+        });
+    });
+
+    describe('RCM & Tests', () => {
+        it('createProcess: Süreç oluşturulmalı', async () => {
+            mockPrismaService.process.create.mockResolvedValue({ id: 'p1' });
+            await service.createProcess({ auditableUnitId: 'u1', name: 'P1' });
+            expect(mockPrismaService.process.create).toHaveBeenCalled();
+        });
+
+        it('updateProcess: Süreç güncellenmeli', async () => {
+            mockPrismaService.process.update.mockResolvedValue({ id: 'p1' });
+            await service.updateProcess('p1', { name: 'P2' });
+            expect(mockPrismaService.process.update).toHaveBeenCalled();
+        });
+
+        it('deleteProcess: Süreç silinmeli', async () => {
+            mockPrismaService.process.delete.mockResolvedValue({ id: 'p1' });
+            await service.deleteProcess('p1');
+            expect(mockPrismaService.process.delete).toHaveBeenCalled();
+        });
+
+        it('deleteAuditTest: Test silinmeli', async () => {
+            mockPrismaService.auditTest.findUnique.mockResolvedValue({ id: 'at1' });
+            mockPrismaService.auditTest.update.mockResolvedValue({ id: 'at1' });
+            await service.deleteAuditTest('at1', mockAdminUser);
+            expect(mockPrismaService.auditTest.update).toHaveBeenCalled();
+        });
+
+        it('deleteWorkpaper: Çalışma kağıdı silinmeli', async () => {
+            mockPrismaService.auditWorkpaper.findUnique.mockResolvedValue({ id: 'wp1' });
+            mockPrismaService.auditWorkpaper.update.mockResolvedValue({ id: 'wp1' });
+            await service.deleteWorkpaper('wp1', mockAdminUser);
+            expect(mockPrismaService.auditWorkpaper.update).toHaveBeenCalled();
+        });
+    });
+
+    describe('Security Regression', () => {
+        it('Vulnerability: undefined supervisor check in getAllAudits', async () => {
+            const existsSpy = jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+            const vulnerableUser = { 
+                id: 'v1', 
+                roles: [], 
+                permissions: [{ module: 'AUDIT', action: 'VIEW', scope: 'OWN' }] 
+            };
+            mockPrismaService.audit.findMany.mockResolvedValue([]);
+            
+            await service.getAllAudits(vulnerableUser);
+            
+            const callArgs = mockPrismaService.audit.findMany.mock.calls[0][0];
+            const orConditions = callArgs?.where?.OR || [];
+            
+            // Check that supervisor: undefined is NOT present
+            const hasUnsafe = orConditions.some((cond: any) => cond.hasOwnProperty('supervisor') && cond.supervisor === undefined);
+            expect(hasUnsafe).toBe(false);
+            
+            // Should at least have creatorId
+            expect(orConditions).toContainEqual(expect.objectContaining({ creatorId: 'v1' }));
+            
+            existsSpy.mockRestore();
+        });
+    });
+});
