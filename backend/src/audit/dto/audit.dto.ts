@@ -112,6 +112,26 @@ export class CreateAuditDto {
     @IsBoolean()
     @IsOptional()
     allowParallel?: boolean;
+
+    // ACFE Investigation Fields
+    @IsString()
+    @IsOptional()
+    fraudType?: string;
+
+    @IsNumber()
+    @IsOptional()
+    financialImpact?: number;
+
+    @IsString()
+    @IsOptional()
+    currency?: string;
+
+    @IsString()
+    @IsOptional()
+    disciplinaryAction?: string;
+
+    @IsOptional()
+    involvedParties?: string;
 }
 
 /**
@@ -213,4 +233,24 @@ export class UpdateAuditDto {
 
     @IsOptional()
     workpapers?: any;
+
+    // ACFE Investigation Fields
+    @IsString()
+    @IsOptional()
+    fraudType?: string;
+
+    @IsNumber()
+    @IsOptional()
+    financialImpact?: number;
+
+    @IsString()
+    @IsOptional()
+    currency?: string;
+
+    @IsString()
+    @IsOptional()
+    disciplinaryAction?: string;
+
+    @IsOptional()
+    involvedParties?: string;
 }

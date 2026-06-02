@@ -194,10 +194,23 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
 
     // Load data from API
     useEffect(() => {
+        const handleOpenFindingModal = (e: any) => {
+            if (e.detail?.auditId === id) {
+                setSelectedFinding(null);
+                setShowFindingModal(true);
+                setActiveTab('findings'); // Bulgu sekmesine geçir
+            }
+        };
+        window.addEventListener('openFindingModalFromInvestigation', handleOpenFindingModal);
+
         loadData();
         if (id && user?.id) {
             checkIndependence();
         }
+
+        return () => {
+            window.removeEventListener('openFindingModalFromInvestigation', handleOpenFindingModal);
+        };
     }, [id, user?.id]);
 
     const checkIndependence = async () => {

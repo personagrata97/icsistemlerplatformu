@@ -216,6 +216,13 @@ model Audit {
   communications      AuditCommunication[]
   meetings            AuditMeeting[]
   
+  // Soruşturma & İnceleme (Investigation) ACFE Alanları
+  fraudType           String?
+  financialImpact     Decimal?
+  currency            String?                   @default("TRY")
+  disciplinaryAction  String?
+  involvedParties     String?                   // Şüpheliler ve İfade Verenler (JSON formatında saklanacak)
+
   // Tebliğ ve Kabul Süreci
   acknowledgedAt      DateTime?
   acknowledgedBy      String?

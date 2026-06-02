@@ -485,6 +485,18 @@ export const ETHICS_CATEGORIES = [
     { value: 'Diger', label: 'Diğer' }
 ];
 
+export const DISCIPLINARY_ACTIONS = [
+    { value: 'Karar Bekleniyor', label: 'Karar Bekleniyor' },
+    { value: 'Disiplin Cezası Gerekli Görülmedi', label: 'Disiplin Cezası Gerekli Görülmedi' },
+    { value: 'İhtar', label: 'İhtar' },
+    { value: 'Kınama', label: 'Kınama' },
+    { value: 'Ağır Kınama', label: 'Ağır Kınama' },
+    { value: 'Ücret Kesintisi', label: 'Ücret Kesintisi' },
+    { value: 'Görevden Uzaklaştırma', label: 'Görevden Uzaklaştırma' },
+    { value: 'İşten Çıkarma (Haklı Fesih)', label: 'İşten Çıkarma (Haklı Fesih)' },
+    { value: 'Diğer', label: 'Diğer' }
+];
+
 export const generateSamplingReport = async (plan: any) => {
     const { jsPDF } = await import('jspdf');
     const { default: autoTable } = await import('jspdf-autotable');

@@ -13,7 +13,7 @@ import ProcessTimeline from '@/components/ui/ProcessTimeline';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/ui/Button';
 import Switch from '@/components/ui/Switch';
-import { formatDate, formatDateTime } from '@/lib/audit-utils';
+import { formatDate, formatDateTime, DISCIPLINARY_ACTIONS } from '@/lib/audit-utils';
 import StaffMultiSelect from '@/components/audit/StaffMultiSelect';
 import EvidenceList from '@/components/audit/ethics/EvidenceList';
 
@@ -1005,14 +1005,7 @@ export default function ViewEthicsReportModal({
                                                         parts[0] = v as string;
                                                         setDisciplinaryActionDetails(parts.join('|'));
                                                     }}
-                                                    options={[
-                                                        { value: 'İhtar', label: 'İhtar' },
-                                                        { value: 'Kınama', label: 'Kınama' },
-                                                        { value: 'Ücret Kesintisi', label: 'Ücret Kesintisi' },
-                                                        { value: 'Görevden Uzaklaştırma', label: 'Görevden Uzaklaştırma' },
-                                                        { value: 'İşten Çıkarma', label: 'İşten Çıkarma' },
-                                                        { value: 'Diğer', label: 'Diğer' }
-                                                    ]}
+                                                    options={DISCIPLINARY_ACTIONS}
                                                     placeholder="Seçiniz..."
                                                 />
                                                 <div>
