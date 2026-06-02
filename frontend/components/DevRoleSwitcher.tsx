@@ -9,7 +9,7 @@ export default function DevRoleSwitcher() {
     // const router = useRouter(); // Navigasyon yerine hard reload kullanacağız
     const [isOpen, setIsOpen] = useState(false);
 
-    if (process.env.NODE_ENV === 'production' || !user || !setRoles) return null;
+    if (!user || !setRoles) return null;
 
     const currentRole = user.roles.includes('SYSTEM_ADMIN') ? 'Sistem Yöneticisi'
         : user.roles.includes('AUDIT_ADMIN') ? 'Teftiş K. Başkanı (CAE)'

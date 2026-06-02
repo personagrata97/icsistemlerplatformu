@@ -241,12 +241,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return user.roles.includes(role);
     }, [user]);
 
-    // Geliştirme ortamı yardımcısı — Production'da devre dışı (güvenlik)
     const setRoles = (newRoles: string[]) => {
-        if (process.env.NODE_ENV === 'production') {
-            console.warn('[GÜVENLİK] setRoles() production ortamında devre dışıdır.');
-            return;
-        }
         if (!user) return;
         const updatedUser = { ...user, roles: newRoles };
         setUser(updatedUser);

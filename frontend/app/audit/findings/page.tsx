@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import {
     AlertCircle, Eye, History as HistoryIcon, Trash2, Send, Save, ArrowLeft, Loader2, Wand2,
@@ -43,7 +44,7 @@ import Modal from '@/components/ui/Modal';
 // --- Sub-Components ---
 // (Modals have been moved to separate files)
 
-export default function FindingsPage() {
+function FindingsPageContent() {
     const { user, hasPermission, hasRole } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
@@ -980,4 +981,13 @@ export default function FindingsPage() {
             />
         </>
     );
+}
+
+
+export default function FindingsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-400">Yükleniyor...</div>}>
+      <FindingsPageContent />
+    </Suspense>
+  );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
     ShieldCheck, 
@@ -41,7 +42,7 @@ interface ActionPlanItem {
     dueDate: string;
 }
 
-export default function FastTrackPage() {
+function FastTrackPageContent() {
     const searchParams = useSearchParams();
     const findingId = searchParams.get('findingId');
     const token = searchParams.get('token');
@@ -671,4 +672,13 @@ export default function FastTrackPage() {
             </div>
         </div>
     );
+}
+
+
+export default function FastTrackPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-400">Yükleniyor...</div>}>
+      <FastTrackPageContent />
+    </Suspense>
+  );
 }

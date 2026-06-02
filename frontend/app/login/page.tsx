@@ -133,16 +133,14 @@ export default function LoginPage() {
                             )}
                         </button>
 
-                        {process.env.NODE_ENV !== 'production' && (
-                            <div className="pt-4 border-t border-gray-100 text-center">
-                                <p className="text-[11px] text-gray-500 leading-relaxed font-medium mb-1">
-                                    <strong>GELİŞTİRME ORTAMI — ORTAK ŞİFRE:</strong> <span className="text-red-500 font-bold text-xs">Test1234!</span>
-                                </p>
-                                <p className="text-[11px] text-gray-400 leading-relaxed font-medium">
-                                    Müfettiş: <strong>mufettis</strong> | Gözetmen: <strong>gozetmen</strong> | Müdür: <strong>mudur</strong> | Admin: <strong>admin</strong>
-                                </p>
-                            </div>
-                        )}
+                        <div className="pt-4 border-t border-gray-100 text-center">
+                            <p className="text-[11px] text-gray-500 leading-relaxed font-medium mb-1">
+                                <strong>TEST ORTAMI — ORTAK ŞİFRE:</strong> <span className="text-red-500 font-bold text-xs">Test1234!</span>
+                            </p>
+                            <p className="text-[11px] text-gray-400 leading-relaxed font-medium">
+                                Müfettiş: <strong>mufettis</strong> | Gözetmen: <strong>gozetmen</strong> | Müdür: <strong>mudur</strong> | Admin: <strong>admin</strong>
+                            </p>
+                        </div>
                     </form>
 
                     {/* Public Ethics Report Portal Action Card */}

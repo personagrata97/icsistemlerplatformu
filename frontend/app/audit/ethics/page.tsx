@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { Suspense } from 'react';
 import { Search, Filter, Eye, ChevronDown, Download, RefreshCw, Plus, X, Edit2, MessageSquare, ExternalLink, UserPlus, LayoutDashboard, List, AlertTriangle, CheckCircle, Calendar } from 'lucide-react';
 import DataTable from '@/components/ui/DataTable';
 import { useToast } from '@/components/Toast';
@@ -73,7 +74,7 @@ const SOURCE_MAP: Record<string, string> = {
     'Manuel Giriş': 'Manuel Giriş',
 };
 
-export default function EthicsPage() {
+function EthicsPageContent() {
     const { setTitle, setSubtitle } = useAuditTitle();
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
@@ -491,4 +492,13 @@ export default function EthicsPage() {
             />
         </>
     );
+}
+
+
+export default function EthicsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-400">Yükleniyor...</div>}>
+      <EthicsPageContent />
+    </Suspense>
+  );
 }
