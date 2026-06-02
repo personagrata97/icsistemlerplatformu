@@ -1,5 +1,5 @@
 # Base Image
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Çalışma dizini oluştur
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Bağımlılıkları yükle
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Kaynak kodları kopyala
 COPY . .
