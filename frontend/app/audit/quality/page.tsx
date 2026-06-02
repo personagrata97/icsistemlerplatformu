@@ -26,6 +26,7 @@ import { clsx } from 'clsx';
 import { formatDate } from '@/lib/audit-utils';
 import { NoResultsState } from '@/components/ui/EmptyState';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import FormInput from "@/components/ui/FormInput";
 
 // ======================== INTERFACES ========================
 
@@ -951,7 +952,7 @@ export default function QualityAssurancePage() {
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <CustomSelect label="Tür" value={assessmentForm.type} onChange={(val) => setAssessmentForm({ ...assessmentForm, type: val as any })} options={[{ value: 'İç', label: 'İç Değerlendirme' }, { value: 'Dış', label: 'Dış Değerlendirme' }]} />
-                        <div className="form-group"><label className="form-label">Tarih</label><input type="date" className="form-input" value={assessmentForm.date} onChange={e => setAssessmentForm({ ...assessmentForm, date: e.target.value })} /></div>
+                        <div className="form-group"><label className="form-label">Tarih</label><FormInput type="date"  value={assessmentForm.date} onChange={e => setAssessmentForm({ ...assessmentForm, date: e.target.value })} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="form-group"><label className="form-label">Değerlendirici Kişi/Kurum</label><input type="text" className="form-input" value={assessmentForm.assessor} onChange={e => setAssessmentForm({ ...assessmentForm, assessor: e.target.value })} placeholder="Örn: Denetim Komitesi / ABC Firması" /></div>
@@ -974,7 +975,7 @@ export default function QualityAssurancePage() {
                         <div className="form-group"><label className="form-label">Puan (%)</label><input type="number" className="form-input" value={assessmentForm.score} onChange={e => setAssessmentForm({ ...assessmentForm, score: Number(e.target.value) })} /></div>
                     </div>
                     <div className="form-group"><label className="form-label">Temel Bulgular</label><textarea className="form-input h-20" value={assessmentForm.findings} onChange={e => setAssessmentForm({ ...assessmentForm, findings: e.target.value })} /></div>
-                    <div className="form-group"><label className="form-label">Sonraki Planlanan Tarih</label><input type="date" className="form-input" value={assessmentForm.nextDueDate} onChange={e => setAssessmentForm({ ...assessmentForm, nextDueDate: e.target.value })} /></div>
+                    <div className="form-group"><label className="form-label">Sonraki Planlanan Tarih</label><FormInput type="date"  value={assessmentForm.nextDueDate} onChange={e => setAssessmentForm({ ...assessmentForm, nextDueDate: e.target.value })} /></div>
                 </div>
             </Modal>
 
@@ -986,7 +987,7 @@ export default function QualityAssurancePage() {
                     <div className="form-group"><label className="form-label">Açıklama</label><textarea className="form-input h-20" value={actionForm.description} onChange={e => setActionForm({ ...actionForm, description: e.target.value })} /></div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="form-group"><label className="form-label">Sorumlu</label><input type="text" className="form-input" value={actionForm.responsible} onChange={e => setActionForm({ ...actionForm, responsible: e.target.value })} /></div>
-                        <div className="form-group"><label className="form-label">Son Tarih</label><input type="date" className="form-input" value={actionForm.dueDate} onChange={e => setActionForm({ ...actionForm, dueDate: e.target.value })} /></div>
+                        <div className="form-group"><label className="form-label">Son Tarih</label><FormInput type="date"  value={actionForm.dueDate} onChange={e => setActionForm({ ...actionForm, dueDate: e.target.value })} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <CustomSelect label="Durum" value={actionForm.status} onChange={(val) => setActionForm({ ...actionForm, status: val as string })} options={[{ value: 'Açık', label: 'Açık' }, { value: 'Devam Ediyor', label: 'Devam Ediyor' }, { value: 'Tamamlandı', label: 'Tamamlandı' }]} />

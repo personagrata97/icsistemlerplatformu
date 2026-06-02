@@ -39,6 +39,7 @@ import { FileUpload } from '@/components/ui/FileUpload';
 import { getRiskScoreColor, getRiskLevelFromScore, getAuditCycleFromScore, formatDate } from '@/lib/audit-utils';
 import { useAuth } from '@/context/AuthContext';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
+import FormInput from "@/components/ui/FormInput";
 
 interface AuditableUnit {
     id: string;
@@ -1753,7 +1754,7 @@ export default function AuditUniversePage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Son Denetim Tarihi</label>
-                                                <input type="date" className="form-input" value={newUnit.lastAuditDate || ''} onChange={e => setNewUnit({ ...newUnit, lastAuditDate: e.target.value })} />
+                                                <FormInput type="date"  value={newUnit.lastAuditDate || ''} onChange={e => setNewUnit({ ...newUnit, lastAuditDate: e.target.value })} />
                                             </div>
                                             <div>
                                                 <CustomSelect
@@ -1769,7 +1770,7 @@ export default function AuditUniversePage() {
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Sonraki Planlanan Denetim</label>
-                                                <input type="date" className="form-input" value={newUnit.nextAuditDate || ''} onChange={e => setNewUnit({ ...newUnit, nextAuditDate: e.target.value })} />
+                                                <FormInput type="date"  value={newUnit.nextAuditDate || ''} onChange={e => setNewUnit({ ...newUnit, nextAuditDate: e.target.value })} />
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Açık Bulgu Sayısı</label>

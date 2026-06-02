@@ -23,6 +23,7 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
 import ConfirmModal from '@/components/ConfirmModal';
+import FormInput from "@/components/ui/FormInput";
 
 interface Finding {
     id: string;
@@ -646,7 +647,7 @@ export default function FindingDetailPage() {
                             <div>
                                 <h4 className="text-sm text-gray-500 mb-1">Termin Tarihi</h4>
                                 {isEditing ? (
-                                    <input type="date" className="form-input" value={editForm.dueDate} onChange={e => setEditForm({ ...editForm, dueDate: e.target.value })} />
+                                    <FormInput type="date"  value={editForm.dueDate} onChange={e => setEditForm({ ...editForm, dueDate: e.target.value })} />
                                 ) : (
                                     <p className="font-medium flex items-center gap-1">
                                         <Calendar size={14} /> {formatDate(finding.dueDate)}

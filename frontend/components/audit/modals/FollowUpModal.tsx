@@ -4,6 +4,7 @@ import Button from '@/components/ui/Button';
 
 import CustomSelect from '@/components/ui/CustomSelect';
 import StaffSelect from '@/components/audit/StaffSelect';
+import FormInput from "@/components/ui/FormInput";
 
 interface FollowUpFormData {
     action: string;
@@ -53,7 +54,7 @@ export default function FollowUpModal({ isOpen, onClose, onSubmit, initialData, 
         >
             <form id="followUpForm" onSubmit={handleSubmit} className="space-y-4">
                 <div className="form-group"><label className="form-label">Aksiyon *</label><input type="text" className="form-input" required value={formData.action} onChange={e => setFormData({ ...formData, action: e.target.value })} /></div>
-                <div className="grid grid-cols-2 gap-4"><div className="form-group"><label className="form-label">Bulgu No</label><input type="text" className="form-input" placeholder="B-2024-XXX" value={formData.findingCode} onChange={e => setFormData({ ...formData, findingCode: e.target.value })} /></div><div className="form-group"><label className="form-label">Son Tarih *</label><input type="date" className="form-input" required value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} /></div></div>
+                <div className="grid grid-cols-2 gap-4"><div className="form-group"><label className="form-label">Bulgu No</label><input type="text" className="form-input" placeholder="B-2024-XXX" value={formData.findingCode} onChange={e => setFormData({ ...formData, findingCode: e.target.value })} /></div><div className="form-group"><label className="form-label">Son Tarih *</label><FormInput type="date"  required value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} /></div></div>
                 <div className="grid grid-cols-2 gap-4">
                     <StaffSelect
                         label="Sorumlu Kişi"

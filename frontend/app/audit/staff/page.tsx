@@ -33,6 +33,7 @@ import ExperienceModal from '@/components/audit/staff/modals/ExperienceModal';
 import TrainingModal from '@/components/audit/staff/modals/TrainingModal';
 import PromotionModal from '@/components/audit/staff/modals/PromotionModal';
 import BulkTrainingModal from '@/components/audit/staff/modals/BulkTrainingModal';
+import FormInput from "@/components/ui/FormInput";
 
 const TITLES = ['Müfettiş Yardımcısı', 'Yetkili Müfettiş Yardımcısı', 'Müfettiş', 'Kıdemli Müfettiş', 'Başmüfettiş', 'Teftiş Kurulu Müdürü'];
 const ROLES = ['Sistem Yöneticisi', 'Teftiş Kurulu Müdürü', 'Müfettiş', 'İzleyici'];
@@ -1201,7 +1202,7 @@ export default function AuditStaffPage() {
                                         </div>
                                         <div className="form-group">
                                             <label className="form-label">İşe Giriş Tarihi</label>
-                                            <input name="hireDate" type="date" className="form-input disabled:bg-gray-50 disabled:text-gray-500" value={formData.hireDate || ''} onChange={e => setFormData({ ...formData, hireDate: e.target.value })} disabled={isViewMode} />
+                                            <FormInput name="hireDate" type="date"  value={formData.hireDate || ''} onChange={e => setFormData({ ...formData, hireDate: e.target.value })} disabled={isViewMode} />
                                         </div>
                                     </div>
 

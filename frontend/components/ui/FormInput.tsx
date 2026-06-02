@@ -1,6 +1,7 @@
 import React, { InputHTMLAttributes, forwardRef } from 'react';
 import { clsx } from 'clsx';
 import { AlertCircle } from 'lucide-react';
+import DatePicker from './DatePicker';
 
 export interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -46,42 +47,63 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                     </label>
                 )}
 
-                <div className="relative flex items-center">
-                    {leftIcon && (
-                        <div className="absolute left-3 flex items-center justify-center pointer-events-none text-slate-400">
-                            {leftIcon}
-                        </div>
-                    )}
-                    
-                    <input
+                {props.type === 'date' ? (
+                    <DatePicker 
+                        value={props.value as string}
+                        onChange={(val) => {
+                            if (props.onChange) {
+                                // Simulate event for react-hook-form / standard onChange handlers
+                                const event = {
+                                    target: { value: val, name: props.name }
+                                } as React.ChangeEvent<HTMLInputElement>;
+                                props.onChange(event);
+                            }
+                        }}
+                        placeholder={props.placeholder}
+                        className={inputClassName}
+                        error={!!error}
+                        disabled={props.disabled}
                         id={inputId}
-                        ref={ref}
                         required={required}
-                        className={clsx(
-                            'flex-1 w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm outline-none transition-all duration-200',
-                            'placeholder:text-slate-400',
-                            leftIcon && 'pl-9',
-                            rightIcon && 'pr-9',
-                            inputClassName,
-                            error
-                                ? 'border-rose-300 text-rose-900 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
-                                : 'border-slate-200 text-slate-900 focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-slate-300 disabled:bg-slate-50 disabled:text-slate-500',
-                        )}
-                        {...props}
                     />
+                ) : (
+                    <div className="relative flex items-center">
+                        {leftIcon && (
+                            <div className="absolute left-3 flex items-center justify-center pointer-events-none text-slate-400">
+                                {leftIcon}
+                            </div>
+                        )}
+                        
+                        <input
+                            id={inputId}
+                            ref={ref}
+                            required={required}
+                            className={clsx(
+                                'flex-1 w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm outline-none transition-all duration-200',
+                                'placeholder:text-slate-400',
+                                leftIcon && 'pl-9',
+                                rightIcon && 'pr-9',
+                                inputClassName,
+                                error
+                                    ? 'border-rose-300 text-rose-900 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
+                                    : 'border-slate-200 text-slate-900 focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-slate-300 disabled:bg-slate-50 disabled:text-slate-500',
+                            )}
+                            {...props}
+                        />
 
-                    {rightIcon && (
-                        <div className="absolute right-3 flex items-center justify-center text-slate-400">
-                            {rightIcon}
-                        </div>
-                    )}
-                    
-                    {error && !rightIcon && (
-                        <div className="absolute right-3 flex items-center justify-center pointer-events-none text-rose-500">
-                            <AlertCircle size={16} />
-                        </div>
-                    )}
-                </div>
+                        {rightIcon && (
+                            <div className="absolute right-3 flex items-center justify-center text-slate-400">
+                                {rightIcon}
+                            </div>
+                        )}
+                        
+                        {error && !rightIcon && (
+                            <div className="absolute right-3 flex items-center justify-center pointer-events-none text-rose-500">
+                                <AlertCircle size={16} />
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {(error || helperText) && (
                     <div className="flex items-center gap-1.5 mt-0.5">

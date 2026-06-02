@@ -10,6 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { useAuth } from '@/context/AuthContext';
 import { auditApi } from '@/lib/audit-api';
 import ConfirmModal from '@/components/ConfirmModal';
+import FormInput from "@/components/ui/FormInput";
 
 interface AuditTimesheetTabProps {
     auditId: string;
@@ -163,7 +164,7 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
             render: (row: any) => {
                 const isEditable = isManager || row.userId === user?.id || row.isNew;
                 return isEditable ? (
-                    <input type="date" className="form-input" 
+                    <FormInput type="date"  
                         value={row.date} 
                         onChange={(e) => handleUpdateEntry(row.id, 'date', e.target.value)} 
                     />
