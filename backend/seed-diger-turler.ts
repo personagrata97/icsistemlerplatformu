@@ -160,7 +160,7 @@ async function main() {
         data: {
             title: 'Kredi Tahsis Süreçlerinde Usulsüzlük İddiası',
             type: 'Soruşturma',
-            status: 'Raporlama',
+            status: 'G�zden Ge�irme',
             progress: 90,
             startDate: '2026-05-01T00:00:00Z',
             endDate: '2026-06-30T00:00:00Z',
