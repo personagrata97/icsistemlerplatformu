@@ -84,12 +84,21 @@ const FindingsTable: React.FC<FindingsTableProps> = ({
             )
         },
         ...(!isUnit ? [{
-            key: 'riskLevel',
+            key: 'risk',
             header: 'Risk',
             sortable: true,
             width: '120px',
             align: 'center',
-            type: 'risk'
+            type: 'risk',
+            render: (item: any) => {
+                const val = item.risk || item.riskLevel;
+                if (!val) return '-';
+                return (
+                    <div className="flex justify-center">
+                        <span className={`badge ${getRiskBadgeClass(val)}`}>{val}</span>
+                    </div>
+                );
+            }
         } as Column<Finding>] : []),
         {
             key: 'status',
@@ -105,7 +114,12 @@ const FindingsTable: React.FC<FindingsTableProps> = ({
             sortable: true,
             width: '150px',
             align: 'center',
-            type: 'date'
+            render: (item: any) => {
+                // followUps dizisindeki son tarihi veya eylem tarihini almaya çalışalım
+                const date = item.dueDate || (item.followUps && item.followUps.length > 0 ? item.followUps[0].deadline : null);
+                if (!date) return <span className="text-gray-400">-</span>;
+                return formatDate(date);
+            }
         },
         ...(!isUnit ? [{
             key: 'assignedUser',
@@ -113,7 +127,22 @@ const FindingsTable: React.FC<FindingsTableProps> = ({
             sortable: true,
             width: '180px',
             align: 'center',
-            type: 'user'
+            render: (item: any) => {
+                // Denetim ekibinden başmüfettişi veya ilgiliyi çekebiliriz ya da owner bilgisini gösterebiliriz
+                // Prisma Finding modelinde direkt assignedUser yok, audit.team den çekilebilir
+                const team = item.audit?.team;
+                let userStr = '-';
+                if (typeof team === 'string') {
+                    try {
+                        const parsed = JSON.parse(team);
+                        userStr = parsed[0]?.name || '-';
+                    } catch { }
+                } else if (Array.isArray(team) && team.length > 0) {
+                    userStr = team[0].name;
+                }
+                
+                return <span className="text-gray-600 font-medium">{userStr}</span>;
+            }
         } as Column<Finding>] : []),
         {
             key: 'actions',
