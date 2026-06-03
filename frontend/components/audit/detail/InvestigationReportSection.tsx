@@ -184,16 +184,17 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
             ".signature-block { text-align: center; width: 45%; }",
             ".signature-line { margin-top: 50px; border-top: 1px solid #cbd5e1; padding-top: 8px; font-size: 13px; font-weight: 600; }",
             '</style></head><body>',
-            '<div class="header"><h1>T.C. EMLAK KATILIM BANKASI A.Ş.</h1><h2 style="font-size: 15px; margin-top: 10px; color: #1e3a8a;">SORUŞTURMA VE İNCELEME RAPORU</h2></div>',
-            '<table class="meta-table"><tr><td class="label">Rapor No</td><td>' + (auditData.code || 'D-01') + '</td><td class="label">Tarih</td><td>' + new Date().toLocaleDateString('tr-TR') + '</td></tr>',
-            '<tr><td class="label">Olay Türü</td><td>' + (fraudType || 'Belirtilmedi') + '</td><td class="label">Zarar Tutarı</td><td>' + impactTxt + '</td></tr>',
-            '<tr><td class="label">Disiplin Durumu</td><td colspan="3"><strong>' + disciplinaryDecision + '</strong></td></tr></table>',
+            '<div class="header"><h1>EMLAK KATILIM TASARRUF FİNANSMAN A.Ş.</h1><h2 style="font-size: 14px; margin-top: 5px; color: #64748b; font-weight: 600;">Teftiş Kurulu Başkanlığı</h2><h2 style="font-size: 16px; margin-top: 15px; color: #1e3a8a;">SORUŞTURMA RAPORU</h2></div>',
+            '<table class="meta-table"><tr><td class="label">Rapor No</td><td>' + (auditData.code || 'D-01') + '</td><td class="label">Rapor Tarihi</td><td>' + new Date().toLocaleDateString('tr-TR') + '</td></tr>',
+            '<tr><td class="label">İnceleme Konusu</td><td>' + (fraudType || 'Belirtilmedi') + '</td><td class="label">Zarar Tutarı</td><td>' + impactTxt + '</td></tr>',
+            '<tr><td class="label">Disiplin Kararı</td><td colspan="3"><strong>' + disciplinaryDecision + '</strong></td></tr></table>',
             subjectsHtml,
-            '<div class="section-title">1. OLAYIN ÖZETİ</div><div class="text-content">' + (summary || '-') + '</div>',
-            '<div class="section-title">2. TESPİTLER VE KANITLAR</div><div class="text-content">' + (findings || '-') + '</div>',
-            '<div class="section-title">3. KANAAT VE MÜTALAA</div><div class="text-content">' + (opinion || '-') + '</div>',
-            '<div class="signatures"><div class="signature-block"><div class="signature-line">' + performers + '</div><div style="font-size: 11px; color: #64748b;">Soruşturmacı Müfettiş</div></div>',
-            '<div class="signature-block"><div class="signature-line">' + supervisor + '</div><div style="font-size: 11px; color: #64748b;">Teftiş Kurulu Gözetmeni</div></div></div>',
+            '<div class="section-title">1. OLAYLAR VE SAVLAR</div><div class="text-content">' + (summary || '-') + '</div>',
+            '<div class="section-title">2. İNCELEME VE ÇÖZÜMLEMELER</div><div class="text-content">' + (findings || '-') + '</div>',
+            '<div class="section-title">3. SONUÇ VE KANAAT</div><div class="text-content">' + (opinion || '-') + '</div>',
+            '<div class="section-title">4. MÜFETTİŞ ÖNERİLERİ</div><div class="text-content"><strong>4.1. Kusurlu ve Sorumlular:</strong><br/>' + (subjects.length > 0 ? subjects.map(s => s.name + ' (' + s.role + ')').join(', ') : 'Belirtilmedi') + '<br/><br/><strong>4.2. İdari Öneriler:</strong><br/>' + disciplinaryDecision + '</div>',
+            '<div class="signatures"><div class="signature-block"><div class="signature-line">' + performers + '</div><div style="font-size: 11px; color: #64748b;">Soruşturmayı Yapan</div></div>',
+            '<div class="signature-block"><div class="signature-line">' + supervisor + '</div><div style="font-size: 11px; color: #64748b;">Gözden Geçiren</div></div></div>',
             '<script>window.onload = function() { window.print(); };</script>',
             '</body></html>'
         ].join('\\n');
@@ -263,7 +264,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                     }`}
                 >
                     <PenTool size={15} />
-                    2. Olay Örgüsü ve Kanıtlar
+                    2. İnceleme ve Çözümlemeler
                 </button>
                 <button
                     onClick={() => setActiveTab('preview')}
@@ -274,7 +275,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                     }`}
                 >
                     <Activity size={15} />
-                    3. Karar & Sistem Zafiyeti
+                    3. Sonuç ve Öneriler
                 </button>
             </div>
 
@@ -448,36 +449,36 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                         <div className="grid grid-cols-1 gap-6">
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
-                                    <Clipboard size={14} /> 1. OLAYIN ÖZETİ VE İHBAR DETAYI
+                                    <Clipboard size={14} /> 1. OLAYLAR VE SAVLAR
                                 </label>
                                 <textarea
                                     value={summary}
                                     onChange={(e) => setSummary(e.target.value)}
-                                    placeholder="Olayın kaynağı, ilk tespiti ve iddiaların kısa özeti..."
+                                    placeholder="Soruşturmaya/İncelemeye konu olaylar ve savlar..."
                                     className="w-full min-h-[140px] p-4 text-sm border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-slate-50/30"
                                 />
                             </div>
 
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
-                                    <PenTool size={14} /> 2. TESPİTLER VE KANITLAR
+                                    <PenTool size={14} /> 2. İNCELEME VE ÇÖZÜMLEMELER
                                 </label>
                                 <textarea
                                     value={findings}
                                     onChange={(e) => setFindings(e.target.value)}
-                                    placeholder="Alınan ifadeler, kamera kayıtları, log incelemeleri ve somut tespitler..."
+                                    placeholder="İnceleme yöntemi, elde edilen kanıtlar, yazılı ifadeler ve ulaşılan tespitler..."
                                     className="w-full min-h-[220px] p-4 text-sm border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-slate-50/30"
                                 />
                             </div>
 
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
-                                    <CheckCircle size={14} /> 3. KANAAT VE MÜTALAA
+                                    <CheckCircle size={14} /> 3. SONUÇ VE KANAAT
                                 </label>
                                 <textarea
                                     value={opinion}
                                     onChange={(e) => setOpinion(e.target.value)}
-                                    placeholder="Soruşturmacının nihai görüşü ve sonuç..."
+                                    placeholder="Müfettişin nihai kanaati ve sonuç bölümü..."
                                     className="w-full min-h-[160px] p-4 text-sm border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-slate-50/30"
                                 />
                             </div>
