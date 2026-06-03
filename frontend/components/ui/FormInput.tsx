@@ -47,27 +47,6 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                     </label>
                 )}
 
-                {props.type === 'date' ? (
-                    <DatePicker 
-                        value={props.value as string}
-                        onChange={(val) => {
-                            if (props.onChange) {
-                                // Simulate event for react-hook-form / standard onChange handlers
-                                const event = {
-                                    target: { value: val, name: props.name }
-                                } as React.ChangeEvent<HTMLInputElement>;
-                                props.onChange(event);
-                            }
-                        }}
-                        placeholder={props.placeholder}
-                        className={inputClassName}
-                        error={!!error}
-                        disabled={props.disabled}
-                        id={inputId}
-                        required={required}
-                    />
-                ) : (
-                    <div className="relative flex items-center">
                         {leftIcon && (
                             <div className="absolute left-3 flex items-center justify-center pointer-events-none text-slate-400">
                                 {leftIcon}
@@ -103,7 +82,6 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                             </div>
                         )}
                     </div>
-                )}
 
                 {(error || helperText) && (
                     <div className="flex items-center gap-1.5 mt-0.5">
