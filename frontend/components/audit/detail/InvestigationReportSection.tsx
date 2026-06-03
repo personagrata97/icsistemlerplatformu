@@ -184,7 +184,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
             ".signature-block { text-align: center; width: 45%; }",
             ".signature-line { margin-top: 50px; border-top: 1px solid #cbd5e1; padding-top: 8px; font-size: 13px; font-weight: 600; }",
             '</style></head><body>',
-            '<div class="header"><h1>EMLAK KATILIM TASARRUF FİNANSMAN A.Ş.</h1><h2 style="font-size: 14px; margin-top: 5px; color: #64748b; font-weight: 600;">Teftiş Kurulu Başkanlığı</h2><h2 style="font-size: 16px; margin-top: 15px; color: #1e3a8a;">SORUŞTURMA RAPORU</h2></div>',
+            '<div class="header"><h1>EMLAK KATILIM TASARRUF FİNANSMAN A.Ş.</h1><h2 style="font-size: 14px; margin-top: 5px; color: #64748b; font-weight: 600;">Teftiş Kurulu Müdürlüğü</h2><h2 style="font-size: 16px; margin-top: 15px; color: #1e3a8a;">SORUŞTURMA RAPORU</h2></div>',
             '<table class="meta-table"><tr><td class="label">Rapor No</td><td>' + (auditData.code || 'D-01') + '</td><td class="label">Rapor Tarihi</td><td>' + new Date().toLocaleDateString('tr-TR') + '</td></tr>',
             '<tr><td class="label">İnceleme Konusu</td><td>' + (fraudType || 'Belirtilmedi') + '</td><td class="label">Zarar Tutarı</td><td>' + impactTxt + '</td></tr>',
             '<tr><td class="label">Disiplin Kararı</td><td colspan="3"><strong>' + disciplinaryDecision + '</strong></td></tr></table>',

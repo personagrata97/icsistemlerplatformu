@@ -260,7 +260,7 @@ function FastTrackPageContent() {
                 <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-1">
                     EMLAK KATILIM <span className="text-[#c9a84c]">TFS</span>
                 </h1>
-                <p className="text-xs uppercase tracking-widest text-[#c9a84c] font-semibold">Teftiş Kurulu Başkanlığı • Dijital Mutabakat Sistemi (AMS)</p>
+                <p className="text-xs uppercase tracking-widest text-[#c9a84c] font-semibold">Teftiş Kurulu Müdürlüğü • Dijital Mutabakat Sistemi (AMS)</p>
             </div>
 
             {/* Portal Card */}

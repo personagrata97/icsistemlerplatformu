@@ -1624,7 +1624,7 @@ export default function AuditStaffPage() {
                                                     <textarea 
                                                         className="form-input text-sm mt-1 bg-white" 
                                                         rows={2} 
-                                                        placeholder="Örn: X Daire Başkanlığında öz ağabeyim birim müdürü olarak görev yapmaktadır..."
+                                                        placeholder="Örn: X Daire Müdürlüğünde öz ağabeyim birim müdürü olarak görev yapmaktadır..."
                                                         value={declarationForm.familyDetails}
                                                         onChange={(e) => setDeclarationForm({ ...declarationForm, familyDetails: e.target.value })}
                                                         required
@@ -1713,7 +1713,7 @@ export default function AuditStaffPage() {
                                                 onChange={(e) => setDeclarationForm({ ...declarationForm, agreedToTerms: e.target.checked })}
                                             />
                                             <label htmlFor="agreed-checkbox" className="text-xs text-indigo-950 font-medium leading-relaxed cursor-pointer select-none">
-                                                <strong>TAAHHÜTNAMEDİR:</strong> Yukarıda beyan ettiğim bilgilerin doğru, güncel ve eksiksiz olduğunu beyan ederim. Denetim çalışmalarımı uluslararası mesleki standartlar, genel etik kurallar ve kurumumuz politikaları doğrultusunda tarafsız, objektif ve dürüstlük ilkelerine bağlı kalarak yürüteceğimi; bağımsızlığımı tehlikeye düşürecek veya çıkar çatışması doğurabilecek herhangi bir yeni durumu derhal Teftiş Kurulu Başkanlığı'na yazılı olarak bildireceğimi taahhüt ederim. İşbu beyan, dijital ortamda e-imza hükmünde onaylanmıştır.
+                                                <strong>TAAHHÜTNAMEDİR:</strong> Yukarıda beyan ettiğim bilgilerin doğru, güncel ve eksiksiz olduğunu beyan ederim. Denetim çalışmalarımı uluslararası mesleki standartlar, genel etik kurallar ve kurumumuz politikaları doğrultusunda tarafsız, objektif ve dürüstlük ilkelerine bağlı kalarak yürüteceğimi; bağımsızlığımı tehlikeye düşürecek veya çıkar çatışması doğurabilecek herhangi bir yeni durumu derhal Teftiş Kurulu Müdürlüğü'ne yazılı olarak bildireceğimi taahhüt ederim. İşbu beyan, dijital ortamda e-imza hükmünde onaylanmıştır.
                                             </label>
                                         </div>
                                     </div>
