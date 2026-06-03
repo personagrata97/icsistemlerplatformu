@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { formatDate } from '@/lib/audit-utils';
+import TruncatedText from '@/components/ui/TruncatedText';
 
 interface AuditInformationGridProps {
     auditData: any;
@@ -97,13 +98,13 @@ const AuditInformationGrid: React.FC<AuditInformationGridProps> = ({
                     )}
                 </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-3">
+            <div className="bg-gray-50 rounded-lg p-3 overflow-hidden">
                 <h4 className="text-xs text-gray-500 mb-1">Denetim Ekibi</h4>
-                <p className="font-medium text-sm truncate" title={getAuditorsWithRoles()}>{getAuditorsWithRoles()}</p>
+                <TruncatedText text={getAuditorsWithRoles()} className="font-medium text-sm text-gray-800" />
             </div>
-            <div className="bg-gray-50 rounded-lg p-3">
+            <div className="bg-gray-50 rounded-lg p-3 overflow-hidden">
                 <h4 className="text-xs text-gray-500 mb-1">Gözetim Sorumlusu</h4>
-                <p className="font-medium text-sm truncate" title={getSupervisorWithRole()}>{getSupervisorWithRole()}</p>
+                <TruncatedText text={getSupervisorWithRole()} className="font-medium text-sm text-gray-800" />
             </div>
             <div className="bg-gray-50 rounded-lg p-3">
                 <h4 className="text-xs text-gray-500 mb-1">İlerleme</h4>

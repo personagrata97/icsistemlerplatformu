@@ -161,7 +161,6 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
     };
 
     // Print / PDF Export Functionality
-    // Print / PDF Export Functionality
     const handlePrintPDF = () => {
         const printWindow = window.open('', '_blank');
         if (!printWindow) return;
@@ -175,7 +174,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
             subjectsHtml = [
                 '<div class="section-title">DOSYA İLGİLİLERİ</div>',
                 '<table class="subjects-list">',
-                '<thead><tr><th>Adı Soyadı</th><th>Ünvanı</th><th>Rolü</th></tr></thead>',
+                '<thead><tr><th>Adı Soyadı</th><th>Unvanı</th><th>Rolü</th></tr></thead>',
                 '<tbody>',
                 subjects.map(s => '<tr><td><strong>' + s.name + '</strong></td><td>' + s.title + '</td><td>' + s.role + '</td></tr>').join(''),
                 '</tbody></table>'
@@ -186,7 +185,8 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
             '<html><head><meta charset="UTF-8">',
             '<title>SORUŞTURMA RAPORU - ' + (auditData.code || 'D-01') + '</title>',
             '<style>',
-            "body { font-family: 'Verdana', sans-serif; color: #1e293b; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; font-size: 14px; }",
+            "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');",
+            "body { font-family: 'Inter', sans-serif; color: #1e293b; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; font-size: 14px; }",
             ".header { text-align: center; border-bottom: 2px double #cbd5e1; padding-bottom: 20px; margin-bottom: 30px; }",
             ".header h1 { font-size: 18px; text-transform: uppercase; margin: 0 0 8px 0; letter-spacing: 0.5px; color: #0f172a; }",
             ".meta-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }",
@@ -201,20 +201,19 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
             ".signature-block { text-align: center; width: 45%; }",
             ".signature-line { margin-top: 50px; border-top: 1px solid #cbd5e1; padding-top: 8px; font-size: 13px; font-weight: 600; }",
             '</style></head><body>',
-            '<div class="header"><h1>EMLAK KATILIM TASARRUF FİNANSMAN A.Ş.</h1><h2 style="font-size: 14px; margin-top: 5px; color: #64748b; font-weight: 600;">Teftiş Kurulu Müdürlüğü</h2><h2 style="font-size: 16px; margin-top: 15px; color: #1e3a8a;">SORUŞTURMA RAPORU</h2></div>',
-            '<table class="meta-table"><tr><td class="label">Rapor No</td><td>' + (auditData.code || 'D-01') + '</td><td class="label">Rapor Tarihi</td><td>' + new Date().toLocaleDateString('tr-TR') + '</td></tr>',
-            '<tr><td class="label">İnceleme Konusu</td><td>' + (fraudType || 'Belirtilmedi') + '</td><td class="label">Zarar Tutarı</td><td>' + impactTxt + '</td></tr>',
-            '<tr><td class="label">Disiplin Kararı</td><td colspan="3"><strong>' + disciplinaryDecision + '</strong></td></tr></table>',
+            '<div class="header"><h1>T.C. EMLAK KATILIM BANKASI A.Ş.</h1><h2 style="font-size: 15px; margin-top: 10px; color: #1e3a8a;">SORUŞTURMA VE İNCELEME RAPORU</h2></div>',
+            '<table class="meta-table"><tr><td class="label">Rapor No</td><td>' + (auditData.code || 'D-01') + '</td><td class="label">Tarih</td><td>' + new Date().toLocaleDateString('tr-TR') + '</td></tr>',
+            '<tr><td class="label">Olay Türü</td><td>' + (fraudType || 'Belirtilmedi') + '</td><td class="label">Zarar Tutarı</td><td>' + impactTxt + '</td></tr>',
+            '<tr><td class="label">Disiplin Durumu</td><td colspan="3"><strong>' + disciplinaryDecision + '</strong></td></tr></table>',
             subjectsHtml,
-            '<div class="section-title">1. OLAYLAR VE SAVLAR</div><div class="text-content">' + (summary || '-') + '</div>',
-            '<div class="section-title">2. İNCELEME VE ÇÖZÜMLEMELER</div><div class="text-content">' + (findings || '-') + '</div>',
-            '<div class="section-title">3. SONUÇ VE KANAAT</div><div class="text-content">' + (opinion || '-') + '</div>',
-            '<div class="section-title">4. MÜFETTİŞ ÖNERİLERİ</div><div class="text-content"><strong>4.1. Kusurlu ve Sorumlular:</strong><br/>' + (subjects.length > 0 ? subjects.map(s => s.name + ' (' + s.role + ')').join(', ') : 'Belirtilmedi') + '<br/><br/><strong>4.2. İdari Öneriler:</strong><br/>' + disciplinaryDecision + '</div>',
-            '<div class="signatures"><div class="signature-block"><div class="signature-line">' + performers + '</div><div style="font-size: 11px; color: #64748b;">Soruşturmayı Yapan</div></div>',
-            '<div class="signature-block"><div class="signature-line">' + supervisor + '</div><div style="font-size: 11px; color: #64748b;">Gözden Geçiren</div></div></div>',
+            '<div class="section-title">1. OLAYIN ÖZETİ</div><div class="text-content">' + (summary || '-') + '</div>',
+            '<div class="section-title">2. TESPİTLER VE KANITLAR</div><div class="text-content">' + (findings || '-') + '</div>',
+            '<div class="section-title">3. KANAAT VE MÜTALAA</div><div class="text-content">' + (opinion || '-') + '</div>',
+            '<div class="signatures"><div class="signature-block"><div class="signature-line">' + performers + '</div><div style="font-size: 11px; color: #64748b;">Soruşturmacı Müfettiş</div></div>',
+            '<div class="signature-block"><div class="signature-line">' + supervisor + '</div><div style="font-size: 11px; color: #64748b;">Teftiş Kurulu Gözetmeni</div></div></div>',
             '<script>window.onload = function() { window.print(); };</script>',
             '</body></html>'
-        ].join('\\n');
+        ].join('\n');
 
         printWindow.document.write(html);
         printWindow.document.close();
