@@ -17,6 +17,7 @@ import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
 import EmptyState from '@/components/ui/EmptyState';
 import Checkbox from '@/components/ui/Checkbox';
+import { FileUpload } from '@/components/ui/FileUpload';
 
 interface TestStepsProps {
     auditId: string;
@@ -78,11 +79,6 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
     };
 
     const handleOpenAddModal = async () => {
-        if (!unitId) {
-            setShowUnitWarning(true);
-            return;
-        }
-
         setShowAddModal(true);
         if (availableProcesses.length === 0) {
             try {
@@ -313,8 +309,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                     {!unitId && (
                         <div className="max-w-md mx-auto mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-800 flex flex-col items-center text-center gap-2">
                             <AlertTriangle size={24} className="text-orange-500" />
-                            <p><strong>Önemli Not:</strong> Test Adımları (RCM) oluşturabilmek için bu denetimin bir <strong>Denetlenecek Birim/Süreç</strong> ile ilişkilendirilmiş olması gerekmektedir.</p>
-                            <p className="opacity-80">Bu işlemi Yönetici veya Sorumlu Müfettiş denetim özellikleri üzerinden yapabilir.</p>
+                            <p><strong>Bilgi:</strong> Bu denetimin henüz bir Birim/Süreci seçilmemiş ancak yine de genel süreçlerden test adımları ekleyebilirsiniz.</p>
                         </div>
                     )}
                 </div>
@@ -413,46 +408,48 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                                     <div className="border-t pt-4 grid grid-cols-1 md:grid-cols-4 gap-6">
                                         <div>
                                             <label className="text-xs font-semibold text-gray-600 block mb-2">1. Tasarım Etkinliği</label>
-                                            <select
-                                                className={`form-select w-full text-sm ${testFormData.designEffectiveness === 'Etkin Değil' ? 'border-red-300 bg-red-50 text-red-700' : ''}`}
+                                            <CustomSelect
                                                 value={testFormData.designEffectiveness || 'Etkin'}
-                                                onChange={e => { setTestFormData({ ...testFormData, designEffectiveness: e.target.value }); setManualTestResult(''); }}
+                                                onChange={val => { setTestFormData({ ...testFormData, designEffectiveness: String(val) }); setManualTestResult(''); }}
+                                                options={[
+                                                    { value: 'Etkin', label: 'Etkin' },
+                                                    { value: 'Etkin Değil', label: 'Etkin Değil (Bulgu!)' },
+                                                    { value: 'Değerlendirilmedi', label: 'Değerlendirilmedi' }
+                                                ]}
                                                 disabled={test.status === 'Onay Bekliyor' || test.status === 'Onaylandı'}
-                                            >
-                                                <option value="Etkin">Etkin</option>
-                                                <option value="Etkin Değil">Etkin Değil (Bulgu!)</option>
-                                                <option value="Değerlendirilmedi">Değerlendirilmedi</option>
-                                            </select>
+                                                className={testFormData.designEffectiveness === 'Etkin Değil' ? 'border-red-300 bg-red-50 text-red-700' : ''}
+                                            />
                                         </div>
                                         <div>
                                             <label className="text-xs font-semibold text-gray-600 block mb-2">2. İşleyiş Etkinliği</label>
-                                            <select
-                                                className={`form-select w-full text-sm ${testFormData.operatingEffectiveness === 'Etkin Değil' ? 'border-red-300 bg-red-50 text-red-700' : ''}`}
+                                            <CustomSelect
                                                 value={testFormData.operatingEffectiveness || 'Etkin'}
-                                                onChange={e => { setTestFormData({ ...testFormData, operatingEffectiveness: e.target.value }); setManualTestResult(''); }}
+                                                onChange={val => { setTestFormData({ ...testFormData, operatingEffectiveness: String(val) }); setManualTestResult(''); }}
+                                                options={[
+                                                    { value: 'Etkin', label: 'Etkin' },
+                                                    { value: 'Etkin Değil', label: 'Etkin Değil (Bulgu!)' },
+                                                    { value: 'Uygulanabilir Değil', label: 'Uygulanabilir Değil' }
+                                                ]}
                                                 disabled={test.status === 'Onay Bekliyor' || test.status === 'Onaylandı'}
-                                            >
-                                                <option value="Etkin">Etkin</option>
-                                                <option value="Etkin Değil">Etkin Değil (Bulgu!)</option>
-                                                <option value="Uygulanabilir Değil">Uygulanabilir Değil</option>
-                                            </select>
+                                                className={testFormData.operatingEffectiveness === 'Etkin Değil' ? 'border-red-300 bg-red-50 text-red-700' : ''}
+                                            />
                                         </div>
                                         {/* #4: Test Sonucu Override */}
                                         <div>
-                                            <label className="text-xs font-semibold text-gray-600 block mb-2">3. Test Sonucu (Override)</label>
-                                            <select
-                                                className="form-select w-full text-sm"
+                                            <label className="text-xs font-semibold text-gray-600 block mb-2">3. Manuel Test Sonucu</label>
+                                            <CustomSelect
                                                 value={manualTestResult || getSuggestedResult()}
-                                                onChange={e => setManualTestResult(e.target.value)}
+                                                onChange={val => setManualTestResult(String(val))}
+                                                options={[
+                                                    { value: 'Başarılı', label: 'Başarılı' },
+                                                    { value: 'Kısmen Başarılı', label: 'Kısmen Başarılı' },
+                                                    { value: 'Başarısız', label: 'Başarısız (Bulgu!)' },
+                                                    { value: 'Değerlendirilmedi', label: 'Değerlendirilmedi' }
+                                                ]}
                                                 disabled={test.status === 'Onay Bekliyor' || test.status === 'Onaylandı'}
-                                            >
-                                                <option value="Başarılı">Başarılı</option>
-                                                <option value="Kısmen Başarılı">Kısmen Başarılı</option>
-                                                <option value="Başarısız">Başarısız (Bulgu!)</option>
-                                                <option value="Değerlendirilmedi">Değerlendirilmedi</option>
-                                            </select>
+                                            />
                                             {manualTestResult && manualTestResult !== getSuggestedResult() && (
-                                                <p className="text-[10px] text-amber-600 mt-1">⚠ Otomatik öneri: {getSuggestedResult()} — Denetçi tarafından override edildi</p>
+                                                <p className="text-[10px] text-amber-600 mt-1">⚠ Otomatik öneri: {getSuggestedResult()} — Müfettiş tarafından değiştirildi</p>
                                             )}
                                         </div>
                                         <div className="flex items-end justify-end gap-2 flex-wrap">
@@ -489,55 +486,48 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                                         </div>
                                     </div>
 
-                                    {/* Evidence Upload Section */}
                                     <div className="mt-4 border-t pt-4">
-                                        <label className="text-xs font-semibold text-gray-600 block mb-2">Kanıtlar / Ekler</label>
-                                        <div className="flex items-center gap-4 mb-2">
-                                            <label className="btn btn-sm btn-outline-secondary cursor-pointer gap-2">
-                                                <Upload size={14} /> Kanıt Yükle
-                                                <input
-                                                    type="file"
-                                                    className="hidden"
-                                                    onChange={async (e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (!file) return;
+                                        <div className="mb-4">
+                                            <FileUpload 
+                                                label="Kanıtlar / Ekler"
+                                                description="Desteklenen formatlar: PDF, XLSX, DOCX, JPG, PNG"
+                                                multiple={false}
+                                                hideList={true}
+                                                onFileSelect={async (files) => {
+                                                    const file = files?.[0];
+                                                    if (!file) return;
 
-                                                        try {
-                                                            showToast('Dosya yükleniyor...', 'info');
+                                                    try {
+                                                        showToast('Dosya yükleniyor...', 'info');
 
-                                                            // Real Upload using Workpaper API
-                                                            // Evidence is technically a workpaper categorized as 'Kanıt'
-                                                            const uploadedWp = await auditApi.uploadWorkpaper(auditId, file, 'Kanıt');
+                                                        // Real Upload using Workpaper API
+                                                        // Evidence is technically a workpaper categorized as 'Kanıt'
+                                                        const uploadedWp = await auditApi.uploadWorkpaper(auditId, file, 'Kanıt');
 
-                                                            if (!uploadedWp || !uploadedWp.id) throw new Error('Yüklenen dosya bilgisi alınamadı');
+                                                        if (!uploadedWp || !uploadedWp.id) throw new Error('Yüklenen dosya bilgisi alınamadı');
 
-                                                            const newEvidenceItem = {
-                                                                id: uploadedWp.id,
-                                                                name: uploadedWp.name,
-                                                                url: `/api/audit/audits/${auditId}/workpapers/${encodeURIComponent(uploadedWp.name)}`, // Direct API link
-                                                                path: uploadedWp.path
-                                                            };
+                                                        const newEvidenceItem = {
+                                                            id: uploadedWp.id,
+                                                            name: uploadedWp.name,
+                                                            url: `/api/audit/audits/${auditId}/workpapers/${encodeURIComponent(uploadedWp.name)}`, // Direct API link
+                                                            path: uploadedWp.path
+                                                        };
 
-                                                            const currentEvidence = (testFormData as any).evidence ? JSON.parse((testFormData as any).evidence || '[]') : [];
-                                                            const newEvidence = [...currentEvidence, newEvidenceItem];
+                                                        const currentEvidence = (testFormData as any).evidence ? JSON.parse((testFormData as any).evidence || '[]') : [];
+                                                        const newEvidence = [...currentEvidence, newEvidenceItem];
 
-                                                            setTestFormData({
-                                                                ...testFormData,
-                                                                // @ts-ignore
-                                                                evidence: JSON.stringify(newEvidence)
-                                                            });
-                                                            showToast('Kanıt başarıyla yüklendi', 'success');
-                                                        } catch (err) {
-                                                            console.error(err);
-                                                            showToast('Kanıt yüklenemedi', 'error');
-                                                        }
-
-                                                        // Reset input
-                                                        e.target.value = '';
-                                                    }}
-                                                />
-                                            </label>
-                                            <span className="text-xs text-gray-400">Desteklenen formatlar: PDF, XLSX, DOCX, JPG, PNG</span>
+                                                        setTestFormData({
+                                                            ...testFormData,
+                                                            // @ts-ignore
+                                                            evidence: JSON.stringify(newEvidence)
+                                                        });
+                                                        showToast('Kanıt başarıyla yüklendi', 'success');
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        showToast('Kanıt yüklenemedi', 'error');
+                                                    }
+                                                }}
+                                            />
                                         </div>
 
                                         {/* Evidence List */}
