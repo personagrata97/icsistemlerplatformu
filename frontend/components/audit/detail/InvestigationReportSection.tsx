@@ -183,7 +183,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
         }
 
         const html = [
-            '<html><head>',
+            '<html><head><meta charset="UTF-8">',
             '<title>SORUŞTURMA RAPORU - ' + (auditData.code || 'D-01') + '</title>',
             '<style>',
             "body { font-family: 'Verdana', sans-serif; color: #1e293b; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; font-size: 14px; }",

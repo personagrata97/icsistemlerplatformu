@@ -31,7 +31,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
     const [loading, setLoading] = useState(true);
     const [tests, setTests] = useState<AuditTest[]>([]);
 
-    // Role checks (IIA 2340)
+    // Role checks 
     const isSupervisor = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_SUPERVISOR');
     const isInspector = hasRole('AUDIT_INSPECTOR') || hasRole('Müfettiş') || hasRole('Başmüfettiş') || hasRole('Kıdemli Müfettiş');
 
@@ -50,7 +50,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
     const [testFormData, setTestFormData] = useState<Partial<AuditTest>>({});
     const [manualTestResult, setManualTestResult] = useState<string>(''); // Override
 
-    // Review Note States (IIA 2340 Maker-Checker)
+    // Review Note States ( Maker-Checker)
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [reviewTargetTest, setReviewTargetTest] = useState<AuditTest | null>(null);
     const [reviewNote, setReviewNote] = useState('');
@@ -166,7 +166,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
             // Sadece schema'da scalar olan alanları gönder (notes relation, completedAt yok)
             const { notes, ...safeFormData } = testFormData as any;
 
-            // IIA 2340: Testi Tamamla yerine "İncelemeye Gönder" akışı
+            // Testi Tamamla yerine "İncelemeye Gönder" akışı
             let newStatus = 'Devam Ediyor';
             if (submitForReview) {
                 newStatus = 'Onay Bekliyor'; // Supervisor review bekleyecek
@@ -184,7 +184,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
             setTests(prev => prev.map(t => t.id === id ? { ...t, ...updatedTest, testResult: result, status: newStatus } : t));
 
             setActiveTest(null);
-            showToast(submitForReview ? 'Test incelemeye gönderildi (IIA 2340)' : 'Test kaydedildi', 'success');
+            showToast(submitForReview ? 'Test incelemeye gönderildi ' : 'Test kaydedildi', 'success');
 
             // Trigger Finding Creation if Failed
             if (submitForReview && result === 'Başarısız') {
@@ -200,7 +200,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
         }
     };
 
-    // IIA 2340: Supervisor Review Handler
+    // Supervisor Review Handler
     const handleSupervisorReview = async () => {
         if (!reviewTargetTest) return;
         try {
@@ -478,7 +478,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                                             >
                                                 Kaydet
                                             </Button>
-                                            {/* IIA 2340: İncelemeye Gönder (Maker-Checker) */}
+                                            {/* İncelemeye Gönder (Maker-Checker) */}
                                             {test.status !== 'Onay Bekliyor' && test.status !== 'Onaylandı' && (
                                                 <Button
                                                     variant="primary"
@@ -686,11 +686,11 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                 type="danger"
             />
 
-            {/* IIA 2340: Supervisor Review Modal */}
+            {/* Supervisor Review Modal */}
             <Modal
                 isOpen={showReviewModal}
                 onClose={() => { setShowReviewModal(false); setReviewNote(''); setReviewTargetTest(null); }}
-                title="Test İnceleme — Gözetim (IIA 2340)"
+                title="Test İnceleme — Gözetim "
                 size="lg"
                 footer={
                     <div className="w-full flex justify-between items-center">

@@ -221,7 +221,7 @@ async function main() {
             title: 'Sahte/Şişirilmiş Ekspertiz ile Kredi Kullandırımı',
             description: 'İncelenen 4 adet ticari kredi dosyasında, teminat olarak alınan gayrimenkullerin değerlerinin bağımsız ekspertiz firmasına baskı yapılarak piyasa değerinin %40 üzerinde gösterildiği ve bu yolla fazladan limit tahsis edildiği saptanmıştır.',
             risk: 'Kritik',
-            category: 'Suiistimal (Fraud)',
+            category: 'Suistimal (Fraud)',
             department: 'Eskişehir Şubesi',
             status: 'Açık',
             code: 'SRG-ESK-01',

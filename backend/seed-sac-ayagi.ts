@@ -35,7 +35,7 @@ async function main() {
         risk = await prisma.risk.create({
             data: {
                 processId: process.id,
-                name: 'Nakit Noksanı veya Suiistimal',
+                name: 'Nakit Noksanı veya Suistimal',
                 category: 'Operasyonel',
                 level: 'Yüksek'
             }

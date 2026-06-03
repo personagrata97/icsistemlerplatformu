@@ -120,7 +120,7 @@ export class ScenarioEngineService {
                                     description: desc,
                                     department: 'Veri Analitiği',
                                     code: `ANM-${Math.floor(1000 + Math.random() * 9000)}-${result.kpi_kodu}`,
-                                    category: 'Veri Analitiği / Suiistimal'
+                                    category: 'Veri Analitiği / Suistimal'
                                 }
                             });
                             this.logger.log(`[Sürekli Denetim] Otomatik bulgu eklendi: KPI=${result.kpi_kodu}`);
