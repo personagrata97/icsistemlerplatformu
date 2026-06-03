@@ -47,11 +47,12 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                     </label>
                 )}
 
-                        {leftIcon && (
-                            <div className="absolute left-3 flex items-center justify-center pointer-events-none text-slate-400">
-                                {leftIcon}
-                            </div>
-                        )}
+                <div className="relative flex items-center">
+                    {leftIcon && (
+                        <div className="absolute left-3 flex items-center justify-center pointer-events-none text-slate-400">
+                            {leftIcon}
+                        </div>
+                    )}
                         
                         <input
                             id={inputId}
