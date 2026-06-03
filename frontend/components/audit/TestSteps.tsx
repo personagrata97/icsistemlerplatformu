@@ -319,7 +319,13 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                         <div key={test.id} className="bg-white border rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md">
                             {/* Card Header */}
                             <div className="p-4 bg-gray-50 border-b flex justify-between items-center cursor-pointer"
-                                onClick={() => setActiveTest(activeTest === test.id ? null : test.id)}>
+                                onClick={() => {
+                                    if (activeTest === test.id) {
+                                        setActiveTest(null);
+                                    } else {
+                                        handleStartTest(test);
+                                    }
+                                }}>
                                 <div className="flex items-center gap-3">
                                     <div className={`p-2 rounded-full ${test.testResult === 'Başarısız' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
                                         <FileText size={20} />
