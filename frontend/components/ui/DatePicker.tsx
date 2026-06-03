@@ -24,6 +24,11 @@ export default function DatePicker({ value, onChange, placeholder = "Tarih seçi
   
   const selectedDate = value ? new Date(value) : null
   const [currentMonth, setCurrentMonth] = useState(selectedDate || new Date())
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const monthStart = startOfMonth(currentMonth)
   const monthEnd = endOfMonth(monthStart)
@@ -111,7 +116,11 @@ export default function DatePicker({ value, onChange, placeholder = "Tarih seçi
       />
 
       <div 
-        onClick={() => !disabled && setIsOpen(!isOpen)}
+        onClick={(e) => {
+          if (disabled) return;
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
         className={clsx(
           'flex items-center w-full rounded-xl border px-3.5 py-2.5 text-sm transition-all duration-200 select-none',
           disabled ? 'bg-slate-50 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-white cursor-pointer',
@@ -129,7 +138,7 @@ export default function DatePicker({ value, onChange, placeholder = "Tarih seçi
       </div>
 
       <AnimatePresence>
-        {isOpen && createPortal(
+        {isOpen && mounted && createPortal(
           <motion.div
             id="datepicker-portal-content"
             initial={{ opacity: 0, y: 10, scale: 0.95 }}

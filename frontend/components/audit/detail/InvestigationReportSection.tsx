@@ -71,9 +71,21 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                     console.error('LocalStorage load error', e);
                 }
             } else {
-                setSummary(`Olay ${auditData.title || 'Soruşturma Konusu İşlem'} kapsamında tebliğ edilen ihbar/etik bildirim üzerine incelenmiştir.`);
-                setFindings(`Yapılan yerel saha çalışmasında ve ilgili e-posta log kayıtlarının incelenmesi neticesinde şu hususlar tespit edilmiştir:\n1. ...\n2. ...`);
-                setOpinion(`Elde edilen deliller ve alınan ifadeler doğrultusunda, sorumluluğu tespit edilen personel hakkında aşağıdaki işlemlerin yapılması mütalaa olunmuştur:\n- Disiplin yönünden: ...\n- İdari yönünden: ...`);
+                setSummary(
+                    auditData.title?.includes('Eskişehir') 
+                    ? `Teftiş Kurulu Müdürlüğüne 12.01.2026 tarihinde gelen e-postada; Eskişehir Şubesi'nde çalışan Ahmet Veli'nin (sicil no 123) müşteri adına evrak düzenlediğine dair şikayet tarafımıza iletilmiştir.`
+                    : `Olay, ${auditData.title || 'Soruşturma Konusu İşlem'} kapsamında tebliğ edilen ihbar/etik bildirim üzerine incelenmiştir.`
+                );
+                setFindings(
+                    auditData.title?.includes('Eskişehir')
+                    ? `Eskişehir Şubesi'nde, imza mutabakatsızlığı bulunan tasarruf finansman sözleşmesine ait evraka ilişkin tarihlerin görüntüsünün izlenmesi neticesinde;\n1. İlgili sözleşmenin 07.01.2026 tarihi saat 13.10'da yazdırıldığı, imzalanan sözleşmenin ise CRM uygulamamıza aynı tarihte saat 13.50'de yüklendiği,\n2. 321 numaralı müşterinin o saat aralığında şubeye hiç gelmediği ve Ahmet Veli isimli çalışanın yazıcıdan aldığı evrakı kendi masasında müşteri adına imzalayarak CRM uygulamamıza yüklediği\ngörülmüştür.`
+                    : `Yapılan yerel saha çalışmasında ve ilgili sistem log kayıtlarının incelenmesi neticesinde somut bulgulara ulaşılmış ve ekler tablosunda sunulmuştur.`
+                );
+                setOpinion(
+                    auditData.title?.includes('Eskişehir')
+                    ? `Ahmet Veli isimli çalışanın yazılı ifadesinde; "Bunu prim kazanabilmek için yaptığını ve pişman olduğunu" belirtmesi ve kamera kayıtları ile evrak loglarının uyuşması neticesinde çalışanın mütamadiyen kusurlu olduğu kanaatine varılmıştır.`
+                    : `Elde edilen deliller ve alınan yazılı ifadeler doğrultusunda, sorumluluğu tespit edilen personel hakkında Kurum disiplin politikaları çerçevesinde işlem yapılması kanaatine varılmıştır.`
+                );
             }
 
             // DB data for analytical fields
@@ -168,8 +180,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
             '<html><head>',
             '<title>SORUŞTURMA RAPORU - ' + (auditData.code || 'D-01') + '</title>',
             '<style>',
-            "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');",
-            "body { font-family: 'Inter', sans-serif; color: #1e293b; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; font-size: 14px; }",
+            "body { font-family: 'Verdana', sans-serif; color: #1e293b; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; font-size: 14px; }",
             ".header { text-align: center; border-bottom: 2px double #cbd5e1; padding-bottom: 20px; margin-bottom: 30px; }",
             ".header h1 { font-size: 18px; text-transform: uppercase; margin: 0 0 8px 0; letter-spacing: 0.5px; color: #0f172a; }",
             ".meta-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }",
