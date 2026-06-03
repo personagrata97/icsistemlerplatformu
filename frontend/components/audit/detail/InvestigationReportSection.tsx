@@ -74,16 +74,22 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                 setSummary(
                     auditData.title?.includes('Eskişehir') 
                     ? `Teftiş Kurulu Müdürlüğüne 12.01.2026 tarihinde gelen e-postada; Eskişehir Şubesi'nde çalışan Ahmet Veli'nin (sicil no 123) müşteri adına evrak düzenlediğine dair şikayet tarafımıza iletilmiştir.`
+                    : auditData.title?.includes('CRM') 
+                    ? `Teftiş Kurulu Müdürlüğünün 05.02.2026 tarihli görevlendirmesine istinaden; Bankamız CRM (Müşteri İlişkileri Yönetimi) uygulamasında kullanıcı yetki tanımları ve onay mekanizmalarının güncel durumu ve işlem logları incelenmiştir.`
                     : `Olay, ${auditData.title || 'Soruşturma Konusu İşlem'} kapsamında tebliğ edilen ihbar/etik bildirim üzerine incelenmiştir.`
                 );
                 setFindings(
                     auditData.title?.includes('Eskişehir')
                     ? `Eskişehir Şubesi'nde, imza mutabakatsızlığı bulunan tasarruf finansman sözleşmesine ait evraka ilişkin tarihlerin görüntüsünün izlenmesi neticesinde;\n1. İlgili sözleşmenin 07.01.2026 tarihi saat 13.10'da yazdırıldığı, imzalanan sözleşmenin ise CRM uygulamamıza aynı tarihte saat 13.50'de yüklendiği,\n2. 321 numaralı müşterinin o saat aralığında şubeye hiç gelmediği ve Ahmet Veli isimli çalışanın yazıcıdan aldığı evrakı kendi masasında müşteri adına imzalayarak CRM uygulamamıza yüklediği\ngörülmüştür.`
+                    : auditData.title?.includes('CRM')
+                    ? `CRM uygulamasında yapılan teknik ve yerel incelemelerde aşağıdaki tespitlere ulaşılmıştır:\n1. İş akdi feshedilen 15 personelin aktif CRM yetkilerinin manuel olarak kapatılmadığı,\n2. Kredi kullandırım süreçlerinde "Şube Müdürü Onayı" adımının sistemsel bir zafiyet nedeniyle bazı operasyonlarda pas geçilebildiği,\n3. Kritik müşteri verilerinden olan iletişim (telefon) numarası güncelleme işlemlerinde, çift onay (maker-checker) kuralının uygulanmadığı ve tek personelin serbestçe değişiklik yapabildiği\ntespit edilmiştir.`
                     : `Yapılan yerel saha çalışmasında ve ilgili sistem log kayıtlarının incelenmesi neticesinde somut bulgulara ulaşılmış ve ekler tablosunda sunulmuştur.`
                 );
                 setOpinion(
                     auditData.title?.includes('Eskişehir')
                     ? `Ahmet Veli isimli çalışanın yazılı ifadesinde; "Bunu prim kazanabilmek için yaptığını ve pişman olduğunu" belirtmesi ve kamera kayıtları ile evrak loglarının uyuşması neticesinde çalışanın mütamadiyen kusurlu olduğu kanaatine varılmıştır.`
+                    : auditData.title?.includes('CRM')
+                    ? `Elde edilen bulgular doğrultusunda;\n- Kurumdan ayrılan personelin yetkilerinin İK-BT entegrasyonuyla otomatik iptal edilmesi,\n- "Şube Müdürü Onayı" adımındaki sistemsel açığın acilen yamanması,\n- Telefon no güncelleme işlemlerine ivedilikle çift onay (maker-checker) kuralı getirilmesi,\n- İşbu teknik zafiyetlerin giderilmesi adına Bilgi Teknolojileri Müdürlüğü'ne bulgu kaydı açılması\nkanaatine varılmıştır.`
                     : `Elde edilen deliller ve alınan yazılı ifadeler doğrultusunda, sorumluluğu tespit edilen personel hakkında Kurum disiplin politikaları çerçevesinde işlem yapılması kanaatine varılmıştır.`
                 );
             }
@@ -169,7 +175,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
             subjectsHtml = [
                 '<div class="section-title">DOSYA İLGİLİLERİ</div>',
                 '<table class="subjects-list">',
-                '<thead><tr><th>Adı Soyadı</th><th>Unvanı</th><th>Rolü</th></tr></thead>',
+                '<thead><tr><th>Adı Soyadı</th><th>Ünvanı</th><th>Rolü</th></tr></thead>',
                 '<tbody>',
                 subjects.map(s => '<tr><td><strong>' + s.name + '</strong></td><td>' + s.title + '</td><td>' + s.role + '</td></tr>').join(''),
                 '</tbody></table>'
@@ -381,7 +387,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                                     <div className="md:col-span-1">
                                         <input
                                             type="text"
-                                            placeholder="Unvan / Birim"
+                                            placeholder="Ünvan / Birim"
                                             value={newSubject.title}
                                             onChange={(e) => setNewSubject({...newSubject, title: e.target.value})}
                                             className="w-full p-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
@@ -429,7 +435,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                                                         }`}>
                                                             {s.role}
                                                         </span>
-                                                        <span className="text-[11px] text-slate-500 font-medium">{s.title || 'Unvan Belirtilmedi'}</span>
+                                                        <span className="text-[11px] text-slate-500 font-medium">{s.title || 'Ünvan Belirtilmedi'}</span>
                                                     </div>
                                                 </div>
                                             </div>

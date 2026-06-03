@@ -20,6 +20,7 @@ export interface DatePickerProps {
 export default function DatePicker({ value, onChange, placeholder = "Tarih seçin...", className, error, disabled, id, required }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const popupRef = useRef<HTMLDivElement>(null)
   const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({})
   
   const selectedDate = value ? new Date(value) : null
@@ -60,9 +61,8 @@ export default function DatePicker({ value, onChange, placeholder = "Tarih seçi
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        // Also check if click is inside the portal popup
-        const popup = document.getElementById('datepicker-portal-content')
-        if (popup && popup.contains(event.target as Node)) return;
+        // Check if click is inside the portal popup using the ref
+        if (popupRef.current && popupRef.current.contains(event.target as Node)) return;
         
         setIsOpen(false)
       }
@@ -140,7 +140,7 @@ export default function DatePicker({ value, onChange, placeholder = "Tarih seçi
       <AnimatePresence>
         {isOpen && mounted && createPortal(
           <motion.div
-            id="datepicker-portal-content"
+            ref={popupRef}
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
