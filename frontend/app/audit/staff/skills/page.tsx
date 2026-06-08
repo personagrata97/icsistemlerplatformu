@@ -295,15 +295,17 @@ export default function SkillsMatrixPage() {
         },
         {
             key: 'actions',
-            header: '',
-            width: '80px',
+            header: 'İşlemler',
+            width: '120px',
             align: 'center' as const,
             render: (row: AuditStaff) => (
-                <ActionMenu
-                    items={[
-                        { label: 'Yetkinlikleri Düzenle', icon: <Edit2 size={14} />, onClick: () => handleEditSkills(row) }
-                    ]}
-                />
+                <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                    <ActionMenu
+                        items={[
+                            { label: 'Yetkinlikleri Düzenle', icon: <Edit2 size={14} />, onClick: () => handleEditSkills(row) }
+                        ]}
+                    />
+                </div>
             )
         }
     ];

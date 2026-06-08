@@ -14,6 +14,7 @@ import Modal from '@/components/ui/Modal';
 import ActionMenu from '@/components/ui/ActionMenu';
 import PageHeader from '@/components/audit/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import EmptyState from '@/components/ui/EmptyState';
 import { Eye } from 'lucide-react';
 import { formatDate } from '@/lib/audit-utils';
 import StatCard from '@/components/ui/StatCard';
@@ -127,15 +128,17 @@ export default function CpePage() {
         },
         {
             key: 'actions',
-            header: '',
-            width: '80px',
+            header: 'İşlemler',
+            width: '120px',
             align: 'center' as const,
             render: (row: any) => (
-                <ActionMenu
-                    items={[
-                        { label: 'Detaylar', icon: <Eye size={14} />, onClick: () => setSelectedStaff(row) }
-                    ]}
-                />
+                <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                    <ActionMenu
+                        items={[
+                            { label: 'Detayı İncele', icon: <Eye size={14} />, onClick: () => setSelectedStaff(row) }
+                        ]}
+                    />
+                </div>
             )
         }
     ];
@@ -256,12 +259,11 @@ export default function CpePage() {
                             </h3>
                             
                             {selectedStaff.trainings.length === 0 ? (
-                                <div className="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
-                                        <Clock size={20} className="text-gray-400" />
-                                    </div>
-                                    <div className="text-gray-500 font-medium">Bu yıla ait eğitim kaydı bulunmuyor.</div>
-                                </div>
+                                <EmptyState
+                                    title="Eğitim Kaydı Yok"
+                                    description="Bu personelin seçili yıla ait bir mesleki eğitim girişi bulunmuyor."
+                                    icon={Clock}
+                                />
                             ) : (
                                 <div className="space-y-3">
                                     {selectedStaff.trainings.map((t: any, idx: number) => (

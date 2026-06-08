@@ -39,6 +39,7 @@ import DatePicker from "@/components/ui/DatePicker";
 
 const TITLES = ['Müfettiş Yardımcısı', 'Yetkili Müfettiş Yardımcısı', 'Müfettiş', 'Kıdemli Müfettiş', 'Başmüfettiş', 'Teftiş Kurulu Müdürü'];
 const ROLES = ['Sistem Yöneticisi', 'Teftiş Kurulu Müdürü', 'Müfettiş', 'İzleyici'];
+const MANAGER_ROLES = ['ADMIN', 'AUDIT_ADMIN', 'AUDIT_MANAGER', 'MANAGER', 'Teftiş Kurulu Müdürü', 'SYSTEM_ADMIN', 'Admin', 'Yönetici'];
 const REASON_OPTIONS = [
     { value: 'Sehven Oluşturuldu', label: 'Sehven Oluşturuldu' },
     { value: 'Mükerrer Kayıt', label: 'Mükerrer Kayıt' },
@@ -59,7 +60,7 @@ const getPhotoUrl = (url?: string) => {
 export default function AuditStaffPage() {
     const router = useRouter();
     const { hasRole, user } = useAuth();
-    const canManage = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_MANAGER') || hasRole('MANAGER') || hasRole('Teftiş Kurulu Müdürü') || hasRole('SYSTEM_ADMIN') || hasRole('Admin') || hasRole('Yönetici');
+    const canManage = MANAGER_ROLES.some(role => hasRole(role));
     const { showToast } = useToast();
     const [staffList, setStaffList] = useState<AuditStaff[]>([]);
     const [loading, setLoading] = useState(true);
@@ -1038,7 +1039,7 @@ export default function AuditStaffPage() {
                     {
                         key: 'actions',
                         header: 'İşlemler',
-                        width: '160px',
+                        width: '120px',
                         align: 'center',
                         render: (staff: AuditStaff) => (
                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
@@ -1101,7 +1102,7 @@ export default function AuditStaffPage() {
                             </Button>
                         </div>
                     </div>
-                ) : activeTab === 'general' && (
+                ) : activeTab === 'general' ? (
                     <div className="flex justify-end gap-3 w-full">
                         <Button
                             variant="secondary"
@@ -1117,6 +1118,16 @@ export default function AuditStaffPage() {
                             isLoading={loading}
                         >
                             {editingStaff ? 'Güncelle' : 'Kaydet'}
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="flex justify-end gap-3 w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsModalOpen(false)}
+                            disabled={loading}
+                        >
+                            Kapat
                         </Button>
                     </div>
                 )}
