@@ -10,6 +10,7 @@ import RefreshButton from '@/components/ui/RefreshButton';
 import { useToast } from '@/components/Toast';
 import { getStatusColor, getRiskColor, formatDate, formatDateTime } from '@/lib/audit-utils';
 import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import ConfirmModal from '@/components/ConfirmModal';
 import LoadingState from '@/components/ui/LoadingState';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -39,7 +40,7 @@ export default function TrashPage() {
     const { user, hasRole } = useAuth();
     const [loading, setLoading] = useState(true);
 
-    const isManager = hasRole('ADMIN') || hasRole('AUDIT_ADMIN');
+    const isManager = checkRole(hasRole, ROLES.TRASH_MANAGER);
     // Data States
     const [deletedItems, setDeletedItems] = useState<DeletedItems>({
         audits: [],
@@ -67,7 +68,7 @@ export default function TrashPage() {
     const [trashSortDir, setTrashSortDir] = useState<'asc' | 'desc'>('desc');
 
     // Yetki kontrolü
-    const isAdmin = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN');
+    const isAdmin = checkRole(hasRole, ROLES.ADMIN);
 
     const [isClient, setIsClient] = useState(false);
 

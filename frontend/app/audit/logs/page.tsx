@@ -14,6 +14,7 @@ import LoadingState from '@/components/ui/LoadingState';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -56,7 +57,7 @@ export default function AuditLogsPage() {
     const [integrityLoading, setIntegrityLoading] = useState(false);
     const [logFilterMode, setLogFilterMode] = useState<'all' | 'today' | 'critical'>('all');
 
-    const isAdmin = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_MANAGER') || hasRole('AUDIT_ADMIN');
+    const isAdmin = checkRole(hasRole, ROLES.LOGS_ADMIN);
 
     useEffect(() => {
         setTitle('Denetim İzi');

@@ -10,6 +10,7 @@ import {
 
 import useOnClickOutside from '@/hooks/useOnClickOutside';
 import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import { useToast } from '@/components/Toast';
 import { auditApi, Audit, CreateFindingDto, User, Finding as ApiFinding } from '@/lib/audit-api';
 import PageHeader from '@/components/audit/PageHeader';
@@ -329,7 +330,7 @@ function FindingsPageContent() {
 
 
     // Filtreleme mantığı
-    const isUnit = hasRole('AUDIT_UNIT') || hasRole('AUDIT_VIEWER');
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
 
     const filteredFindings = findings.filter(f => {
         const matchesTerm = (f.title?.toLocaleLowerCase('tr-TR') || '').includes(searchTerm.toLocaleLowerCase('tr-TR')) ||
@@ -779,7 +780,7 @@ function FindingsPageContent() {
                 findings={paginatedFindings}
                 loading={loading}
                 isUnit={isUnit}
-                isManager={hasRole('AUDIT_MANAGER') || hasRole('ADMIN')}
+                isManager={checkRole(hasRole, ROLES.FINDING_MANAGER)}
                 onView={handleView}
                 onEdit={handleEditFinding}
                 onDelete={handleDeleteClick}
@@ -828,7 +829,7 @@ function FindingsPageContent() {
                 onReviewRequest={(finding) => { setActionFinding(finding); setShowReviewModal(true); }}
                 onEdit={handleEditFinding}
                 onDelete={handleDeleteClick}
-                isManager={hasRole('AUDIT_MANAGER') || hasRole('ADMIN')}
+                isManager={checkRole(hasRole, ROLES.FINDING_MANAGER)}
                 user={user}
             />
             {/* HISTORY MODAL */}

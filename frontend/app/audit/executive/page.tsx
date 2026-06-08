@@ -14,6 +14,7 @@ import RefreshButton from '@/components/ui/RefreshButton';
 import { formatDateTime } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import { useRouter } from 'next/navigation';
 
 import QualityMetrics from '@/components/audit/QualityMetrics';
@@ -36,7 +37,7 @@ export default function ExecutiveDashboard() {
     const { showToast } = useToast();
     const { hasRole } = useAuth();
     const [loading, setLoading] = useState(true);
-    const isExecutive = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_MANAGER');
+    const isExecutive = checkRole(hasRole, ROLES.EXECUTIVE);
 
     const [activeTab, setActiveTab] = useState<'overview' | 'quality'>('overview');
     const [audits, setAudits] = useState<any[]>([]);

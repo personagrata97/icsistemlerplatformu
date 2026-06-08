@@ -40,6 +40,7 @@ import { getRiskScoreColor, getRiskLevelFromScore, getAuditCycleFromScore, forma
 import { useAuth } from '@/context/AuthContext';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 import FormInput from "@/components/ui/FormInput";
+import { checkRole, ROLES } from '@/lib/auth-constants';
 
 interface AuditableUnit {
     id: string;
@@ -340,7 +341,7 @@ export default function AuditUniversePage() {
     const router = useRouter();
     const { showToast } = useToast();
     const { hasRole } = useAuth();
-    const canManage = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('Admin') || hasRole('Yönetici');
+    const canManage = checkRole(hasRole, ROLES.UNIVERSE_MANAGER);
 
     const [loading, setLoading] = useState(true);
     const [units, setUnits] = useState<AuditableUnit[]>([]);
@@ -1215,7 +1216,7 @@ export default function AuditUniversePage() {
                                     width: '180px',
                                     render: (unit: AuditableUnit) => {
                                         const { user } = useAuth();
-                                        const canManage = hasRole('ADMIN') || hasRole('MANAGER');
+                                        const canManage = checkRole(hasRole, ROLES.BASIC_MANAGER);
                                         
                                         const items = [
                                             { label: 'RCM', icon: Shield, onClick: () => router.push(`/audit/universe/${unit.id}`) }

@@ -25,7 +25,9 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import CodeBadge from '@/components/ui/CodeBadge';
 import DashboardListItem from '@/components/ui/DashboardListItem';
 import DashboardWidget from '@/components/ui/DashboardWidget';
+import StatsWidget from '@/components/ui/StatsWidget';
 import EmptyState from '@/components/ui/EmptyState';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import { Search, FolderOpen, Activity as ActivityIcon } from 'lucide-react';
 
 interface AuditStats {
@@ -73,11 +75,11 @@ export default function AuditDashboard() {
     ]);
 
     // Erişim Kontrolü
-    const isManager = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_MANAGER');
+    const isManager = checkRole(hasRole, ROLES.DASHBOARD_MANAGER);
     const isInspector = hasRole('AUDIT_INSPECTOR');
     const isSupervisor = hasRole('AUDIT_SUPERVISOR');
     const isAuditor = isManager || isInspector || isSupervisor;
-    const isUnit = hasRole('AUDIT_UNIT') || hasRole('AUDIT_VIEWER');
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
 
     // Kısıtlı Görünüm: Denetçi veya Sistem Yöneticisi OLMAYAN kullanıcılar.
     // Standart çalışanlar ve Birim kullanıcıları bu gruba dahildir.

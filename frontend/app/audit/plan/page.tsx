@@ -20,6 +20,7 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import Modal from '@/components/ui/Modal';
 import CodeBadge from '@/components/ui/CodeBadge';
 import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 
 // Yıllık İç Denetim Planı Yapısı
 interface AuditPlanItem {
@@ -45,7 +46,7 @@ export default function AuditPlanPage() {
     const router = useRouter();
     const { showToast } = useToast();
     const { hasRole } = useAuth();
-    const canManage = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('Admin') || hasRole('Yönetici');
+    const canManage = checkRole(hasRole, ROLES.TRASH_MANAGER) || hasRole('SYSTEM_ADMIN') || hasRole('Admin') || hasRole('Yönetici');
 
     const [loading, setLoading] = useState(true);
     const [plans, setPlans] = useState<AuditPlanItem[]>([]);

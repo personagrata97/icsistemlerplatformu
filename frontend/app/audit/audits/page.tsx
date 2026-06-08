@@ -12,6 +12,7 @@ import { getStatusColor, formatDate } from '@/lib/audit-utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import ConfirmModal from '@/components/ConfirmModal';
 import CreateAuditModal from '@/components/audit/CreateAuditModal';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -150,7 +151,7 @@ export default function AuditsPage() {
 
     // Yetki kontrolü
     const { hasRole } = useAuth();
-    const canDelete = hasRole('MANAGER') || hasRole('ADMIN') || hasRole('SYSTEM_ADMIN');
+    const canDelete = checkRole(hasRole, ROLES.AUDIT_DELETE);
 
     // Denetim silme - tıklama işleyicisi
     const handleDeleteClick = (e: React.MouseEvent, id: string) => {

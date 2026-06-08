@@ -20,6 +20,7 @@ import Modal from '@/components/ui/Modal';
 import { useToast } from '@/components/Toast';
 import FindingsTable from '@/components/audit/FindingsTable';
 import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import CreateFindingModal from '@/components/audit/CreateFindingModal';
 import CreateAuditModal from '@/components/audit/CreateAuditModal';
 import DeleteRequestModal from '@/components/audit/DeleteRequestModal';
@@ -188,7 +189,7 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
     const [deleteTargetItem, setDeleteTargetItem] = useState<any>(null);
     const [isAssignedToAudit, setIsAssignedToAudit] = useState<boolean>(false);
     const { hasRole } = useAuth();
-    const canDelete = hasRole('MANAGER') || hasRole('ADMIN') || hasRole('SYSTEM_ADMIN');
+    const canDelete = checkRole(hasRole, ROLES.AUDIT_DELETE);
 
 
 
@@ -1017,7 +1018,7 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
     const isDeleted = auditData.status === 'Silindi' || auditData.status === 'Silinme Onayı Bekliyor';
 
     // Role, Confidentiality & Independence Logic (IIA 1100 & Audit Confidentiality)
-    const isSupervisor = hasRole('ADMIN') || hasRole('MANAGER') || hasRole('AUDIT_MANAGER') || hasRole('AUDIT_ADMIN') || hasRole('Teftiş Kurulu Müdürü') || hasRole('AUDIT_SUPERVISOR') || hasRole('SYSTEM_ADMIN') || hasRole('Yönetici');
+    const isSupervisor = checkRole(hasRole, ROLES.AUDIT_SUPERVISOR);
     const isTeamMember = isSupervisor || team.some((t: any) => t.id === user?.id || t.userId === user?.id || t.name === user?.displayName);
     const hasIndependence = !!myDeclaration;
 

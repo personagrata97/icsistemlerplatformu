@@ -18,6 +18,7 @@ import { useToast } from '@/components/Toast';
 import { getStatusColor, getRiskColor, formatDate } from '@/lib/audit-utils';
 import { getAvailableTransitions } from '@/lib/audit-workflow';
 import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import CustomSelect from '@/components/ui/CustomSelect';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Button from '@/components/ui/Button';
@@ -453,9 +454,9 @@ export default function FindingDetailPage() {
         
         // Dynamic workflow role calculation based on AuthContext roles
         const getUserWorkflowRole = () => {
-            if (hasRole('ADMIN') || hasRole('SYSTEM_ADMIN')) return 'Sistem Yöneticisi';
-            if (hasRole('AUDIT_ADMIN') || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_MANAGER')) return 'Gözetim Sorumlusu';
-            if (hasRole('AUDIT_UNIT') || hasRole('AUDIT_VIEWER')) return 'Birim Yöneticisi';
+            if (checkRole(hasRole, ROLES.ADMIN)) return 'Sistem Yöneticisi';
+            if (checkRole(hasRole, ROLES.FINDING_SUPERVISOR)) return 'Gözetim Sorumlusu';
+            if (checkRole(hasRole, ROLES.UNIT)) return 'Birim Yöneticisi';
             return 'Müfettiş';
         };
         

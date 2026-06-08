@@ -25,6 +25,7 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import EmptyState from '@/components/ui/EmptyState';
 import Checkbox from '@/components/ui/Checkbox';
 import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import { DateDisplay } from '@/components/ui/DateDisplay';
 import { getRiskScoreColor, getRiskLevelFromScore, getAuditCycleFromScore } from '@/lib/audit-utils';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
@@ -1969,7 +1970,7 @@ export default function AuditStaffPage() {
                                                         header: 'Aksiyonlar',
                                                         accessor: (item: any) => (
                                                             <div className="flex gap-2 justify-end">
-                                                                {item.status !== 'Onaylandı' && (hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('Teftiş Kurulu Müdürü') || hasRole('SYSTEM_ADMIN')) && (
+                                                                {item.status !== 'Onaylandı' && (checkRole(hasRole, ROLES.TRASH_MANAGER) || hasRole('Teftiş Kurulu Müdürü') || hasRole('SYSTEM_ADMIN')) && (
                                                                     <Button 
                                                                         variant="secondary"
                                                                         size="sm"
