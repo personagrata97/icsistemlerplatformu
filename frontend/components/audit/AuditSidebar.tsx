@@ -40,7 +40,7 @@ import { useAuditTitle } from '@/context/AuditTitleContext';
 
 // Path to Title/Subtitle mapping
 const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
-    '/audit': { title: 'Ana Panel', subtitle: 'Yönetim paneli ve genel işlemler' },
+    '/audit': { title: 'Ana Panel', subtitle: 'Teftiş Kurulu anlık durum özeti ve performans göstergeleri' },
     '/audit/executive': { title: 'Yönetici Paneli', subtitle: 'Yönetim özeti ve performans göstergeleri' },
     '/audit/plan': { title: 'Denetim Planı', subtitle: 'Yıllık denetim planlaması' },
     '/audit/universe': { title: 'Denetim Evreni', subtitle: 'Denetlenebilir birimler ve risk değerlendirmesi' },
@@ -114,7 +114,7 @@ export default function AuditSidebar() {
 
     return (
         <aside className="sidebar flex flex-col h-screen overflow-hidden bg-white border-r shadow-sm z-50">
-            <div className="sidebar-header !justify-center !px-0 flex items-center bg-gray-50 border-b border-gray-200 py-3 shrink-0">
+            <div className="h-[64px] flex items-center justify-center bg-gray-50 border-b border-gray-200 shrink-0">
                 <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain mix-blend-multiply transition-transform hover:scale-105" />
             </div>
 

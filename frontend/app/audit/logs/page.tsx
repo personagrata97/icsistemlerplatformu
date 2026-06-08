@@ -56,7 +56,7 @@ export default function AuditLogsPage() {
     const [integrityLoading, setIntegrityLoading] = useState(false);
     const [logFilterMode, setLogFilterMode] = useState<'all' | 'today' | 'critical'>('all');
 
-    const isAdmin = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_MANAGER');
+    const isAdmin = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_MANAGER') || hasRole('AUDIT_ADMIN');
 
     useEffect(() => {
         setTitle('Denetim İzi');
@@ -137,7 +137,7 @@ export default function AuditLogsPage() {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 px-1 -mx-1 mb-2">
                 <StatCard
                     title="Toplam Kayıt"
                     value={logs.length}

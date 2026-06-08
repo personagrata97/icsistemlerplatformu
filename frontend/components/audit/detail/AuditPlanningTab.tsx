@@ -18,6 +18,7 @@ export default function AuditPlanningTab({ auditData }: AuditPlanningTabProps) {
                     value={<StatusBadge value={auditData.riskLevel || 'Belirtilmemiş'} type="risk" size="md" className="mt-1" />} 
                     icon={Activity} 
                     color="orange" 
+                    infoTooltip="Bu denetim görevinin genel risk ağırlığını belirtir. Risk bazlı denetim planlamasında önceliklendirme için kullanılır."
                 />
                 <StatCard 
                     title="İlgili Birim / Departman" 
@@ -25,12 +26,14 @@ export default function AuditPlanningTab({ auditData }: AuditPlanningTabProps) {
                     icon={Map} 
                     color="indigo"
                     valueClassName="text-lg font-bold text-gray-800 tracking-tight line-clamp-1"
+                    infoTooltip="Denetimin gerçekleştirileceği ana departman veya denetim evreni (auditable unit) kaydıdır."
                 />
                 <StatCard 
                     title="Denetim Türü" 
                     value={<StatusBadge value={auditData.type || 'Süreç Denetimi'} type="plan-type" size="md" className="mt-1" />} 
                     icon={Target} 
                     color="blue" 
+                    infoTooltip="Mali, Uyum, Bilgi Teknolojileri veya Süreç denetimi gibi görevin ana kategorisini belirler."
                 />
             </div>
 

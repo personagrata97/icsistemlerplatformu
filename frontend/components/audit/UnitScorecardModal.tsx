@@ -61,24 +61,28 @@ export default function UnitScorecardModal({ isOpen, onClose, unitName }: UnitSc
                             value={scorecard.toplamBulgu}
                             icon={<Target size={20} />}
                             color="blue"
+                            infoTooltip="Birimle ilişkilendirilmiş, tüm zamanlardaki açık veya kapalı toplam bulgu sayısıdır."
                         />
                         <StatCard
                             title="Açık Bulgu"
                             value={scorecard.acikBulgu}
                             icon={<AlertCircle size={20} />}
                             color="red"
+                            infoTooltip="Henüz aksiyon alınmamış, doğrulanmamış veya süreci devam eden bulgu sayısıdır."
                         />
                         <StatCard
                             title="Kapanan Bulgu"
                             value={scorecard.kapaliBulgu}
                             icon={<CheckCircle size={20} />}
                             color="green"
+                            infoTooltip="Aksiyonu alınmış ve denetçi tarafından onaylanarak tamamen kapatılmış bulgu sayısıdır."
                         />
                         <StatCard
                             title="Tekerrür"
                             value={scorecard.tekrarlayanBulgu}
                             icon={<TrendingUp size={20} />}
                             color="orange"
+                            infoTooltip="Geçmiş denetimlerde tespit edilip kapatılmasına rağmen, sonraki denetimlerde aynı birimde tekrar eden bulguların sayısıdır."
                         />
                     </div>
 

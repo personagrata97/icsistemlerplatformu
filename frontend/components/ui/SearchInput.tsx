@@ -16,7 +16,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
                     ref={ref}
                     type="text"
                     className={clsx(
-                        "pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-64 shadow-sm transition-all",
+                        "pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-full shadow-sm transition-all",
                         className
                     )}
                     {...props}

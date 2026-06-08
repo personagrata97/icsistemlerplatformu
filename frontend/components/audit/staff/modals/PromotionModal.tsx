@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
+import DatePicker from '@/components/ui/DatePicker';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 
 const TITLES = [
@@ -80,11 +81,9 @@ export default function PromotionModal({
                     </div>
                     <div className="form-group">
                         <label className="form-label">Tarih</label>
-                        <input 
-                            type="date" 
-                            className="form-input" 
+                        <DatePicker 
                             value={promotionForm.promotionDate} 
-                            onChange={e => setPromotionForm({ ...promotionForm, promotionDate: e.target.value })} 
+                            onChange={(val) => setPromotionForm({ ...promotionForm, promotionDate: val })} 
                             required={true} 
                         />
                     </div>

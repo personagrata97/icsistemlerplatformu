@@ -43,7 +43,7 @@ const PageToolbar: React.FC<PageToolbarProps> = ({
             {/* Left Side: Search & Primary Filters */}
             <div className="flex flex-1 items-center gap-3 w-full md:w-auto">
                 {!noSearch && (
-                    <div className="w-full md:w-[300px]">
+                    <div className="w-full md:w-[340px] lg:w-[380px]">
                         <SearchInput
                             placeholder={searchPlaceholder}
                             value={searchValue || ''}

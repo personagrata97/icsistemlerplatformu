@@ -31,8 +31,8 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
     const settingsRef = useRef<HTMLDivElement>(null);
     useOnClickOutside(settingsRef, () => setIsSettingsOpen(false));
     
-    const isAdmin = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN');
-    const isAuditor = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_INSPECTOR');
+    const isAdmin = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_MANAGER');
+    const isAuditor = isAdmin || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_INSPECTOR');
 
     return (
         <header className="header flex items-center justify-between h-20 bg-white border-b border-gray-200 px-8">

@@ -126,10 +126,10 @@ const Tooltip: React.FC<TooltipProps> = ({
                     }}
                     className="tooltip-container z-[100010] pointer-events-none"
                 >
-                    <div className="relative bg-gray-900 text-white text-xs font-medium py-1.5 px-3 rounded-lg shadow-2xl border border-gray-700/50 backdrop-blur-md animate-tooltip-in">
+                    <div className="relative bg-white/95 text-slate-700 text-xs font-medium py-1.5 px-3 rounded-lg shadow-xl border border-slate-200/80 backdrop-blur-md animate-tooltip-in">
                         {content}
                         {/* Arrow */}
-                        <div className={`absolute w-2 h-2 bg-gray-900 border-gray-700/50 transform rotate-45 ${activePosition === 'top' ? 'bottom-[-5px] left-1/2 -translate-x-1/2 border-r border-b' :
+                        <div className={`absolute w-2 h-2 bg-white border-slate-200/80 transform rotate-45 ${activePosition === 'top' ? 'bottom-[-5px] left-1/2 -translate-x-1/2 border-r border-b' :
                             activePosition === 'bottom' ? 'top-[-5px] left-1/2 -translate-x-1/2 border-l border-t' :
                                 activePosition === 'left' ? 'right-[-5px] top-1/2 -translate-y-1/2 border-r border-t' :
                                     'left-[-5px] top-1/2 -translate-y-1/2 border-l border-b'

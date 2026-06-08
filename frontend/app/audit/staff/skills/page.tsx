@@ -8,11 +8,11 @@ import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
 import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';
-import PageHeader from '@/components/audit/PageHeader';
 import Modal from '@/components/ui/Modal';
 import ActionMenu from '@/components/ui/ActionMenu';
 import StatCard from '@/components/ui/StatCard';
 import CustomSelect from '@/components/ui/CustomSelect';
+import PageHeader from '@/components/audit/PageHeader';
 import { BackButton } from '@/components/ui/BackButton';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 
@@ -315,13 +315,10 @@ export default function SkillsMatrixPage() {
     return (
         <div className="space-y-6">
             <BackButton href="/audit/staff" label="Denetim Ekibi Listesine Dön" />
-            <PageHeader
-                title="Yetkinlik Matrisi"
-                subtitle="Denetim ekibinin uzmanlık alanları, teknik yetkinlikleri ve kaynak planlama matrisi"
-            />
+            <PageHeader title="Yetkinlik Matrisi" subtitle="Personel uzmanlık alanları ve denetim kabiliyetleri" />
 
             <PageToolbar
-                searchPlaceholder="Personel veya unvan ara..."
+                searchPlaceholder="Personel veya ünvan ara..."
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 onRefresh={loadData}

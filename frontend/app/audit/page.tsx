@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, AlertTriangle, CheckCircle, Calendar, History, FileText, TrendingUp, PieChart, Users, Zap, RefreshCw, ShieldAlert, FileSignature, ArrowRight } from 'lucide-react';
 import RiskHeatmap from '@/components/audit/RiskHeatmap';
+import ExecutiveActionCards from '@/components/audit/ExecutiveActionCards';
 import Link from 'next/link';
 import ActionLink from '@/components/ui/ActionLink';
 import LoadingState from '@/components/ui/LoadingState';
@@ -14,9 +15,18 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import { useRouter } from 'next/navigation';
 
 import StatCard from '@/components/ui/StatCard';
+import Tooltip from '@/components/ui/Tooltip';
+import Modal from '@/components/ui/Modal';
+import CustomSelect from '@/components/ui/CustomSelect';
 import { useAuth } from '@/context/AuthContext';
 import PageHeader from '@/components/audit/PageHeader';
 import DataTable from '@/components/ui/DataTable';
+import PageToolbar from '@/components/ui/PageToolbar';
+import CodeBadge from '@/components/ui/CodeBadge';
+import DashboardListItem from '@/components/ui/DashboardListItem';
+import DashboardWidget from '@/components/ui/DashboardWidget';
+import EmptyState from '@/components/ui/EmptyState';
+import { Search, FolderOpen, Activity as ActivityIcon } from 'lucide-react';
 
 interface AuditStats {
     total: number;
@@ -41,6 +51,9 @@ interface ActivityLog {
     user: string;
     date: string;
     status: string;
+    targetId?: string;
+    targetType?: string;
+    details?: string;
 }
 
 export default function AuditDashboard() {
@@ -53,9 +66,14 @@ export default function AuditDashboard() {
     const [units, setUnits] = useState<any[]>([]);
     const [activities, setActivities] = useState<ActivityLog[]>([]);
     const [lastUpdate, setLastUpdate] = useState<string>('');
+    const [heatmapModal, setHeatmapModal] = useState<{isOpen: boolean, inherent: string, control: string, list: any[]}>({ isOpen: false, inherent: '', control: '', list: [] });
+    const [selectedYear, setSelectedYear] = useState<string>('Tümü');
+    const [availableYears, setAvailableYears] = useState<{value: string, label: string}[]>([
+        { value: 'Tümü', label: 'Tüm Yıllar' }
+    ]);
 
     // Erişim Kontrolü
-    const isManager = hasRole('ADMIN') || hasRole('AUDIT_ADMIN');
+    const isManager = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_MANAGER');
     const isInspector = hasRole('AUDIT_INSPECTOR');
     const isSupervisor = hasRole('AUDIT_SUPERVISOR');
     const isAuditor = isManager || isInspector || isSupervisor;
@@ -66,39 +84,59 @@ export default function AuditDashboard() {
     // Bu kullanıcılar Ana Panel yerine Portal görünümünü görmelidir.
     const isRestrictedUser = !isAuditor && !hasRole('SYSTEM_ADMIN');
 
+    const extractYear = (dateValue: any) => {
+        if (!dateValue) return null;
+        const d = new Date(dateValue);
+        if (isNaN(d.getTime())) return null;
+        return d.getFullYear().toString();
+    };
+
+    const filterByYear = (items: any[], dateFields: string[]) => {
+        if (selectedYear === 'Tümü') return items;
+        return items.filter(item => {
+            // Check if any of the provided date fields match the selected year
+            return dateFields.some(field => {
+                const year = extractYear(item[field]);
+                return year === selectedYear;
+            });
+        });
+    };
+
+    const filteredAudits = filterByYear(audits, ['startDate', 'createdAt', 'created_at', 'updatedAt']);
+    const filteredFindings = filterByYear(findings, ['createdAt', 'created_at', 'updatedAt']);
+
     // Gerçek veriden istatistik hesaplama
     const auditStats: AuditStats = {
-        total: audits.length,
-        ongoing: audits.filter(a => a.status === 'Devam Ediyor').length,
-        completed: audits.filter(a => a.status === 'Tamamlandı').length,
-        planned: audits.filter(a => a.status === 'Planlandı').length,
+        total: filteredAudits.length,
+        ongoing: filteredAudits.filter(a => a.status === 'Devam Ediyor').length,
+        completed: filteredAudits.filter(a => a.status === 'Tamamlandı').length,
+        planned: filteredAudits.filter(a => a.status === 'Planlandı').length,
     };
 
-    const CLOSED_STATUSES = ['Kapalı', 'Kapalı (Mutabık Değil)', 'Tamamlandı', 'Risk Kabul Edildi', 'Denetim Esnasında Giderildi'];
+    const CLOSED_STATUSES = ['Tamamlandı', 'Risk Kabul Edildi', 'Denetim Esnasında Giderildi'];
     const findingStats: FindingStats = {
-        total: findings.length,
-        open: findings.filter(f => !CLOSED_STATUSES.includes(f.status)).length,
-        closed: findings.filter(f => CLOSED_STATUSES.includes(f.status)).length,
-        critical: findings.filter(f => (f.risk || f.riskLevel) === 'Kritik').length,
-        high: findings.filter(f => (f.risk || f.riskLevel) === 'Yüksek').length,
-        medium: findings.filter(f => (f.risk || f.riskLevel) === 'Orta').length,
-        low: findings.filter(f => (f.risk || f.riskLevel) === 'Düşük').length,
+        total: filteredFindings.length,
+        open: filteredFindings.filter(f => !CLOSED_STATUSES.includes(f.status)).length,
+        closed: filteredFindings.filter(f => CLOSED_STATUSES.includes(f.status)).length,
+        critical: filteredFindings.filter(f => (f.risk || f.riskLevel) === 'Kritik').length,
+        high: filteredFindings.filter(f => (f.risk || f.riskLevel) === 'Yüksek').length,
+        medium: filteredFindings.filter(f => (f.risk || f.riskLevel) === 'Orta').length,
+        low: filteredFindings.filter(f => (f.risk || f.riskLevel) === 'Düşük').length,
     };
 
-    // Son 6 ay için aylık açık/kapalı bulgu verisi oluştur (Grafik için)
-    const monthlyChartData = Array.from({ length: 6 }).map((_, i) => {
-        const date = new Date();
-        date.setMonth(date.getMonth() - (5 - i));
-        const monthName = date.toLocaleString('tr-TR', { month: 'short' });
-        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
-        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    // Seçilen yıla ait 12 aylık açık/kapalı bulgu verisi oluştur (Grafik için)
+    const targetYearForChart = selectedYear === 'Tümü' ? new Date().getFullYear() : parseInt(selectedYear);
+    const monthlyChartData = Array.from({ length: 12 }).map((_, i) => {
+        const monthStart = new Date(targetYearForChart, i, 1);
+        const monthEnd = new Date(targetYearForChart, i + 1, 0);
+        const monthName = monthStart.toLocaleString('tr-TR', { month: 'short' });
 
-        const open = findings.filter((f: any) => {
+        const open = filteredFindings.filter((f: any) => {
             const d = new Date(f.created_at || f.createdAt);
             return d >= monthStart && d <= monthEnd && !CLOSED_STATUSES.includes(f.status);
         }).length;
 
-        const closed = findings.filter((f: any) => {
+        const closed = filteredFindings.filter((f: any) => {
             const d = new Date(f.closedAt || f.updatedAt || f.updated_at || f.created_at);
             return d >= monthStart && d <= monthEnd && CLOSED_STATUSES.includes(f.status);
         }).length;
@@ -110,6 +148,44 @@ export default function AuditDashboard() {
         };
     });
 
+    const handleHeatmapClick = (inherentRisk: string, controlEffectiveness: string) => {
+        const filteredUnits = units.filter(u => 
+            (u.inherentRisk || 'Orta') === inherentRisk && 
+            (u.controlEffectiveness || 'Orta') === controlEffectiveness
+        );
+        if (filteredUnits.length > 0) {
+            setHeatmapModal({
+                isOpen: true,
+                inherent: inherentRisk,
+                control: controlEffectiveness,
+                list: filteredUnits
+            });
+        } else {
+            showToast('Bu risk seviyesinde birim bulunmamaktadır.', 'info');
+        }
+    };
+
+    let overdueActionsCount = 0;
+    let dueSoonActionsCount = 0;
+    const now = new Date();
+    const fifteenDaysFromNow = new Date();
+    fifteenDaysFromNow.setDate(now.getDate() + 15);
+
+    filteredFindings.forEach((f: any) => {
+        if (!CLOSED_STATUSES.includes(f.status) && f.status !== 'İptal') {
+            const actions = f.actions || f.followUps;
+            if (Array.isArray(actions)) {
+                actions.forEach((a: any) => {
+                    if (a.status !== 'Kapalı' && a.status !== 'Tamamlandı' && (a.deadline || a.dueDate)) {
+                        const deadline = new Date(a.deadline || a.dueDate);
+                        if (deadline < now) overdueActionsCount++;
+                        else if (deadline <= fifteenDaysFromNow) dueSoonActionsCount++;
+                    }
+                });
+            }
+        }
+    });
+
     const loadData = async (showOverlay = true) => {
         if (showOverlay) setLoading(true);
         // Kısıtlı kullanıcılar için veri yüklemeyi atla
@@ -119,40 +195,121 @@ export default function AuditDashboard() {
         }
 
         try {
-            const [auditsData, findingsData, unitsData] = await Promise.all([
+            const [auditsData, findingsData, unitsData, logsData] = await Promise.all([
                 auditApi.getAudits(),
                 auditApi.getFindings(),
-                auditApi.getAuditableUnits()
+                auditApi.getAuditableUnits(),
+                auditApi.getLogs().catch(() => [])
             ]);
 
-            setAudits(Array.isArray(auditsData) ? auditsData : []);
-            setFindings(Array.isArray(findingsData) ? findingsData : []);
-            setUnits(Array.isArray(unitsData) ? unitsData : []);
-
-            // Son verilerden aktivite logu oluştur
-            const recentActivities: ActivityLog[] = [];
-
-            // Son denetimleri aktivite olarak ekle
-            (Array.isArray(auditsData) ? auditsData : []).slice(0, 3).forEach((audit: any, idx: number) => {
-                recentActivities.push({
-                    id: `audit-${audit.id || idx}`,
-                    action: `Denetim: ${audit.title || audit.auditNumber || 'Güncellendi'}`,
-                    user: audit.supervisor || audit.creatorName || 'Sistem',
-                    date: audit.updatedAt ? formatDate(audit.updatedAt) : 'Bugün',
-                    status: audit.status || 'Bilinmiyor'
-                });
+            let parsedAudits = Array.isArray(auditsData) ? auditsData : [];
+            let parsedFindings = (Array.isArray(findingsData) ? findingsData : []).map(f => {
+                let status = f.status || 'Taslak';
+                if (status === 'Açık') status = 'Tebliğ Edildi';
+                if (status === 'Çözüldü' || status === 'Kapalı' || status === 'Kapalı (Mutabık Değil)') status = 'Tamamlandı';
+                return { ...f, status };
             });
+            let parsedUnits = Array.isArray(unitsData) ? unitsData : [];
 
-            // Son bulguları aktivite olarak ekle
-            (Array.isArray(findingsData) ? findingsData : []).slice(0, 3).forEach((finding: any, idx: number) => {
-                recentActivities.push({
-                    id: `finding-${finding.id || idx}`,
-                    action: `Bulgu: ${finding.title || finding.code || 'Güncellendi'}`,
-                    user: finding.assignedUser?.displayName || finding.assignedTo || finding.creatorName || 'Müfettiş',
-                    date: finding.updated_at ? formatDate(finding.updated_at) : (finding.updatedAt ? formatDate(finding.updatedAt) : 'Bugün'),
-                    status: finding.status || 'Açık'
-                });
+            // ROL BAZLI FİLTRELEME (RBAC)
+            if (isInspector && !isManager && !isSupervisor && user?.id) {
+                // Sadece yetkili olduğu denetimleri getir (Kendi oluşturduğu veya ekibinde olduğu)
+                parsedAudits = parsedAudits.filter((a: any) => 
+                    String(a.auditorId) === String(user.id) || 
+                    String(a.supervisorId) === String(user.id) ||
+                    (Array.isArray(a.team) && a.team.some((t: any) => String(t.id) === String(user.id)))
+                );
+                
+                const myAuditIds = new Set(parsedAudits.map((a: any) => String(a.id)));
+
+                // Sadece kendi denetimlerine VEYA kendisine atanmış bulguları getir
+                parsedFindings = parsedFindings.filter((f: any) => 
+                    String(f.assignedUserId) === String(user.id) || 
+                    myAuditIds.has(String(f.auditId))
+                );
+            }
+
+            setAudits(parsedAudits);
+            setFindings(parsedFindings);
+            setUnits(parsedUnits);
+
+            const years = new Set<string>();
+            const addYear = (dateStr: string) => {
+                if (dateStr) {
+                    const year = new Date(dateStr).getFullYear().toString();
+                    if (!isNaN(Number(year))) years.add(year);
+                }
+            };
+            
+            parsedAudits.forEach((a: any) => {
+                if (a.startDate) addYear(a.startDate);
+                else if (a.createdAt) addYear(a.createdAt);
+                else if (a.created_at) addYear(a.created_at);
             });
+            parsedFindings.forEach((f: any) => {
+                if (f.createdAt) addYear(f.createdAt);
+                else if (f.created_at) addYear(f.created_at);
+            });
+            
+            const sortedYears = Array.from(years).sort().reverse();
+            setAvailableYears([
+                { value: 'Tümü', label: 'Tüm Yıllar' },
+                ...sortedYears.map(y => ({ value: y, label: y }))
+            ]);
+
+            let recentActivities: ActivityLog[] = [];
+
+            if (Array.isArray(logsData) && logsData.length > 0) {
+                let filteredLogs = logsData;
+                
+                if (isInspector && !isManager && !isSupervisor && user?.id) {
+                    const myAuditIds = new Set(parsedAudits.map((a: any) => String(a.id)));
+                    const myFindingIds = new Set(parsedFindings.map((f: any) => String(f.id)));
+                    
+                    filteredLogs = logsData.filter((l: any) => 
+                        (l.targetType === 'Audit' && myAuditIds.has(String(l.targetId))) ||
+                        (l.targetType === 'Finding' && myFindingIds.has(String(l.targetId))) ||
+                        String(l.user) === String(user.displayName) ||
+                        String(l.userId) === String(user.id)
+                    );
+                }
+
+                recentActivities = filteredLogs.slice(0, 8).map((log: any) => ({
+                    id: log.id,
+                    action: log.action || 'İşlem',
+                    user: log.user || 'Sistem',
+                    date: log.date ? formatDate(log.date) : 'Bugün',
+                    status: 'Bilgi',
+                    targetId: log.targetId,
+                    targetType: log.targetType,
+                    details: log.details
+                }));
+            } else {
+                // Fallback to old mock logic if logs fail
+                parsedAudits.slice(0, 3).forEach((audit: any, idx: number) => {
+                    recentActivities.push({
+                        id: `audit-${audit.id || idx}`,
+                        action: `Denetim: ${audit.title || audit.auditNumber || 'Güncellendi'}`,
+                        user: audit.supervisor || audit.creatorName || 'Sistem',
+                        date: audit.updatedAt ? formatDate(audit.updatedAt) : 'Bugün',
+                        status: audit.status || 'Bilinmiyor',
+                        targetId: audit.id,
+                        targetType: 'Audit'
+                    });
+                });
+
+                parsedFindings.slice(0, 3).forEach((finding: any, idx: number) => {
+                    recentActivities.push({
+                        id: `finding-${finding.id || idx}`,
+                        action: `Bulgu: ${finding.title || finding.code || 'Güncellendi'}`,
+                        user: finding.assignedUser?.displayName || finding.assignedTo || finding.creatorName || 'Müfettiş',
+                        date: finding.updated_at ? formatDate(finding.updated_at) : (finding.updatedAt ? formatDate(finding.updatedAt) : 'Bugün'),
+                        status: finding.status || 'Tebliğ Edildi',
+                        targetId: finding.id,
+                        targetType: 'Finding'
+                    });
+                });
+            }
 
             setActivities(recentActivities.slice(0, 5));
             setLastUpdate(formatDateTime(new Date()));
@@ -225,125 +382,92 @@ export default function AuditDashboard() {
 
     return (
         <>
-            <PageHeader title="Ana Panel" subtitle="Yönetim paneli ve genel işlemler" />
-            {/* Header with Refresh */}
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <p className="text-sm text-gray-500">Son güncelleme: {lastUpdate}</p>
-                </div>
-                <RefreshButton onClick={handleRefresh} />
-            </div>
-
-            {/* Stats Grid - REAL DATA */}
-            <div className="grid grid-flow-col auto-cols-[minmax(240px,1fr)] gap-4 pb-2 mb-8 overflow-x-auto snap-x hide-scrollbar">
-                <StatCard
-                    title="Toplam Denetim"
-                    value={auditStats.total}
-                    subtext={`${auditStats.planned} planlandı`}
-                    color="blue"
-                    icon={<FileText size={24} />}
-                    onClick={() => router.push('/audit/universe')}
-                    className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-blue-500"
-                />
-
-                <StatCard
-                    title="Devam Eden"
-                    value={auditStats.ongoing}
-                    subtext="aktif denetim"
-                    color="yellow"
-                    icon={<Activity size={24} />}
-                    onClick={() => router.push('/audit/universe')}
-                    className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-yellow-500"
-                />
-
-                <StatCard
-                    title="Açık Bulgular"
-                    value={findingStats.open}
-                    subtext={`${findingStats.critical} kritik`}
-                    color="red"
-                    icon={<AlertTriangle size={24} />}
-                    onClick={() => router.push('/audit/findings')}
-                    className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-red-500"
-                />
-
-                <StatCard
-                    title="Tamamlanan"
-                    value={auditStats.completed}
-                    subtext={`${findingStats.closed} bulgu kapatıldı`}
-                    color="green"
-                    icon={<CheckCircle size={24} />}
-                    onClick={() => router.push('/audit/findings')}
-                    className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-green-500"
-                />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Activities Table - REAL DATA */}
-                <div className="lg:col-span-2">
-                    <div className="card h-full">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                                <History size={20} className="text-primary" />
-                                Son Aktiviteler
-                            </h3>
-                            <ActionLink href="/audit/logs" variant="primary">Tümünü Gör</ActionLink>
-                        </div>
-
-                        <DataTable
-                            columns={[
-                                {
-                                    key: 'action',
-                                    header: 'Aktivite / Denetim No',
-                                    sortable: true,
-                                    render: (item: any) => (
-                                        <div className="flex flex-col">
-                                            <span className="font-medium text-gray-700 group-hover/row:text-emerald-700 transition-colors">{String(item.action || '')}</span>
-                                        </div>
-                                    )
-                                },
-                                {
-                                    key: 'user',
-                                    header: 'Kullanıcı',
-                                    sortable: true,
-                                    render: (item: any) => (
-                                        <div className="flex items-center gap-2.5">
-                                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-600 font-bold border border-white shadow-sm shrink-0">
-                                                {String(item.user || '').split(' ').filter(Boolean).map((n: string) => n[0]).join('')}
-                                            </div>
-                                            <span className="text-sm text-gray-600 group-hover/row:text-gray-800">{String(item.user || '')}</span>
-                                        </div>
-                                    )
-                                },
-                                {
-                                    key: 'date',
-                                    header: 'Tarih',
-                                    sortable: true,
-                                    render: (item: any) => <span className="text-gray-500 text-sm font-medium">{String(item.date || '')}</span>
-                                },
-                                {
-                                    key: 'status',
-                                    header: 'Durum',
-                                    sortable: true,
-                                    render: (item: any) => (
-                                        <StatusBadge value={item.status} />
-                                    )
-                                }
-                            ]}
-                            data={activities}
-                            rowKey="id"
-                            emptyIcon={History}
-                            rowClassName={() => "group/row hover:bg-emerald-50/30 transition-colors"}
-                            className="border-none shadow-none"
+            <PageHeader title="Ana Panel" subtitle="Teftiş Kurulu anlık durum özeti ve performans göstergeleri" />
+            {/* Header with Refresh and Year Filter */}
+            <PageToolbar
+                noSearch={true}
+                onRefresh={handleRefresh}
+                leftActions={
+                    <div>
+                        <p className="text-sm text-gray-500 font-medium">Son güncelleme: {lastUpdate}</p>
+                    </div>
+                }
+                filters={
+                    <div className="w-[160px]">
+                        <CustomSelect 
+                            value={selectedYear}
+                            onChange={(val) => setSelectedYear(val as string)}
+                            options={availableYears}
                         />
                     </div>
-                </div>
+                }
+            />
 
-                {/* Risk Distribution - REAL DATA */}
-                <div className="card">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-6">
-                        <PieChart size={20} className="text-primary" />
-                        Bulgu Risk Dağılımı
-                    </h3>
+            {/* 1. SATIR: Acil Aksiyonlar (Focus Zone) */}
+            <DashboardWidget widgetType="actions" variant="transparent">
+                <ExecutiveActionCards 
+                    variant="dashboard"
+                    pendingApprovals={filteredAudits.filter(a => a.status === 'Onay Bekliyor').length}
+                    ongoingAudits={filteredAudits.filter(a => a.status === 'Devam Ediyor' || a.status === 'Sürüyor').length}
+                    pendingNotifications={filteredFindings.filter(f => f.status === 'Tebliğ Edildi' || f.status === 'Birim Yanıtladı').length}
+                    pendingVerification={filteredFindings.filter(f => f.status === 'Doğrulama Bekliyor').length}
+                    pendingRevisions={filteredFindings.filter(f => f.status === 'Revizyon Gerekli').length + filteredAudits.filter(a => a.status === 'Revizyon Gerekli').length}
+                    overdueActionsCount={overdueActionsCount}
+                    dueSoonActionsCount={dueSoonActionsCount}
+                />
+            </DashboardWidget>
+
+            {/* 2. SATIR: Stratejik Risk (Risk Heatmap) */}
+            <div className="mb-8">
+                <RiskHeatmap units={units} onCellClick={handleHeatmapClick} />
+            </div>
+
+            {/* 3. SATIR: Performans ve Makro Görünüm */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                {/* KPI Metrics */}
+                <DashboardWidget widgetType="metrics" className="lg:col-span-2">
+                    <div className="grid grid-cols-2 gap-4 h-[calc(100%-3rem)]">
+                        <StatCard
+                            title="Denetim Tamamlama Oranı"
+                            value={`%${auditStats.total > 0 ? Math.round((auditStats.completed / auditStats.total) * 100) : 0}`}
+                            color="blue"
+                            infoTooltip="Tamamlanan denetimlerin toplam denetimlere oranını ifade eder. Hedef: %90"
+                        />
+                        <StatCard
+                            title="Bulgu Kapatma Oranı"
+                            value={`%${findingStats.total > 0 ? Math.round((findingStats.closed / findingStats.total) * 100) : 0}`}
+                            color="green"
+                            infoTooltip="Kapatılan veya tamamlanan bulguların tüm açık/kapalı bulgulara oranını gösterir. Hedef: %85"
+                        />
+                        <StatCard
+                            title="Ort. Denetim Süresi (Gün)"
+                            value={(() => {
+                                const completedAudits = filteredAudits.filter((a: any) => a.status === 'Tamamlandı' && a.startDate && a.endDate);
+                                if (completedAudits.length === 0) return '-';
+                                const totalDays = completedAudits.reduce((sum: number, a: any) => {
+                                    const start = new Date(a.startDate);
+                                    const end = new Date(a.endDate);
+                                    return sum + Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+                                }, 0);
+                                return Math.round(totalDays / completedAudits.length).toString();
+                            })()}
+                            color="orange"
+                            infoTooltip="Sadece 'Tamamlandı' statüsündeki denetimlerin başlangıç ve bitiş tarihleri arasındaki net gün sayısının ortalamasıdır. Hedef: Maks 30 gün"
+                        />
+                        <StatCard
+                            title="Yüksek Öncelikli Bulgu"
+                            value={(findingStats.critical + findingStats.high).toString()}
+                            color="purple"
+                            infoTooltip="Sistemdeki durumu henüz kapanmamış olan Kritik ve Yüksek riskli bulguların toplam sayısıdır."
+                        />
+                    </div>
+                </DashboardWidget>
+
+                {/* Risk Distribution - Pie Chart */}
+                <DashboardWidget 
+                    widgetType="risk"
+                    infoTooltip="Sistemdeki bulguların risk ağırlıklarına (Kritik, Yüksek, Orta, Düşük) göre oransal dağılımını gösterir."
+                >
 
                     <div className="space-y-4">
                         {[
@@ -373,427 +497,185 @@ export default function AuditDashboard() {
                             <span className="font-bold text-lg">{findingStats.total}</span>
                         </div>
                     </div>
-                </div>
+                </DashboardWidget>
             </div>
 
-            {/* Risk Heatmap Row - NEW */}
-            <div className="mt-8">
-                <RiskHeatmap units={units} />
-            </div>
-
-            {/* Trend Charts & Performance Metrics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                {/* Monthly Trend Chart */}
-                <div className="card">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
-                        <TrendingUp size={20} className="text-primary" />
-                        Aylık Denetim Trendi
-                    </h3>
-                    <div className="space-y-3">
-                        {Array.from({ length: 6 }).map((_, i) => {
-                            const date = new Date();
-                            date.setMonth(date.getMonth() - (5 - i));
-                            const monthName = date.toLocaleString('tr-TR', { month: 'long' });
-                            const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
-                            const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-                            // Gerçek veriden aylık dağılım hesaplaması
-                            const completed = audits.filter((a: any) => {
-                                const d = new Date(a.updatedAt || a.updated_at || a.created_at);
-                                return a.status === 'Tamamlandı' && d >= monthStart && d <= monthEnd;
-                            }).length;
-                            const found = findings.filter((f: any) => {
-                                const d = new Date(f.created_at || f.createdAt);
-                                return d >= monthStart && d <= monthEnd;
-                            }).length;
-
-                            const maxAudit = Math.max(...Array.from({ length: 6 }).map((_, j) => {
-                                const md = new Date(); md.setMonth(md.getMonth() - (5 - j));
-                                return audits.filter((a: any) => { const d = new Date(a.updatedAt || a.updated_at || a.created_at); return a.status === 'Tamamlandı' && d.getMonth() === md.getMonth() && d.getFullYear() === md.getFullYear(); }).length;
-                            }), 1);
-                            const maxFinding = Math.max(...Array.from({ length: 6 }).map((_, j) => {
-                                const md = new Date(); md.setMonth(md.getMonth() - (5 - j));
-                                return findings.filter((f: any) => { const d = new Date(f.created_at || f.createdAt); return d.getMonth() === md.getMonth() && d.getFullYear() === md.getFullYear(); }).length;
-                            }), 1);
-
-                            return (
-                                <div key={i} className="flex items-center gap-4">
-                                    <span className="w-16 text-sm text-gray-500">{monthName}</span>
-                                    <div className="flex-1 flex items-center gap-2">
-                                        <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                                            <div className="h-full bg-blue-500 rounded-full transition-all duration-1000" style={{ width: `${(completed / maxAudit) * 100}%` }} />
-                                        </div>
-                                        <span className="text-sm font-medium w-6">{completed}</span>
-                                    </div>
-                                    <div className="flex-1 flex items-center gap-2">
-                                        <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                                            <div className="h-full bg-red-400 rounded-full transition-all duration-1000" style={{ width: `${(found / maxFinding) * 100}%` }} />
-                                        </div>
-                                        <span className="text-sm font-medium w-6">{found}</span>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                        <div className="flex justify-center gap-6 mt-4 text-sm">
-                            <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-blue-500" /> Tamamlanan Denetim</span>
-                            <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-red-400" /> Açılan Bulgu</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* KPI Metrics */}
-                <div className="card">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
-                        <Zap size={20} className="text-primary" />
-                        Performans Göstergeleri
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
-                            <div className="text-3xl font-bold text-blue-700">
-                                %{auditStats.total > 0 ? Math.round((auditStats.completed / auditStats.total) * 100) : 0}
-                            </div>
-                            <div className="text-sm text-blue-600">Denetim Tamamlama Oranı</div>
-                        </div>
-                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4">
-                            <div className="text-3xl font-bold text-green-700">
-                                %{findingStats.total > 0 ? Math.round((findingStats.closed / findingStats.total) * 100) : 0}
-                            </div>
-                            <div className="text-sm text-green-600">Bulgu Kapatma Oranı</div>
-                        </div>
-                        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4">
-                            <div className="text-3xl font-bold text-orange-700">
-                                {(() => {
-                                    const completedAudits = audits.filter((a: any) => a.status === 'Tamamlandı' && a.startDate && a.endDate);
-                                    if (completedAudits.length === 0) return '-';
-                                    const totalDays = completedAudits.reduce((sum: number, a: any) => {
-                                        const start = new Date(a.startDate);
-                                        const end = new Date(a.endDate);
-                                        return sum + Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-                                    }, 0);
-                                    return Math.round(totalDays / completedAudits.length);
-                                })()}
-                            </div>
-                            <div className="text-sm text-orange-600">Ort. Denetim Süresi (Gün)</div>
-                        </div>
-                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
-                            <div className="text-3xl font-bold text-purple-700">
-                                {findingStats.critical + findingStats.high}
-                            </div>
-                            <div className="text-sm text-purple-600">Yüksek Öncelikli Bulgu</div>
-                        </div>
-                    </div>
-                    <div className="mt-4 pt-4 border-t">
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-gray-500">Son 30 günde kapatılan bulgu</span>
-                            <span className="font-bold text-green-600">+{findings.filter(f => {
-                                if (!CLOSED_STATUSES.includes(f.status)) return false;
-                                const kapanisTarihi = f.closedAt || f.updatedAt;
-                                if (!kapanisTarihi) return false;
-                                const otuzGunOnce = new Date();
-                                otuzGunOnce.setDate(otuzGunOnce.getDate() - 30);
-                                return new Date(kapanisTarihi) >= otuzGunOnce;
-                            }).length}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Stats Grid - REAL DATA */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <StatCard
-                    title="Toplam Denetim"
-                    value={auditStats.total}
-                    subtext={`${auditStats.planned} planlandı`}
-                    color="blue"
-                    icon={<FileText size={24} />}
-                    onClick={() => router.push('/audit/universe')}
-                    className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-blue-500"
-                />
-
-                <StatCard
-                    title="Devam Eden"
-                    value={auditStats.ongoing}
-                    subtext="aktif denetim"
-                    color="yellow"
-                    icon={<Activity size={24} />}
-                    onClick={() => router.push('/audit/universe')}
-                    className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-yellow-500"
-                />
-
-                <StatCard
-                    title="Açık Bulgular"
-                    value={findingStats.open}
-                    subtext={`${findingStats.critical} kritik`}
-                    color="red"
-                    icon={<AlertTriangle size={24} />}
-                    onClick={() => router.push('/audit/findings')}
-                    className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-red-500"
-                />
-
-                <StatCard
-                    title="Tamamlanan"
-                    value={auditStats.completed}
-                    subtext={`${findingStats.closed} bulgu kapatıldı`}
-                    color="green"
-                    icon={<CheckCircle size={24} />}
-                    onClick={() => router.push('/audit/findings')}
-                    className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-green-500"
-                />
-            </div>
-
-            {/* Rest of the content */}
+            {/* 4. SATIR: Operasyonel Akış (Micro View) */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                {/* Sol Taraf: Grafik ve Aktivite Akışı */}
-                <div className="xl:col-span-2 space-y-6">
-                    {/* Grafik Kartı */}
-                    <div className="card">
-                        <div className="flex justify-between items-center mb-6">
-                            <div>
-                                <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                    <TrendingUp size={20} className="text-primary" />
-                                    Bulgu Dağılımı (Aylık)
-                                </h3>
-                                <p className="text-xs text-gray-400 mt-1 font-medium">Bulgu durumlarının aylık trend analizi</p>
-                            </div>
-                            <div className="flex items-center gap-4 text-xs font-semibold">
-                                <span className="flex items-center gap-1.5 text-red-600 bg-red-50 px-2 py-1 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-red-600"></span>Açık</span>
-                                <span className="flex items-center gap-1.5 text-green-600 bg-green-50 px-2 py-1 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-green-600"></span>Kapalı</span>
-                            </div>
-                        </div>
+                {/* Bulgu Dağılımı (Aylık) CSS Chart */}
+                <DashboardWidget 
+                    widgetType="trend" 
+                    title="Bulgu Dağılımı" 
+                    subtitle="Aylık trend analizi" 
+                    infoTooltip="Yıl içerisindeki açılan ve kapatılan bulguların aylar bazında karşılaştırmalı trend analizidir."
+                    className="flex flex-col justify-between"
+                >
 
-                        {/* Custom Pure CSS Chart (Emlak Katılım Renk Paleti Uyumlu) */}
-                        <div className="h-64 flex flex-col justify-between">
-                            <div className="flex-1 flex items-end gap-6 md:gap-8 lg:gap-12 px-4 border-b border-gray-100 pb-2">
-                                {monthlyChartData.map((d, i) => {
-                                    const maxVal = Math.max(...monthlyChartData.map(x => x.open + x.closed));
-                                    const openHeight = maxVal > 0 ? (d.open / maxVal) * 100 : 0;
-                                    const closedHeight = maxVal > 0 ? (d.closed / maxVal) * 100 : 0;
+                        <div className="h-48 flex flex-col justify-end">
+                            {monthlyChartData.some(d => d.open > 0 || d.closed > 0) ? (
+                                <div className="flex-1 flex items-end gap-2 px-1 border-b border-gray-100 pb-2">
+                                    {monthlyChartData.map((d, i) => {
+                                        const maxVal = Math.max(...monthlyChartData.map(x => x.open + x.closed));
+                                        const openHeight = maxVal > 0 ? (d.open / maxVal) * 100 : 0;
+                                        const closedHeight = maxVal > 0 ? (d.closed / maxVal) * 100 : 0;
 
-                                    return (
-                                        <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group cursor-pointer">
-                                            <div className="w-full flex items-end justify-center gap-1.5 h-full relative">
-                                                {/* Tooltip */}
-                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-800 text-white text-[10px] py-1 px-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-20">
-                                                    <span className="font-bold">{d.month}</span>: {d.open} Açık, {d.closed} Kapalı
-                                                </div>
-
-                                                {/* Açık Bar - Kırmızı */}
-                                                <div 
-                                                    style={{ height: `${openHeight}%` }} 
-                                                    className="w-3 md:w-4 rounded-t-full bg-gradient-to-t from-red-500 to-rose-400 group-hover:brightness-110 transition-all duration-300 shadow-sm"
-                                                />
-                                                {/* Kapalı Bar - Emlak Katılım Yeşil */}
-                                                <div 
-                                                    style={{ height: `${closedHeight}%` }} 
-                                                    className="w-3 md:w-4 rounded-t-full bg-gradient-to-t from-green-600 to-emerald-500 group-hover:brightness-110 transition-all duration-300 shadow-sm"
-                                                />
+                                        return (
+                                            <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group cursor-pointer">
+                                                <Tooltip content={<><span className="font-bold">{d.month}</span>: {d.open} Açık, {d.closed} Kapalı</>} position="top">
+                                                    <div className="w-full flex items-end justify-center gap-0.5 h-full relative">
+                                                        <div style={{ height: `${openHeight}%` }} className="w-2.5 rounded-t-sm bg-gradient-to-t from-red-500 to-rose-400 group-hover:brightness-110 transition-all duration-300 shadow-sm" />
+                                                        <div style={{ height: `${closedHeight}%` }} className="w-2.5 rounded-t-sm bg-gradient-to-t from-green-600 to-emerald-500 group-hover:brightness-110 transition-all duration-300 shadow-sm" />
+                                                    </div>
+                                                </Tooltip>
+                                                <span className="text-[9px] font-bold text-gray-400 mt-2 group-hover:text-gray-700 transition-colors tracking-wider">{d.month}</span>
                                             </div>
-                                            <span className="text-[10px] font-bold text-gray-400 mt-2 group-hover:text-gray-700 transition-colors uppercase tracking-wider">{d.month}</span>
-                                        </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="flex-1 flex items-center justify-center bg-gray-50/30 rounded-lg border border-dashed border-gray-200">
+                                    <EmptyState 
+                                        variant="minimal" 
+                                        icon={TrendingUp} 
+                                        title="Kayıt Bulunamadı" 
+                                        description="Görüntülenecek trend verisi bulunmuyor." 
+                                    />
+                                </div>
+                            )}
+                        </div>
+                </DashboardWidget>
+
+                {/* Son Eklenen Bulgular */}
+                <DashboardWidget 
+                    widgetType="findings" 
+                    subtitle="Sisteme eklenen son bulgu kayıtları"
+                    infoTooltip="Sisteme yakın zamanda eklenen ve henüz kapanmamış veya yeni kapanmış güncel bulguları listeler."
+                    actionHref="/audit/findings" 
+                    actionLabel="Tüm Bulguları Görüntüle"
+                >
+
+                    {filteredFindings.length === 0 ? (
+                        <div className="flex-1 flex items-center justify-center min-h-[200px] bg-gray-50/30 rounded-lg border border-dashed border-gray-200">
+                            <EmptyState 
+                                variant="minimal" 
+                                icon={FolderOpen} 
+                                title="Kayıt Bulunamadı" 
+                                description="Görüntülenecek bulgu kaydı bulunmuyor." 
+                            />
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {filteredFindings.slice(0, 5).map((finding) => {
+                                const displayStatus = finding.status;
+                                const isClosed = CLOSED_STATUSES.includes(displayStatus);
+                                return (
+                                    <DashboardListItem
+                                        key={finding.id}
+                                        href={`/audit/findings?id=${finding.id}`}
+                                        code={finding.code || (typeof finding.id === 'string' ? `#${finding.id.substring(0, 7)}` : `#${finding.id}`)}
+                                        title={finding.title || finding.headline}
+                                        subtitle={
+                                            <div className="flex items-center text-[11px] text-gray-400">
+                                                {finding.department || 'Birim Belirtilmedi'}
+                                                <span className="mx-1.5">•</span>
+                                                Vade: <span className={!finding.dueDate ? (isClosed ? 'text-gray-500' : 'italic text-amber-600') : ''}>{
+                                                    finding.dueDate ? formatDate(finding.dueDate) : (isClosed ? 'Kapatıldı' : 'Bekleniyor')
+                                                }</span>
+                                            </div>
+                                        }
+                                        status={displayStatus}
+                                    />
+                                );
+                            })}
+                        </div>
+                    )}
+                </DashboardWidget>
+
+                {/* Son Denetim İzleri */}
+                <DashboardWidget 
+                    widgetType="activities"
+                    subtitle="Sisteme eklenen son denetim izleri"
+                    infoTooltip="Sistem içerisinde kullanıcılar tarafından gerçekleştirilen son kritik eylemlerin (giriş, düzenleme vb.) denetim izi kayıtlarıdır."
+                    actionHref="/audit/logs" 
+                    actionLabel="Tüm Aktiviteleri Görüntüle"
+                    className="flex flex-col justify-between"
+                >
+
+                        {activities.length === 0 ? (
+                            <div className="flex-1 flex items-center justify-center min-h-[200px] bg-gray-50/30 rounded-lg border border-dashed border-gray-200">
+                                <EmptyState 
+                                    variant="minimal" 
+                                    icon={ActivityIcon} 
+                                    title="Kayıt Bulunamadı" 
+                                    description="Görüntülenecek denetim izi bulunmuyor." 
+                                />
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {activities.slice(0, 5).map((activity) => {
+                                    const isLogin = activity.action.includes('Giriş');
+                                    const isAudit = (activity as any).entityType === 'Denetim' || activity.action.includes('Denetim');
+                                    
+                                    return (
+                                        <DashboardListItem
+                                            key={activity.id}
+                                            icon={
+                                                <div className={`p-2 rounded-lg ${
+                                                    isLogin ? 'bg-blue-50 text-blue-600' : 
+                                                    isAudit ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-600'
+                                                }`}>
+                                                    {isLogin ? <ShieldAlert size={16} /> : isAudit ? <RefreshCw size={16} /> : <FileSignature size={16} />}
+                                                </div>
+                                            }
+                                            title={activity.action}
+                                            subtitle={
+                                                <div className="flex items-center text-[11px] text-gray-400">
+                                                    <span className="font-semibold text-gray-600">{activity.user}</span>
+                                                    <span className="mx-1.5">•</span>
+                                                    {activity.details || 'Sistem kaydı oluşturuldu'}
+                                                </div>
+                                            }
+                                            rightContent={
+                                                <div className="text-[11px] font-bold text-gray-400 whitespace-nowrap">
+                                                    {activity.date}
+                                                </div>
+                                            }
+                                        />
                                     );
                                 })}
                             </div>
-                        </div>
-                    </div>
+                        )}
+                </DashboardWidget>
+            </div>
 
-                    {/* Son Bulgular Kartı */}
-                    <div className="card">
-                        <div className="flex justify-between items-center mb-6">
+            {/* Heatmap Modal */}
+            <Modal
+                isOpen={heatmapModal.isOpen}
+                onClose={() => setHeatmapModal({ ...heatmapModal, isOpen: false })}
+                title="Risk Kategorisi Detayı"
+                size="md"
+            >
+                <div className="mb-4">
+                    <p className="text-sm text-gray-500 mb-2 font-medium">Seçilen Risk Seviyesi:</p>
+                    <div className="flex gap-2 items-center">
+                        <span className="bg-rose-100 text-rose-800 px-3 py-1 rounded-md text-xs font-bold shadow-sm">Doğal Risk: {heatmapModal.inherent}</span>
+                        <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-xs font-bold shadow-sm">Kontrol Etkinliği: {heatmapModal.control}</span>
+                    </div>
+                </div>
+                
+                <h4 className="font-bold text-gray-800 mb-3 border-b pb-2">Bu Kategorideki Birimler ({heatmapModal.list.length})</h4>
+                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                    {heatmapModal.list.map(unit => (
+                        <div key={unit.id} className="p-3 bg-gray-50 rounded-lg border border-gray-100 flex justify-between items-center hover:border-primary/30 transition-colors group">
                             <div>
-                                <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                    <AlertTriangle size={20} className="text-red-500" />
-                                    Son Eklenen Bulgular
-                                </h3>
-                                <p className="text-xs text-gray-400 mt-1 font-medium">Aksiyon takibindeki en güncel tespitler</p>
+                                <div className="font-bold text-sm text-gray-800 group-hover:text-primary transition-colors">{unit.name}</div>
+                                {unit.department && <div className="text-xs text-gray-500 mt-0.5">{unit.department}</div>}
                             </div>
-                            <Link href="/audit/findings" className="btn btn-ghost text-xs hover:bg-slate-100 font-semibold gap-1">
-                                Tümünü Gör <ArrowRight size={14} />
-                            </Link>
+                            <ActionLink href={`/audit/universe/${unit.id}`} variant="primary">Detay</ActionLink>
                         </div>
-
-                        <div className="divide-y divide-gray-100">
-                            {findings.slice(0, 3).map((finding) => (
-                                <div key={finding.id} className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between group hover:bg-slate-50/50 transition-colors rounded-lg px-2 -mx-2">
-                                    <div className="flex items-center gap-3">
-                                        <span className={`w-2 h-2 rounded-full ${
-                                            finding.risk === 'Kritik' ? 'bg-red-600 animate-pulse' :
-                                            finding.risk === 'Yüksek' ? 'bg-orange-500' :
-                                            finding.risk === 'Orta' ? 'bg-yellow-500' : 'bg-blue-500'
-                                        }`} />
-                                        <div>
-                                            <div className="font-bold text-sm text-gray-800 group-hover:text-primary transition-colors">{finding.title}</div>
-                                            <div className="text-xs text-gray-500 mt-0.5">{finding.department} • Vade: {new Date(finding.dueDate || '').toLocaleDateString('tr-TR')}</div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                            finding.risk === 'Kritik' ? 'bg-red-50 text-red-600' :
-                                            finding.risk === 'Yüksek' ? 'bg-orange-50 text-orange-600' :
-                                            finding.risk === 'Orta' ? 'bg-yellow-50 text-yellow-600' : 'bg-blue-50 text-blue-600'
-                                        }`}>
-                                            {finding.risk}
-                                        </span>
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                            finding.status === 'Açık' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'
-                                        }`}>
-                                            {finding.status}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    ))}
                 </div>
-
-                {/* Sağ Taraf: Sistem Logları / Son İşlemler */}
-                <div className="card h-full flex flex-col justify-between">
-                    <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <div>
-                                <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                    <Activity size={20} className="text-primary" />
-                                    Son İşlem Logları
-                                </h3>
-                                <p className="text-xs text-gray-400 mt-1 font-medium">Platform genelindeki son kullanıcı izleri</p>
-                            </div>
-                            <Link href="/audit/logs" className="btn btn-ghost text-xs hover:bg-slate-100 font-semibold gap-1">
-                                Tüm Loglar <ArrowRight size={14} />
-                            </Link>
-                        </div>
-
-                        <div className="space-y-4">
-                            {activities.slice(0, 5).map((log) => (
-                                <div key={log.id} className="flex gap-3 text-xs leading-relaxed border-l-2 border-slate-100 pl-4 py-1 hover:border-primary transition-all duration-300">
-                                    <div className="flex-1">
-                                        <div className="font-bold text-gray-800">{log.user}</div>
-                                        <div className="text-slate-500 mt-0.5">{log.action || log.status}</div>
-                                        <div className="text-[10px] text-gray-400 mt-1 font-medium">
-                                            {log.date}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Bekleyen İşlemler (Eski Yönetici Görev Paneli) */}
-            <div className="mt-8">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
-                    <Calendar size={20} className="text-primary" />
-                    Bekleyen İşlemler
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    {/* Onay Bekleyen Bulgular - Mavi */}
-                    <Link href="/audit/findings?status=Onay%20Bekliyor" className="group relative overflow-hidden bg-blue-600 rounded-xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[160px]">
-                        <div className="flex justify-between items-start">
-                            <span className="text-4xl font-bold text-white">{findings.filter(f => f.status === 'Onay Bekliyor').length}</span>
-                            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                                <Calendar size={24} className="text-white" />
-                            </div>
-                        </div>
-                        <div className="mt-auto">
-                            <h4 className="font-bold text-lg text-white mb-1">Onay Bekliyor</h4>
-                            <p className="text-blue-100 text-xs mb-4">Gözetim sorumlusu onayı gereken bulgular</p>
-                            <div className="flex items-center gap-2 text-sm font-bold text-white/90">
-                                Görüntüle <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-2" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Aktif Denetimler - Turuncu/Sarı */}
-                    <Link href="/audit/audits?status=Devam%20Ediyor" className="group relative overflow-hidden bg-amber-500 rounded-xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[160px]">
-                        <div className="flex justify-between items-start">
-                            <span className="text-4xl font-bold text-white">{auditStats.ongoing}</span>
-                            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                                <FileText size={24} className="text-white" />
-                            </div>
-                        </div>
-                        <div className="mt-auto">
-                            <h4 className="font-bold text-lg text-white mb-1">Aktif Denetim</h4>
-                            <p className="text-amber-100 text-xs mb-4">Devam eden denetim faaliyetleri</p>
-                            <div className="flex items-center gap-2 text-sm font-bold text-white/90">
-                                Görüntüle <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-2" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Mutabakat Bekleyen - Mor */}
-                    <Link href="/audit/conciliation" className="group relative overflow-hidden bg-purple-600 rounded-xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[160px]">
-                        <div className="flex justify-between items-start">
-                            <span className="text-4xl font-bold text-white">{findings.filter(f => f.status === 'Tebliğ Edildi' || f.status === 'Birim Yanıtladı').length}</span>
-                            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                                <FileText size={24} className="text-white" />
-                            </div>
-                        </div>
-                        <div className="mt-auto">
-                            <h4 className="font-bold text-lg text-white mb-1">Mutabakat Bekliyor</h4>
-                            <p className="text-purple-100 text-xs mb-4">Birim yanıtı beklenen tebliğler</p>
-                            <div className="flex items-center gap-2 text-sm font-bold text-white/90">
-                                Görüntüle <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-2" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Doğrulama/Aksiyon Bekleyen - Kırmızı */}
-                    <Link href="/audit/follow-up" className="group relative overflow-hidden bg-rose-600 rounded-xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[160px]">
-                        <div className="flex justify-between items-start">
-                            <span className="text-4xl font-bold text-white">{findings.filter(f => f.status === 'Doğrulama Bekliyor').length}</span>
-                            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                                <AlertTriangle size={24} className="text-white" />
-                            </div>
-                        </div>
-                        <div className="mt-auto">
-                            <h4 className="font-bold text-lg text-white mb-1">Doğrulama Bekliyor</h4>
-                            <p className="text-rose-100 text-xs mb-4">Aksiyon kontrolü yapılacak bulgular</p>
-                            <div className="flex items-center gap-2 text-sm font-bold text-white/90">
-                                Görüntüle <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-2" />
-                            </div>
-                        </div>
-                    </Link>
-                </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                <Link href="/audit/audits" className="card hover:shadow-lg transition-shadow cursor-pointer flex items-center gap-3 !py-4">
-                    <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                        <FileText size={20} />
-                    </div>
-                    <div>
-                        <div className="font-semibold text-gray-800">Denetimler</div>
-                        <div className="text-xs text-gray-500">{auditStats.total} kayıt</div>
-                    </div>
-                </Link>
-                <Link href="/audit/findings" className="card hover:shadow-lg transition-shadow cursor-pointer flex items-center gap-3 !py-4">
-                    <div className="p-2 bg-red-100 rounded-lg text-red-600">
-                        <AlertTriangle size={20} />
-                    </div>
-                    <div>
-                        <div className="font-semibold text-gray-800">Bulgular</div>
-                        <div className="text-xs text-gray-500">{findingStats.open} açık</div>
-                    </div>
-                </Link>
-                <Link href="/audit/staff" className="card hover:shadow-lg transition-shadow cursor-pointer flex items-center gap-3 !py-4">
-                    <div className="p-2 bg-green-100 rounded-lg text-green-600">
-                        <Users size={20} />
-                    </div>
-                    <div>
-                        <div className="font-semibold text-gray-800">Personel</div>
-                        <div className="text-xs text-gray-500">Ekip yönetimi</div>
-                    </div>
-                </Link>
-                <Link href="/audit/plan" className="card hover:shadow-lg transition-shadow cursor-pointer flex items-center gap-3 !py-4">
-                    <div className="p-2 bg-purple-100 rounded-lg text-purple-600">
-                        <TrendingUp size={20} />
-                    </div>
-                    <div>
-                        <div className="font-semibold text-gray-800">Denetim Planı</div>
-                        <div className="text-xs text-gray-500">Yıllık plan</div>
-                    </div>
-                </Link>
-            </div>
+            </Modal>
         </>
     );
 }

@@ -25,12 +25,12 @@ export default function Home() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Top Bar with Logout */}
-            <div className="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center">
-                <div className="flex items-center gap-3">
+            <div className="h-[64px] bg-white border-b border-gray-200 pr-8 flex justify-between items-center shrink-0">
+                <div className="w-[260px] flex items-center justify-center shrink-0">
                     <img
                         src="/logo.png"
                         alt="Emlak Katılım"
-                        className="h-8 w-auto object-contain mix-blend-multiply"
+                        className="h-10 w-auto object-contain mix-blend-multiply transition-transform hover:scale-105"
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = 'https://placehold.co/150x50?text=LOGO';

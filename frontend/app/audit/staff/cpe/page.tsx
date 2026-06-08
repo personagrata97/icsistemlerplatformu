@@ -10,9 +10,10 @@ import Button from '@/components/ui/Button';
 import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';
 import CustomSelect from '@/components/ui/CustomSelect';
-import PageHeader from '@/components/audit/PageHeader';
 import Modal from '@/components/ui/Modal';
 import ActionMenu from '@/components/ui/ActionMenu';
+import PageHeader from '@/components/audit/PageHeader';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import { Eye } from 'lucide-react';
 import { formatDate } from '@/lib/audit-utils';
 import StatCard from '@/components/ui/StatCard';
@@ -146,27 +147,25 @@ export default function CpePage() {
     return (
         <div className="space-y-6">
             <BackButton href="/audit/staff" label="Denetim Ekibi Listesine Dön" />
-            <PageHeader
-                title="Sürekli Mesleki Eğitim (CPE)"
-                subtitle="Personel eğitim istatistikleri ve yıllık kazanım analizleri"
-            />
+            <PageHeader title="CPE (Mesleki Eğitim) Raporu" subtitle="Personel eğitim süreleri ve mesleki gelişim istatistikleri" />
 
             <PageToolbar
-                searchPlaceholder="Personel veya unvan ara..."
+                searchPlaceholder="Personel veya ünvan ara..."
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 onRefresh={loadData}
                 filters={
-                    <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-500 whitespace-nowrap">Rapor Yılı:</span>
-                        <div className="w-32">
-                            <CustomSelect
-                                options={yearOptions}
-                                value={selectedYear}
-                                onChange={(val) => setSelectedYear(val as string)}
-                            />
-                        </div>
-                    </div>
+                    <FilterDropdown
+                        activeCount={selectedYear !== currentYear.toString() ? 1 : 0}
+                        onClear={() => setSelectedYear(currentYear.toString())}
+                    >
+                        <CustomSelect
+                            label="Rapor Yılı"
+                            options={yearOptions}
+                            value={selectedYear}
+                            onChange={(val) => setSelectedYear(val as string)}
+                        />
+                    </FilterDropdown>
                 }
             />
 
@@ -179,6 +178,7 @@ export default function CpePage() {
                     color="indigo"
                     subtext={`${selectedYear} Yılı Geneli`}
                     badgeText="Yeni"
+                    infoTooltip="Seçili yıl içerisinde denetim ekibinin tamamladığı toplam eğitim (CPE) saati miktarıdır."
                     onClick={() => setCpeFilterMode('all')}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${cpeFilterMode === 'all' ? 'ring-2 ring-indigo-500 scale-[1.02] bg-indigo-50/10' : ''}`}
                 />
@@ -189,6 +189,7 @@ export default function CpePage() {
                     icon={TrendingUp}
                     color="emerald"
                     subtext="Kurum Ortalaması"
+                    infoTooltip="Toplam eğitim saatinin, aktif değerlendirilen personel sayısına bölünmesiyle elde edilen kişi başı ortalama saattir."
                     onClick={() => setCpeFilterMode(prev => prev === 'above_avg' ? 'all' : 'above_avg')}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${cpeFilterMode === 'above_avg' ? 'ring-2 ring-emerald-500 scale-[1.02] bg-emerald-50/10' : ''}`}
                 />
@@ -199,6 +200,7 @@ export default function CpePage() {
                     icon={Users}
                     color="orange"
                     subtext="Aktif Kadro"
+                    infoTooltip="Eğitim programı kapsamında takip edilen ve bu yıl için eğitim saati (CPE) hesabı yapılan aktif personel sayısıdır."
                     onClick={() => setCpeFilterMode('all')}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${cpeFilterMode === 'all' ? 'ring-2 ring-orange-500 scale-[1.02] bg-orange-50/10' : ''}`}
                 />

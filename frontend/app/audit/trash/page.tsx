@@ -343,6 +343,7 @@ export default function TrashPage() {
                     value={deletedItems.audits.length + deletedItems.findings.length + deletedItems.ethics.length + deletedItems.plans.length}
                     color="gray"
                     icon={<Trash2 size={20} />}
+                    infoTooltip="Çöp kutusunda yer alan tüm türlerdeki (denetim, bulgu, vb.) toplam kayıt sayısıdır."
                     onClick={() => setSelectedRecordTypes([])}
                     className={`transition-all hover:scale-[1.02] ${selectedRecordTypes.length === 0 ? 'ring-2 ring-gray-400 scale-[1.02] bg-gray-50/10' : ''}`}
                 />
@@ -351,6 +352,7 @@ export default function TrashPage() {
                     value={deletedItems.audits.length}
                     color="blue"
                     icon={<FileText size={20} />}
+                    infoTooltip="Kullanıcılar tarafından sistemden silinmiş ve kalıcı olarak silinmeyi/geri yüklenmeyi bekleyen denetim görevleridir."
                     onClick={() => toggleRecordTypeFilter('audits')}
                     className={`transition-all hover:scale-[1.02] ${selectedRecordTypes.includes('audits') ? 'ring-2 ring-blue-500 scale-[1.02] bg-blue-50/10' : ''}`}
                 />
@@ -359,6 +361,7 @@ export default function TrashPage() {
                     value={deletedItems.findings.length}
                     color="rose"
                     icon={<AlertTriangle size={20} />}
+                    infoTooltip="Denetimler sırasında eklenmiş ancak sonradan geçersiz kılınarak silinen bulgu kayıtlarıdır."
                     onClick={() => toggleRecordTypeFilter('findings')}
                     className={`transition-all hover:scale-[1.02] ${selectedRecordTypes.includes('findings') ? 'ring-2 ring-rose-500 scale-[1.02] bg-rose-50/10' : ''}`}
                 />
@@ -367,6 +370,7 @@ export default function TrashPage() {
                     value={deletedItems.ethics.length}
                     color="amber"
                     icon={<AlertCircle size={20} />}
+                    infoTooltip="Etik bildirim sisteminden silinen ancak kalıcı olarak yok edilmeyi bekleyen ihbar dosyalarıdır."
                     onClick={() => toggleRecordTypeFilter('ethics')}
                     className={`transition-all hover:scale-[1.02] ${selectedRecordTypes.includes('ethics') ? 'ring-2 ring-amber-500 scale-[1.02] bg-amber-50/10' : ''}`}
                 />
@@ -375,6 +379,7 @@ export default function TrashPage() {
                     value={deletedItems.plans.length}
                     color="indigo"
                     icon={<Calendar size={20} />}
+                    infoTooltip="Denetim evreninden veya yıllık plandan silinmiş, aktif olmayan taslak planların sayısıdır."
                     onClick={() => toggleRecordTypeFilter('plans')}
                     className={`transition-all hover:scale-[1.02] ${selectedRecordTypes.includes('plans') ? 'ring-2 ring-indigo-500 scale-[1.02] bg-indigo-50/10' : ''}`}
                 />

@@ -2,6 +2,9 @@ import React from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
+import DatePicker from '@/components/ui/DatePicker';
+import FormInput from '@/components/ui/FormInput';
+import { AlertCircle } from 'lucide-react';
 
 interface TrainingForm {
     name: string;
@@ -46,58 +49,45 @@ export default function TrainingModal({
             )}
         >
             <form id="training-form" onSubmit={onSave} className="space-y-4">
-                <div className="form-group">
-                    <label className="form-label">Eğitim / Sertifika Adı</label>
-                    <input 
-                        type="text" 
-                        className="form-input" 
-                        value={trainingForm.name} 
-                        onChange={e => setTrainingForm({ ...trainingForm, name: e.target.value })} 
-                        required={true} 
-                    />
-                </div>
-                <div className="form-group">
-                    <label className="form-label">Eğitim Kurumu / Sağlayıcı</label>
-                    <input 
-                        type="text" 
-                        className="form-input" 
-                        value={trainingForm.provider} 
-                        onChange={e => setTrainingForm({ ...trainingForm, provider: e.target.value })} 
-                        placeholder="Örn: ISACA, Kurum İçi" 
-                    />
-                </div>
+                <FormInput
+                    label="Eğitim / Sertifika Adı"
+                    type="text"
+                    value={trainingForm.name}
+                    onChange={e => setTrainingForm({ ...trainingForm, name: e.target.value })}
+                    required={true}
+                />
+                <FormInput
+                    label="Eğitim Kurumu / Sağlayıcı"
+                    type="text"
+                    value={trainingForm.provider}
+                    onChange={e => setTrainingForm({ ...trainingForm, provider: e.target.value })}
+                    placeholder="Örn: ISACA, Kurum İçi"
+                />
                 <div className="grid grid-cols-2 gap-4">
                     <div className="form-group">
                         <label className="form-label">Başlangıç Tarihi</label>
-                        <input 
-                            type="date" 
-                            className="form-input" 
+                        <DatePicker 
                             value={trainingForm.startDate} 
-                            onChange={e => setTrainingForm({ ...trainingForm, startDate: e.target.value })} 
+                            onChange={(val) => setTrainingForm({ ...trainingForm, startDate: val })} 
                             required={true} 
                         />
                     </div>
                     <div className="form-group">
                         <label className="form-label">Bitiş Tarihi</label>
-                        <input 
-                            type="date" 
-                            className="form-input" 
+                        <DatePicker 
                             value={trainingForm.endDate} 
-                            onChange={e => setTrainingForm({ ...trainingForm, endDate: e.target.value })} 
+                            onChange={(val) => setTrainingForm({ ...trainingForm, endDate: val })} 
                             required={true} 
                         />
                     </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="form-group">
-                        <label className="form-label">CPE / Eğitim Saati</label>
-                        <input 
-                            type="number" 
-                            className="form-input" 
-                            value={trainingForm.hours} 
-                            onChange={e => setTrainingForm({ ...trainingForm, hours: e.target.value })} 
-                        />
-                    </div>
+                    <FormInput
+                        label="CPE / Eğitim Saati"
+                        type="number"
+                        value={trainingForm.hours}
+                        onChange={e => setTrainingForm({ ...trainingForm, hours: e.target.value })}
+                    />
                     <div className="form-group">
                         <label className="form-label">Durum</label>
                         <CustomSelect
@@ -111,6 +101,10 @@ export default function TrainingModal({
                             ]}
                         />
                     </div>
+                </div>
+                <div className="flex items-start gap-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100 text-sm text-blue-700">
+                    <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                    <p>Buraya girdiğiniz eğitim saati (CPE), personelin yıl sonu <strong>CPE Raporu</strong> hesaplamalarına otomatik olarak dahil edilecektir.</p>
                 </div>
                 <div className="form-group">
                     <label className="form-label">Açıklama</label>

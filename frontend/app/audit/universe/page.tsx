@@ -780,6 +780,7 @@ export default function AuditUniversePage() {
                     color="blue"
                     icon={<Building size={20} />}
                     subtext="Toplam Envanter"
+                    infoTooltip="Denetim evrenindeki (denetlenebilir süreç, şube veya departman) toplam kayıt sayısıdır."
                     onClick={() => { setFilterRisk([]); setFilterMandatory(''); setFilterOpenFindings(false); setFilterPendingAudits(false); }}
                     className={`transition-all hover:scale-[1.02] ${filterRisk.length === 0 && !filterMandatory && !filterOpenFindings && !filterPendingAudits ? 'ring-2 ring-blue-500 scale-[1.02] bg-blue-50/10' : ''}`}
                 />
@@ -789,6 +790,7 @@ export default function AuditUniversePage() {
                     color="rose"
                     icon={<AlertTriangle size={20} />}
                     subtext={statsCounts.total > 0 ? `Evren Payı: %${Math.round((statsCounts.kritik / statsCounts.total) * 100)}` : "Evren Payı: %0"}
+                    infoTooltip="Yıllık risk değerlendirmesinde 'Kritik' derecesi almış ve öncelikli denetlenmesi gereken birimlerdir."
                     onClick={() => toggleRiskFilter('Kritik')}
                     className={`transition-all hover:scale-[1.02] ${filterRisk.includes('Kritik') ? 'ring-2 ring-rose-500 scale-[1.02] bg-rose-50/10' : ''}`}
                 />
@@ -798,6 +800,7 @@ export default function AuditUniversePage() {
                     color="red"
                     icon={<AlertTriangle size={20} />}
                     subtext={statsCounts.total > 0 ? `Evren Payı: %${Math.round((statsCounts.yuksek / statsCounts.total) * 100)}` : "Evren Payı: %0"}
+                    infoTooltip="Risk değerlendirmesinde 'Yüksek' seviyede çıkan denetlenebilir birimlerdir."
                     onClick={() => toggleRiskFilter('Yüksek')}
                     className={`transition-all hover:scale-[1.02] ${filterRisk.includes('Yüksek') ? 'ring-2 ring-red-500 scale-[1.02] bg-red-50/10' : ''}`}
                 />
@@ -807,6 +810,7 @@ export default function AuditUniversePage() {
                     color="orange"
                     icon={<AlertTriangle size={20} />}
                     subtext={statsCounts.total > 0 ? `Evren Payı: %${Math.round((statsCounts.orta / statsCounts.total) * 100)}` : "Evren Payı: %0"}
+                    infoTooltip="Kabul edilebilir ancak izlenmesi gereken risk seviyesine (Orta) sahip birimlerdir."
                     onClick={() => toggleRiskFilter('Orta')}
                     className={`transition-all hover:scale-[1.02] ${filterRisk.includes('Orta') ? 'ring-2 ring-orange-500 scale-[1.02] bg-orange-50/10' : ''}`}
                 />
@@ -816,6 +820,7 @@ export default function AuditUniversePage() {
                     color="yellow"
                     icon={<CheckCircle size={20} />}
                     subtext={statsCounts.total > 0 ? `Evren Payı: %${Math.round((statsCounts.dusuk / statsCounts.total) * 100)}` : "Evren Payı: %0"}
+                    infoTooltip="Risk iştahı çerçevesinde düşük seviyede risk barındıran süreç ve birimlerin sayısı."
                     onClick={() => toggleRiskFilter('Düşük')}
                     className={`transition-all hover:scale-[1.02] ${filterRisk.includes('Düşük') ? 'ring-2 ring-yellow-500 scale-[1.02] bg-yellow-50/10' : ''}`}
                 />
@@ -825,6 +830,7 @@ export default function AuditUniversePage() {
                     color="purple"
                     icon={<FileText size={20} />}
                     subtext="Çözüm Bekleyen"
+                    infoTooltip="Geçmiş denetimlerinden kaynaklı, halen giderilmemiş açık bulgusu bulunan birimlerin sayısıdır."
                     onClick={() => setFilterOpenFindings(prev => !prev)}
                     className={`transition-all hover:scale-[1.02] ${filterOpenFindings ? 'ring-2 ring-purple-500 scale-[1.02] bg-purple-50/10' : ''}`}
                 />
@@ -834,6 +840,7 @@ export default function AuditUniversePage() {
                     color="amber"
                     icon={<Calendar size={20} />}
                     subtext="90 Gün İçinde"
+                    infoTooltip="Denetim periyoduna veya takvime göre önümüzdeki 90 gün içerisinde denetlenmesi planlanan birimler."
                     onClick={() => setFilterPendingAudits(prev => !prev)}
                     className={`transition-all hover:scale-[1.02] ${filterPendingAudits ? 'ring-2 ring-amber-500 scale-[1.02] bg-amber-50/10' : ''}`}
                 />
@@ -843,6 +850,7 @@ export default function AuditUniversePage() {
                     color="indigo"
                     icon={<Shield size={20} />}
                     subtext="Yasal Zorunluluk"
+                    infoTooltip="BDDK, SPK vb. resmi otoriteler tarafından belirli periyotlarla zorunlu olarak denetlenmesi gereken birim/süreçlerin sayısıdır."
                     onClick={toggleMandatoryFilter}
                     className={`transition-all hover:scale-[1.02] ${filterMandatory === 'Evet' ? 'ring-2 ring-indigo-500 scale-[1.02] bg-indigo-50/10' : ''}`}
                 />

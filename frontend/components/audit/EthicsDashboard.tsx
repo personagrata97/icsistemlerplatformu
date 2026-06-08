@@ -52,6 +52,7 @@ export default function EthicsDashboard({ stats }: EthicsDashboardProps) {
                     subtext="Sonuçlanan dosyalardan"
                     badgeText={`%${stats.closedReports > 0 ? Math.round(((stats.disciplinaryCount || 0) / stats.closedReports) * 100) : 0} Başarı`}
                     badgeColor="text-red-600 bg-red-50"
+                    infoTooltip="İncelenen ve ihlali doğrulanarak disiplin kurulu/aksiyonu ile sonuçlanan bildirimlerin sayısı."
                 />
 
                 <StatCard
@@ -62,6 +63,7 @@ export default function EthicsDashboard({ stats }: EthicsDashboardProps) {
                     subtext="Resmi rapora bağlanan"
                     badgeText="Denetim"
                     badgeColor="text-amber-600 bg-amber-50"
+                    infoTooltip="Yapılan inceleme neticesinde resmi denetim/soruşturma raporuna dönüştürülen etik ihbar sayısı."
                 />
 
                 <StatCard
@@ -70,6 +72,7 @@ export default function EthicsDashboard({ stats }: EthicsDashboardProps) {
                     icon={<Users size={20} />}
                     color="blue"
                     subtext="İlgili birimlere iletilen"
+                    infoTooltip="Denetim komitesi dışında, aksiyon için yetkili departmanlara (İnsan Kaynakları vb.) yönlendirilen bildirimler."
                 />
 
                 <StatCard
@@ -80,6 +83,7 @@ export default function EthicsDashboard({ stats }: EthicsDashboardProps) {
                     subtext="Süresi geçen dosyalar"
                     badgeText={stats.overdueReports > 0 ? "Aksiyon Al" : undefined}
                     badgeColor="text-white bg-red-500 animate-pulse"
+                    infoTooltip="Yönetmelikte belirlenen maksimum inceleme/sonuçlandırma süresini (SLA) aşmış olan bildirimlerin sayısı."
                 />
             </div>
 

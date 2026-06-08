@@ -8,9 +8,10 @@ interface KpiCardProps {
     riskLevel: 'GREEN' | 'YELLOW' | 'RED';
     change?: number;
     icon?: React.ReactNode;
+    infoTooltip?: string;
 }
 
-export default function KpiCard({ title, value, unit, riskLevel, change, icon }: KpiCardProps) {
+export default function KpiCard({ title, value, unit, riskLevel, change, icon, infoTooltip }: KpiCardProps) {
     const riskColorMap: Record<string, "green" | "yellow" | "red"> = {
         GREEN: 'green',
         YELLOW: 'yellow',
@@ -27,7 +28,7 @@ export default function KpiCard({ title, value, unit, riskLevel, change, icon }:
     const getChangeText = () => {
         if (change === undefined) return undefined;
         const arrow = change >= 0 ? '↑' : '↓';
-        return `${arrow} ${Math.abs(change).toFixed(2)}% değişim`;
+        return `${arrow} %${Math.abs(change).toFixed(2)} değişim`;
     };
 
     const getBadge = () => {
@@ -45,6 +46,7 @@ export default function KpiCard({ title, value, unit, riskLevel, change, icon }:
             color={riskColorMap[riskLevel] || 'gray'}
             subtext={getChangeText()}
             badgeText={getBadge()}
+            infoTooltip={infoTooltip}
         // Badge rengi otomatik olarak color prop'undan (red/green/yellow) gelecek
         />
     );

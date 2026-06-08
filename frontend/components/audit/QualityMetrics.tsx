@@ -7,13 +7,31 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import LoadingState from '@/components/ui/LoadingState';
 import ActionLink from '@/components/ui/ActionLink';
 import EmptyState from '@/components/ui/EmptyState';
+import DashboardWidget from '@/components/ui/DashboardWidget';
+import DashboardListItem from '@/components/ui/DashboardListItem';
+import Alert from '@/components/ui/Alert';
+import Tooltip from '@/components/ui/Tooltip';
 import { auditApi } from '@/lib/audit-api';
 import { formatDate } from '@/lib/audit-utils';
+import { Info } from 'lucide-react';
 
 /** Türk standardında yüzde/birim formatlama */
 const formatMetricValue = (value: number, unit: string) => {
     if (unit === '%') return `%${value}`;
     return `${value} ${unit}`;
+};
+
+const getMetricTooltip = (metricId: string, target: number, unit: string) => {
+    const formattedTarget = formatMetricValue(target, unit);
+    switch(metricId) {
+        case 'auto-completion-rate': return `Tüm denetimlerin tamamlanma yüzdesi. Hedef: ${formattedTarget}`;
+        case 'auto-finding-resolution': return `Toplam bulgular içerisinden kapatılanların yüzdesi. Hedef: ${formattedTarget}`;
+        case 'auto-plan-compliance': return `Onaylanan denetim planlarının toplam plana oranı. Hedef: ${formattedTarget}`;
+        case 'auto-avg-duration': return `Tamamlanan denetimlerin başlangıç ve bitiş tarihleri arasındaki ortalama süre. Hedef: Maksimum ${formattedTarget}`;
+        case 'auto-ontime-rate': return `Kapatılan bulguların, hedeflenen vade tarihinden önce kapatılma yüzdesi. Hedef: ${formattedTarget}`;
+        case 'auto-open-critical': return `Sistemde durumu açık olan kritik veya yüksek riskli bulgu sayısı. Hedef: ${formattedTarget}`;
+        default: return `Bu metriğin hedeflenen değeri: ${formattedTarget}`;
+    }
 };
 
 export default function QualityMetrics() {
@@ -91,18 +109,21 @@ export default function QualityMetrics() {
                     color="green"
                     icon={<CheckCircle size={20} />}
                     subtext={`${metrics.length} metrik izleniyor`}
+                    infoTooltip="Hedefine ulaşan veya hedefini aşan metriklerin sayısıdır."
                 />
                 <StatCard
                     title="Uyarı"
                     value={warningMetrics}
                     color="yellow"
                     icon={<AlertTriangle size={20} />}
+                    infoTooltip="Hedefin altında kalan ancak henüz kritik seviyeye ulaşmamış olan metriklerin sayısıdır."
                 />
                 <StatCard
                     title="Kritik"
                     value={criticalMetrics}
                     color="red"
                     icon={<AlertCircle size={20} />}
+                    infoTooltip="Hedefin çok uzağında kalarak acil aksiyon gerektiren metriklerin sayısıdır."
                 />
                 <StatCard
                     title="Açık Aksiyon"
@@ -110,6 +131,7 @@ export default function QualityMetrics() {
                     color="orange"
                     icon={<ListChecks size={20} />}
                     subtext={overdueActions > 0 ? `${overdueActions} gecikmiş` : undefined}
+                    infoTooltip="Henüz tamamlanmamış ve süreci devam eden kalite iyileştirme planlarının sayısı."
                 />
                 <StatCard
                     title="Değerlendirme"
@@ -117,56 +139,57 @@ export default function QualityMetrics() {
                     color="purple"
                     icon={<Shield size={20} />}
                     subtext={`${assessments.filter(a => a.type === 'İç').length} iç, ${assessments.filter(a => a.type === 'Dış').length} dış`}
+                    infoTooltip="Kurum içindeki kalite güvence ekibi veya bağımsız dış denetçiler tarafından yapılan değerlendirmelerin toplam sayısı."
                 />
             </div>
 
             {/* Dış Değerlendirme (EQA) Uyarısı */}
             {eqaInfo.status === 'OVERDUE' && (
-                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl shadow-sm">
-                    <div className="flex items-center gap-3">
-                        <AlertTriangle className="text-red-600 shrink-0" size={24} />
-                        <div>
-                            <h4 className="font-bold text-red-800">Dış Değerlendirme Süresi Doldu!</h4>
-                            <p className="text-sm text-red-700">Zorunlu 5 yıllık dış değerlendirme süresi <strong>{eqaInfo.daysLeft} gün</strong> önce dolmuştur.</p>
-                        </div>
-                    </div>
-                </div>
+                <Alert
+                    variant="error"
+                    title="Dış Değerlendirme Süresi Doldu!"
+                    description={`Zorunlu 5 yıllık dış değerlendirme süresi ${eqaInfo.daysLeft} gün önce dolmuştur.`}
+                />
             )}
             {eqaInfo.status === 'APPROACHING' && (
-                <div className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-xl shadow-sm">
-                    <div className="flex items-center gap-3">
-                        <Clock className="text-orange-600 shrink-0" size={24} />
-                        <div>
-                            <h4 className="font-bold text-orange-800">Dış Değerlendirme Yaklaşıyor</h4>
-                            <p className="text-sm text-orange-700">Bir sonraki zorunlu dış değerlendirmeye <strong>{eqaInfo.daysLeft} gün</strong> kaldı.</p>
-                        </div>
-                    </div>
-                </div>
+                <Alert
+                    variant="warning"
+                    title="Dış Değerlendirme Yaklaşıyor"
+                    description={`Bir sonraki zorunlu dış değerlendirmeye ${eqaInfo.daysLeft} gün kaldı.`}
+                    icon={<Clock size={24} className="text-orange-600" />}
+                />
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Performans Metrikleri Özeti */}
-                <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                            <BarChart3 size={20} className="text-primary" />
-                            Performans Metrikleri
-                        </h3>
-                        <ActionLink href="/audit/quality" variant="primary">Detaylı Görüntüle</ActionLink>
-                    </div>
+                <DashboardWidget 
+                    widgetType="metrics"
+                    title="Performans Metrikleri"
+                    actionHref="/audit/quality"
+                    actionLabel="Tüm Metrikleri Görüntüle"
+                >
 
                     {metrics.length === 0 ? (
-                        <EmptyState
-                            title="Henüz metrik tanımlı değil"
-                            description="Kalite Güvence sayfasından performans metriklerinizi tanımlayabilirsiniz."
-                        />
+                        <div className="flex-1 flex items-center justify-center py-8 bg-gray-50/30 rounded-lg border border-dashed border-gray-200">
+                            <EmptyState
+                                variant="minimal"
+                                entityType="METRIC"
+                                title="Kayıt Bulunamadı"
+                                description="Görüntülenecek performans metriği bulunmuyor."
+                            />
+                        </div>
                     ) : (
                         <div className="space-y-3">
                             {metrics.slice(0, 6).map((metric: any) => (
                                 <div key={metric.id} className="flex items-center gap-3">
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between text-sm mb-1">
-                                            <span className="text-gray-700 font-medium truncate">{metric.name}</span>
+                                        <div className="flex justify-between text-sm mb-1 items-center">
+                                            <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                                                <span className="text-gray-700 font-medium truncate">{metric.name}</span>
+                                                <Tooltip content={getMetricTooltip(metric.id, metric.target, metric.unit)} position="top">
+                                                    <Info size={14} className="text-gray-400 hover:text-primary cursor-help shrink-0 outline-none" />
+                                                </Tooltip>
+                                            </div>
                                             <div className="flex items-center gap-2 shrink-0">
                                                 <span className="font-bold text-gray-900">{formatMetricValue(metric.actual, metric.unit)}</span>
                                                 {metric.trend === 'up' && <TrendingUp size={14} className="text-green-500" />}
@@ -198,41 +221,44 @@ export default function QualityMetrics() {
                             )}
                         </div>
                     )}
-                </div>
+                </DashboardWidget>
 
                 {/* Değerlendirme ve Aksiyon Özeti */}
                 <div className="space-y-6">
                     {/* Son Değerlendirmeler */}
-                    <div className="card">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                                <Award size={20} className="text-primary" />
-                                Son Değerlendirmeler
-                            </h3>
-                        </div>
+                    <DashboardWidget 
+                        widgetType="activities"
+                        title="Son Değerlendirmeler"
+                    >
 
                         {assessments.length === 0 ? (
-                            <EmptyState
-                                title="Henüz değerlendirme yok"
-                                description="Kalite Güvence sayfasından değerlendirme ekleyebilirsiniz."
-                            />
+                            <div className="flex-1 flex items-center justify-center py-8 bg-gray-50/30 rounded-lg border border-dashed border-gray-200">
+                                <EmptyState
+                                    variant="minimal"
+                                    entityType="ACTIVITY"
+                                    title="Kayıt Bulunamadı"
+                                    description="Görüntülenecek değerlendirme kaydı bulunmuyor."
+                                />
+                            </div>
                         ) : (
                             <div className="space-y-2">
                                 {assessments.slice(0, 4).map((assessment: any) => (
-                                    <div key={assessment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border shrink-0 ${
+                                    <DashboardListItem
+                                        key={assessment.id}
+                                        icon={
+                                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${
                                                 assessment.type === 'İç' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-purple-50 text-purple-600 border-purple-100'
                                             }`}>
                                                 {assessment.type}
                                             </span>
-                                            <span className="text-sm text-gray-700 truncate">{assessment.assessor}</span>
-                                        </div>
-                                        <div className="flex items-center gap-3 shrink-0">
-                                            <span className="text-xs text-gray-500">{formatDate(assessment.date)}</span>
-                                            <StatusBadge value={assessment.result} />
-                                        </div>
-                                    </div>
+                                        }
+                                        title={assessment.assessor}
+                                        rightContent={
+                                            <span className="text-xs text-gray-500 font-medium">{formatDate(assessment.date)}</span>
+                                        }
+                                        status={assessment.result}
+                                        className="bg-gray-50/50"
+                                    />
                                 ))}
                             </div>
                         )}
@@ -250,34 +276,39 @@ export default function QualityMetrics() {
                                 </div>
                             </div>
                         )}
-                    </div>
+                    </DashboardWidget>
 
                     {/* Gecikmiş Aksiyonlar */}
                     {overdueActions > 0 && (
-                        <div className="card border-l-4 border-l-red-500">
-                            <h3 className="text-sm font-bold text-red-700 flex items-center gap-2 mb-3">
-                                <Clock size={18} />
-                                Gecikmiş İyileştirme Aksiyonları ({overdueActions})
-                            </h3>
+                        <DashboardWidget 
+                            widgetType="actions"
+                            title={`Gecikmiş Aksiyonlar (${overdueActions})`}
+                            color="red"
+                            icon={Clock}
+                            className="border-l-4 border-l-red-500"
+                        >
                             <div className="space-y-2">
                                 {actions
                                     .filter(a => a.status !== 'Tamamlandı' && new Date(a.dueDate) < new Date())
                                     .slice(0, 3)
                                     .map((action: any) => (
-                                        <div key={action.id} className="flex items-center justify-between p-2 bg-red-50 rounded-lg border border-red-100">
-                                            <div>
-                                                <div className="text-sm font-medium text-red-800">{action.title}</div>
-                                                <div className="text-xs text-red-600">
-                                                    Sorumlu: {action.responsible || '-'} · Son Tarih: {formatDate(action.dueDate)}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <DashboardListItem
+                                            key={action.id}
+                                            icon={<div className="p-1.5 bg-red-100 text-red-600 rounded-lg"><Clock size={16} /></div>}
+                                            title={<span className="text-red-800">{action.title}</span>}
+                                            subtitle={
+                                                <span className="text-red-600">
+                                                    Sorumlu: {action.responsible || '-'} <span className="mx-1">•</span> Son Tarih: {formatDate(action.dueDate)}
+                                                </span>
+                                            }
+                                            className="bg-red-50/50 border-red-100"
+                                        />
                                     ))}
                             </div>
                             <div className="mt-3">
-                                <ActionLink href="/audit/quality" variant="primary">Tümünü Gör</ActionLink>
+                                <ActionLink href="/audit/quality" variant="primary">Tüm Aksiyonları Görüntüle</ActionLink>
                             </div>
-                        </div>
+                        </DashboardWidget>
                     )}
                 </div>
             </div>

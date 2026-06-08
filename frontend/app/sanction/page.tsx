@@ -16,12 +16,13 @@ import Button from '@/components/ui/Button';
 import RefreshButton from '@/components/ui/RefreshButton';
 
 // Stat Card Component
-function StatCard({ icon: Icon, label, value, trend, color, onClick, className }: {
+function StatCard({ icon: Icon, label, value, trend, color, infoTooltip, onClick, className }: {
     icon: any;
     label: string;
     value: string | number;
     trend?: string;
     color: string;
+    infoTooltip?: string;
     onClick?: () => void;
     className?: string;
 }) {
@@ -34,7 +35,14 @@ function StatCard({ icon: Icon, label, value, trend, color, onClick, className }
                 <Icon size={20} />
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate">{label}</p>
+                <div className="flex items-center gap-1.5 mb-1">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate">{label}</p>
+                    {infoTooltip && (
+                        <Tooltip content={infoTooltip} position="top">
+                            <span className="text-gray-400 hover:text-primary cursor-help"><AlertTriangle size={12} /></span>
+                        </Tooltip>
+                    )}
+                </div>
                 <div className="flex items-baseline gap-2">
                     <h3 className="text-2xl font-black text-slate-900">{value}</h3>
                     {trend && (
@@ -136,6 +144,7 @@ export default function SanctionDashboard() {
                     value={stats.totalScans.toLocaleString()}
                     trend="Bu ay +1,234"
                     color="bg-blue-500"
+                    infoTooltip="Sistem üzerinde anlık veya toplu olarak yapılan tüm sorguların toplam sayısıdır."
                     onClick={() => setFilterResult('')}
                     className={!filterResult ? 'ring-2 ring-blue-500 scale-[1.02] bg-blue-50/10' : ''}
                 />
@@ -144,6 +153,7 @@ export default function SanctionDashboard() {
                     label="Eşleşme Sayısı"
                     value={stats.matchesFound}
                     color="bg-red-500"
+                    infoTooltip="Kara listeler (OFAC, BM vb.) ile birebir veya yüksek benzerlikte eşleşen kayıt sayısıdır."
                     onClick={() => toggleResultFilter('Eşleşme')}
                     className={filterResult === 'Eşleşme' ? 'ring-2 ring-red-500 scale-[1.02] bg-red-50/10' : ''}
                 />
@@ -152,6 +162,7 @@ export default function SanctionDashboard() {
                     label="İnceleme Bekleyen"
                     value={stats.pendingReview}
                     color="bg-orange-500"
+                    infoTooltip="Kısmi eşleşme nedeniyle sistem tarafından otomatik karara bağlanamamış, uzman onayı bekleyen kayıtlardır."
                     onClick={() => toggleResultFilter('İnceleme')}
                     className={filterResult === 'İnceleme' ? 'ring-2 ring-orange-500 scale-[1.02] bg-orange-50/10' : ''}
                 />
@@ -160,6 +171,7 @@ export default function SanctionDashboard() {
                     label="Yüklü Liste"
                     value={stats.listsLoaded}
                     color="bg-green-500"
+                    infoTooltip="Sistemde aktif olarak tarama yapılan güncel yaptırım listesi (OFAC, AB, MASAK vb.) sayısıdır."
                 />
             </div>
 

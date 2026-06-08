@@ -12,6 +12,7 @@ import { useToast } from '@/components/Toast';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { auditApi } from '@/lib/audit-api';
 import { DISCIPLINARY_ACTIONS } from '@/lib/audit-utils';
+import Tooltip from '@/components/ui/Tooltip';
 
 interface InvestigationReportSectionProps {
     status: string;
@@ -174,7 +175,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
             subjectsHtml = [
                 '<div class="section-title">DOSYA İLGİLİLERİ</div>',
                 '<table class="subjects-list">',
-                '<thead><tr><th>Adı Soyadı</th><th>Unvanı</th><th>Rolü</th></tr></thead>',
+                '<thead><tr><th>Adı Soyadı</th><th>Ünvanı</th><th>Rolü</th></tr></thead>',
                 '<tbody>',
                 subjects.map(s => '<tr><td><strong>' + s.name + '</strong></td><td>' + s.title + '</td><td>' + s.role + '</td></tr>').join(''),
                 '</tbody></table>'

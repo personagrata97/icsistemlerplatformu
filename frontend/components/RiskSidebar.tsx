@@ -32,11 +32,11 @@ export default function RiskSidebar() {
     return (
         <aside className="w-[260px] bg-white flex flex-col h-screen flex-shrink-0 border-r border-gray-200 transition-all duration-300">
             {/* Header / Logo Area */}
-            <div className="h-[64px] flex items-center px-6 border-b border-gray-200">
+            <div className="h-[64px] flex items-center justify-center bg-white border-b border-gray-200 shrink-0">
                 <img
                     src="/logo.png"
                     alt="Emlak Katılım"
-                    className="h-[40px] w-auto object-contain mix-blend-multiply"
+                    className="h-10 w-auto object-contain mix-blend-multiply transition-transform hover:scale-105"
                     onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = 'https://placehold.co/150x50?text=LOGO';

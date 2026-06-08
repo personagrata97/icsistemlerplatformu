@@ -22,6 +22,7 @@ import ActionMenu from '@/components/ui/ActionMenu';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
+import DatePicker from '@/components/ui/DatePicker';
 import { clsx } from 'clsx';
 import { formatDate } from '@/lib/audit-utils';
 import { NoResultsState } from '@/components/ui/EmptyState';
@@ -408,30 +409,37 @@ export default function QualityAssurancePage() {
             {/* 2. Stat Cards (her zaman görünür) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4 mb-2">
                 <StatCard title="İyi Performans" value={metrics.filter(m => m.status === 'İyi').length} color="green" icon={<CheckCircle size={20} />}
+                    infoTooltip="Hedefine ulaşan veya hedefini aşan metriklerin sayısıdır."
                     onClick={() => { setActiveTab('metrics'); setFilterStatus(['İyi']); setFilterCategory([]); }}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${activeTab === 'metrics' && filterStatus.includes('İyi') ? 'ring-2 ring-green-500 scale-[1.02] bg-green-50/30' : ''}`}
                 />
                 <StatCard title="Uyarı" value={metrics.filter(m => m.status === 'Uyarı').length} color="yellow" icon={<AlertTriangle size={20} />}
+                    infoTooltip="Hedefin altında kalan ancak henüz kritik seviyeye ulaşmamış olan metriklerin sayısıdır."
                     onClick={() => { setActiveTab('metrics'); setFilterStatus(['Uyarı']); setFilterCategory([]); }}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${activeTab === 'metrics' && filterStatus.includes('Uyarı') ? 'ring-2 ring-yellow-500 scale-[1.02] bg-yellow-50/30' : ''}`}
                 />
                 <StatCard title="Kritik" value={metrics.filter(m => m.status === 'Kritik').length} color="red" icon={<AlertCircle size={20} />}
+                    infoTooltip="Hedefin çok uzağında kalarak acil aksiyon gerektiren metriklerin sayısıdır."
                     onClick={() => { setActiveTab('metrics'); setFilterStatus(['Kritik']); setFilterCategory([]); }}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${activeTab === 'metrics' && filterStatus.includes('Kritik') ? 'ring-2 ring-red-500 scale-[1.02] bg-red-50/30' : ''}`}
                 />
                 <StatCard title="İç Değerlendirme" value={assessments.filter(a => a.type === 'İç').length} color="blue" icon={<ClipboardCheck size={20} />}
+                    infoTooltip="Kurum içindeki kalite güvence ekibi tarafından yapılan denetim faaliyetlerinin sayısı."
                     onClick={() => { setActiveTab('assessments'); setFilterType(['İç']); setFilterResult([]); }}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${activeTab === 'assessments' && filterType.includes('İç') ? 'ring-2 ring-blue-500 scale-[1.02] bg-blue-50/30' : ''}`}
                 />
                 <StatCard title="Dış Değerlendirme" value={assessments.filter(a => a.type === 'Dış').length} color="purple" icon={<Shield size={20} />}
+                    infoTooltip="Bağımsız dış denetçiler tarafından (EQA vb.) yapılan kalite değerlendirmelerinin sayısı."
                     onClick={() => { setActiveTab('assessments'); setFilterType(['Dış']); setFilterResult([]); }}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${activeTab === 'assessments' && filterType.includes('Dış') ? 'ring-2 ring-purple-500 scale-[1.02] bg-purple-50/30' : ''}`}
                 />
                 <StatCard title="Açık Aksiyon" value={stats?.actions?.open || actions.filter(a => a.status === 'Açık' || a.status === 'Devam Ediyor').length} color="orange" icon={<ListChecks size={20} />}
+                    infoTooltip="Henüz tamamlanmamış ve süreci devam eden kalite iyileştirme planlarının sayısı."
                     onClick={() => { setActiveTab('actions'); setFilterStatus(['Açık', 'Devam Ediyor']); setFilterPriority([]); }}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${activeTab === 'actions' && (filterStatus.includes('Açık') || filterStatus.includes('Devam Ediyor')) ? 'ring-2 ring-orange-500 scale-[1.02] bg-orange-50/30' : ''}`}
                 />
                 <StatCard title="Gecikmiş Aksiyon" value={stats?.actions?.overdue || overdueActions.length} color="red" icon={<Clock size={20} />}
+                    infoTooltip="Hedef tarihi geçmiş olmasına rağmen henüz tamamlanmamış olan kalite iyileştirme planlarının sayısı."
                     onClick={() => { setActiveTab('actions'); setFilterStatus(['Gecikmiş']); setFilterPriority([]); }}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${activeTab === 'actions' && filterStatus.includes('Gecikmiş') ? 'ring-2 ring-red-500 scale-[1.02] bg-red-50/30' : ''}`}
                 />
@@ -952,7 +960,7 @@ export default function QualityAssurancePage() {
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <CustomSelect label="Tür" value={assessmentForm.type} onChange={(val) => setAssessmentForm({ ...assessmentForm, type: val as any })} options={[{ value: 'İç', label: 'İç Değerlendirme' }, { value: 'Dış', label: 'Dış Değerlendirme' }]} />
-                        <div className="form-group"><label className="form-label">Tarih</label><FormInput type="date"  value={assessmentForm.date} onChange={e => setAssessmentForm({ ...assessmentForm, date: e.target.value })} /></div>
+                        <div className="form-group"><label className="form-label">Tarih</label><DatePicker value={assessmentForm.date} onChange={val => setAssessmentForm({ ...assessmentForm, date: val })} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="form-group"><label className="form-label">Değerlendirici Kişi/Kurum</label><input type="text" className="form-input" value={assessmentForm.assessor} onChange={e => setAssessmentForm({ ...assessmentForm, assessor: e.target.value })} placeholder="Örn: Denetim Komitesi / ABC Firması" /></div>
@@ -963,7 +971,7 @@ export default function QualityAssurancePage() {
                         <div className="bg-purple-50 p-4 rounded-lg border border-purple-100 space-y-4 mb-4">
                             <h4 className="text-sm font-semibold text-purple-800">Dış Değerlendirici Yetkinlik Bilgileri</h4>
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="form-group"><label className="form-label">Unvanı</label><input type="text" className="form-input" value={assessmentForm.assessorTitle} onChange={e => setAssessmentForm({ ...assessmentForm, assessorTitle: e.target.value })} /></div>
+                                <div className="form-group"><label className="form-label">Ünvanı</label><input type="text" className="form-input" value={assessmentForm.assessorTitle} onChange={e => setAssessmentForm({ ...assessmentForm, assessorTitle: e.target.value })} /></div>
                                 <div className="form-group"><label className="form-label">Sertifikaları</label><input type="text" className="form-input" value={assessmentForm.assessorCertifications} onChange={e => setAssessmentForm({ ...assessmentForm, assessorCertifications: e.target.value })} placeholder="Örn: CIA, CISA, CRMA" /></div>
                             </div>
                             <div className="form-group"><label className="form-label">Mesleki Deneyim Özeti</label><textarea className="form-input h-16" value={assessmentForm.assessorExperience} onChange={e => setAssessmentForm({ ...assessmentForm, assessorExperience: e.target.value })} /></div>
@@ -975,7 +983,7 @@ export default function QualityAssurancePage() {
                         <div className="form-group"><label className="form-label">Puan (%)</label><input type="number" className="form-input" value={assessmentForm.score} onChange={e => setAssessmentForm({ ...assessmentForm, score: Number(e.target.value) })} /></div>
                     </div>
                     <div className="form-group"><label className="form-label">Temel Bulgular</label><textarea className="form-input h-20" value={assessmentForm.findings} onChange={e => setAssessmentForm({ ...assessmentForm, findings: e.target.value })} /></div>
-                    <div className="form-group"><label className="form-label">Sonraki Planlanan Tarih</label><FormInput type="date"  value={assessmentForm.nextDueDate} onChange={e => setAssessmentForm({ ...assessmentForm, nextDueDate: e.target.value })} /></div>
+                    <div className="form-group"><label className="form-label">Sonraki Planlanan Tarih</label><DatePicker value={assessmentForm.nextDueDate} onChange={val => setAssessmentForm({ ...assessmentForm, nextDueDate: val })} /></div>
                 </div>
             </Modal>
 
@@ -987,7 +995,7 @@ export default function QualityAssurancePage() {
                     <div className="form-group"><label className="form-label">Açıklama</label><textarea className="form-input h-20" value={actionForm.description} onChange={e => setActionForm({ ...actionForm, description: e.target.value })} /></div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="form-group"><label className="form-label">Sorumlu</label><input type="text" className="form-input" value={actionForm.responsible} onChange={e => setActionForm({ ...actionForm, responsible: e.target.value })} /></div>
-                        <div className="form-group"><label className="form-label">Son Tarih</label><FormInput type="date"  value={actionForm.dueDate} onChange={e => setActionForm({ ...actionForm, dueDate: e.target.value })} /></div>
+                        <div className="form-group"><label className="form-label">Son Tarih</label><DatePicker value={actionForm.dueDate} onChange={val => setActionForm({ ...actionForm, dueDate: val })} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <CustomSelect label="Durum" value={actionForm.status} onChange={(val) => setActionForm({ ...actionForm, status: val as string })} options={[{ value: 'Açık', label: 'Açık' }, { value: 'Devam Ediyor', label: 'Devam Ediyor' }, { value: 'Tamamlandı', label: 'Tamamlandı' }]} />

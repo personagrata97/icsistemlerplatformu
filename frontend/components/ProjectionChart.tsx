@@ -33,7 +33,7 @@ export default function ProjectionChart({ data, title, yAxisLabel = 'Değer' }: 
                             borderRadius: '8px',
                             padding: '8px',
                         }}
-                        formatter={(value: any) => `${(value * 100).toFixed(2)}%`}
+                        formatter={(value: any) => `%${(value * 100).toFixed(2)}`}
                     />
                     <Legend />
                     <Line

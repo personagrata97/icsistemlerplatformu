@@ -8,6 +8,7 @@ import Tooltip from '@/components/ui/Tooltip';
 import OverflowTooltip from '@/components/ui/OverflowTooltip';
 import { auditApi, AuditStaff, StaffExperience, StaffEducation, StaffTraining, StaffPromotion } from '@/lib/audit-api';
 import PageToolbar from '@/components/ui/PageToolbar';
+import PageHeader from '@/components/audit/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import DataTable from '@/components/ui/DataTable';
 import RefreshButton from '@/components/ui/RefreshButton';
@@ -18,7 +19,7 @@ import LoadingState from '@/components/ui/LoadingState';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
-import PageHeader from '@/components/audit/PageHeader';
+
 import CustomSelect from '@/components/ui/CustomSelect';
 import StatusBadge from '@/components/ui/StatusBadge';
 import EmptyState from '@/components/ui/EmptyState';
@@ -34,6 +35,7 @@ import TrainingModal from '@/components/audit/staff/modals/TrainingModal';
 import PromotionModal from '@/components/audit/staff/modals/PromotionModal';
 import BulkTrainingModal from '@/components/audit/staff/modals/BulkTrainingModal';
 import FormInput from "@/components/ui/FormInput";
+import DatePicker from "@/components/ui/DatePicker";
 
 const TITLES = ['Müfettiş Yardımcısı', 'Yetkili Müfettiş Yardımcısı', 'Müfettiş', 'Kıdemli Müfettiş', 'Başmüfettiş', 'Teftiş Kurulu Müdürü'];
 const ROLES = ['Sistem Yöneticisi', 'Teftiş Kurulu Müdürü', 'Müfettiş', 'İzleyici'];
@@ -57,6 +59,7 @@ const getPhotoUrl = (url?: string) => {
 export default function AuditStaffPage() {
     const router = useRouter();
     const { hasRole, user } = useAuth();
+    const canManage = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_MANAGER') || hasRole('MANAGER') || hasRole('Teftiş Kurulu Müdürü') || hasRole('SYSTEM_ADMIN') || hasRole('Admin') || hasRole('Yönetici');
     const { showToast } = useToast();
     const [staffList, setStaffList] = useState<AuditStaff[]>([]);
     const [loading, setLoading] = useState(true);
@@ -92,8 +95,8 @@ export default function AuditStaffPage() {
     // Filtre durumu
     const [filters, setFilters] = useState({
         title: [] as string[],
-        role: [] as string[],
-        status: [] as string[]
+        status: [] as string[],
+        hireYear: [] as string[]
     });
 
     // Silme onay durumları
@@ -869,9 +872,12 @@ export default function AuditStaffPage() {
     };
 
     const resetFilters = () => {
-        setFilters({ title: [], role: [], status: [] });
+        setFilters({ title: [], status: [], hireYear: [] });
         setSearchTerm('');
     };
+
+    // Dinamik filtre seçenekleri
+    const hireYears = Array.from(new Set(staffList.map(s => s.hireDate ? new Date(s.hireDate).getFullYear().toString() : '').filter(Boolean))).sort((a, b) => b.localeCompare(a));
 
     // Filtreleme mantığı
     const filteredStaff = staffList.filter(staff => {
@@ -886,10 +892,12 @@ export default function AuditStaffPage() {
             (staff.employeeId || staff.registerNumber || '').includes(searchTerm);
 
         const matchesTitle = filters.title.length === 0 || filters.title.includes(staff.title);
-        const matchesRole = filters.role.length === 0 || filters.role.some(r => (staff.role || '').includes(r));
         const matchesStatus = filters.status.length === 0 || filters.status.includes(staff.status);
+        
+        const staffHireYear = staff.hireDate ? new Date(staff.hireDate).getFullYear().toString() : '';
+        const matchesHireYear = filters.hireYear.length === 0 || filters.hireYear.includes(staffHireYear);
 
-        return matchesSearch && matchesTitle && matchesRole && matchesStatus;
+        return matchesSearch && matchesTitle && matchesStatus && matchesHireYear;
     });
 
     const handleExport = () => {
@@ -906,9 +914,9 @@ export default function AuditStaffPage() {
     }
 
     const pageContent = (
-        <>
-            <PageHeader title="Teftiş Kurulu Personeli" subtitle="Müfettiş kadrosu, yetkinlikler ve eğitim bilgileri" />
-
+        <div className="space-y-6">
+            <PageHeader title="Denetim Ekibi" subtitle="Personel listesi, yetkinlik matrisi ve kapasite yönetimi" />
+            
             {/* Standart Araç Çubuğu */}
             <PageToolbar
                 searchPlaceholder="İsim, sicil, ünvan veya rol ara..."
@@ -917,7 +925,7 @@ export default function AuditStaffPage() {
                 onRefresh={() => loadStaff(false)}
                 showExportButton={true}
                 onExportClick={() => { auditApi.exportToExcel(staffList, 'Teftiş Kurulu Personeli'); }}
-                showAddButton={!!(hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('Admin') || hasRole('Yönetici'))}
+                showAddButton={canManage}
                 onAddClick={() => {
                     setEditingStaff(null);
                     setIsModalOpen(true);
@@ -925,11 +933,11 @@ export default function AuditStaffPage() {
                 addButtonText="Yeni Personel Ekle"
                 filters={
                     <FilterDropdown
-                        activeCount={filters.title.length + filters.status.length + filters.role.length}
-                        onClear={() => { setFilters({ title: [], status: [], role: [] }); setSearchTerm(''); }}
+                        activeCount={filters.title.length + filters.status.length + filters.hireYear.length}
+                        onClear={() => { setFilters({ title: [], status: [], hireYear: [] }); setSearchTerm(''); }}
                     >
                         <CustomSelect label="Ünvan" value={filters.title} onChange={(val) => setFilters({ ...filters, title: val as string[] })} isMulti options={TITLES.map(t => ({ value: t, label: t }))} />
-                        <CustomSelect label="Rol" value={filters.role} onChange={(val) => setFilters({ ...filters, role: val as string[] })} isMulti options={ROLES.map(r => ({ value: r, label: r }))} />
+                        <CustomSelect label="İşe Giriş Yılı" value={filters.hireYear} onChange={(val) => setFilters({ ...filters, hireYear: val as string[] })} isMulti options={hireYears.map(y => ({ value: y, label: y }))} />
                         <CustomSelect label="Durum" value={filters.status} onChange={(val) => setFilters({ ...filters, status: val as string[] })} isMulti options={[{ value: "Aktif", label: "Aktif" }, { value: "İzinli", label: "İzinli" }, { value: "Pasif", label: "Pasif" }]} />
                     </FilterDropdown>
                 }
@@ -949,7 +957,7 @@ export default function AuditStaffPage() {
                         >
                             Yetkinlikler
                         </Button>
-                        {(hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('Admin') || hasRole('Yönetici')) && (
+                        {canManage && (
                             <Button variant="secondary" onClick={() => { setBulkTrainingForm({ name: '', provider: '', startDate: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], participantIds: [] }); setIsBulkTrainingModalOpen(true); }} className="border-primary/20 text-primary hover:bg-primary/5" leftIcon={<ShieldCheck size={18} />}>
                                 Toplu Eğitim
                             </Button>
@@ -974,6 +982,7 @@ export default function AuditStaffPage() {
                     {
                         key: 'title',
                         header: 'Ünvan & Sertifikalar',
+                        sortable: true,
                         width: '250px',
                         render: (staff: AuditStaff) => (
                             <div className="flex flex-col">
@@ -996,6 +1005,7 @@ export default function AuditStaffPage() {
                     {
                         key: 'hireDate',
                         header: 'İşe Giriş',
+                        sortable: true,
                         width: '150px',
                         type: 'date'
                     },
@@ -1021,6 +1031,7 @@ export default function AuditStaffPage() {
                     {
                         key: 'status',
                         header: 'Durum',
+                        sortable: true,
                         width: '120px',
                         render: (item: any) => <StatusBadge type="status" value={item.status} />
                     },
@@ -1164,11 +1175,10 @@ export default function AuditStaffPage() {
                                     />
 
                                     <div className="w-36">
-                                        <label className="form-label text-xs mb-1">Sicil No</label>
-                                        <input
+                                        <FormInput
+                                            label="Sicil No"
                                             name="employeeId"
                                             type="text"
-                                            className="form-input text-sm h-9 disabled:bg-gray-50 disabled:text-gray-500"
                                             value={formData.employeeId || ''}
                                             onChange={e => setFormData({ ...formData, employeeId: e.target.value })}
                                             required
@@ -1180,29 +1190,21 @@ export default function AuditStaffPage() {
 
                                 <div className="flex-1 space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="form-group">
-                                            <label className="form-label">Ad</label>
-                                            <input name="firstName" type="text" className="form-input disabled:bg-gray-50 disabled:text-gray-500" value={formData.firstName || ''} onChange={e => setFormData({ ...formData, firstName: e.target.value })} required disabled={isViewMode} />
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Soyad</label>
-                                            <input name="lastName" type="text" className="form-input disabled:bg-gray-50 disabled:text-gray-500" value={formData.lastName || ''} onChange={e => setFormData({ ...formData, lastName: e.target.value })} required disabled={isViewMode} />
-                                        </div>
+                                        <FormInput label="Ad" name="firstName" type="text" value={formData.firstName || ''} onChange={e => setFormData({ ...formData, firstName: e.target.value })} required disabled={isViewMode} />
+                                        <FormInput label="Soyad" name="lastName" type="text" value={formData.lastName || ''} onChange={e => setFormData({ ...formData, lastName: e.target.value })} required disabled={isViewMode} />
                                     </div>
-                                    <div className="form-group">
-                                        <label className="form-label">E-posta</label>
-                                        <input name="email" type="email" className="form-input disabled:bg-gray-50 disabled:text-gray-500" value={formData.email || ''} onChange={e => setFormData({ ...formData, email: e.target.value })} required disabled={isViewMode} />
-                                    </div>
+                                    <FormInput label="E-posta" name="email" type="email" value={formData.email || ''} onChange={e => setFormData({ ...formData, email: e.target.value })} required disabled={isViewMode} />
 
                                     {/* Telefon ve İşe Giriş Tarihi */}
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="form-group">
-                                            <label className="form-label">Telefon</label>
-                                            <input name="phone" type="tel" className="form-input disabled:bg-gray-50 disabled:text-gray-500" value={formData.phone || ''} onChange={e => setFormData({ ...formData, phone: e.target.value })} disabled={isViewMode} />
-                                        </div>
+                                        <FormInput label="Telefon" name="phone" type="tel" value={formData.phone || ''} onChange={e => setFormData({ ...formData, phone: e.target.value })} disabled={isViewMode} />
                                         <div className="form-group">
                                             <label className="form-label">İşe Giriş Tarihi</label>
-                                            <FormInput name="hireDate" type="date"  value={formData.hireDate || ''} onChange={e => setFormData({ ...formData, hireDate: e.target.value })} disabled={isViewMode} />
+                                            <DatePicker 
+                                                value={formData.hireDate || ''} 
+                                                onChange={(val) => setFormData({ ...formData, hireDate: val })} 
+                                                disabled={isViewMode} 
+                                            />
                                         </div>
                                     </div>
 
@@ -1345,25 +1347,57 @@ export default function AuditStaffPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="form-group">
-                                    <label className="form-label text-blue-700">Sertifikalar (Virgülle ayırın)</label>
-                                    <input
-                                        type="text"
-                                        className="form-input border-blue-200 focus:border-blue-500"
-                                        value={formData.certifications || ''}
-                                        onChange={e => setFormData({ ...formData, certifications: e.target.value })}
-                                        placeholder="CISA, ISO 27001, CIA..."
+                                    <CustomSelect
+                                        label="Sertifikalar"
+                                        isMulti={true}
+                                        isCreatable={true}
+                                        showSearch={true}
                                         disabled={isViewMode}
+                                        value={formData.certifications ? (typeof formData.certifications === 'string' && formData.certifications.startsWith('[') ? JSON.parse(formData.certifications) : formData.certifications.split(',').map((c: string) => c.trim()).filter(Boolean)) : []}
+                                        onChange={(val) => setFormData({ ...formData, certifications: Array.isArray(val) ? val.join(', ') : val })}
+                                        options={[
+                                            { value: 'CISA', label: 'CISA' },
+                                            { value: 'CIA', label: 'CIA' },
+                                            { value: 'CFE', label: 'CFE' },
+                                            { value: 'CPA', label: 'CPA' },
+                                            { value: 'SMMM', label: 'SMMM' },
+                                            { value: 'CRMA', label: 'CRMA' },
+                                            { value: 'CGAP', label: 'CGAP' },
+                                            { value: 'CISM', label: 'CISM' },
+                                            { value: 'CRISC', label: 'CRISC' },
+                                            { value: 'ISO 27001', label: 'ISO 27001' },
+                                            { value: 'ISO 9001', label: 'ISO 9001' },
+                                            { value: 'ITIL', label: 'ITIL' }
+                                        ]}
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label text-purple-700">Yetenekler (Virgülle ayırın)</label>
-                                    <input
-                                        type="text"
-                                        className="form-input border-purple-200 focus:border-purple-500"
-                                        value={formData.skills || ''}
-                                        onChange={e => setFormData({ ...formData, skills: e.target.value })}
-                                        placeholder="Python, SQL, Veri Analizi..."
+                                    <CustomSelect
+                                        label="Yetenekler & Uzmanlık Alanları"
+                                        isMulti={true}
+                                        isCreatable={true}
+                                        showSearch={true}
                                         disabled={isViewMode}
+                                        value={formData.skills ? (typeof formData.skills === 'string' && formData.skills.startsWith('[') ? JSON.parse(formData.skills) : formData.skills.split(',').map((c: string) => c.trim()).filter(Boolean)) : []}
+                                        onChange={(val) => setFormData({ ...formData, skills: Array.isArray(val) ? val.join(', ') : val })}
+                                        options={[
+                                            { value: 'Python', label: 'Python' },
+                                            { value: 'SQL', label: 'SQL' },
+                                            { value: 'Veri Analitiği', label: 'Veri Analitiği' },
+                                            { value: 'Power BI', label: 'Power BI' },
+                                            { value: 'Tableau', label: 'Tableau' },
+                                            { value: 'İleri Excel', label: 'İleri Excel' },
+                                            { value: 'COBIT', label: 'COBIT' },
+                                            { value: 'COSO', label: 'COSO' },
+                                            { value: 'IFRS', label: 'IFRS' },
+                                            { value: 'VUK', label: 'VUK' },
+                                            { value: 'UFRS', label: 'UFRS' },
+                                            { value: 'Siber Güvenlik', label: 'Siber Güvenlik' },
+                                            { value: 'Sızma Testi', label: 'Sızma Testi' },
+                                            { value: 'Çevik Denetim', label: 'Çevik Denetim' },
+                                            { value: 'Raporlama', label: 'Raporlama' },
+                                            { value: 'Sunum Teknikleri', label: 'Sunum Teknikleri' }
+                                        ]}
                                     />
                                 </div>
                             </div>
@@ -1382,7 +1416,7 @@ export default function AuditStaffPage() {
                                     </h3>
                                     <p className="text-xs text-gray-500">Personelin kurum içi ünvan ve görev değişimleri.</p>
                                 </div>
-                                {!isViewMode && (hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('Admin') || hasRole('Yönetici')) && (
+                                {!isViewMode && canManage && (
                                     <Button
                                         variant="secondary"
                                         size="sm"
@@ -1880,94 +1914,81 @@ export default function AuditStaffPage() {
                                         <h4 className="font-bold text-gray-800 text-sm flex items-center gap-2">
                                             <History size={16} className="text-slate-500" /> Beyan Geçmişi Logları
                                         </h4>
-                                        <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
-                                            <table className="min-w-full divide-y divide-slate-200 text-sm">
-                                                <thead className="bg-slate-50">
-                                                    <tr>
-                                                        <th className="px-4 py-3 text-left font-bold text-gray-600">Tür / Yıl</th>
-                                                        <th className="px-4 py-3 text-left font-bold text-gray-600">Beyan Tarihi</th>
-                                                        <th className="px-4 py-3 text-left font-bold text-gray-600">Durum</th>
-                                                        <th className="px-4 py-3 text-left font-bold text-gray-600">Bildirilen İstisna</th>
-                                                        <th className="px-4 py-3 text-left font-bold text-gray-600">Aksiyonlar</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-slate-100">
-                                                    {declarations.length === 0 ? (
-                                                        <tr>
-                                                            <td colSpan={5} className="px-4 py-8 text-center text-gray-400 font-medium">
-                                                                Henüz bağımsızlık beyanı kaydı bulunmamaktadır.
-                                                            </td>
-                                                        </tr>
-                                                    ) : (
-                                                        declarations.map((item) => {
-                                                            const hasIssues = item.hasConflict || item.hasFinancialLink ||
-                                                                item.hasFamilyLink || item.hasPreviousRole || item.hasOtherIssue;
-
-                                                            return (
-                                                                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                                                                    <td className="px-4 py-3 font-semibold text-gray-900">
-                                                                        {item.year ? `${item.year} - Yıllık Beyan` : item.declarationType}
-                                                                    </td>
-                                                                    <td className="px-4 py-3 text-gray-500">
-                                                                        {formatDate(item.declaredAt)}
-                                                                    </td>
-                                                                    <td className="px-4 py-3">
-                                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                                                            item.status === 'Onaylandı' 
-                                                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                                                : item.status === 'Sorun Var'
-                                                                                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                                                                    : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                                                                        }`}>
-                                                                            {item.status === 'Onaylandı' ? 'Uyumlu' : item.status === 'Sorun Var' ? 'İstisna Mevcut' : 'Bekliyor'}
-                                                                        </span>
-                                                                    </td>
-                                                                    <td className="px-4 py-3">
-                                                                        {hasIssues ? (
-                                                                            <span className="text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded">
-                                                                                İlişki Beyan Edilmiş
-                                                                            </span>
-                                                                        ) : (
-                                                                            <span className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded font-bold">
-                                                                                Yok (Tam Bağımsız)
-                                                                            </span>
-                                                                        )}
-                                                                    </td>
-                                                                    <td className="px-4 py-3 text-right">
-                                                                        <div className="flex gap-2 justify-end">
-                                                                            {/* Yönetici Onay Aksiyonu */}
-                                                                            {item.status !== 'Onaylandı' && (hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('Teftiş Kurulu Müdürü') || hasRole('SYSTEM_ADMIN')) && (
-                                                                                <button 
-                                                                                    type="button"
-                                                                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded transition-colors"
-                                                                                    onClick={() => {
-                                                                                        setReviewingDeclarationId(item.id);
-                                                                                        setReviewNotes(item.reviewNotes || '');
-                                                                                    }}
-                                                                                >
-                                                                                    Değerlendir
-                                                                                </button>
-                                                                            )}
-
-                                                                            {/* Silme Aksiyonu (Onaylanmamışsa ve sahibi ise) */}
-                                                                            {item.status !== 'Onaylandı' && user?.id === item.userId && (
-                                                                                <button 
-                                                                                    type="button"
-                                                                                    className="text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 p-1 rounded transition-colors"
-                                                                                    onClick={() => handleDeleteDeclaration(item.id)}
-                                                                                    title="Geri Çek / Sil"
-                                                                                >
-                                                                                    <Trash2 size={14} />
-                                                                                </button>
-                                                                            )}
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
+                                        <div className="border border-slate-200 rounded-xl bg-white overflow-hidden">
+                                            <DataTable
+                                                columns={[
+                                                    { 
+                                                        header: 'Tür / Yıl', 
+                                                        accessor: (item: any) => <span className="font-semibold text-gray-900">{item.year ? `${item.year} - Yıllık Beyan` : item.declarationType}</span>
+                                                    },
+                                                    { 
+                                                        header: 'Beyan Tarihi', 
+                                                        accessor: (item: any) => <span className="text-gray-500">{formatDate(item.declaredAt)}</span>
+                                                    },
+                                                    { 
+                                                        header: 'Durum', 
+                                                        accessor: (item: any) => (
+                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                                                                item.status === 'Onaylandı' 
+                                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                                    : item.status === 'Sorun Var'
+                                                                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                                                        : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                                                            }`}>
+                                                                {item.status === 'Onaylandı' ? 'Uyumlu' : item.status === 'Sorun Var' ? 'İstisna Mevcut' : 'Bekliyor'}
+                                                            </span>
+                                                        )
+                                                    },
+                                                    { 
+                                                        header: 'Bildirilen İstisna', 
+                                                        accessor: (item: any) => {
+                                                            const hasIssues = item.hasConflict || item.hasFinancialLink || item.hasFamilyLink || item.hasPreviousRole || item.hasOtherIssue;
+                                                            return hasIssues ? (
+                                                                <span className="text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded">
+                                                                    İlişki Beyan Edilmiş
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded font-bold">
+                                                                    Yok (Tam Bağımsız)
+                                                                </span>
                                                             );
-                                                        })
-                                                    )}
-                                                </tbody>
-                                            </table>
+                                                        }
+                                                    },
+                                                    {
+                                                        header: 'Aksiyonlar',
+                                                        accessor: (item: any) => (
+                                                            <div className="flex gap-2 justify-end">
+                                                                {item.status !== 'Onaylandı' && (hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('Teftiş Kurulu Müdürü') || hasRole('SYSTEM_ADMIN')) && (
+                                                                    <Button 
+                                                                        variant="secondary"
+                                                                        size="sm"
+                                                                        onClick={() => {
+                                                                            setReviewingDeclarationId(item.id);
+                                                                            setReviewNotes(item.reviewNotes || '');
+                                                                        }}
+                                                                    >
+                                                                        Değerlendir
+                                                                    </Button>
+                                                                )}
+                                                                {item.status !== 'Onaylandı' && user?.id === item.userId && (
+                                                                    <Button 
+                                                                        variant="danger"
+                                                                        size="sm"
+                                                                        onClick={() => handleDeleteDeclaration(item.id)}
+                                                                        title="Geri Çek / Sil"
+                                                                    >
+                                                                        <Trash2 size={14} />
+                                                                    </Button>
+                                                                )}
+                                                            </div>
+                                                        )
+                                                    }
+                                                ]}
+                                                data={declarations}
+                                                keyExtractor={(item) => item.id}
+                                                emptyTitle="Kayıt Bulunamadı"
+                                                emptyDescription="Henüz bağımsızlık beyanı kaydı bulunmamaktadır."
+                                            />
                                         </div>
                                     </div>
                                 </>
@@ -2293,22 +2314,19 @@ export default function AuditStaffPage() {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label">Talep/Oluşturma Nedeni</label>
-                        <input
-                            type="text"
-                            className="form-input"
-                            placeholder="Örn: Denetim Talebi, Atama Süreci vb."
-                            value={creationReason}
-                            onChange={(e) => setCreationReason(e.target.value)}
-                            autoFocus
-                        />
-                    </div>
+                    <FormInput
+                        label="Talep/Oluşturma Nedeni"
+                        type="text"
+                        placeholder="Örn: Denetim Talebi, Atama Süreci vb."
+                        value={creationReason}
+                        onChange={(e) => setCreationReason(e.target.value)}
+                        autoFocus
+                    />
 
                 </div>
             </Modal>
 
-        </>
+        </div>
     );
     return pageContent;
 }

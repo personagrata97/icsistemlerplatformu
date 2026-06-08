@@ -3,9 +3,12 @@
 import React from 'react';
 import { LucideIcon, Search, FolderOpen, AlertCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import EntityIcon from '@/components/ui/EntityIcon';
+import { EntityType } from '@/lib/entity-config';
 
 interface EmptyStateProps {
     icon?: LucideIcon;
+    entityType?: EntityType;
     title?: string;
     description?: string;
     action?: {
@@ -19,6 +22,7 @@ interface EmptyStateProps {
 
 export default function EmptyState({
     icon: Icon = Search,
+    entityType,
     title = "Kayıt Bulunamadı",
     description = "Görüntülenecek veri bulunamadı veya arama kriterlerinize uygun sonuç yok.",
     action,
@@ -57,7 +61,11 @@ export default function EmptyState({
     return (
         <div className={`flex flex-col items-center justify-center text-center ${variantStyles.container} ${className}`}>
             <div className={`mb-4 ${variantStyles.icon}`}>
-                <Icon size={iconSize} strokeWidth={1.5} />
+                {entityType ? (
+                    <EntityIcon type={entityType} size={iconSize} variant="text-only" className="opacity-50" />
+                ) : (
+                    <Icon size={iconSize} strokeWidth={1.5} />
+                )}
             </div>
             <h3 className={`font-semibold mb-1 ${variantStyles.title}`}>
                 {title}

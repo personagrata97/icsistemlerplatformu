@@ -17,7 +17,7 @@ export default function ActionLink({
     className = '',
     variant = 'primary'
 }: ActionLinkProps) {
-    const baseClasses = "group inline-flex items-center font-semibold transition-all duration-200";
+    const baseClasses = "group inline-flex items-center font-semibold transition-all duration-200 text-sm";
     const variantClasses = {
         primary: "text-primary hover:text-primary-hover",
         secondary: "text-gray-600 hover:text-gray-900"
@@ -29,7 +29,7 @@ export default function ActionLink({
                 {children}
             </span>
             <ArrowRight
-                size={16}
+                size={14}
                 className="ml-1 transform transition-transform duration-200 group-hover:translate-x-1"
             />
         </>

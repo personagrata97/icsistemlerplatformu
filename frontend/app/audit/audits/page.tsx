@@ -9,7 +9,7 @@ import Tooltip from '@/components/ui/Tooltip';
 import { auditApi, AuditStaff } from '@/lib/audit-api';
 import RefreshButton from '@/components/ui/RefreshButton';
 import { getStatusColor, formatDate } from '@/lib/audit-utils';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -45,6 +45,15 @@ export default function AuditsPage() {
     const [filterType, setFilterType] = useState<string[]>([]);
     const [filterStatus, setFilterStatus] = useState<string[]>([]);
     const [filterInspector, setFilterInspector] = useState<string[]>([]);
+
+    const searchParams = useSearchParams();
+    const linkedStatus = searchParams.get('status');
+
+    useEffect(() => {
+        if (linkedStatus) {
+            setFilterStatus(linkedStatus.split(','));
+        }
+    }, [linkedStatus]);
 
 
     // Form durumu

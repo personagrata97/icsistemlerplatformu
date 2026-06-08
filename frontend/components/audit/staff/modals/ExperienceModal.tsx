@@ -3,6 +3,7 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Checkbox from '@/components/ui/Checkbox';
+import DatePicker from '@/components/ui/DatePicker';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 
 interface ExperienceForm {
@@ -133,21 +134,17 @@ export default function ExperienceModal({
                 <div className="grid grid-cols-2 gap-4">
                     <div className="form-group">
                         <label className="form-label">Başlangıç</label>
-                        <input 
-                            type="date" 
-                            className="form-input" 
+                        <DatePicker 
                             value={experienceForm.startDate} 
-                            onChange={e => setExperienceForm({ ...experienceForm, startDate: e.target.value })} 
+                            onChange={(val) => setExperienceForm({ ...experienceForm, startDate: val })} 
                             required={true} 
                         />
                     </div>
                     <div className="form-group">
                         <label className="form-label">Bitiş</label>
-                        <input 
-                            type="date" 
-                            className="form-input" 
+                        <DatePicker 
                             value={experienceForm.endDate} 
-                            onChange={e => setExperienceForm({ ...experienceForm, endDate: e.target.value })} 
+                            onChange={(val) => setExperienceForm({ ...experienceForm, endDate: val })} 
                             disabled={experienceForm.isCurrent} 
                         />
                         <div className="mt-1">

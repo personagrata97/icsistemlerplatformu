@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { AuditableUnit } from '@/lib/audit-api';
 import { Activity, Info } from 'lucide-react';
+import DashboardWidget from '@/components/ui/DashboardWidget';
 
 interface RiskHeatmapProps {
     units: AuditableUnit[];
@@ -53,12 +54,11 @@ export default function RiskHeatmap({ units, onCellClick }: RiskHeatmapProps) {
     };
 
     return (
-        <div className="card">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-6">
-                <Activity size={20} className="text-primary" />
-                Risk Isı Haritası
-            </h3>
-
+        <DashboardWidget 
+            widgetType="heatmap" 
+            title="Risk Isı Haritası"
+            infoTooltip="Sistemdeki denetim birimlerinin Doğal Risk ve Kontrol Etkinliği eksenlerinde nerede konumlandığını gösteren 3x3 risk matrisidir."
+        >
             <div className="flex flex-col items-center">
                 {/* Y-Axis Label */}
                 <div className="flex w-full">
@@ -68,7 +68,6 @@ export default function RiskHeatmap({ units, onCellClick }: RiskHeatmapProps) {
 
                     <div className="flex-1">
                         <div className="grid grid-cols-3 gap-2 mb-2">
-                            {/* Kontrol Etkinliği Başlıkları (Alt) */}
                             {/* Izgara satırları */}
                             {['Yüksek', 'Orta', 'Düşük'].map((inherent) => (
                                 <React.Fragment key={inherent}>
@@ -114,6 +113,6 @@ export default function RiskHeatmap({ units, onCellClick }: RiskHeatmapProps) {
                     </p>
                 </div>
             </div>
-        </div>
+        </DashboardWidget>
     );
 }

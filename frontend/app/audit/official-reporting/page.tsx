@@ -22,6 +22,9 @@ import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import ConfirmModal from '@/components/ConfirmModal';
 import EmptyState from '@/components/ui/EmptyState';
+import EntityIcon from '@/components/ui/EntityIcon';
+import DashboardWidget from '@/components/ui/DashboardWidget';
+import { EntityType, ENTITY_CONFIG, getColorClasses } from '@/lib/entity-config';
 
 // Resmi Kurum Raporlama Türleri
 const REPORT_TYPES = [
@@ -29,48 +32,42 @@ const REPORT_TYPES = [
         id: 'annual-activity',
         name: 'Yıllık Faaliyet Raporu',
         description: 'İç denetim faaliyetlerinin yıllık özet raporu',
-        icon: FileText,
-        color: 'bg-blue-50 text-blue-600 border-blue-200',
+        entityType: 'ACTIVITY',
         frequency: 'Yıllık'
     },
     {
         id: 'risk-assessment',
         name: 'Risk Değerlendirme Raporu',
         description: 'Kurum geneli risk değerlendirme sonuçları',
-        icon: AlertTriangle,
-        color: 'bg-orange-50 text-orange-600 border-orange-200',
+        entityType: 'HEATMAP',
         frequency: 'Dönemsel'
     },
     {
         id: 'plan-compliance',
         name: 'Denetim Planı Uyum Raporu',
         description: 'Yıllık denetim planı gerçekleşme oranları',
-        icon: Calendar,
-        color: 'bg-green-50 text-green-600 border-green-200',
+        entityType: 'AUDIT',
         frequency: 'Çeyreklik'
     },
     {
         id: 'finding-summary',
         name: 'Bulgu Özet Raporu',
         description: 'Denetim bulguları, risk dağılımları ve aksiyon takibi',
-        icon: ShieldCheck,
-        color: 'bg-purple-50 text-purple-600 border-purple-200',
+        entityType: 'FINDING',
         frequency: 'Aylık'
     },
     {
         id: 'it-audit',
         name: 'Bilgi Sistemleri Denetim Raporu',
         description: 'BT denetimleri ve bilgi güvenliği bulguları',
-        icon: Landmark,
-        color: 'bg-cyan-50 text-cyan-600 border-cyan-200',
+        entityType: 'USER',
         frequency: 'Yıllık'
     },
     {
         id: 'quality-assurance',
         name: 'Kalite Güvence Raporu',
         description: 'İç ve dış kalite değerlendirme sonuçları',
-        icon: CheckCircle2,
-        color: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+        entityType: 'REPORT',
         frequency: '5 Yıllık (Dış) / Yıllık (İç)'
     }
 ];
@@ -98,7 +95,7 @@ export default function OfficialReportingPage() {
     const [deleteReportId, setDeleteReportId] = useState<string | null>(null);
 
     useEffect(() => {
-        loadStats();
+        loadStats(true);
         loadReportHistory();
     }, []);
 
@@ -111,8 +108,8 @@ export default function OfficialReportingPage() {
         }
     };
 
-    const loadStats = async () => {
-        setLoading(true);
+    const loadStats = async (isInitial = false) => {
+        if (isInitial) setLoading(true);
         try {
             const [execStats, qualityStats] = await Promise.all([
                 auditApi.getExecutiveStats().catch(() => null),
@@ -122,7 +119,7 @@ export default function OfficialReportingPage() {
         } catch (error) {
             console.error('İstatistik yükleme hatası:', error);
         } finally {
-            setLoading(false);
+            if (isInitial) setLoading(false);
         }
     };
 
@@ -183,16 +180,15 @@ export default function OfficialReportingPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <PageHeader
-                    title="Yasal ve Kurumsal Raporlama"
-                    subtitle="Regülasyon kurumları ve üst yönetim için periyodik raporlar"
-                />
+            <PageHeader
+                title="Yasal ve Kurumsal Raporlama"
+                subtitle="Regülasyon kurumları ve üst yönetim için periyodik raporlar"
+            />
             <PageToolbar
                 noSearch={true}
-                onRefresh={loadStats}
+                onRefresh={() => loadStats(false)}
                 filters={
-                    <div className="w-[120px]">
+                    <div className="w-[160px]">
                         <CustomSelect
                             value={selectedPeriod}
                             onChange={(val) => setSelectedPeriod(val as string)}
@@ -205,66 +201,70 @@ export default function OfficialReportingPage() {
                     </div>
                 }
             />
-            </div>
 
             {/* Summary Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <StatCard
                     title="Toplam Denetim"
                     value={totalAudits}
-                    icon={<BarChart3 size={22} />}
+                    entityType="AUDIT"
                     subtext={`${completedAudits} tamamlandı`}
+                    infoTooltip="Seçili dönem (yıl) içerisindeki onaylanmış toplam denetim sayısıdır."
                     onClick={() => router.push('/audit')}
                     className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-blue-500"
                 />
                 <StatCard
                     title="Toplam Bulgu"
                     value={totalFindings}
-                    icon={<AlertTriangle size={22} />}
+                    entityType="FINDING"
                     subtext={`${openFindings} açık`}
+                    infoTooltip="Dönem içerisindeki denetimlerden elde edilen veya raporlanmış olan toplam bulgu sayısıdır."
                     onClick={() => router.push('/audit/findings')}
                     className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-yellow-500"
                 />
                 <StatCard
                     title="Oluşturulan Rapor"
                     value={reportHistory.length}
-                    icon={<FileText size={22} />}
+                    entityType="REPORT"
                     subtext="Bu dönem"
+                    infoTooltip="Resmi kurumlar için sistem üzerinden otomatik oluşturulmuş ve kaydedilmiş resmi rapor sayısıdır."
                     onClick={() => router.push('/audit/reports')}
                     className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-emerald-500"
                 />
                 <StatCard
                     title="Plan Uyum Oranı"
                     value={totalAudits > 0 ? `%${Math.round((completedAudits / totalAudits) * 100)}` : '%0'}
-                    icon={<TrendingUp size={22} />}
+                    entityType="TREND"
                     subtext="Hedef: %90"
+                    infoTooltip="Planlanan denetimlerden tamamlananların yüzdesel oranıdır. BDDK/BRSA standartları gereği min %90 beklenir."
                     onClick={() => router.push('/audit')}
                     className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-purple-500"
                 />
             </div>
 
             {/* Report Types Grid */}
-            <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
-                <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-                    <div>
-                        <h2 className="text-lg font-bold text-gray-900">Mevzuat Uyumlu Rapor Şablonları</h2>
-                        <p className="text-sm text-gray-500 mt-1">Resmi düzenlemelere uygun standart rapor formatları</p>
-                    </div>
-                </div>
+            <DashboardWidget
+                widgetType="reports"
+                title="Mevzuat Uyumlu Rapor Şablonları"
+                subtitle="Resmi düzenlemelere uygun standart rapor formatları"
+                infoTooltip="BDDK, SPK, KVKK ve TCMB gibi düzenleyici kurumların standartlarına uygun otomatik olarak oluşturulabilen resmi rapor şablonlarını listeler."
+                className="mb-8"
+            >
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {REPORT_TYPES.map(report => {
-                        const Icon = report.icon;
                         const isGenerating = generatingReport === report.id;
+                        const config = ENTITY_CONFIG[report.entityType as EntityType];
+                        const colors = getColorClasses(config.color);
 
                         return (
                             <div
                                 key={report.id}
-                                className={`p-5 border rounded-2xl transition-all hover:shadow-md group ${report.color}`}
+                                className={`p-5 border rounded-2xl transition-all hover:shadow-md group ${colors.bg} ${colors.border}`}
                             >
                                 <div className="flex items-start gap-3 mb-3">
                                     <div className="p-2.5 bg-white/80 rounded-xl shadow-sm">
-                                        <Icon size={22} />
+                                        <EntityIcon type={report.entityType as EntityType} size={22} variant="text-only" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-bold text-gray-900 text-sm">{report.name}</h3>
@@ -289,16 +289,14 @@ export default function OfficialReportingPage() {
                         );
                     })}
                 </div>
-            </div>
+            </DashboardWidget>
 
             {/* Report History Table */}
-            <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-                    <div>
-                        <h2 className="text-lg font-bold text-gray-900">Rapor Geçmişi</h2>
-                        <p className="text-sm text-gray-500 mt-1">Oluşturulan ve gönderilen raporlar</p>
-                    </div>
-                </div>
+            <DashboardWidget
+                widgetType="activities"
+                title="Rapor Geçmişi"
+                subtitle="Oluşturulan ve gönderilen raporlar"
+            >
 
                 <DataTable
                     data={reportHistory}
@@ -310,12 +308,16 @@ export default function OfficialReportingPage() {
                             key: 'type',
                             header: 'Rapor Türü',
                             sortable: true,
-                            render: (report: any) => (
-                                <div className="flex items-center gap-2">
-                                    <FileText size={16} className="text-gray-400" />
-                                    <span className="text-sm font-medium text-gray-800">{report.type}</span>
-                                </div>
-                            )
+                            render: (report: any) => {
+                                const reportTemplate = REPORT_TYPES.find(r => r.name === report.type);
+                                const eType = reportTemplate ? reportTemplate.entityType : 'REPORT';
+                                return (
+                                    <div className="flex items-center gap-2">
+                                        <EntityIcon type={eType as EntityType} size={16} variant="text-only" className="opacity-60" />
+                                        <span className="text-sm font-medium text-gray-800">{report.type}</span>
+                                    </div>
+                                );
+                            }
                         },
                         {
                             key: 'period',
@@ -367,11 +369,12 @@ export default function OfficialReportingPage() {
 
                 {reportHistory.length === 0 && (
                     <EmptyState
+                        entityType="REPORT"
                         title="Henüz rapor oluşturulmamış"
                         description="Yukarıdaki şablonlardan birini kullanarak ilk raporunuzu oluşturun."
                     />
                 )}
-            </div>
+            </DashboardWidget>
 
             <ConfirmModal
                 isOpen={!!deleteReportId}

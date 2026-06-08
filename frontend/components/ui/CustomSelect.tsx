@@ -21,6 +21,7 @@ interface CustomSelectProps {
     placeholder?: string;
     label?: string;
     isMulti?: boolean;
+    isCreatable?: boolean;
     disabled?: boolean;
     showSearch?: boolean;
     isSearchable?: boolean;
@@ -39,6 +40,7 @@ export default function CustomSelect({
     placeholder = 'Seçiniz...',
     label,
     isMulti = false,
+    isCreatable = false,
     disabled = false,
     showSearch = false,
     isSearchable = false,
@@ -136,7 +138,44 @@ export default function CustomSelect({
             onChange(optionValue);
             setIsOpen(false);
         }
+        
+        // Reset search term when a selection is made
+        if (isCreatable) {
+            setSearchTerm('');
+        }
     };
+
+    const exactMatchExists = (options || []).some(o => o.label.toLocaleLowerCase('tr-TR') === searchTerm.toLocaleLowerCase('tr-TR'));
+    
+    // Create base display options
+    let displayOptions = [...filteredOptions];
+    
+    // Add custom selected values to the dropdown so they can be unchecked
+    if (isCreatable) {
+        const currentValues = Array.isArray(value) ? value : (value ? [value] : []);
+        currentValues.forEach(val => {
+            const existsInOptions = (options || []).some(o => o.value === val);
+            const existsInDisplay = displayOptions.some(o => o.value === val);
+            if (!existsInOptions && !existsInDisplay) {
+                // If it matches search term or search term is empty, show it
+                if (searchTerm.trim() === '' || val.toLocaleLowerCase('tr-TR').includes(searchTerm.toLocaleLowerCase('tr-TR'))) {
+                    displayOptions.push({
+                        value: val,
+                        label: val,
+                        className: 'text-primary'
+                    });
+                }
+            }
+        });
+    }
+
+    if (isCreatable && searchTerm.trim() !== '' && !exactMatchExists) {
+        displayOptions.push({
+            value: searchTerm.trim(),
+            label: `Ekle: "${searchTerm.trim()}"`,
+            className: 'text-primary font-bold'
+        });
+    }
 
     const isSelected = (optionValue: string) => {
         if (isMulti) {
@@ -214,14 +253,16 @@ export default function CustomSelect({
 
             <div
                 className={`
-                    w-full flex items-center justify-between cursor-pointer transition-all gap-2
+                    w-full flex items-center justify-between cursor-pointer transition-all gap-2 select-none outline-none focus:outline-none
                     ${variantClass} ${sizeClass} ${variant === 'default' ? 'min-h-[42px] py-2.5' : ''}
-                    ${isOpen && variant === 'default' ? 'border-primary ring-4 ring-primary/10 outline-none' : ''}
+                    ${isOpen && variant === 'default' ? 'border-primary ring-4 ring-primary/10' : ''}
                     ${isOpen && variant !== 'default' ? 'ring-2 ring-primary/20 border-primary' : ''}
                     ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : ''}
                     ${containerDynamicClass} 
                 `}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
                 onClick={toggleDropdown}
+                tabIndex={0}
             >
                 <div className="flex-1 overflow-hidden flex items-center">
                     {/* If we applied the class to the container, we don't need to wrap the text in another span with same class, or we do specific text color handling */}
@@ -269,6 +310,17 @@ export default function CustomSelect({
                                         placeholder="Ara..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && isCreatable && searchTerm.trim() !== '') {
+                                                e.preventDefault();
+                                                const exactMatch = filteredOptions.find(o => o.label.toLocaleLowerCase('tr-TR') === searchTerm.toLocaleLowerCase('tr-TR'));
+                                                if (exactMatch) {
+                                                    handleSelect(exactMatch.value);
+                                                } else {
+                                                    handleSelect(searchTerm.trim());
+                                                }
+                                            }
+                                        }}
                                         ref={(input) => {
                                             if (input) input.focus({ preventScroll: true });
                                         }}
@@ -309,10 +361,10 @@ export default function CustomSelect({
                         )}
 
                         <div className="p-1.5 overflow-y-auto custom-scrollbar flex-1 min-h-0">
-                            {filteredOptions.length === 0 ? (
+                            {displayOptions.length === 0 ? (
                                 <div className="py-3 text-center text-xs text-gray-500">Sonuç bulunamadı</div>
                             ) : (
-                                filteredOptions.map((option) => {
+                                displayOptions.map((option) => {
                                     const selected = isSelected(option.value);
                                     return (
                                         <div

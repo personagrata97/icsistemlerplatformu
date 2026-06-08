@@ -1,15 +1,22 @@
 import React from 'react';
 import Link from 'next/link';
+import EntityIcon from '@/components/ui/EntityIcon';
+import { EntityType, ENTITY_CONFIG, getColorClasses } from '@/lib/entity-config';
+
+import Tooltip from '@/components/ui/Tooltip';
+import { Info } from 'lucide-react';
 
 interface StatCardProps {
     title: string;
     value: React.ReactNode;
     icon?: any;
+    entityType?: EntityType;
     color?: 'blue' | 'green' | 'yellow' | 'purple' | 'red' | 'orange' | 'gray' | 'rose' | 'amber' | 'emerald' | 'primary' | 'indigo';
     href?: string;
     subtext?: string;
     badgeText?: string;
-    badgeColor?: string; // Optional custom badge color class
+    badgeColor?: string;
+    infoTooltip?: string;
     onClick?: () => void;
     children?: React.ReactNode;
     valueClassName?: string;
@@ -35,17 +42,21 @@ export default function StatCard({
     title,
     value,
     icon,
+    entityType,
     color = 'blue',
     href,
     subtext,
     badgeText,
     badgeColor,
+    infoTooltip,
     className = '',
     onClick,
     children,
     valueClassName = 'text-2xl font-bold text-gray-800 tracking-tight'
 }: StatCardProps) {
-    const theme = colorMap[color] || colorMap.blue;
+    const config = entityType ? ENTITY_CONFIG[entityType] : null;
+    const themeColor = config ? config.color : color;
+    const theme = colorMap[themeColor as keyof typeof colorMap] || colorMap.blue;
 
     const Content = () => (
         <div className={`bg-white p-4 rounded-xl border ${theme.border} shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300 h-full ${className} ${onClick ? 'cursor-pointer' : ''}`}>
@@ -56,6 +67,13 @@ export default function StatCard({
                 <div>
                     <div className="flex items-center gap-3 mb-2">
                         {(() => {
+                            if (entityType) {
+                                return (
+                                    <div className={`p-2 rounded-lg ${theme.iconBg} transition-transform group-hover:scale-105 duration-300`}>
+                                        <EntityIcon type={entityType} size={20} variant="text-only" />
+                                    </div>
+                                );
+                            }
                             if (!icon) return null;
                             return (
                                 <div className={`p-2 rounded-lg ${theme.iconBg} ${theme.iconText} transition-transform group-hover:scale-105 duration-300`}>
@@ -66,7 +84,14 @@ export default function StatCard({
                                 </div>
                             );
                         })()}
-                        <span className="text-sm font-medium text-gray-500 group-hover:text-gray-700 transition-colors">{String(title || '')}</span>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-sm font-medium text-gray-500 group-hover:text-gray-700 transition-colors truncate">{String(title || '')}</span>
+                            {infoTooltip && (
+                                <Tooltip content={infoTooltip} position="top">
+                                    <Info size={14} className="text-gray-400 hover:text-primary cursor-help shrink-0 outline-none" />
+                                </Tooltip>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex items-baseline gap-2">

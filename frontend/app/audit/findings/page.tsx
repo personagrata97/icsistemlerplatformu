@@ -98,6 +98,13 @@ function FindingsPageContent() {
     // URL parametrelerini doğrudan bağlantı için işle
     const searchParams = useSearchParams();
     const linkedId = searchParams.get('id');
+    const linkedStatus = searchParams.get('status');
+
+    useEffect(() => {
+        if (linkedStatus) {
+            setFilterStatus(linkedStatus.split(','));
+        }
+    }, [linkedStatus]);
 
     useEffect(() => {
         if (linkedId && findings.length > 0) {
@@ -662,19 +669,24 @@ function FindingsPageContent() {
     return (
         <>
             <div className="mb-8">
-                <SegmentedTabs
-                    tabs={[
-                        { id: '/audit/findings', label: 'Tüm Bulgular', icon: List },
-                        { id: '/audit/conciliation', label: 'Tebliğ ve Mutabakat', icon: FileSignature },
-                        { id: '/audit/follow-up', label: 'Aksiyon Takip', icon: Clock }
-                    ].filter(tab => {
-                        if (hasRole('AUDIT_UNIT')) {
-                            return tab.id === '/audit/conciliation';
-                        }
-                        return true;
-                    })}
-                    activeTab={pathname}
-                    onChange={(id) => router.push(id)}
+                <PageToolbar
+                    noSearch={true}
+                    leftActions={
+                        <SegmentedTabs
+                            tabs={[
+                                { id: '/audit/findings', label: 'Tüm Bulgular', icon: List },
+                                { id: '/audit/conciliation', label: 'Tebliğ ve Mutabakat', icon: FileSignature },
+                                { id: '/audit/follow-up', label: 'Aksiyon Takip', icon: Clock }
+                            ].filter(tab => {
+                                if (hasRole('AUDIT_UNIT')) {
+                                    return tab.id === '/audit/conciliation';
+                                }
+                                return true;
+                            })}
+                            activeTab={pathname}
+                            onChange={(id) => router.push(id)}
+                        />
+                    }
                 />
             </div>
             {/* Page Header */}

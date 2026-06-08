@@ -82,7 +82,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
         setShowAddModal(true);
         if (availableProcesses.length === 0) {
             try {
-                const processes = await auditApi.getProcesses(unitId);
+                const processes = await auditApi.getProcesses(unitId || '');
                 setAvailableProcesses(processes);
             } catch (error) {
                 showToast('Süreçler yüklenirken hata oluştu', 'error');
