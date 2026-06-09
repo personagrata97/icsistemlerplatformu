@@ -429,6 +429,14 @@ export interface AuditStaff {
     education?: StaffEducation[];
     trainings?: StaffTraining[];
     promotions?: StaffPromotion[];
+    languages?: string[];
+    // Pasiflik ve Geçici Görevlendirme Takibi (IIA Bağımsızlık)
+    passiveReason?: string;
+    temporaryUnit?: string;
+    temporaryStartDate?: string;
+    temporaryEndDate?: string;
+    temporaryAssignmentDetails?: string;
+    otherPassiveReasonDetails?: string;
 }
 
 export const getWorkpaperUrl = (auditId: string, filename: string) => {

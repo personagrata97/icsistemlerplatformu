@@ -16,6 +16,7 @@ export default function Home() {
     const isAdmin = hasRole(['ADMIN', 'SYSTEM_ADMIN']);
     const canSeeRisk = hasRole(['RISK_ADMIN', 'RISK_VIEWER', 'ADMIN', 'SYSTEM_ADMIN', 'COMPLIANCE_ADMIN']);
     const canSeeAudit = hasRole(['AUDIT_ADMIN', 'AUDIT_INSPECTOR', 'AUDIT_UNIT', 'ADMIN', 'SYSTEM_ADMIN']);
+    const isUnitOnly = hasRole(['AUDIT_UNIT', 'AUDIT_VIEWER']) && !hasRole(['ADMIN', 'SYSTEM_ADMIN', 'AUDIT_ADMIN', 'AUDIT_INSPECTOR', 'AUDIT_SUPERVISOR']);
     const canSeeSanction = hasRole(['SANCTION_ADMIN', 'COMPLIANCE_ADMIN', 'ADMIN', 'SYSTEM_ADMIN']);
 
     const handleLogout = () => {
@@ -73,7 +74,7 @@ export default function Home() {
                             <p className="text-gray-500 mb-6">
                                 Şube ve süreç denetimlerini planlayın, bulguları takip edin ve raporlayın
                             </p>
-                            <Link href="/audit" className="inline-flex items-center text-purple-600 font-semibold hover:gap-2 transition-all">
+                            <Link href={isUnitOnly ? "/portal" : "/audit"} className="inline-flex items-center text-purple-600 font-semibold hover:gap-2 transition-all">
                                 Uygulamaya Git <ArrowRight size={18} className="ml-1" />
                             </Link>
                         </div>

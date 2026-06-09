@@ -239,33 +239,35 @@ export default function AuditSidebar() {
                 )}
 
                 {/* 5. ETİK VE UYUM */}
-                <li className="pt-1.5 border-t border-gray-100">
-                    <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">Etik & Uyum</div>
-                    <ul className="space-y-1">
-                        <li className="nav-item">
-                            <Link href="/audit/ethics/submit" className={`nav-link ${isActive('/audit/ethics/submit') ? 'active' : ''}`}>
-                                <Send size={18} />
-                                <span>Bildirim Yap</span>
-                            </Link>
-                        </li>
-                        {isAuditor && (
-                            <>
-                                <li className="nav-item">
-                                    <Link href="/audit/ethics" className={`nav-link ${isActive('/audit/ethics') && !isActive('/audit/ethics/submit') && !isActive('/audit/ethics/reports') ? 'active' : ''}`}>
-                                        <Scale size={18} />
-                                        <span>Gelen Bildirimler</span>
-                                    </Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link href="/audit/ethics/reports" className={`nav-link ${isActive('/audit/ethics/reports') ? 'active' : ''}`}>
-                                        <FileBarChart size={18} />
-                                        <span>Etik Raporları</span>
-                                    </Link>
-                                </li>
-                            </>
-                        )}
-                    </ul>
-                </li>
+                {!isUnit && (
+                    <li className="pt-1.5 border-t border-gray-100">
+                        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">Etik & Uyum</div>
+                        <ul className="space-y-1">
+                            <li className="nav-item">
+                                <Link href="/audit/ethics/submit" className={`nav-link ${isActive('/audit/ethics/submit') ? 'active' : ''}`}>
+                                    <Send size={18} />
+                                    <span>Bildirim Yap</span>
+                                </Link>
+                            </li>
+                            {isAuditor && (
+                                <>
+                                    <li className="nav-item">
+                                        <Link href="/audit/ethics" className={`nav-link ${isActive('/audit/ethics') && !isActive('/audit/ethics/submit') && !isActive('/audit/ethics/reports') ? 'active' : ''}`}>
+                                            <Scale size={18} />
+                                            <span>Gelen Bildirimler</span>
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link href="/audit/ethics/reports" className={`nav-link ${isActive('/audit/ethics/reports') ? 'active' : ''}`}>
+                                            <FileBarChart size={18} />
+                                            <span>Etik Raporları</span>
+                                        </Link>
+                                    </li>
+                                </>
+                            )}
+                        </ul>
+                    </li>
+                )}
             </ul>
             </div>
         </aside>

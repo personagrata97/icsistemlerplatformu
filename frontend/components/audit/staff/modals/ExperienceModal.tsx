@@ -4,6 +4,10 @@ import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Checkbox from '@/components/ui/Checkbox';
 import DatePicker from '@/components/ui/DatePicker';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
+import Tooltip from '@/components/ui/Tooltip';
+import { AlertCircle } from 'lucide-react';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 
 interface ExperienceForm {
@@ -54,16 +58,13 @@ export default function ExperienceModal({
             )}
         >
             <form id="experience-form" onSubmit={onSave} className="space-y-4">
-                <div className="form-group">
-                    <label className="form-label">Şirket/Kurum</label>
-                    <input 
-                        type="text" 
-                        className="form-input" 
-                        value={experienceForm.companyName} 
-                        onChange={e => setExperienceForm({ ...experienceForm, companyName: e.target.value })} 
-                        required={true} 
-                    />
-                </div>
+                <FormInput
+                    label="Şirket/Kurum"
+                    type="text"
+                    value={experienceForm.companyName}
+                    onChange={e => setExperienceForm({ ...experienceForm, companyName: e.target.value })}
+                    required={true}
+                />
                 <div className="form-group">
                     <label className="form-label">Departman / Birim</label>
                     <div className="space-y-3">
@@ -111,9 +112,8 @@ export default function ExperienceModal({
                             />
                         )}
                         {!selectedParentExp && (
-                            <input
+                            <FormInput
                                 type="text"
-                                className="form-input"
                                 value={experienceForm.department}
                                 onChange={e => setExperienceForm({ ...experienceForm, department: e.target.value })}
                                 placeholder="Veya elle giriniz..."
@@ -121,16 +121,13 @@ export default function ExperienceModal({
                         )}
                     </div>
                 </div>
-                <div className="form-group">
-                    <label className="form-label">Pozisyon</label>
-                    <input 
-                        type="text" 
-                        className="form-input" 
-                        value={experienceForm.position} 
-                        onChange={e => setExperienceForm({ ...experienceForm, position: e.target.value })} 
-                        required={true} 
-                    />
-                </div>
+                <FormInput
+                    label="Pozisyon"
+                    type="text"
+                    value={experienceForm.position}
+                    onChange={e => setExperienceForm({ ...experienceForm, position: e.target.value })}
+                    required={true}
+                />
                 <div className="grid grid-cols-2 gap-4">
                     <div className="form-group">
                         <label className="form-label">Başlangıç</label>
@@ -158,23 +155,26 @@ export default function ExperienceModal({
                     </div>
                 </div>
                 <div className="form-group">
-                    <label className="form-label">Kariyer Detayları (Ünvan & Yıllar)</label>
-                    <textarea 
-                        className="form-input min-h-[60px]" 
+                    <div className="flex items-center gap-2 mb-1.5">
+                        <label className="text-sm font-semibold text-slate-700">Kariyer Detayları (Ünvan & Yıllar)</label>
+                        <Tooltip content="Şirket içi ünvan değişikliklerini ve tarihlerini buraya yazabilirsiniz.">
+                            <AlertCircle size={14} className="text-gray-400 cursor-help" />
+                        </Tooltip>
+                    </div>
+                    <FormTextarea 
+                        className="min-h-[60px]" 
                         value={experienceForm.careerPaths} 
                         onChange={e => setExperienceForm({ ...experienceForm, careerPaths: e.target.value })} 
                         placeholder="Örn: 2020-2022: Uzman Yardımcısı, 2022-2024: Uzman (Her satıra bir ünvan)" 
                     />
                 </div>
 
-                <div className="form-group">
-                    <label className="form-label">Açıklama / Başarılar</label>
-                    <textarea 
-                        className="form-input min-h-[100px]" 
-                        value={experienceForm.description} 
-                        onChange={e => setExperienceForm({ ...experienceForm, description: e.target.value })} 
-                    />
-                </div>
+                <FormTextarea
+                    label="Açıklama / Başarılar"
+                    className="min-h-[100px]" 
+                    value={experienceForm.description} 
+                    onChange={e => setExperienceForm({ ...experienceForm, description: e.target.value })} 
+                />
             </form>
         </Modal>
     );

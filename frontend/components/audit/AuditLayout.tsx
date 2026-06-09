@@ -37,8 +37,11 @@ function AuditLayoutContent({ children, title: initialTitle = "Genel Bakış", h
 
     const isAuditor = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_INSPECTOR');
     const isSystemAdmin = hasRole('SYSTEM_ADMIN');
-    // Hide sidebar for restricted users (Standard Employee & Unit) OR if explicitly hidden via props
-    const showSidebar = !forceHideSidebar && (isAuditor || isSystemAdmin);
+    const isUnit = hasRole('AUDIT_UNIT') || hasRole('AUDIT_VIEWER');
+    
+    // Hide sidebar for Standard Employees OR if explicitly hidden via props
+    // Auditors, System Admins, and Units ALWAYS see the sidebar
+    const showSidebar = !forceHideSidebar && (isAuditor || isSystemAdmin || isUnit);
 
     // Override title for portal users if it's the default "Genel Bakış"
     // This provides a more specific portal name for limited users

@@ -716,7 +716,7 @@ function FindingsPageContent() {
                 }}
                 addButtonText="Yeni Bulgu"
                 showExportButton={true}
-                onExportClick={() => { auditApi.exportToExcel(findings.map(f => ({ Kod: f.code, Başlık: f.title, Risk: f.riskLevel, Durum: f.status })), 'Bulgular'); }}
+                onExportClick={() => { auditApi.exportToExcel(filteredFindings.map(f => ({ Kod: f.code, Başlık: f.title, Risk: f.riskLevel, Durum: f.status })), 'Bulgular'); }}
                 filters={
                     <FilterDropdown
                         activeCount={filterAudit.length + filterRisk.length + filterStatus.length + filterInspector.length + filterYear.length}
@@ -729,7 +729,7 @@ function FindingsPageContent() {
                             setFilterYear([]);
                         }}
                     >
-                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                        <div className="space-y-4">
                             <div>
                                 <CustomSelect
                                     label="Denetim"
@@ -738,7 +738,9 @@ function FindingsPageContent() {
                                     placeholder="Tümü"
                                     showSearch
                                     isMulti
-                                    options={audits.map(a => ({ value: String(a.id), label: `${a.code} - ${a.title.substring(0, 20)}...` }))}
+                                    options={audits
+                                        .filter(a => !isUnit || (a.unit?.name && user?.department && a.unit.name.toLocaleLowerCase('tr-TR').trim() === user.department.toLocaleLowerCase('tr-TR').trim()))
+                                        .map(a => ({ value: String(a.id), label: `${a.code || 'KOD-YOK'} - ${a.title}` }))}
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-3">
@@ -831,6 +833,7 @@ function FindingsPageContent() {
                 onDelete={handleDeleteClick}
                 isManager={checkRole(hasRole, ROLES.FINDING_MANAGER)}
                 user={user}
+                onRefresh={loadData}
             />
             {/* HISTORY MODAL */}
             <Modal

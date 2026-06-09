@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Clock, AlertCircle, CheckCircle, User, Tag, FileText, Check, Shield, Activity, Calendar, History, Search, Send, PlayCircle, XCircle, FileSearch, Edit2, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
-import { Finding } from '@/lib/audit-api';
+import { Finding, auditApi } from '@/lib/audit-api';
+import { useToast } from '@/components/Toast';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
 import Modal from '@/components/ui/Modal';
@@ -24,13 +25,22 @@ interface FindingDetailModalProps {
     onDelete?: (finding: Finding) => void;
     isManager?: boolean;
     user?: any;
+    onRefresh?: () => void;
 }
 
 export default function FindingDetailModal({ 
     isOpen, onClose, finding,
-    onStatusUpdate, onNotify, onAcceptRisk, onExtensionRequest, onReviewRequest, onEdit, onDelete, isManager, user
+    onStatusUpdate, onNotify, onAcceptRisk, onExtensionRequest, onReviewRequest, onEdit, onDelete, isManager, user, onRefresh
 }: FindingDetailModalProps) {
     const [activeTab, setActiveTab] = useState('details');
+    
+    // Unit Response Form States
+    const [actionPlan, setActionPlan] = useState('');
+    const [actionOwner, setActionOwner] = useState('');
+    const [targetDate, setTargetDate] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    const { showToast } = useToast();
 
 
 
@@ -50,6 +60,64 @@ export default function FindingDetailModal({
 
     const canAcceptRisk = isManager && onAcceptRisk && finding.status !== 'Taslak' && finding.status !== 'Tamamlandı' && finding.status !== 'Risk Kabul Edildi';
     const canRequestExtension = onExtensionRequest && (finding.status === 'Tebliğ Edildi' || finding.status === 'Birim Yanıtladı' || finding.status === 'Takip Ediliyor') && finding.dueDate;
+    
+    const isUnitRole = user?.roles?.some((r:string) => ['MUDUR', 'BIRIM', 'UNIT', 'AUDIT_UNIT'].includes(r.toUpperCase())) || false;
+    const canRespond = (finding.status === 'Tebliğ Edildi' || finding.status === 'Revizyon Gerekli') && isUnitRole;
+    const canUploadEvidence = finding.status === 'Takip Ediliyor' && isUnitRole;
+
+    const handleSubmitResponse = async () => {
+        if (!actionPlan.trim()) {
+            showToast('Lütfen aksiyon planını giriniz.', 'warning');
+            return;
+        }
+        try {
+            setIsSubmitting(true);
+            const payload = {
+                status: 'Birim Yanıtladı',
+                actionPlan: actionPlan,
+                departmentResponse: actionPlan,
+                actionOwner: actionOwner,
+                dueDate: targetDate || finding.dueDate
+            };
+            await auditApi.updateFinding(String(finding.id), payload);
+            await auditApi.createLog({
+                action: 'Birim Yanıtı',
+                user: user?.displayName || 'Kullanıcı',
+                details: `${finding.code} bulgusuna aksiyon planı girildi.`,
+                targetType: 'Finding',
+                targetId: finding.id
+            });
+            showToast('Yanıtınız başarıyla iletildi.', 'success');
+            if (onRefresh) onRefresh();
+            onClose();
+        } catch (error) {
+            showToast('Yanıt gönderilirken hata oluştu.', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleSubmitEvidence = async () => {
+        try {
+            setIsSubmitting(true);
+            const payload = { status: 'Doğrulama Bekliyor' };
+            await auditApi.updateFinding(String(finding.id), payload);
+            await auditApi.createLog({
+                action: 'Kanıt Yüklendi',
+                user: user?.displayName || 'Kullanıcı',
+                details: `${finding.code} bulgusu için kanıtlar yüklenip doğrulamaya gönderildi.`,
+                targetType: 'Finding',
+                targetId: finding.id
+            });
+            showToast('Kanıtlar başarıyla iletildi.', 'success');
+            if (onRefresh) onRefresh();
+            onClose();
+        } catch (error) {
+            showToast('İşlem başarısız.', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <Modal
@@ -269,12 +337,54 @@ export default function FindingDetailModal({
                         </div>
 
                         {/* Additional Sections: Action Plan & Evidence */}
-                        {(finding.actionPlan || finding.inspectorEvidence?.length || finding.unitEvidence?.length) && (
+                        {(finding.actionPlan || finding.inspectorEvidence?.length || finding.unitEvidence?.length || canRespond || canUploadEvidence) && (
                             <div className="space-y-4 pt-6 border-t border-gray-200">
                                 <h3 className="text-lg font-bold text-gray-800">Yanıt ve Aksiyonlar</h3>
 
                                 <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                                    {finding.actionPlan ? (
+                                    {canRespond ? (
+                                        <div className="space-y-4 mb-6 bg-emerald-50/30 p-5 rounded-xl border border-emerald-100">
+                                            <h4 className="text-sm font-bold text-emerald-800 flex items-center gap-2">
+                                                <Edit2 size={16} /> Aksiyon Planı ve Yanıt Girişi
+                                            </h4>
+                                            <div>
+                                                <label className="block text-xs font-semibold text-gray-700 mb-1">Aksiyon Planınız <span className="text-red-500">*</span></label>
+                                                <textarea
+                                                    className="w-full form-input rounded-lg border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500/20 text-sm"
+                                                    rows={4}
+                                                    placeholder="Bulguya istinaden alınacak aksiyonları ve kök neden analizini detaylıca açıklayınız..."
+                                                    value={actionPlan}
+                                                    onChange={e => setActionPlan(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-xs font-semibold text-gray-700 mb-1">Aksiyon Sorumlusu</label>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full form-input rounded-lg border-emerald-200 focus:border-emerald-500 text-sm"
+                                                        placeholder="Örn: Ahmet Yılmaz (Kredi Tahsis)"
+                                                        value={actionOwner}
+                                                        onChange={e => setActionOwner(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-semibold text-gray-700 mb-1">Hedeflenen Termin (Vade)</label>
+                                                    <input
+                                                        type="date"
+                                                        className="w-full form-input rounded-lg border-emerald-200 focus:border-emerald-500 text-sm"
+                                                        value={targetDate}
+                                                        onChange={e => setTargetDate(e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-end pt-2">
+                                                <Button variant="primary" onClick={handleSubmitResponse} disabled={isSubmitting}>
+                                                    {isSubmitting ? 'Kaydediliyor...' : 'Yanıtı Gönder ve Onaya Sun'}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ) : finding.actionPlan ? (
                                         <div className="mb-6">
                                             <h4 className="text-sm font-bold text-emerald-700 mb-2">Birim Aksiyon Planı</h4>
                                             <p className="text-sm text-gray-700 bg-emerald-50/50 p-4 rounded-lg border border-emerald-100">{finding.actionPlan}</p>
@@ -282,6 +392,32 @@ export default function FindingDetailModal({
                                     ) : (
                                         <div className="text-center py-6 text-gray-400 bg-gray-50 rounded border border-dashed text-sm mb-6">
                                             Henüz aksiyon planı girilmemiş.
+                                        </div>
+                                    )}
+
+                                    {canUploadEvidence && (
+                                        <div className="mb-6 bg-blue-50/30 p-5 rounded-xl border border-blue-100">
+                                            <h4 className="text-sm font-bold text-blue-800 flex items-center gap-2 mb-3">
+                                                <FileSearch size={16} /> Kanıt Yükleme ve Doğrulama Talebi
+                                            </h4>
+                                            <p className="text-xs text-blue-600 mb-4">Bu bulgu için aksiyonlarınız tamamlandıysa, lütfen kanıt dosyalarınızı ekleyip müfettişin doğrulamasına sunun.</p>
+                                            
+                                            <div className="border-2 border-dashed border-blue-200 rounded-lg p-6 text-center bg-white mb-4">
+                                                <input type="file" multiple className="hidden" id="evidence-upload" />
+                                                <label htmlFor="evidence-upload" className="cursor-pointer flex flex-col items-center">
+                                                    <div className="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-2">
+                                                        <Plus size={20} />
+                                                    </div>
+                                                    <span className="text-sm font-semibold text-blue-700">Dosya Seçin veya Sürükleyin</span>
+                                                    <span className="text-xs text-gray-400 mt-1">PDF, Excel, Word, JPEG (Maks 10MB)</span>
+                                                </label>
+                                            </div>
+                                            
+                                            <div className="flex justify-end">
+                                                <Button variant="primary" onClick={handleSubmitEvidence} disabled={isSubmitting}>
+                                                    {isSubmitting ? 'Gönderiliyor...' : 'Kanıtları Gönder ve Doğrulama İste'}
+                                                </Button>
+                                            </div>
                                         </div>
                                     )}
 

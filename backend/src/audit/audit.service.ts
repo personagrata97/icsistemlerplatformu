@@ -81,15 +81,10 @@ export class AuditService {
                 if (scope === 'OWN') {
                     const orConditions: any[] = [
                         { creatorId: safeUser.id },
-                        { findings: { some: { assignedUserId: safeUser.id } } }
+                        { findings: { some: { assignedUserId: safeUser.id } } },
+                        { supervisorId: safeUser.id },
+                        { team: { contains: safeUser.id } }
                     ];
-
-                    if (safeUser.displayName) {
-                        orConditions.push({ supervisor: safeUser.displayName });
-                    }
-                    if (safeUser.username) {
-                        orConditions.push({ supervisor: safeUser.username });
-                    }
 
                     where.OR = orConditions;
                 } else if (scope === 'DEPARTMENT') {
@@ -182,10 +177,11 @@ export class AuditService {
                 hasAccess = audit.department === user.department ||
                     audit.findings.some(f => f.department === user.department);
             } else if (scope === 'OWN') {
+                const teamStr = audit.team || '';
                 hasAccess = audit.creatorId === user.id ||
                     audit.findings.some(f => f.assignedUserId === user.id) ||
-                    audit.supervisor === user.displayName ||
-                    audit.supervisor === user.username;
+                    audit.supervisorId === user.id ||
+                    teamStr.includes(user.id);
             }
 
             if (!hasAccess) throw new ForbiddenException('Bu denetime erişim yetkiniz yok.');
@@ -426,10 +422,25 @@ export class AuditService {
         };
 
         if (updateData.status && updateData.status !== audit.status) {
+            if (!updateData.statusJustification && !this.isAdmin(user)) {
+                throw new Error('Statü değişikliği yaparken gerekçe belirtilmesi (statusJustification) zorunludur.');
+            }
+            
             const allowedTargets = VALID_TRANSITIONS[audit.status] || [];
             if (!allowedTargets.includes(updateData.status) && !this.isAdmin(user)) {
-                throw new Error(`Geçersiz durum geçişi: \"${audit.status}\" → \"${updateData.status}\" geçişine izin verilmiyor. İzin verilen hedefler: ${allowedTargets.join(', ')}`);
+                throw new Error(`Geçersiz durum geçişi: "${audit.status}" → "${updateData.status}" geçişine izin verilmiyor. İzin verilen hedefler: ${allowedTargets.join(', ')}`);
             }
+
+            // Log statü değişikliği
+            await this.auditLogService.createLog({ 
+                user: user.displayName || user.username,
+                action: 'Denetim Statüsü Değiştirildi',
+                details: `Denetim statüsü "${audit.status}" durumundan "${updateData.status}" durumuna alındı. Gerekçe: "${updateData.statusJustification || 'Yönetici İnisiyatifi'}"`,
+                targetType: 'Audit',
+                targetId: id,
+                changeData: { oldStatus: audit.status, newStatus: updateData.status }
+            });
+            delete updateData.statusJustification; // Sütun DB'de yoksa çıkart
         }
 
         // --- BUSINESS LOGIC & FLOW VALIDATION ---

@@ -1,7 +1,8 @@
 import { 
     Briefcase, FolderOpen, CheckCircle, AlertTriangle, 
     FileText, Activity, Users, LayoutDashboard,
-    Calendar, PieChart, TrendingUp, Clock, BarChart3
+    Calendar, PieChart, TrendingUp, Clock, BarChart3,
+    Shield, Cpu, Database, Globe
 } from 'lucide-react';
 
 export type EntityType = 
@@ -16,7 +17,12 @@ export type EntityType =
     | 'ACTIVITY' 
     | 'DASHBOARD'
     | 'USER'
-    | 'METRIC';
+    | 'METRIC'
+    | 'SKILL_RISK'
+    | 'SKILL_IT'
+    | 'SKILL_FINANCE'
+    | 'SKILL_DATA'
+    | 'SKILL_REPORT';
 
 export type EntityColor = 'primary' | 'emerald' | 'indigo' | 'orange' | 'purple' | 'blue' | 'red' | 'slate' | 'cyan';
 
@@ -38,7 +44,12 @@ export const ENTITY_CONFIG: Record<EntityType, EntityConfig> = {
     ACTIVITY: { icon: Activity, color: 'slate', label: 'Aktivite' },
     DASHBOARD: { icon: LayoutDashboard, color: 'primary', label: 'Panel' },
     USER: { icon: Users, color: 'cyan', label: 'Kullanıcı' },
-    METRIC: { icon: BarChart3, color: 'primary', label: 'Metrik' }
+    METRIC: { icon: BarChart3, color: 'primary', label: 'Metrik' },
+    SKILL_RISK: { icon: Shield, color: 'indigo', label: 'Risk Yönetimi' },
+    SKILL_IT: { icon: Cpu, color: 'cyan', label: 'Bilgi Sistemleri' },
+    SKILL_FINANCE: { icon: BarChart3, color: 'emerald', label: 'Finansal Denetim' },
+    SKILL_DATA: { icon: Database, color: 'orange', label: 'Veri Analitiği' },
+    SKILL_REPORT: { icon: Globe, color: 'purple', label: 'Raporlama' }
 };
 
 export const getColorClasses = (color: EntityColor) => {

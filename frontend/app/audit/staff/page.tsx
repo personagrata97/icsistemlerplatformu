@@ -36,10 +36,11 @@ import TrainingModal from '@/components/audit/staff/modals/TrainingModal';
 import PromotionModal from '@/components/audit/staff/modals/PromotionModal';
 import BulkTrainingModal from '@/components/audit/staff/modals/BulkTrainingModal';
 import FormInput from "@/components/ui/FormInput";
+import FormTextarea from "@/components/ui/FormTextarea";
 import DatePicker from "@/components/ui/DatePicker";
 
 const TITLES = ['Müfettiş Yardımcısı', 'Yetkili Müfettiş Yardımcısı', 'Müfettiş', 'Kıdemli Müfettiş', 'Başmüfettiş', 'Teftiş Kurulu Müdürü'];
-const ROLES = ['Sistem Yöneticisi', 'Teftiş Kurulu Müdürü', 'Müfettiş', 'İzleyici'];
+const STAFF_ROLES = ['Sistem Yöneticisi', 'Teftiş Kurulu Müdürü', 'Müfettiş', 'İzleyici'];
 const MANAGER_ROLES = ['ADMIN', 'AUDIT_ADMIN', 'AUDIT_MANAGER', 'MANAGER', 'Teftiş Kurulu Müdürü', 'SYSTEM_ADMIN', 'Admin', 'Yönetici'];
 const REASON_OPTIONS = [
     { value: 'Sehven Oluşturuldu', label: 'Sehven Oluşturuldu' },
@@ -49,7 +50,6 @@ const REASON_OPTIONS = [
     { value: 'Diğer', label: 'Diğer' }
 ];
 
-// Fotoğraf URL yardımcısı
 const getPhotoUrl = (url?: string) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
@@ -58,23 +58,61 @@ const getPhotoUrl = (url?: string) => {
     return `${origin}${url}`;
 };
 
+// Alt kırılımlı ve Teftiş/Yönetim Kurulu hariç departman listesi oluşturan yardımcı fonksiyon
+const getNestedDepartmentOptions = () => {
+    const options: { value: string, label: string }[] = [];
+    const flatten = (nodes: any[], depth = 0) => {
+        nodes.forEach(node => {
+            // Teftiş Kurulu Müdürlüğü'nü ve olası alt birimlerini listeden tamamen çıkarıyoruz
+            if (node.id === 'TEFTIS_KURULU' || node.title === 'Teftiş Kurulu Müdürlüğü') return;
+
+            // Yönetim Kurulu ve Genel Müdür başlıklarına doğrudan atama yapılamaz, bu yüzden listede göstermiyoruz
+            // Ancak altlarındaki departmanları işlemeye devam ediyoruz
+            const isRootNode = node.id === 'YK' || node.id === 'GM' || node.title === 'Yönetim Kurulu' || node.title === 'Genel Müdür';
+
+            if (!isRootNode) {
+                // Kök düğümleri (YK ve GM) atladığımız için görsel derinliği 1 kademe geri çekiyoruz
+                const visualDepth = depth > 0 ? depth - 1 : 0;
+                const indent = Array(visualDepth).fill('\u00A0\u00A0\u00A0\u00A0').join('');
+                const prefix = visualDepth > 0 ? '↳ ' : '';
+                options.push({
+                    value: node.title,
+                    label: `${indent}${prefix}${node.title}`
+                });
+            }
+            
+            if (node.children) {
+                flatten(node.children, depth + 1);
+            }
+        });
+    };
+    flatten(HIERARCHY);
+    return options;
+};
+
 export default function AuditStaffPage() {
     const router = useRouter();
     const { hasRole, user } = useAuth();
-    const canManage = MANAGER_ROLES.some(role => hasRole(role));
+    const MANAGER_ROLES_LOWER = [
+        'admin', 'audit_admin', 'audit_manager', 'manager', 'cae',
+        'teftiş kurulu başkanı', 'başkan', 'teftiş kurulu müdürü', 'müdür',
+        'system_admin', 'yönetici'
+    ];
+    const userRoleStr = (user?.role || '').toLowerCase();
+    const canManage = MANAGER_ROLES_LOWER.includes(userRoleStr) || checkRole(hasRole, ROLES.STAFF_MANAGER);
     const { showToast } = useToast();
     const [staffList, setStaffList] = useState<AuditStaff[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStaff, setEditingStaff] = useState<AuditStaff | null>(null);
+    const isEditingSelf = Boolean(user && editingStaff && user.id === editingStaff.id);
+    const canEditStaff = canManage || isEditingSelf;
     const [isViewMode, setIsViewMode] = useState(false);
     const [selectedStaffForResume, setSelectedStaffForResume] = useState<AuditStaff | null>(null);
     const [creationReason, setCreationReason] = useState('');
     const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('general');
-
-    // modalRef kaldırıldı — DOM öğesine bağlanmadığı için her tıklamada modal kapanıyordu
 
     // İlk veri yükleme
     useEffect(() => {
@@ -342,10 +380,6 @@ export default function AuditStaffPage() {
     // Terfi düzenleme/silme işlemleri
     const [editingPromotion, setEditingPromotion] = useState<any>(null);
 
-
-
-
-
     useEffect(() => {
         if (isModalOpen) {
             setActiveTab('general'); // İlk sekmeye dön
@@ -475,9 +509,6 @@ export default function AuditStaffPage() {
             setLoading(false);
         }
     };
-
-
-
 
     const handleExperienceSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -874,7 +905,7 @@ export default function AuditStaffPage() {
     };
 
     const resetFilters = () => {
-        setFilters({ title: [], status: [], hireYear: [] });
+        setFilters({ title: [], status: [], hireYear: [], certifications: [], skills: [] });
         setSearchTerm('');
     };
 
@@ -899,7 +930,25 @@ export default function AuditStaffPage() {
         const staffHireYear = staff.hireDate ? new Date(staff.hireDate).getFullYear().toString() : '';
         const matchesHireYear = filters.hireYear.length === 0 || filters.hireYear.includes(staffHireYear);
 
-        return matchesSearch && matchesTitle && matchesStatus && matchesHireYear;
+        const staffCerts = Array.isArray(staff.certifications) 
+            ? staff.certifications.map(c => typeof c === 'object' ? c.value || c.label : c) 
+            : (typeof staff.certifications === 'string' && staff.certifications.trim() !== ''
+                ? (staff.certifications.startsWith('[') 
+                    ? (() => { try { return JSON.parse(staff.certifications).map((c:any) => typeof c === 'object' ? c.value || c.label : c); } catch { return []; } })()
+                    : staff.certifications.split(',').map(c => c.trim()))
+                : []);
+        const matchesCerts = !filters.certifications || filters.certifications.length === 0 || filters.certifications.some(c => staffCerts.includes(c));
+
+        const staffSkills = Array.isArray(staff.skills) 
+            ? staff.skills.map(c => typeof c === 'object' ? c.value || c.label : c) 
+            : (typeof staff.skills === 'string' && staff.skills.trim() !== ''
+                ? (staff.skills.startsWith('[') 
+                    ? (() => { try { return JSON.parse(staff.skills).map((c:any) => typeof c === 'object' ? c.value || c.label : c); } catch { return []; } })()
+                    : staff.skills.split(',').map(c => c.trim()))
+                : []);
+        const matchesSkills = !filters.skills || filters.skills.length === 0 || filters.skills.some(s => staffSkills.includes(s));
+
+        return matchesSearch && matchesTitle && matchesStatus && matchesHireYear && matchesCerts && matchesSkills;
     });
 
     const handleExport = () => {
@@ -919,14 +968,13 @@ export default function AuditStaffPage() {
         <div className="space-y-6">
             <PageHeader title="Denetim Ekibi" subtitle="Personel listesi, yetkinlik matrisi ve kapasite yönetimi" />
             
-            {/* Standart Araç Çubuğu */}
             <PageToolbar
                 searchPlaceholder="İsim, sicil, ünvan veya rol ara..."
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 onRefresh={() => loadStaff(false)}
                 showExportButton={true}
-                onExportClick={() => { auditApi.exportToExcel(staffList, 'Teftiş Kurulu Personeli'); }}
+                onExportClick={() => { auditApi.exportToExcel(filteredStaff, 'Teftiş Kurulu Personeli'); }}
                 showAddButton={canManage}
                 onAddClick={() => {
                     setEditingStaff(null);
@@ -935,10 +983,13 @@ export default function AuditStaffPage() {
                 addButtonText="Yeni Personel Ekle"
                 filters={
                     <FilterDropdown
-                        activeCount={filters.title.length + filters.status.length + filters.hireYear.length}
-                        onClear={() => { setFilters({ title: [], status: [], hireYear: [] }); setSearchTerm(''); }}
+                        activeCount={(filters.title || []).length + (filters.status || []).length + (filters.hireYear || []).length + (filters.certifications || []).length + (filters.skills || []).length}
+                        onClear={() => { setFilters({ title: [], status: [], hireYear: [], certifications: [], skills: [] }); setSearchTerm(''); }}
                     >
                         <CustomSelect label="Ünvan" value={filters.title} onChange={(val) => setFilters({ ...filters, title: val as string[] })} isMulti options={TITLES.map(t => ({ value: t, label: t }))} />
+                        <CustomSelect label="Sertifikalar" value={filters.certifications} onChange={(val) => setFilters({ ...filters, certifications: val as string[] })} isMulti isCreatable options={[
+                            { value: 'Bilgi Sistemleri Bağımsız Denetim', label: 'Bilgi Sis. Bağımsız Denetim (SPL)' }, { value: 'CFE', label: 'CFE' }, { value: 'CIA', label: 'CIA' }, { value: 'CISA', label: 'CISA' }, { value: 'CISM', label: 'CISM' }, { value: 'CPA', label: 'CPA' }, { value: 'CRISC', label: 'CRISC' }, { value: 'CRMA', label: 'CRMA' }, { value: 'ISO 27001', label: 'ISO 27001' }, { value: 'MASAK Uyum Görevlisi', label: 'MASAK Uyum Görevlisi' }, { value: 'SMMM', label: 'SMMM' }, { value: 'SPL Düzey 3', label: 'SPL Düzey 3' }
+                        ]} />
                         <CustomSelect label="İşe Giriş Yılı" value={filters.hireYear} onChange={(val) => setFilters({ ...filters, hireYear: val as string[] })} isMulti options={hireYears.map(y => ({ value: y, label: y }))} />
                         <CustomSelect label="Durum" value={filters.status} onChange={(val) => setFilters({ ...filters, status: val as string[] })} isMulti options={[{ value: "Aktif", label: "Aktif" }, { value: "İzinli", label: "İzinli" }, { value: "Pasif", label: "Pasif" }]} />
                     </FilterDropdown>
@@ -968,10 +1019,6 @@ export default function AuditStaffPage() {
                 }
             />
 
-
-
-
-            {/* Personel Tablosu */}
             <DataTable
                 columns={[
                     {
@@ -1044,7 +1091,10 @@ export default function AuditStaffPage() {
                         align: 'center',
                         render: (staff: AuditStaff) => (
                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                <ActionMenu items={[{ label: 'Detayı İncele', icon: Eye, onClick: () => openModal(staff, true) }]} />
+                                <ActionMenu items={[
+                                    { label: 'Detayı İncele', icon: Eye, onClick: () => openModal(staff, true) },
+                                    ...(canManage || user?.id === staff.id ? [{ label: 'Düzenle', icon: Edit2, onClick: () => openModal(staff, false) }] : [])
+                                ]} />
                             </div>
                         )
                     }
@@ -1062,7 +1112,7 @@ export default function AuditStaffPage() {
                 searchTerm={searchTerm}
                 onClearFilters={() => {
                     setSearchTerm('');
-                    setFilters({ title: [], role: [], status: [] });
+                    setFilters({ title: [], status: [], hireYear: [] });
                 }}
             />
 
@@ -1087,23 +1137,23 @@ export default function AuditStaffPage() {
                 footer={isViewMode ? (
                     <div className="flex justify-between w-full">
                         <div className="flex gap-2">
-                            <Button variant="danger" onClick={() => { setIsModalOpen(false); handleDeleteClick(editingStaff?.id || ''); }}>
-                                Sil
-                            </Button>
+                            {canManage && (
+                                <Button variant="danger" onClick={() => { setIsModalOpen(false); handleDeleteClick(editingStaff?.id || ''); }}>
+                                    Sil
+                                </Button>
+                            )}
                         </div>
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => { if(editingStaff) handleResumeClick(editingStaff); }}>
                                 Özgeçmiş
                             </Button>
-                            <Button variant="secondary" onClick={() => { setIsViewMode(false); }}>
-                                Düzenle
-                            </Button>
+                            {canEditStaff && <Button variant="secondary" onClick={() => setIsViewMode(false)}>Düzenle</Button>}
                             <Button variant="primary" onClick={() => setIsModalOpen(false)}>
                                 Kapat
                             </Button>
                         </div>
                     </div>
-                ) : activeTab === 'general' ? (
+                ) : (
                     <div className="flex justify-end gap-3 w-full">
                         <Button
                             variant="secondary"
@@ -1119,16 +1169,6 @@ export default function AuditStaffPage() {
                             isLoading={loading}
                         >
                             {editingStaff ? 'Güncelle' : 'Kaydet'}
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="flex justify-end gap-3 w-full">
-                        <Button
-                            variant="secondary"
-                            onClick={() => setIsModalOpen(false)}
-                            disabled={loading}
-                        >
-                            Kapat
                         </Button>
                     </div>
                 )}
@@ -1194,7 +1234,7 @@ export default function AuditStaffPage() {
                                             value={formData.employeeId || ''}
                                             onChange={e => setFormData({ ...formData, employeeId: e.target.value })}
                                             required
-                                            disabled={isViewMode}
+                                            disabled={isViewMode || !canManage}
                                             placeholder="S12345"
                                         />
                                     </div>
@@ -1202,20 +1242,19 @@ export default function AuditStaffPage() {
 
                                 <div className="flex-1 space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
-                                        <FormInput label="Ad" name="firstName" type="text" value={formData.firstName || ''} onChange={e => setFormData({ ...formData, firstName: e.target.value })} required disabled={isViewMode} />
-                                        <FormInput label="Soyad" name="lastName" type="text" value={formData.lastName || ''} onChange={e => setFormData({ ...formData, lastName: e.target.value })} required disabled={isViewMode} />
+                                        <FormInput label="Ad" name="firstName" type="text" value={formData.firstName || ''} onChange={e => setFormData({ ...formData, firstName: e.target.value })} required disabled={isViewMode || !canEditStaff} />
+                                        <FormInput label="Soyad" name="lastName" type="text" value={formData.lastName || ''} onChange={e => setFormData({ ...formData, lastName: e.target.value })} required disabled={isViewMode || !canEditStaff} />
                                     </div>
-                                    <FormInput label="E-posta" name="email" type="email" value={formData.email || ''} onChange={e => setFormData({ ...formData, email: e.target.value })} required disabled={isViewMode} />
+                                    <FormInput label="E-posta" name="email" type="email" value={formData.email || ''} onChange={e => setFormData({ ...formData, email: e.target.value })} required disabled={isViewMode || !canManage} />
 
-                                    {/* Telefon ve İşe Giriş Tarihi */}
                                     <div className="grid grid-cols-2 gap-4">
-                                        <FormInput label="Telefon" name="phone" type="tel" value={formData.phone || ''} onChange={e => setFormData({ ...formData, phone: e.target.value })} disabled={isViewMode} />
+                                        <FormInput label="Telefon" name="phone" type="tel" value={formData.phone || ''} onChange={e => setFormData({ ...formData, phone: e.target.value })} disabled={isViewMode || !canEditStaff} />
                                         <div className="form-group">
                                             <label className="form-label">İşe Giriş Tarihi</label>
                                             <DatePicker 
                                                 value={formData.hireDate || ''} 
                                                 onChange={(val) => setFormData({ ...formData, hireDate: val })} 
-                                                disabled={isViewMode} 
+                                                disabled={isViewMode || !canManage} 
                                             />
                                         </div>
                                     </div>
@@ -1227,7 +1266,7 @@ export default function AuditStaffPage() {
                                                 value={formData.title}
                                                 onChange={val => setFormData({ ...formData, title: val })}
                                                 options={TITLES.map(t => ({ value: t, label: t }))}
-                                                disabled={isViewMode}
+                                                disabled={isViewMode || !canManage}
                                                 placeholder="Seçiniz..."
                                             />
                                         </div>
@@ -1236,8 +1275,8 @@ export default function AuditStaffPage() {
                                             <CustomSelect
                                                 value={formData.role}
                                                 onChange={val => setFormData({ ...formData, role: val })}
-                                                options={ROLES.map(r => ({ value: r, label: r }))}
-                                                disabled={isViewMode}
+                                                options={STAFF_ROLES.map(r => ({ value: r, label: r }))}
+                                                disabled={isViewMode || !canManage}
                                                 placeholder="Seçiniz..."
                                             />
                                         </div>
@@ -1253,13 +1292,12 @@ export default function AuditStaffPage() {
                                                 { value: "İzinli", label: "İzinli" },
                                                 { value: "Pasif", label: "Pasif" }
                                             ]}
-                                            disabled={isViewMode}
+                                            disabled={isViewMode || !canManage}
                                         />
                                     </div>
                                 </div>
                             </div>
-
-
+                            
                             {formData.status === 'Pasif' && (
                                 <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
                                     <div className="form-group">
@@ -1273,87 +1311,74 @@ export default function AuditStaffPage() {
                                                 { value: "Emeklilik", label: "Emeklilik" },
                                                 { value: "Diğer", label: "Diğer" }
                                             ]}
-                                            disabled={isViewMode}
+                                            disabled={isViewMode || !canManage}
                                         />
                                     </div>
 
                                     {formData.passiveReason === 'Geçici Görevlendirme' && (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                                        <div className="space-y-4 animate-in slide-in-from-top-2 duration-200 pt-2">
                                             <div className="form-group">
-                                                <label className="form-label">Görevlendirilen Üst Birim</label>
+                                                <label className="form-label">Görevlendirildiği Birim</label>
                                                 <CustomSelect
-                                                    value={selectedParentDept}
-                                                    onChange={(val) => {
-                                                        setSelectedParentDept(val as string);
-                                                        setFormData({ ...formData, temporaryDepartment: '' });
-                                                    }}
-                                                    options={HIERARCHY.flatMap(group =>
-                                                        group.children.map(child => ({
-                                                            value: child.title,
-                                                            label: `${group.title} > ${child.title}`
-                                                        }))
-                                                    )}
-                                                    placeholder="Grup seçiniz..."
-                                                    disabled={isViewMode}
+                                                    value={formData.temporaryUnit || ''}
+                                                    onChange={(val) => setFormData({ ...formData, temporaryUnit: val as string })}
+                                                    options={getNestedDepartmentOptions()}
+                                                    disabled={isViewMode || !canManage}
+                                                    placeholder="Birim Seçiniz"
                                                 />
                                             </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="form-group">
+                                                    <label className="form-label">Başlangıç Tarihi</label>
+                                                    <DatePicker
+                                                        value={formData.temporaryStartDate || ''}
+                                                        onChange={(val) => setFormData({ ...formData, temporaryStartDate: val })}
+                                                        disabled={isViewMode || !canManage}
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="form-label">Bitiş Tarihi</label>
+                                                    <DatePicker
+                                                        value={formData.temporaryEndDate || ''}
+                                                        onChange={(val) => setFormData({ ...formData, temporaryEndDate: val })}
+                                                        disabled={isViewMode || !canManage}
+                                                    />
+                                                </div>
+                                            </div>
                                             <div className="form-group">
-                                                <label className="form-label">Görevlendirilen Alt Birim</label>
-                                                <CustomSelect
-                                                    value={formData.temporaryDepartment || ''}
-                                                    onChange={(val) => setFormData({ ...formData, temporaryDepartment: val as string })}
-                                                    options={(function () {
-                                                        const flatten = (items: any[], level: number = 0): any[] => {
-                                                            return items.flatMap(item => {
-                                                                const current = {
-                                                                    value: item.title,
-                                                                    label: (level > 0 ? '→ '.repeat(level) + ' ' : '') + item.title
-                                                                };
-                                                                if (item.children) {
-                                                                    return [current, ...flatten(item.children, level + 1)];
-                                                                }
-                                                                return [current];
-                                                            });
-                                                        };
+                                                <FormTextarea
+                                                    label="Görevlendirme Detayı ve Açıklamalar"
+                                                    value={formData.temporaryAssignmentDetails || ''}
+                                                    onChange={(e) => setFormData({ ...formData, temporaryAssignmentDetails: e.target.value })}
+                                                    disabled={isViewMode || !canManage}
+                                                    placeholder="Örn: Kredi Tahsis Birimi'ne Kıdemli Uzman ünvanıyla, süreç optimizasyonu projesine destek amacıyla 6 aylığına görevlendirilmiştir."
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
 
-                                                        for (const group of HIERARCHY) {
-                                                            const child = group.children.find(c => c.title === selectedParentDept);
-                                                            if (child && 'children' in child) {
-                                                                return flatten((child as any).children);
-                                                            }
-                                                        }
-                                                        return DEPARTMENTS.map(d => ({ value: d, label: d }));
-                                                    })()}
-                                                    placeholder="Alt birim seçiniz..."
-                                                    disabled={isViewMode || !selectedParentDept}
-                                                />
-                                            </div>
+                                    {formData.passiveReason === 'Diğer' && (
+                                        <div className="form-group animate-in slide-in-from-top-2 duration-200 pt-2">
+                                            <FormTextarea
+                                                label="Lütfen 'Diğer' nedenini açıklayınız"
+                                                value={formData.otherPassiveReasonDetails || ''}
+                                                onChange={(e) => setFormData({ ...formData, otherPassiveReasonDetails: e.target.value })}
+                                                disabled={isViewMode || !canManage}
+                                                required
+                                            />
                                         </div>
                                     )}
                                 </div>
                             )}
 
-
-
                             <div className="form-group">
-                                <label className="form-label">Özet</label>
-                                <textarea
-                                    className="form-input min-h-[100px]"
+                                <FormTextarea
+                                    label="Özet"
+                                    className="min-h-[100px]"
                                     value={formData.summary || ''}
                                     onChange={e => setFormData({ ...formData, summary: e.target.value })}
-                                    placeholder="Personelin uzmanlık alanları ve kısa özeti..."
-                                    disabled={isViewMode}
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">İş Tanımı</label>
-                                <textarea
-                                    className="form-input min-h-[100px]"
-                                    value={formData.jobDescription || ''}
-                                    onChange={e => setFormData({ ...formData, jobDescription: e.target.value })}
-                                    placeholder="Müfettiş/Yönetici olarak görev ve sorumluluklarınızı detaylıca giriniz..."
-                                    disabled={isViewMode}
+                                    disabled={isViewMode || !canEditStaff}
+                                    placeholder="Personel hakkında genel özet bilgisi..."
                                 />
                             </div>
 
@@ -1363,93 +1388,130 @@ export default function AuditStaffPage() {
                                         label="Sertifikalar"
                                         isMulti={true}
                                         isCreatable={true}
-                                        showSearch={true}
-                                        disabled={isViewMode}
-                                        value={formData.certifications ? (typeof formData.certifications === 'string' && formData.certifications.startsWith('[') ? JSON.parse(formData.certifications) : formData.certifications.split(',').map((c: string) => c.trim()).filter(Boolean)) : []}
+                                        disabled={isViewMode || !canEditStaff}
+                                        value={(() => {
+                                            const raw = formData.certifications;
+                                            if (!raw) return [];
+                                            let parsed = Array.isArray(raw) ? raw : [];
+                                            if (typeof raw === 'string' && raw.trim() !== '') {
+                                                if (raw.startsWith('[')) {
+                                                    try { parsed = JSON.parse(raw); } catch(e) {}
+                                                } else {
+                                                    parsed = raw.split(',').map(c => c.trim()).filter(Boolean);
+                                                }
+                                            }
+                                            return parsed.map((c: any) => typeof c === 'object' ? (c.value || c.label || '') : c).filter(Boolean);
+                                        })()}
                                         onChange={(val) => setFormData({ ...formData, certifications: Array.isArray(val) ? val.join(', ') : val })}
                                         options={[
-                                            { value: 'CISA', label: 'CISA' },
-                                            { value: 'CIA', label: 'CIA' },
-                                            { value: 'CFE', label: 'CFE' },
-                                            { value: 'CPA', label: 'CPA' },
-                                            { value: 'SMMM', label: 'SMMM' },
-                                            { value: 'CRMA', label: 'CRMA' },
-                                            { value: 'CGAP', label: 'CGAP' },
-                                            { value: 'CISM', label: 'CISM' },
-                                            { value: 'CRISC', label: 'CRISC' },
-                                            { value: 'ISO 27001', label: 'ISO 27001' },
-                                            { value: 'ISO 9001', label: 'ISO 9001' },
-                                            { value: 'ITIL', label: 'ITIL' }
+                                            { value: 'Bilgi Sistemleri Bağımsız Denetim', label: 'Bilgi Sistemleri Bağımsız Denetim (SPL)' },
+                                            { value: 'CFE', label: 'CFE (Certified Fraud Examiner)' },
+                                            { value: 'CIA', label: 'CIA (Certified Internal Auditor)' },
+                                            { value: 'CISA', label: 'CISA (Certified Information Systems Auditor)' },
+                                            { value: 'CISM', label: 'CISM (Certified Information Security Manager)' },
+                                            { value: 'CPA', label: 'CPA (Certified Public Accountant)' },
+                                            { value: 'CRISC', label: 'CRISC (Risk and Information Systems Control)' },
+                                            { value: 'CRMA', label: 'CRMA (Risk Management Assurance)' },
+                                            { value: 'ISO 27001', label: 'ISO 27001 Baş Denetçi' },
+                                            { value: 'MASAK Uyum Görevlisi', label: 'MASAK Uyum Görevlisi' },
+                                            { value: 'SMMM', label: 'SMMM (Serbest Muhasebeci Mali Müşavir)' },
+                                            { value: 'SPL Düzey 3', label: 'SPL Düzey 3' }
                                         ]}
                                     />
                                 </div>
                                 <div className="form-group">
                                     <CustomSelect
-                                        label="Yetenekler & Uzmanlık Alanları"
+                                        label="Yabancı Dil(ler) ve Seviyesi"
                                         isMulti={true}
                                         isCreatable={true}
-                                        showSearch={true}
-                                        disabled={isViewMode}
-                                        value={formData.skills ? (typeof formData.skills === 'string' && formData.skills.startsWith('[') ? JSON.parse(formData.skills) : formData.skills.split(',').map((c: string) => c.trim()).filter(Boolean)) : []}
-                                        onChange={(val) => setFormData({ ...formData, skills: Array.isArray(val) ? val.join(', ') : val })}
+                                        disabled={isViewMode || !canEditStaff}
+                                        value={(() => {
+                                            const raw = formData.languages;
+                                            if (!raw) return [];
+                                            let parsed = Array.isArray(raw) ? raw : [];
+                                            if (typeof raw === 'string' && raw.trim() !== '') {
+                                                if (raw.startsWith('[')) {
+                                                    try { parsed = JSON.parse(raw); } catch(e) {}
+                                                } else {
+                                                    parsed = raw.split(',').map((l: string) => l.trim()).filter(Boolean);
+                                                }
+                                            }
+                                            return parsed.map((l: any) => typeof l === 'object' ? (l.value || l.label || '') : l).filter(Boolean);
+                                        })()}
+                                        onChange={(val) => {
+                                            if (Array.isArray(val)) {
+                                                // Akıllı çatışma önleme: Aynı dilin iki farklı seviyesi seçilemez.
+                                                // Son seçilen seviye, o dilin önceki seviyesini ezer.
+                                                const languageMap = new Map<string, string>();
+                                                val.forEach(item => {
+                                                    const langName = item.split(' - ')[0].trim();
+                                                    languageMap.set(langName, item);
+                                                });
+                                                const finalValues = Array.from(languageMap.values());
+                                                setFormData({ ...formData, languages: finalValues.join(', ') });
+                                            } else {
+                                                setFormData({ ...formData, languages: val as string });
+                                            }
+                                        }}
                                         options={[
-                                            { value: 'Python', label: 'Python' },
-                                            { value: 'SQL', label: 'SQL' },
-                                            { value: 'Veri Analitiği', label: 'Veri Analitiği' },
-                                            { value: 'Power BI', label: 'Power BI' },
-                                            { value: 'Tableau', label: 'Tableau' },
-                                            { value: 'İleri Excel', label: 'İleri Excel' },
-                                            { value: 'COBIT', label: 'COBIT' },
-                                            { value: 'COSO', label: 'COSO' },
-                                            { value: 'IFRS', label: 'IFRS' },
-                                            { value: 'VUK', label: 'VUK' },
-                                            { value: 'UFRS', label: 'UFRS' },
-                                            { value: 'Siber Güvenlik', label: 'Siber Güvenlik' },
-                                            { value: 'Sızma Testi', label: 'Sızma Testi' },
-                                            { value: 'Çevik Denetim', label: 'Çevik Denetim' },
-                                            { value: 'Raporlama', label: 'Raporlama' },
-                                            { value: 'Sunum Teknikleri', label: 'Sunum Teknikleri' }
+                                            { value: 'İngilizce - İleri (C1/C2)', label: 'İngilizce - İleri (C1/C2)' },
+                                            { value: 'İngilizce - Orta (B1/B2)', label: 'İngilizce - Orta (B1/B2)' },
+                                            { value: 'İngilizce - Temel (A1/A2)', label: 'İngilizce - Temel (A1/A2)' },
+                                            { value: 'Almanca - İleri (C1/C2)', label: 'Almanca - İleri (C1/C2)' },
+                                            { value: 'Almanca - Orta (B1/B2)', label: 'Almanca - Orta (B1/B2)' },
+                                            { value: 'Fransızca - İleri (C1/C2)', label: 'Fransızca - İleri (C1/C2)' },
+                                            { value: 'Rusça - İleri (C1/C2)', label: 'Rusça - İleri (C1/C2)' },
+                                            { value: 'Arapça - İleri (C1/C2)', label: 'Arapça - İleri (C1/C2)' }
                                         ]}
+                                        placeholder="Dil ve seviye seçiniz..."
                                     />
                                 </div>
                             </div>
-
+                            
+                            <div className="form-group">
+                                <label className="form-label">Yetkinlikler</label>
+                                <div className="p-3 bg-primary/5 border border-primary/20 rounded-xl flex flex-col gap-2 min-h-[42px] justify-center transition-colors">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Shield className="text-primary" size={16} />
+                                            <span className="text-sm text-primary font-medium">
+                                                Yetkinlikler, <span className="font-bold border-b border-primary/30 cursor-pointer hover:border-primary transition-colors" onClick={() => { setIsModalOpen(false); router.push('/audit/staff/skills'); }}>Yetkinlik Matrisi</span> üzerinden takip edilmektedir.
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
 
-                    {/* Kariyer Geçmişi Sekmesi */}
                     {activeTab === 'career' && editingStaff && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                            <div className="flex justify-between items-center mb-6">
+                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                            {/* Başlık ve Buton */}
+                            <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                                        <History size={18} className="text-primary" />
-                                        Kariyer ve Terfi Geçmişi
+                                    <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                                        <TrendingUp size={18} className="text-primary" /> Kariyer Geçmişi
                                     </h3>
-                                    <p className="text-xs text-gray-500">Personelin kurum içi ünvan ve görev değişimleri.</p>
+                                    <p className="text-xs text-gray-500">Terfi, atama ve kurum içi görev değişiklikleri.</p>
                                 </div>
                                 {!isViewMode && canManage && (
                                     <Button
-                                        variant="secondary"
+                                        variant="primary"
                                         size="sm"
                                         onClick={() => openPromotionModal()}
                                     >
-                                        <TrendingUp size={14} className="mr-1.5" /> Terfi Ekle
+                                        <Plus size={14} className="mr-1.5" /> Kariyer Kaydı Ekle
                                     </Button>
                                 )}
                             </div>
 
-                            <div className="relative pl-8 border-l-2 border-gray-100 ml-4 space-y-8">
-                                {/* Mevcut Ünvan Dönemi */}
+                            <div className="relative pl-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-100 space-y-8">
+                                {/* Mevcut Ünvan */}
                                 <div className="relative">
-                                    <div className="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center ring-4 ring-white shadow-sm">
-                                        <div className="w-3 h-3 rounded-full bg-primary"></div>
-                                    </div>
-                                    <div className="bg-white p-4 rounded-xl border-2 border-primary/20 shadow-sm relative overflow-hidden group hover:border-primary/40 transition-colors">
-                                        <div className="absolute top-0 right-0 p-2 opacity-10">
-                                            {/* TrendingUp ikonu kaldırıldı — karışıklığa yol açıyordu */}
-                                        </div>
-                                        <div className="flex justify-between items-start mb-2">
+                                    <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-primary ring-4 ring-white shadow-sm"></div>
+                                    <div className="bg-white p-4 rounded-xl border border-primary/20 shadow-sm relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16"></div>
+                                        <div className="flex justify-between items-start relative z-10">
                                             <div>
                                                 <div className="text-xs font-bold text-primary uppercase tracking-wider">Mevcut Ünvan</div>
                                                 <div className="text-xl font-bold text-gray-900 mt-1">{editingStaff.title}</div>
@@ -1518,7 +1580,7 @@ export default function AuditStaffPage() {
                                                             {promo.endDate && ` - ${formatDate(promo.endDate)}`}
                                                         </span>
                                                     </div>
-                                                    {!isViewMode && (
+                                                    {!isViewMode && canManage && (
                                                         <div className="flex gap-2">
                                                             <ActionMenu items={[
                                                                 { label: 'Düzenle', icon: Edit2, onClick: () => openPromotionModal(promo) },
@@ -1615,26 +1677,30 @@ export default function AuditStaffPage() {
                                         <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div className="flex-1">
-                                                    <h5 className="font-bold text-sm text-gray-900">1. Finansal İlişki / Çıkar Çatışması</h5>
+                                                    <div className="flex items-center gap-2">
+                                                        <h5 className="font-bold text-sm text-gray-900">1. Finansal İlişki / Çıkar Çatışması</h5>
+                                                        <Tooltip content="Borsa İstanbul'daki halka açık hisse senetleri ve yatırım fonları kapsam dışıdır.">
+                                                            <AlertCircle size={14} className="text-gray-400 cursor-help" />
+                                                        </Tooltip>
+                                                    </div>
                                                     <p className="text-xs text-gray-500 mt-1">
                                                         Denetlenen/denetlenecek birimlerde kendimin veya birinci derece yakınlarımın doğrudan/dolaylı finansal çıkarı, pay sahipliği veya ticari ortaklığı bulunmamaktadır.
                                                     </p>
                                                 </div>
-                                                <div className="flex items-center gap-2 shrink-0">
-                                                    <span className="text-xs font-semibold text-gray-500">İstisna Var mı?</span>
-                                                    <input 
-                                                        type="checkbox"
-                                                        className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                                                <div className="flex items-center shrink-0">
+                                                    <Checkbox 
+                                                        id="hasFinancialLink"
+                                                        label="İstisna Bildir"
                                                         checked={declarationForm.hasFinancialLink}
-                                                        onChange={(e) => setDeclarationForm({ ...declarationForm, hasFinancialLink: e.target.checked })}
+                                                        onChange={(checked) => setDeclarationForm({ ...declarationForm, hasFinancialLink: checked })}
                                                     />
                                                 </div>
                                             </div>
                                             {declarationForm.hasFinancialLink && (
-                                                <div className="animate-in slide-in-from-top-2 duration-200">
-                                                    <label className="form-label text-xs font-semibold text-red-600">Lütfen İlişki ve Çıkar Detaylarını Giriniz:</label>
-                                                    <textarea 
-                                                        className="form-input text-sm mt-1 bg-white" 
+                                                <div className="animate-in slide-in-from-top-2 duration-200 mt-3 pt-3 border-t border-slate-100">
+                                                    <FormTextarea 
+                                                        label="Lütfen İlişki ve Çıkar Detaylarını Giriniz:"
+                                                        className="text-sm bg-white" 
                                                         rows={2} 
                                                         placeholder="Örn: X A.Ş.'de eşimin %5 hisse ortaklığı bulunmaktadır..."
                                                         value={declarationForm.financialDetails}
@@ -1649,26 +1715,30 @@ export default function AuditStaffPage() {
                                         <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div className="flex-1">
-                                                    <h5 className="font-bold text-sm text-gray-900">2. Aile / Yakınlık İlişkisi</h5>
+                                                    <div className="flex items-center gap-2">
+                                                        <h5 className="font-bold text-sm text-gray-900">2. Aile / Yakınlık İlişkisi</h5>
+                                                        <Tooltip content="Birinci derece: Anne, baba, eş, çocuk. İkinci derece: Kardeş, büyükanne/baba, torun.">
+                                                            <AlertCircle size={14} className="text-gray-400 cursor-help" />
+                                                        </Tooltip>
+                                                    </div>
                                                     <p className="text-xs text-gray-500 mt-1">
                                                         Denetlenen/denetlenecek birimlerde veya bu birimlerin bağlı olduğu karar organlarında birinci veya ikinci derece akrabalarım üst düzey yönetici veya imza yetkilisi pozisyonunda çalışmamaktadır.
                                                     </p>
                                                 </div>
-                                                <div className="flex items-center gap-2 shrink-0">
-                                                    <span className="text-xs font-semibold text-gray-500">İstisna Var mı?</span>
-                                                    <input 
-                                                        type="checkbox"
-                                                        className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                                                <div className="flex items-center shrink-0">
+                                                    <Checkbox 
+                                                        id="hasFamilyLink"
+                                                        label="İstisna Bildir"
                                                         checked={declarationForm.hasFamilyLink}
-                                                        onChange={(e) => setDeclarationForm({ ...declarationForm, hasFamilyLink: e.target.checked })}
+                                                        onChange={(checked) => setDeclarationForm({ ...declarationForm, hasFamilyLink: checked })}
                                                     />
                                                 </div>
                                             </div>
                                             {declarationForm.hasFamilyLink && (
-                                                <div className="animate-in slide-in-from-top-2 duration-200">
-                                                    <label className="form-label text-xs font-semibold text-red-600">Lütfen Akrabalık ve Pozisyon Detaylarını Giriniz:</label>
-                                                    <textarea 
-                                                        className="form-input text-sm mt-1 bg-white" 
+                                                <div className="animate-in slide-in-from-top-2 duration-200 mt-3 pt-3 border-t border-slate-100">
+                                                    <FormTextarea 
+                                                        label="Lütfen Akrabalık ve Pozisyon Detaylarını Giriniz:"
+                                                        className="text-sm bg-white" 
                                                         rows={2} 
                                                         placeholder="Örn: X Daire Müdürlüğünde öz ağabeyim birim müdürü olarak görev yapmaktadır..."
                                                         value={declarationForm.familyDetails}
@@ -1688,21 +1758,20 @@ export default function AuditStaffPage() {
                                                         Son 1 yıl (12 ay) içerisinde denetlenen veya denetlenecek birimlerde operasyonel, idari, yönetimsel veya finansal bir görevde bulunmadım.
                                                     </p>
                                                 </div>
-                                                <div className="flex items-center gap-2 shrink-0">
-                                                    <span className="text-xs font-semibold text-gray-500">İstisna Var mı?</span>
-                                                    <input 
-                                                        type="checkbox"
-                                                        className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                                                <div className="flex items-center shrink-0">
+                                                    <Checkbox 
+                                                        id="hasPreviousRole"
+                                                        label="İstisna Bildir"
                                                         checked={declarationForm.hasPreviousRole}
-                                                        onChange={(e) => setDeclarationForm({ ...declarationForm, hasPreviousRole: e.target.checked })}
+                                                        onChange={(checked) => setDeclarationForm({ ...declarationForm, hasPreviousRole: checked })}
                                                     />
                                                 </div>
                                             </div>
                                             {declarationForm.hasPreviousRole && (
-                                                <div className="animate-in slide-in-from-top-2 duration-200">
-                                                    <label className="form-label text-xs font-semibold text-red-600">Lütfen Geçmiş Görev Detaylarını Giriniz:</label>
-                                                    <textarea 
-                                                        className="form-input text-sm mt-1 bg-white" 
+                                                <div className="animate-in slide-in-from-top-2 duration-200 mt-3 pt-3 border-t border-slate-100">
+                                                    <FormTextarea 
+                                                        label="Lütfen Geçmiş Görev Detaylarını Giriniz:"
+                                                        className="text-sm bg-white" 
                                                         rows={2} 
                                                         placeholder="Örn: Son 6 aya kadar Kredi Tahsis Birimi'nde Kıdemli Uzman olarak görev yapmaktaydım..."
                                                         value={declarationForm.previousRoleDetails}
@@ -1722,21 +1791,20 @@ export default function AuditStaffPage() {
                                                         Denetim faaliyetlerimi bağımsız ve tarafsız yürütmemi engelleyecek veya üçüncü şahıslar nezdinde bağımsızlığıma gölge düşürecek herhangi bir durum veya çıkar çatışması bulunmamaktadır.
                                                     </p>
                                                 </div>
-                                                <div className="flex items-center gap-2 shrink-0">
-                                                    <span className="text-xs font-semibold text-gray-500">İstisna Var mı?</span>
-                                                    <input 
-                                                        type="checkbox"
-                                                        className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                                                <div className="flex items-center shrink-0">
+                                                    <Checkbox 
+                                                        id="hasConflict"
+                                                        label="İstisna Bildir"
                                                         checked={declarationForm.hasConflict}
-                                                        onChange={(e) => setDeclarationForm({ ...declarationForm, hasConflict: e.target.checked })}
+                                                        onChange={(checked) => setDeclarationForm({ ...declarationForm, hasConflict: checked })}
                                                     />
                                                 </div>
                                             </div>
                                             {declarationForm.hasConflict && (
-                                                <div className="animate-in slide-in-from-top-2 duration-200">
-                                                    <label className="form-label text-xs font-semibold text-red-600">Lütfen Çıkar Çatışması Detaylarını Giriniz:</label>
-                                                    <textarea 
-                                                        className="form-input text-sm mt-1 bg-white" 
+                                                <div className="animate-in slide-in-from-top-2 duration-200 mt-3 pt-3 border-t border-slate-100">
+                                                    <FormTextarea 
+                                                        label="Lütfen Çıkar Çatışması Detaylarını Giriniz:"
+                                                        className="text-sm bg-white" 
                                                         rows={2} 
                                                         placeholder="Örn: Denetim kapsamındaki X tedarikçi firmasının yönetim kurulu üyesiyle doğrudan yakınlığım vardır..."
                                                         value={declarationForm.conflictDetails}
@@ -1750,17 +1818,17 @@ export default function AuditStaffPage() {
 
                                     {/* TAAHHÜT METNİ VE İMZA */}
                                     <div className="p-4 bg-indigo-50/50 rounded-xl border border-indigo-100/50 space-y-3">
-                                        <div className="flex gap-3 items-start">
-                                            <input 
+                                        <div className="py-2">
+                                            <Checkbox 
                                                 id="agreed-checkbox"
-                                                type="checkbox" 
-                                                className="w-4.5 h-4.5 text-indigo-600 border-indigo-300 rounded focus:ring-indigo-500 mt-1"
                                                 checked={declarationForm.agreedToTerms}
-                                                onChange={(e) => setDeclarationForm({ ...declarationForm, agreedToTerms: e.target.checked })}
+                                                onChange={(checked) => setDeclarationForm({ ...declarationForm, agreedToTerms: checked })}
+                                                label={
+                                                    <span className="text-xs text-indigo-950 font-medium leading-relaxed select-none block mt-0.5">
+                                                        <strong>TAAHHÜTNAMEDİR:</strong> Yukarıda beyan ettiğim bilgilerin doğru, güncel ve eksiksiz olduğunu beyan ederim. Denetim çalışmalarımı uluslararası mesleki standartlar, genel etik kurallar ve kurumumuz politikaları doğrultusunda tarafsız, objektif ve dürüstlük ilkelerine bağlı kalarak yürüteceğimi; bağımsızlığımı tehlikeye düşürecek veya çıkar çatışması doğurabilecek herhangi bir yeni durumu derhal Teftiş Kurulu Müdürlüğü'ne yazılı olarak bildireceğimi taahhüt ederim. İşbu beyan, dijital ortamda e-imza hükmünde onaylanmıştır.
+                                                    </span>
+                                                }
                                             />
-                                            <label htmlFor="agreed-checkbox" className="text-xs text-indigo-950 font-medium leading-relaxed cursor-pointer select-none">
-                                                <strong>TAAHHÜTNAMEDİR:</strong> Yukarıda beyan ettiğim bilgilerin doğru, güncel ve eksiksiz olduğunu beyan ederim. Denetim çalışmalarımı uluslararası mesleki standartlar, genel etik kurallar ve kurumumuz politikaları doğrultusunda tarafsız, objektif ve dürüstlük ilkelerine bağlı kalarak yürüteceğimi; bağımsızlığımı tehlikeye düşürecek veya çıkar çatışması doğurabilecek herhangi bir yeni durumu derhal Teftiş Kurulu Müdürlüğü'ne yazılı olarak bildireceğimi taahhüt ederim. İşbu beyan, dijital ortamda e-imza hükmünde onaylanmıştır.
-                                            </label>
                                         </div>
                                     </div>
 
@@ -1896,17 +1964,15 @@ export default function AuditStaffPage() {
                                             <h4 className="font-bold text-gray-800 flex items-center gap-2">
                                                 <UserCheck size={16} className="text-primary" /> Bağımsızlık Beyanını Değerlendir
                                             </h4>
-                                            <div className="form-group">
-                                                <label className="form-label">Değerlendirme Notları / Tedbirler</label>
-                                                <textarea 
-                                                    className="form-input bg-white" 
-                                                    rows={3} 
-                                                    placeholder="Örn: Bildirilen çıkar çatışması makuldür. İlgili personel X biriminin denetiminde görevlendirilmeyecektir..."
-                                                    value={reviewNotes}
-                                                    onChange={(e) => setReviewNotes(e.target.value)}
-                                                    required
-                                                />
-                                            </div>
+                                            <FormTextarea 
+                                                label="Değerlendirme Notları / Tedbirler"
+                                                className="bg-white" 
+                                                rows={3} 
+                                                placeholder="Örn: Bildirilen çıkar çatışması makuldür. İlgili personel X biriminin denetiminde görevlendirilmeyecektir..."
+                                                value={reviewNotes}
+                                                onChange={(e) => setReviewNotes(e.target.value)}
+                                                required
+                                            />
                                             <div className="flex gap-2 justify-end">
                                                 <Button variant="secondary" size="sm" onClick={() => setReviewingDeclarationId(null)}>
                                                     İptal
@@ -1930,16 +1996,19 @@ export default function AuditStaffPage() {
                                             <DataTable
                                                 columns={[
                                                     { 
+                                                        key: 'type',
                                                         header: 'Tür / Yıl', 
-                                                        accessor: (item: any) => <span className="font-semibold text-gray-900">{item.year ? `${item.year} - Yıllık Beyan` : item.declarationType}</span>
+                                                        render: (item: any) => <span className="font-semibold text-gray-900">{item.year ? `${item.year} - Yıllık Beyan` : item.declarationType}</span>
                                                     },
                                                     { 
+                                                        key: 'date',
                                                         header: 'Beyan Tarihi', 
-                                                        accessor: (item: any) => <span className="text-gray-500">{formatDate(item.declaredAt)}</span>
+                                                        render: (item: any) => <span className="text-gray-500">{formatDate(item.declaredAt)}</span>
                                                     },
                                                     { 
+                                                        key: 'status',
                                                         header: 'Durum', 
-                                                        accessor: (item: any) => (
+                                                        render: (item: any) => (
                                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
                                                                 item.status === 'Onaylandı' 
                                                                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
@@ -1952,8 +2021,9 @@ export default function AuditStaffPage() {
                                                         )
                                                     },
                                                     { 
+                                                        key: 'exception',
                                                         header: 'Bildirilen İstisna', 
-                                                        accessor: (item: any) => {
+                                                        render: (item: any) => {
                                                             const hasIssues = item.hasConflict || item.hasFinancialLink || item.hasFamilyLink || item.hasPreviousRole || item.hasOtherIssue;
                                                             return hasIssues ? (
                                                                 <span className="text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded">
@@ -1967,8 +2037,9 @@ export default function AuditStaffPage() {
                                                         }
                                                     },
                                                     {
+                                                        key: 'actions',
                                                         header: 'Aksiyonlar',
-                                                        accessor: (item: any) => (
+                                                        render: (item: any) => (
                                                             <div className="flex gap-2 justify-end">
                                                                 {item.status !== 'Onaylandı' && (checkRole(hasRole, ROLES.TRASH_MANAGER) || hasRole('Teftiş Kurulu Müdürü') || hasRole('SYSTEM_ADMIN')) && (
                                                                     <Button 
@@ -1997,7 +2068,7 @@ export default function AuditStaffPage() {
                                                     }
                                                 ]}
                                                 data={declarations}
-                                                keyExtractor={(item) => item.id}
+                                                rowKey="id"
                                                 emptyTitle="Kayıt Bulunamadı"
                                                 emptyDescription="Henüz bağımsızlık beyanı kaydı bulunmamaktadır."
                                             />

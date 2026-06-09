@@ -22,6 +22,15 @@ import { useToast } from '@/components/Toast';
 import { BackButton } from '@/components/ui/BackButton';
 import Button from '@/components/ui/Button';
 
+// Fotoğraf URL yardımcısı
+const getPhotoUrl = (url?: string) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const origin = apiUrl.replace(/\/api\/v1\/?$/, '');
+    return `${origin}${url}`;
+};
+
 export default function StaffProfilePage() {
     const { id } = useParams();
     const router = useRouter();
@@ -127,7 +136,7 @@ export default function StaffProfilePage() {
                     <div className="shrink-0 relative">
                         {staff.photoUrl ? (
                             <img
-                                src={staff.photoUrl.startsWith('http') ? staff.photoUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${staff.photoUrl}`}
+                                src={getPhotoUrl(staff.photoUrl)!}
                                 alt={staff.firstName}
                                 className="w-28 h-28 rounded-xl object-cover border-4 border-white shadow-md"
                             />
@@ -357,11 +366,31 @@ export default function StaffProfilePage() {
                                     YETENEKLER
                                 </h2>
                                 <div className="flex flex-wrap gap-1.5">
-                                    {staff.skills.split(',').map((skill: string, i: number) => (
-                                        <span key={i} className="px-2 py-0.5 bg-white text-gray-700 text-[11px] font-bold rounded-md border border-gray-200 shadow-sm">
-                                            {skill.trim()}
-                                        </span>
-                                    ))}
+                                    {(() => {
+                                        let skillsArr: string[] = [];
+                                        try {
+                                            if (Array.isArray(staff.skills)) {
+                                                skillsArr = staff.skills;
+                                            } else if (typeof staff.skills === 'string' && staff.skills.trim()) {
+                                                const trimmed = staff.skills.trim();
+                                                if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+                                                    try {
+                                                        const parsed = JSON.parse(trimmed);
+                                                        skillsArr = Array.isArray(parsed) ? parsed.map((s: any) => s.value || s.label || s) : [trimmed];
+                                                    } catch (e) { skillsArr = [trimmed]; }
+                                                } else {
+                                                    skillsArr = trimmed.split(',').map((s: string) => s.trim());
+                                                }
+                                            }
+                                        } catch (e) { skillsArr = []; }
+                                        skillsArr = skillsArr.filter(s => s && s.trim() && s.trim() !== '[]' && s.trim() !== '""');
+
+                                        return skillsArr.map((skill, i) => (
+                                            <span key={i} className="px-2 py-0.5 bg-white text-gray-700 text-[11px] font-bold rounded-md border border-gray-200 shadow-sm">
+                                                {String(skill || '').replace(/[\[\]"]/g, '').trim()}
+                                            </span>
+                                        ));
+                                    })()}
                                 </div>
                             </section>
                         )}

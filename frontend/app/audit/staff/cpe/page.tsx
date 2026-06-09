@@ -5,7 +5,6 @@ import { auditApi } from '@/lib/audit-api';
 import { Users, TrendingUp, TrendingDown, Minus, Clock, BookOpen, Award, FileText } from 'lucide-react';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
-import StatusBadge from '@/components/ui/StatusBadge';
 import Button from '@/components/ui/Button';
 import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';
@@ -19,6 +18,15 @@ import { Eye } from 'lucide-react';
 import { formatDate } from '@/lib/audit-utils';
 import StatCard from '@/components/ui/StatCard';
 import { BackButton } from '@/components/ui/BackButton';
+
+// Fotoğraf URL yardımcısı
+const getPhotoUrl = (url?: string) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const origin = apiUrl.replace(/\/api\/v1\/?$/, '');
+    return `${origin}${url}`;
+};
 
 export default function CpePage() {
     const { showToast } = useToast();
@@ -87,8 +95,12 @@ export default function CpePage() {
             sortable: true,
             render: (row: any) => (
                 <div className="flex items-center gap-3 py-1">
-                    <div className="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-500 font-black tracking-tighter shadow-inner overflow-hidden">
-                        {row.name.substring(0, 2).toUpperCase()}
+                    <div className="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-500 font-bold tracking-tighter shadow-inner overflow-hidden">
+                        {getPhotoUrl(row.photoUrl) ? (
+                            <img src={getPhotoUrl(row.photoUrl)!} alt={row.name} className="w-full h-full object-cover" />
+                        ) : (
+                            row.name.substring(0, 2).toUpperCase()
+                        )}
                     </div>
                     <div>
                         <div className="font-bold text-gray-900">{row.name}</div>
@@ -111,7 +123,7 @@ export default function CpePage() {
         },
         {
             key: 'previousYearHours',
-            header: 'Geçen Yıl',
+            header: `Geçen Yıl (${parseInt(selectedYear) - 1})`,
             align: 'center' as const,
             sortable: true,
             render: (row: any) => (
@@ -157,6 +169,8 @@ export default function CpePage() {
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 onRefresh={loadData}
+                showExportButton={true}
+                onExportClick={() => auditApi.exportToExcel(stats, 'CPE_Raporu')}
                 filters={
                     <FilterDropdown
                         activeCount={selectedYear !== currentYear.toString() ? 1 : 0}
@@ -238,8 +252,12 @@ export default function CpePage() {
                     <div className="space-y-6">
                         <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-white border-2 border-primary/20 flex items-center justify-center text-primary font-black text-xl shadow-sm">
-                                    {selectedStaff.name.substring(0, 2).toUpperCase()}
+                                <div className="w-12 h-12 rounded-full bg-white border-2 border-primary/20 flex items-center justify-center text-primary font-bold text-xl shadow-sm overflow-hidden">
+                                    {getPhotoUrl(selectedStaff.photoUrl) ? (
+                                        <img src={getPhotoUrl(selectedStaff.photoUrl)!} alt={selectedStaff.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        selectedStaff.name.substring(0, 2).toUpperCase()
+                                    )}
                                 </div>
                                 <div>
                                     <div className="font-bold text-gray-900 text-lg">{selectedStaff.name}</div>

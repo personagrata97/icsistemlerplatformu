@@ -25,6 +25,15 @@ import { useToast } from '@/components/Toast';
 import Button from '@/components/ui/Button';
 import { BackButton } from '@/components/ui/BackButton';
 
+// Fotoğraf URL yardımcısı
+const getPhotoUrl = (url?: string) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const origin = apiUrl.replace(/\/api\/v1\/?$/, '');
+    return `${origin}${url}`;
+};
+
 export default function StaffOzgecmisLegacyPage() {
     const { id } = useParams();
     const router = useRouter();
@@ -90,7 +99,7 @@ export default function StaffOzgecmisLegacyPage() {
                     <div className="relative z-10">
                         {staff.photoUrl ? (
                             <img
-                                src={staff.photoUrl.startsWith('http') ? staff.photoUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${staff.photoUrl}`}
+                                src={getPhotoUrl(staff.photoUrl)!}
                                 alt={staff.firstName}
                                 className="w-40 h-40 rounded-2xl object-cover border-4 border-white/20 shadow-2xl"
                             />
@@ -228,12 +237,34 @@ export default function StaffOzgecmisLegacyPage() {
                                 01. YETENEKLER
                             </h2>
                             <div className="flex flex-wrap gap-2">
-                                {staff.skills?.split(',').map((skill: string, i: number) => (
-                                    <span key={i} className="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-sm rounded-lg border border-slate-200 hover:bg-primary hover:text-white hover:border-primary transition-all cursor-default">
-                                        {skill.trim()}
-                                    </span>
-                                ))}
-                                {!staff.skills && <span className="text-slate-400 italic">Belirtilmedi</span>}
+                                {(() => {
+                                    if (!staff.skills) return <span className="text-slate-400 italic">Belirtilmedi</span>;
+                                    let skillsArr: string[] = [];
+                                    try {
+                                        if (Array.isArray(staff.skills)) {
+                                            skillsArr = staff.skills;
+                                        } else if (typeof staff.skills === 'string' && staff.skills.trim()) {
+                                            const trimmed = staff.skills.trim();
+                                            if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+                                                try {
+                                                    const parsed = JSON.parse(trimmed);
+                                                    skillsArr = Array.isArray(parsed) ? parsed.map((s: any) => s.value || s.label || s) : [trimmed];
+                                                } catch (e) { skillsArr = [trimmed]; }
+                                            } else {
+                                                skillsArr = trimmed.split(',').map((s: string) => s.trim());
+                                            }
+                                        }
+                                    } catch (e) { skillsArr = []; }
+                                    skillsArr = skillsArr.filter(s => s && s.trim() && s.trim() !== '[]' && s.trim() !== '""');
+
+                                    if (skillsArr.length === 0) return <span className="text-slate-400 italic">Belirtilmedi</span>;
+
+                                    return skillsArr.map((skill, i) => (
+                                        <span key={i} className="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-sm rounded-lg border border-slate-200 hover:bg-primary hover:text-white hover:border-primary transition-all cursor-default">
+                                            {String(skill || '').replace(/[\[\]"]/g, '').trim()}
+                                        </span>
+                                    ));
+                                })()}
                             </div>
                         </section>
 
@@ -243,20 +274,35 @@ export default function StaffOzgecmisLegacyPage() {
                                 02. SERTİFİKALAR
                             </h2>
                             <div className="space-y-3">
-                                {Array.isArray(staff.certifications) ? staff.certifications.map((cert: string, i: number) => (
-                                    <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10 group">
-                                        <Award size={18} className="text-primary mt-0.5" />
-                                        <span className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors">{cert}</span>
-                                    </div>
-                                )) : (
-                                    staff.certifications?.split(',').map((cert: string, i: number) => (
-                                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                                {(() => {
+                                    if (!staff.certifications) return <span className="text-slate-400 italic">Belirtilmedi</span>;
+                                    let certsArr: string[] = [];
+                                    try {
+                                        if (Array.isArray(staff.certifications)) {
+                                            certsArr = staff.certifications;
+                                        } else if (typeof staff.certifications === 'string' && staff.certifications.trim()) {
+                                            const trimmed = staff.certifications.trim();
+                                            if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+                                                try {
+                                                    const parsed = JSON.parse(trimmed);
+                                                    certsArr = Array.isArray(parsed) ? parsed.map((s: any) => s.value || s.label || s) : [trimmed];
+                                                } catch (e) { certsArr = [trimmed]; }
+                                            } else {
+                                                certsArr = trimmed.split(',').map((s: string) => s.trim());
+                                            }
+                                        }
+                                    } catch (e) { certsArr = []; }
+                                    certsArr = certsArr.filter(c => c && c.trim() && c.trim() !== '[]' && c.trim() !== '""');
+
+                                    if (certsArr.length === 0) return <span className="text-slate-400 italic">Belirtilmedi</span>;
+
+                                    return certsArr.map((cert, i) => (
+                                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10 group">
                                             <Award size={18} className="text-primary mt-0.5" />
-                                            <span className="text-sm font-bold text-slate-700">{cert.trim()}</span>
+                                            <span className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors">{String(cert || '').replace(/[\[\]"]/g, '').trim()}</span>
                                         </div>
-                                    ))
-                                )}
-                                {!staff.certifications && <span className="text-slate-400 italic">Belirtilmedi</span>}
+                                    ));
+                                })()}
                             </div>
                         </section>
 

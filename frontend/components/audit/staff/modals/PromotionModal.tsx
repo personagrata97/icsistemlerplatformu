@@ -3,6 +3,7 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
 import DatePicker from '@/components/ui/DatePicker';
+import FormTextarea from '@/components/ui/FormTextarea';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 
 const TITLES = [
@@ -149,14 +150,12 @@ export default function PromotionModal({
                         options={TITLES.map(t => ({ value: t, label: t }))}
                     />
                 </div>
-                <div className="form-group">
-                    <label className="form-label">Notlar</label>
-                    <textarea 
-                        className="form-input min-h-[80px]" 
-                        value={promotionForm.notes} 
-                        onChange={e => setPromotionForm({ ...promotionForm, notes: e.target.value })} 
-                    />
-                </div>
+                <FormTextarea
+                    label="Notlar"
+                    className="min-h-[80px]"
+                    value={promotionForm.notes}
+                    onChange={e => setPromotionForm({ ...promotionForm, notes: e.target.value })}
+                />
             </form>
         </Modal>
     );

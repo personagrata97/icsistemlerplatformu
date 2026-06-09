@@ -238,7 +238,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const hasRole = useCallback((role: string): boolean => {
         if (!user || !user.roles) return false;
-        return user.roles.includes(role);
+        
+        const normalizedRoles = user.roles.map(r => r.toUpperCase());
+        const targetRole = role.toUpperCase();
+        
+        // DevMode Role Mapping
+        if (normalizedRoles.includes('GOZETMEN') || normalizedRoles.includes('GÖZETMEN')) {
+            normalizedRoles.push('AUDIT_SUPERVISOR');
+        }
+        if (normalizedRoles.includes('MUDUR') || normalizedRoles.includes('MÜDÜR')) {
+            normalizedRoles.push('AUDIT_MANAGER', 'MANAGER');
+        }
+        if (normalizedRoles.includes('MUFETTIS') || normalizedRoles.includes('MÜFETTİŞ')) {
+            normalizedRoles.push('AUDITOR');
+        }
+        if (normalizedRoles.includes('ADMIN')) {
+            normalizedRoles.push('SYSTEM_ADMIN', 'AUDIT_ADMIN');
+        }
+        if (normalizedRoles.includes('CAE')) {
+            normalizedRoles.push('MANAGER', 'AUDIT_MANAGER', 'ADMIN');
+        }
+
+        return normalizedRoles.includes(targetRole);
     }, [user]);
 
     const setRoles = (newRoles: string[]) => {

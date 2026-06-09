@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { auditApi, AuditStaff } from '@/lib/audit-api';
-import { Users, Shield, Cpu, BookOpen, BarChart3, Database, Globe, Star, Search, Edit2, RefreshCw } from 'lucide-react';
+import { Users, Shield, Cpu, BookOpen, BarChart3, Database, Globe, Star, Search, Edit2, RefreshCw, Eye } from 'lucide-react';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
@@ -12,9 +12,21 @@ import Modal from '@/components/ui/Modal';
 import ActionMenu from '@/components/ui/ActionMenu';
 import StatCard from '@/components/ui/StatCard';
 import CustomSelect from '@/components/ui/CustomSelect';
+import Badge from '@/components/ui/Badge';
+import EntityIcon from '@/components/ui/EntityIcon';
+import { EntityType } from '@/lib/entity-config';
 import PageHeader from '@/components/audit/PageHeader';
 import { BackButton } from '@/components/ui/BackButton';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import { useAuth } from '@/context/AuthContext';
+import { ROLES, checkRole } from '@/lib/auth-constants';
+
+const normalizeName = (name: string) => {
+    return name.toLowerCase()
+        .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+        .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+        .replace(/[^a-z0-9]/g, ''); // Nokta, boşluk, parantez her şeyi sil
+};
 
 // Fotoğraf URL yardımcısı
 const getPhotoUrl = (url?: string) => {
@@ -41,38 +53,47 @@ const DEFAULT_SKILLS: SkillRatings = {
     reporting_english: 2
 };
 
-const SKILL_LABELS: Record<keyof SkillRatings, { label: string; icon: any; color: string; desc: string }> = {
+const SKILL_LABELS: Record<keyof SkillRatings, { label: string; shortLabel: string; entityType: EntityType; desc: string }> = {
     risk_assessment: {
-        label: 'Risk & Kontrol Güvence',
-        icon: Shield,
-        color: 'text-indigo-600 bg-indigo-50 border-indigo-100',
-        desc: 'İç kontrol metodolojileri, risk yönetimi ve süreç analizi yetkinliği'
+        label: 'Risk Yönetimi ve İç Kontrol',
+        shortLabel: 'Risk ve İç Kontrol',
+        entityType: 'SKILL_RISK',
+        desc: 'İç kontrol çerçeveleri (COSO), risk değerlendirme, süreç analizi ve suistimal (fraud) riskleri yetkinliği'
     },
     it_audit: {
-        label: 'BT & Siber Güvenlik',
-        icon: Cpu,
-        color: 'text-cyan-600 bg-cyan-50 border-cyan-100',
-        desc: 'Bilgi teknolojileri genel kontrolleri, siber güvenlik ve sistem denetimi'
+        label: 'Bilgi Sistemleri ve Siber Güvenlik',
+        shortLabel: 'BT ve Siber Güvenlik',
+        entityType: 'SKILL_IT',
+        desc: 'BT genel kontrolleri (COBIT), bilgi güvenliği standartları (ISO 27001) ve uygulama kontrolleri (ITAC)'
     },
     financial_audit: {
-        label: 'Finansal & Operasyonel',
-        icon: BarChart3,
-        color: 'text-emerald-600 bg-emerald-50 border-emerald-100',
-        desc: 'Finansal tablolar analizi, vergi mevzuatı ve operasyonel süreç denetimi'
+        label: 'Finansal, Operasyonel ve Uyum Denetimi',
+        shortLabel: 'Finansal ve Uyum',
+        entityType: 'SKILL_FINANCE',
+        desc: 'Finansal tablo analizi, operasyonel süreç denetimleri ve yasal mevzuata uyum'
     },
     data_analysis: {
-        label: 'Veri Analitiği',
-        icon: Database,
-        color: 'text-amber-600 bg-amber-50 border-amber-100',
-        desc: 'Veri analiz metotları, raporlama ve veri madenciliği yetkinliği'
+        label: 'Veri Analitiği ve CAATs',
+        shortLabel: 'Veri Analitiği',
+        entityType: 'SKILL_DATA',
+        desc: 'Bilgisayar Destekli Denetim Teknikleri (CAATs), SQL/Python ile veri madenciliği ve sonuç görselleştirme'
     },
     reporting_english: {
-        label: 'Raporlama & Sunum',
-        icon: Globe,
-        color: 'text-purple-600 bg-purple-50 border-purple-100',
-        desc: 'Raporlama standartları doğrultusunda rapor yazımı ve sunum teknikleri'
+        label: 'Raporlama ve İletişim',
+        shortLabel: 'Raporlama ve İletişim',
+        entityType: 'SKILL_REPORT',
+        desc: 'IIA standartlarına uygun denetim bulgusu/raporu yazımı ve üst yönetim iletişim becerileri'
     }
 };
+
+const TITLES = [
+    'Müfettiş Yardımcısı', 
+    'Yetkili Müfettiş Yardımcısı', 
+    'Müfettiş', 
+    'Kıdemli Müfettiş', 
+    'Başmüfettiş', 
+    'Teftiş Kurulu Müdürü'
+];
 
 const SKILL_LEVELS = [
     { value: 0, label: 'Yok / Başlangıç' },
@@ -83,6 +104,15 @@ const SKILL_LEVELS = [
 ];
 
 export default function SkillsMatrixPage() {
+    const { user, hasRole } = useAuth();
+    // Yöneticileri belirleme (Büyük/Küçük Harf Duyarsız)
+    const MANAGER_ROLES = [
+        'admin', 'audit_admin', 'audit_manager', 'manager', 'cae',
+        'teftiş kurulu başkanı', 'başkan', 'teftiş kurulu müdürü', 'müdür',
+        'system_admin', 'yönetici'
+    ];
+    const userRoleStr = (user?.role || '').toLowerCase();
+    const canManage = MANAGER_ROLES.includes(userRoleStr) || (hasRole ? checkRole(hasRole, ROLES.STAFF_MANAGER) : false);
     const { showToast } = useToast();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -90,6 +120,7 @@ export default function SkillsMatrixPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSkillFilter, setSelectedSkillFilter] = useState<string>('all');
     const [selectedLevelFilter, setSelectedLevelFilter] = useState<string>('all');
+    const [selectedTitleFilter, setSelectedTitleFilter] = useState<string[]>([]);
 
     // Yetkinlik düzenleme modalı
     const [selectedStaff, setSelectedStaff] = useState<AuditStaff | null>(null);
@@ -141,9 +172,15 @@ export default function SkillsMatrixPage() {
             await auditApi.updateStaff(selectedStaff.id, {
                 skills: updatedSkillsStr
             });
+            
+            // Optimistic Update: Tablo ve istatistiklerin anında güncellenmesi için yerel state'i eziyoruz.
+            // (Backend'in önbellekleme/gecikme yapma ihtimaline karşı loadData()'yı beklemeyiz)
+            setStaffList(prev => prev.map(staff => 
+                staff.id === selectedStaff.id ? { ...staff, skills: updatedSkillsStr } : staff
+            ));
+
             showToast(`${selectedStaff.name} yetkinlik matrisi güncellendi.`, 'success');
             setSelectedStaff(null);
-            loadData();
         } catch (error: any) {
             console.error('Yetkinlik güncellenemedi:', error);
             showToast(error.message || 'Güncelleme sırasında bir hata oluştu.', 'error');
@@ -159,16 +196,31 @@ export default function SkillsMatrixPage() {
 
         if (!matchesSearch) return false;
 
+        if (selectedTitleFilter.length > 0) {
+            if (!staff.title || !selectedTitleFilter.includes(staff.title)) return false;
+        }
+
         if (selectedSkillFilter !== 'all') {
             const skills = parseSkills(staff.skills);
             const level = skills[selectedSkillFilter as keyof SkillRatings] ?? 0;
             if (selectedLevelFilter !== 'all') {
-                return level === parseInt(selectedLevelFilter);
+                return level >= parseInt(selectedLevelFilter);
             }
-            return level >= 2; // Default show intermediate and above
+            return true;
         }
 
         return true;
+    }).map(staff => {
+        // DataTable'ın sortable özelliğini kullanabilmesi için parse edilmiş skilleri objenin en üst seviyesine taşıyoruz
+        const parsed = parseSkills(staff.skills);
+        return {
+            ...staff,
+            risk_assessment: parsed.risk_assessment,
+            it_audit: parsed.it_audit,
+            financial_audit: parsed.financial_audit,
+            data_analysis: parsed.data_analysis,
+            reporting_english: parsed.reporting_english
+        };
     });
 
     // İstatistik Hesaplamaları
@@ -202,6 +254,17 @@ export default function SkillsMatrixPage() {
         );
     };
 
+    const getLevelBadgeVariant = (level: number): any => {
+        switch(level) {
+            case 0: return 'gray';
+            case 1: return 'info';
+            case 2: return 'primary';
+            case 3: return 'success';
+            case 4: return 'warning';
+            default: return 'gray';
+        }
+    };
+
     const columns = [
         {
             key: 'name',
@@ -225,8 +288,9 @@ export default function SkillsMatrixPage() {
         },
         {
             key: 'risk_assessment',
-            header: 'Risk & Kontrol',
+            header: SKILL_LABELS.risk_assessment.label,
             align: 'center' as const,
+            sortable: true,
             render: (row: AuditStaff) => {
                 const skills = parseSkills(row.skills);
                 return (
@@ -239,8 +303,9 @@ export default function SkillsMatrixPage() {
         },
         {
             key: 'it_audit',
-            header: 'BT Denetimi',
+            header: SKILL_LABELS.it_audit.label,
             align: 'center' as const,
+            sortable: true,
             render: (row: AuditStaff) => {
                 const skills = parseSkills(row.skills);
                 return (
@@ -253,8 +318,9 @@ export default function SkillsMatrixPage() {
         },
         {
             key: 'financial_audit',
-            header: 'Finansal Den.',
+            header: SKILL_LABELS.financial_audit.label,
             align: 'center' as const,
+            sortable: true,
             render: (row: AuditStaff) => {
                 const skills = parseSkills(row.skills);
                 return (
@@ -267,8 +333,9 @@ export default function SkillsMatrixPage() {
         },
         {
             key: 'data_analysis',
-            header: 'Veri Analitiği',
+            header: SKILL_LABELS.data_analysis.label,
             align: 'center' as const,
+            sortable: true,
             render: (row: AuditStaff) => {
                 const skills = parseSkills(row.skills);
                 return (
@@ -281,8 +348,9 @@ export default function SkillsMatrixPage() {
         },
         {
             key: 'reporting_english',
-            header: 'Raporlama & Sunum',
+            header: SKILL_LABELS.reporting_english.label,
             align: 'center' as const,
+            sortable: true,
             render: (row: AuditStaff) => {
                 const skills = parseSkills(row.skills);
                 return (
@@ -298,17 +366,52 @@ export default function SkillsMatrixPage() {
             header: 'İşlemler',
             width: '120px',
             align: 'center' as const,
-            render: (row: AuditStaff) => (
-                <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                    <ActionMenu
-                        items={[
-                            { label: 'Yetkinlikleri Düzenle', icon: <Edit2 size={14} />, onClick: () => handleEditSkills(row) }
-                        ]}
-                    />
-                </div>
-            )
+            render: (row: AuditStaff) => {
+                const isIdMatch = String(row.id) === String(user?.id);
+                let userName = user?.displayName || (user as any)?.name || user?.username || '';
+                const rawUsername = (user?.username || '').toLowerCase();
+                
+                // DEVMODE HACK: Admin/CAE hesaplarını Kerem Yılmaz olarak kabul et
+                if (rawUsername === 'admin' || rawUsername === 'cae' || userName.toLowerCase().includes('admin') || userName.toLowerCase().includes('cae') || userName.toLowerCase().includes('yönetici')) {
+                    userName = 'Kerem Yılmaz';
+                }
+
+                const normUser = normalizeName(userName);
+                const normStaff = normalizeName(row.name || '');
+                const isNameMatch = Boolean(normUser && normStaff && (normUser.includes(normStaff) || normStaff.includes(normUser)));
+                const isSelfRow = isIdMatch || isNameMatch;
+                const canEditThisRow = canManage && !isSelfRow;
+                return (
+                    <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                        <ActionMenu
+                            items={[
+                                { 
+                                    label: canEditThisRow ? 'Yetkinlikleri Düzenle' : 'Yetkinlikleri Görüntüle', 
+                                    icon: canEditThisRow ? <Edit2 size={14} /> : <Eye size={14} />, 
+                                    onClick: () => handleEditSkills(row) 
+                                }
+                            ]}
+                        />
+                    </div>
+                );
+            }
         }
     ];
+
+    const isSelfStaffId = selectedStaff && user ? String(selectedStaff.id) === String(user.id) : false;
+    let modalUserName = user?.displayName || (user as any)?.name || user?.username || '';
+    const rawModalUsername = (user?.username || '').toLowerCase();
+    
+    // DEVMODE HACK: Admin/CAE hesaplarını Kerem Yılmaz olarak kabul et
+    if (rawModalUsername === 'admin' || rawModalUsername === 'cae' || modalUserName.toLowerCase().includes('admin') || modalUserName.toLowerCase().includes('cae') || modalUserName.toLowerCase().includes('yönetici')) {
+        modalUserName = 'Kerem Yılmaz';
+    }
+
+    const normModalUser = normalizeName(modalUserName);
+    const normModalStaff = normalizeName(selectedStaff?.name || '');
+    const isSelfStaffName = Boolean(selectedStaff && normModalUser && normModalStaff && (normModalUser.includes(normModalStaff) || normModalStaff.includes(normModalUser)));
+    const isSelfStaff = isSelfStaffId || isSelfStaffName;
+    const canEditStaff = selectedStaff ? (canManage && !isSelfStaff) : false;
 
     if (loading && staffList.length === 0) {
         return <div className="flex items-center justify-center h-64"><LoadingState message="Yetkinlik Matrisi yükleniyor..." /></div>;
@@ -324,24 +427,34 @@ export default function SkillsMatrixPage() {
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 onRefresh={loadData}
+                showExportButton={true}
+                onExportClick={() => auditApi.exportToExcel(filteredStaff, 'Yetkinlik_Matrisi')}
                 filters={
-                    <FilterDropdown
-                        activeCount={selectedSkillFilter !== 'all' ? (selectedLevelFilter !== 'all' ? 2 : 1) : 0}
+                        <FilterDropdown
+                        activeCount={(selectedSkillFilter !== 'all' ? (selectedLevelFilter !== 'all' ? 2 : 1) : 0) + (selectedTitleFilter.length > 0 ? 1 : 0)}
                         onClear={() => {
                             setSelectedSkillFilter('all');
                             setSelectedLevelFilter('all');
+                            setSelectedTitleFilter([]);
                             setSearchTerm('');
                         }}
                     >
                         <CustomSelect
+                            label="Ünvan"
+                            options={TITLES.map(t => ({ value: t, label: t }))}
+                            value={selectedTitleFilter}
+                            onChange={(val) => setSelectedTitleFilter(val as string[])}
+                            isMulti
+                            placeholder="Ünvan seçiniz..."
+                        />
+                        <CustomSelect
                             label="Yetkinlik Alanı"
                             options={[
                                 { value: 'all', label: 'Tüm Yetkinlikler' },
-                                { value: 'risk_assessment', label: 'Risk & Kontrol' },
-                                { value: 'it_audit', label: 'BT Denetimi' },
-                                { value: 'financial_audit', label: 'Finansal Denetim' },
-                                { value: 'data_analysis', label: 'Veri Analitiği' },
-                                { value: 'reporting_english', label: 'Raporlama & Sunum' }
+                                ...Object.entries(SKILL_LABELS).map(([key, value]) => ({
+                                    value: key,
+                                    label: value.label
+                                }))
                             ]}
                             value={selectedSkillFilter}
                             onChange={(val) => {
@@ -370,47 +483,42 @@ export default function SkillsMatrixPage() {
             {/* İstatistik Kartları */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <StatCard
-                    title="Risk & Kontrol Ortalama"
+                    title={`${SKILL_LABELS.risk_assessment.shortLabel} Ort.`}
                     value={`${getAvgSkill('risk_assessment').toFixed(1)} / 4.0`}
-                    icon={Shield}
-                    color="indigo"
-                    subtext={`${countExperts('risk_assessment')} İleri/Uzman Müfettiş`}
+                    entityType="SKILL_RISK"
+                    subtext={`${countExperts('risk_assessment')} İleri/Uzman Seviye Personel`}
                     onClick={() => setSelectedSkillFilter(prev => prev === 'risk_assessment' ? 'all' : 'risk_assessment')}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'risk_assessment' ? 'ring-2 ring-indigo-500 scale-[1.02] bg-indigo-50/10' : ''}`}
                 />
                 <StatCard
-                    title="BT Denetimi Ortalama"
+                    title={`${SKILL_LABELS.it_audit.shortLabel} Ort.`}
                     value={`${getAvgSkill('it_audit').toFixed(1)} / 4.0`}
-                    icon={Cpu}
-                    color="blue"
-                    subtext={`${countExperts('it_audit')} İleri/Uzman Müfettiş`}
+                    entityType="SKILL_IT"
+                    subtext={`${countExperts('it_audit')} İleri/Uzman Seviye Personel`}
                     onClick={() => setSelectedSkillFilter(prev => prev === 'it_audit' ? 'all' : 'it_audit')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'it_audit' ? 'ring-2 ring-blue-500 scale-[1.02] bg-blue-50/10' : ''}`}
+                    className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'it_audit' ? 'ring-2 ring-cyan-500 scale-[1.02] bg-cyan-50/10' : ''}`}
                 />
                 <StatCard
-                    title="Finansal Den. Ortalama"
+                    title={`${SKILL_LABELS.financial_audit.shortLabel} Ort.`}
                     value={`${getAvgSkill('financial_audit').toFixed(1)} / 4.0`}
-                    icon={BarChart3}
-                    color="emerald"
-                    subtext={`${countExperts('financial_audit')} İleri/Uzman Müfettiş`}
+                    entityType="SKILL_FINANCE"
+                    subtext={`${countExperts('financial_audit')} İleri/Uzman Seviye Personel`}
                     onClick={() => setSelectedSkillFilter(prev => prev === 'financial_audit' ? 'all' : 'financial_audit')}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'financial_audit' ? 'ring-2 ring-emerald-500 scale-[1.02] bg-emerald-50/10' : ''}`}
                 />
                 <StatCard
-                    title="Veri Analitiği Ortalama"
+                    title={`${SKILL_LABELS.data_analysis.shortLabel} Ort.`}
                     value={`${getAvgSkill('data_analysis').toFixed(1)} / 4.0`}
-                    icon={Database}
-                    color="amber"
-                    subtext={`${countExperts('data_analysis')} İleri/Uzman Müfettiş`}
+                    entityType="SKILL_DATA"
+                    subtext={`${countExperts('data_analysis')} İleri/Uzman Seviye Personel`}
                     onClick={() => setSelectedSkillFilter(prev => prev === 'data_analysis' ? 'all' : 'data_analysis')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'data_analysis' ? 'ring-2 ring-amber-500 scale-[1.02] bg-amber-50/10' : ''}`}
+                    className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'data_analysis' ? 'ring-2 ring-orange-500 scale-[1.02] bg-orange-50/10' : ''}`}
                 />
                 <StatCard
-                    title="Raporlama & Sunum Ortalama"
+                    title={`${SKILL_LABELS.reporting_english.shortLabel} Ort.`}
                     value={`${getAvgSkill('reporting_english').toFixed(1)} / 4.0`}
-                    icon={Globe}
-                    color="purple"
-                    subtext={`${countExperts('reporting_english')} İleri/Uzman Müfettiş`}
+                    entityType="SKILL_REPORT"
+                    subtext={`${countExperts('reporting_english')} İleri/Uzman Seviye Personel`}
                     onClick={() => setSelectedSkillFilter(prev => prev === 'reporting_english' ? 'all' : 'reporting_english')}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'reporting_english' ? 'ring-2 ring-purple-500 scale-[1.02] bg-purple-50/10' : ''}`}
                 />
@@ -431,6 +539,7 @@ export default function SkillsMatrixPage() {
                         setSearchTerm('');
                         setSelectedSkillFilter('all');
                         setSelectedLevelFilter('all');
+                        setSelectedTitleFilter([]);
                     }}
                 />
             </div>
@@ -439,68 +548,60 @@ export default function SkillsMatrixPage() {
             <Modal
                 isOpen={!!selectedStaff}
                 onClose={() => setSelectedStaff(null)}
-                title={`${selectedStaff?.name} - Yetkinlik Profilini Düzenle`}
+                title={`${selectedStaff?.name || ''} - Yetkinlik ${canEditStaff ? 'Profilini Düzenle' : 'Profili'}`}
                 size="lg"
                 footer={
                     <div className="flex justify-end gap-3 w-full">
-                        <Button variant="secondary" onClick={() => setSelectedStaff(null)} disabled={saving}>İptal</Button>
-                        <Button onClick={handleSaveSkills} isLoading={saving}>Değişiklikleri Kaydet</Button>
+                        <Button variant="secondary" onClick={() => setSelectedStaff(null)} disabled={saving}>{canEditStaff ? 'İptal' : 'Kapat'}</Button>
+                        {canEditStaff && (
+                            <Button onClick={handleSaveSkills} isLoading={saving}>Değişiklikleri Kaydet</Button>
+                        )}
                     </div>
                 }
             >
                 {selectedStaff && (
                     <div className="space-y-6">
-                        <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-sm shadow-sm overflow-hidden">
-                                {selectedStaff.photoUrl ? (
-                                    <img src={selectedStaff.photoUrl.startsWith('http') ? selectedStaff.photoUrl : `http://localhost:3001${selectedStaff.photoUrl}`} alt={selectedStaff.name} className="w-full h-full object-cover" />
+                        <div className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                            <div className="w-12 h-12 rounded-full bg-white border-2 border-primary/20 flex items-center justify-center text-primary font-bold text-xl shadow-sm overflow-hidden shrink-0">
+                                {getPhotoUrl(selectedStaff.photoUrl) ? (
+                                    <img src={getPhotoUrl(selectedStaff.photoUrl)!} alt={selectedStaff.name} className="w-full h-full object-cover" />
                                 ) : (
                                     selectedStaff.name.substring(0, 2).toUpperCase()
                                 )}
                             </div>
                             <div>
-                                <div className="font-bold text-gray-900">{selectedStaff.name}</div>
-                                <div className="text-xs text-gray-500">{selectedStaff.title}</div>
+                                <div className="font-bold text-gray-900 text-lg">{selectedStaff.name}</div>
+                                <div className="text-sm text-gray-500">{selectedStaff.title}</div>
                             </div>
                         </div>
 
                         <div className="space-y-5">
                             {(Object.keys(SKILL_LABELS) as Array<keyof SkillRatings>).map((key) => {
                                 const skill = SKILL_LABELS[key];
-                                const Icon = skill.icon;
                                 return (
                                     <div key={key} className="space-y-2 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <div className={`p-1.5 rounded-lg border ${skill.color}`}>
-                                                    <Icon size={16} />
-                                                </div>
-                                                <div>
+                                        <div className="flex items-center justify-between gap-4">
+                                            <div className="flex items-center gap-3 flex-1">
+                                                <EntityIcon type={skill.entityType} variant="pill" size={16} />
+                                                <div className="flex flex-col">
                                                     <div className="text-sm font-bold text-gray-800">{skill.label}</div>
-                                                    <div className="text-[11px] text-gray-500 font-medium leading-relaxed">{skill.desc}</div>
+                                                    <div className="text-[11px] text-gray-500 font-medium leading-relaxed mt-0.5">{skill.desc}</div>
                                                 </div>
                                             </div>
-                                            <div className="text-sm font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-                                                {SKILL_LEVELS.find(l => l.value === modalSkills[key])?.label}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-4 pt-1">
-                                            <input
-                                                type="range"
-                                                min="0"
-                                                max="4"
-                                                step="1"
-                                                className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-100 rounded-lg appearance-none"
-                                                value={modalSkills[key]}
-                                                onChange={(e) => setModalSkills({ ...modalSkills, [key]: parseInt(e.target.value) })}
-                                            />
-                                            <div className="flex justify-between w-full text-[10px] text-gray-400 font-medium px-1">
-                                                <span>Başlangıç</span>
-                                                <span>Temel</span>
-                                                <span>Orta</span>
-                                                <span>İleri</span>
-                                                <span>Uzman</span>
+                                            <div className="shrink-0 w-44 flex justify-end">
+                                                {canEditStaff ? (
+                                                    <div className="w-full">
+                                                        <CustomSelect
+                                                            value={modalSkills[key].toString()}
+                                                            onChange={(val) => setModalSkills({ ...modalSkills, [key]: parseInt(val as string) })}
+                                                            options={SKILL_LEVELS.map(l => ({ value: l.value.toString(), label: l.label }))}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <Badge variant={getLevelBadgeVariant(modalSkills[key])} size="md">
+                                                        {SKILL_LEVELS.find(l => l.value === modalSkills[key])?.label}
+                                                    </Badge>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

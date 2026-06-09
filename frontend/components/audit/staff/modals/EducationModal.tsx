@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
+import FormInput from '@/components/ui/FormInput';
 
 interface EducationForm {
     schoolName: string;
@@ -44,37 +45,28 @@ export default function EducationModal({
             )}
         >
             <form id="education-form" onSubmit={onSave} className="space-y-4">
-                <div className="form-group">
-                    <label className="form-label">Kurum</label>
-                    <input 
-                        type="text" 
-                        className="form-input" 
-                        value={educationForm.schoolName} 
-                        onChange={e => setEducationForm({ ...educationForm, schoolName: e.target.value })} 
-                        required={true} 
-                    />
-                </div>
+                <FormInput
+                    label="Kurum"
+                    type="text"
+                    value={educationForm.schoolName}
+                    onChange={e => setEducationForm({ ...educationForm, schoolName: e.target.value })}
+                    required={true}
+                />
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="form-group">
-                        <label className="form-label">Fakülte</label>
-                        <input 
-                            type="text" 
-                            className="form-input" 
-                            value={educationForm.faculty} 
-                            onChange={e => setEducationForm({ ...educationForm, faculty: e.target.value })} 
-                            placeholder="Örn: İşletme Fakültesi" 
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Bölüm</label>
-                        <input 
-                            type="text" 
-                            className="form-input" 
-                            value={educationForm.department} 
-                            onChange={e => setEducationForm({ ...educationForm, department: e.target.value })} 
-                            placeholder="Örn: İktisat" 
-                        />
-                    </div>
+                    <FormInput
+                        label="Fakülte"
+                        type="text"
+                        value={educationForm.faculty}
+                        onChange={e => setEducationForm({ ...educationForm, faculty: e.target.value })}
+                        placeholder="Örn: İşletme Fakültesi"
+                    />
+                    <FormInput
+                        label="Bölüm"
+                        type="text"
+                        value={educationForm.department}
+                        onChange={e => setEducationForm({ ...educationForm, department: e.target.value })}
+                        placeholder="Örn: İktisat"
+                    />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="form-group">
@@ -89,15 +81,12 @@ export default function EducationModal({
                             ]}
                         />
                     </div>
-                    <div className="form-group">
-                        <label className="form-label">Mezuniyet Yılı</label>
-                        <input 
-                            type="number" 
-                            className="form-input" 
-                            value={educationForm.graduationYear} 
-                            onChange={e => setEducationForm({ ...educationForm, graduationYear: e.target.value })} 
-                        />
-                    </div>
+                    <FormInput
+                        label="Mezuniyet Yılı"
+                        type="number"
+                        value={educationForm.graduationYear}
+                        onChange={e => setEducationForm({ ...educationForm, graduationYear: e.target.value })}
+                    />
                 </div>
             </form>
         </Modal>

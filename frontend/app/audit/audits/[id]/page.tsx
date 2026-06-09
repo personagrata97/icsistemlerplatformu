@@ -558,12 +558,29 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
             }
 
             const newMembers: TeamMember[] = [];
+            let hasCoolOffError = false;
+
             for (const staffId of selectedStaffIds) {
                 // Check if already in team
                 if (team.some(m => m.id === staffId)) continue;
 
                 const staff = allStaff.find(s => s.id === staffId);
                 if (staff) {
+                    // IIA Independence Check: 1-Year Cool-off Period for Temporary Assignments
+                    const auditDepartment = auditData?.department || auditData?.unitId || '';
+                    if (staff.temporaryUnit && auditDepartment && (staff.temporaryUnit === auditDepartment || auditDepartment.includes(staff.temporaryUnit))) {
+                        if (staff.temporaryEndDate) {
+                            const coolOffDate = new Date(staff.temporaryEndDate);
+                            coolOffDate.setFullYear(coolOffDate.getFullYear() + 1); // +1 Year
+                            
+                            if (new Date() < coolOffDate) {
+                                showToast(`${staff.name}, "${staff.temporaryUnit}" birimine geçici olarak atanmıştı. 1 yıllık soğuma süresi henüz dolmamıştır! (Bitiş: ${coolOffDate.toLocaleDateString('tr-TR')})`, 'error');
+                                hasCoolOffError = true;
+                                continue; // Block this specific user from being added
+                            }
+                        }
+                    }
+
                     newMembers.push({
                         id: staff.id, // Use staff ID as member ID for consistency
                         name: staff.name,
@@ -575,7 +592,9 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
             }
 
             if (newMembers.length === 0) {
-                showToast('Seçilen personel zaten ekipte mevcut', 'warning');
+                if (!hasCoolOffError) {
+                    showToast('Seçilen personel zaten ekipte mevcut', 'warning');
+                }
                 return;
             }
 

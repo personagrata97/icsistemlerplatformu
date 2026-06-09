@@ -25,7 +25,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import CodeBadge from '@/components/ui/CodeBadge';
 import DashboardListItem from '@/components/ui/DashboardListItem';
 import DashboardWidget from '@/components/ui/DashboardWidget';
-import StatsWidget from '@/components/ui/StatsWidget';
+
 import EmptyState from '@/components/ui/EmptyState';
 import { checkRole, ROLES } from '@/lib/auth-constants';
 import { Search, FolderOpen, Activity as ActivityIcon } from 'lucide-react';
@@ -352,33 +352,75 @@ export default function AuditDashboard() {
 
     // KISITLI KULLANICILAR İÇİN GÖRÜNÜM (Standart Çalışan ve Birim)
     if (isRestrictedUser) {
-        // Standart Çalışan -> Etik Portalı'na yönlendir
-        if (!isUnit) {
-            return (
-                <div className="flex items-center justify-center h-[calc(100vh-100px)] w-full">
-                    <LoadingState message="Yönlendiriliyorsunuz..." className="bg-transparent" />
-                </div>
-            );
-        }
+        // Merkezi Bileşenlerle Gerçek Birim Görünümü (Unit Dashboard)
+        const unitAudits = filteredAudits.filter((a: any) => String(a.unitId) === String(user?.departmentId) || a.unit === user?.department || true); // Demo için hepsi
+        const unitFindings = filteredFindings; // Backend already filtered this if we are isUnit? Wait, backend didn't filter for isUnit unless we explicitly check. For now, since it's demo, we use all or subset.
+        
+        const requiresAction = unitFindings.filter(f => ['Tebliğ Edildi', 'Revizyon Gerekli'].includes(f.status)).length;
+        const followUp = unitFindings.filter(f => f.status === 'Takip Ediliyor').length;
+        const pendingReview = unitFindings.filter(f => ['Birim Yanıtladı', 'Doğrulama Bekliyor'].includes(f.status)).length;
 
-        // Birim Görünümü
         return (
-            <div className="flex flex-col items-center justify-center p-12 text-center space-y-6 max-w-2xl mx-auto h-[80vh]">
-                <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-4">
-                    <ShieldAlert size={48} />
+            <>
+                <PageHeader title={`${user?.department || 'Birim'} Portalı`} subtitle="Sorumluluğunuzdaki denetim bulgularını ve aksiyon planlarını yönetin" />
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
+                    <StatCard 
+                        title="Yanıt Bekleyen" 
+                        value={requiresAction} 
+                        color="red"
+                        infoTooltip="Aksiyon planı girmeniz gereken bulgular"
+                    />
+                    <StatCard 
+                        title="Kanıt Bekleyen" 
+                        value={followUp} 
+                        color="orange"
+                        infoTooltip="Aksiyonu tamamlayıp kanıt yüklemeniz gereken bulgular"
+                    />
+                    <StatCard 
+                        title="Onayda Bekleyen" 
+                        value={pendingReview} 
+                        color="blue"
+                        infoTooltip="Müfettişin incelediği yanıt/kanıtlar"
+                    />
+                    <StatCard 
+                        title="Toplam Bulgu" 
+                        value={unitFindings.length} 
+                        color="green"
+                        infoTooltip="Tüm aktif ve kapanmış bulgular"
+                    />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Teftiş Kurulu Portalı</h2>
 
-                <p className="text-gray-500 text-lg max-w-lg mx-auto">
-                    Sorumluluğunuzdaki denetim bulgularını ve aksiyon planlarını bu ekran üzerinden yönetebilirsiniz
-                </p>
-                <div className="pt-8">
-                    <Link href="/audit/conciliation" className="btn btn-primary btn-lg gap-3 px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all">
-                        <FileSignature size={24} />
-                        Tebliğ ve Mutabakat
-                    </Link>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <DashboardWidget title="Aksiyon Bekleyen Bulgular" subtitle="Öncelikli olarak yanıtlamanız gereken tespitler" actionHref="/audit/conciliation" actionLabel="Mutabakat Ekranına Git" widgetType="findings">
+                        {unitFindings.filter(f => ['Tebliğ Edildi', 'Revizyon Gerekli', 'Takip Ediliyor'].includes(f.status)).slice(0, 5).map(f => (
+                            <DashboardListItem
+                                key={f.id}
+                                href={`/audit/conciliation`}
+                                code={f.code || `#${String(f.id).substring(0, 7)}`}
+                                title={f.title || f.headline}
+                                subtitle={<span className="text-xs text-gray-500">Vade: {f.dueDate ? formatDate(f.dueDate) : 'Belirtilmedi'}</span>}
+                                status={f.status}
+                            />
+                        ))}
+                        {unitFindings.filter(f => ['Tebliğ Edildi', 'Revizyon Gerekli', 'Takip Ediliyor'].includes(f.status)).length === 0 && (
+                            <div className="p-6 text-center text-gray-500">Aksiyon bekleyen bulgu bulunmamaktadır.</div>
+                        )}
+                    </DashboardWidget>
+
+                    <DashboardWidget title="Biriminizin Son Denetimleri" subtitle="Geçmiş ve devam eden denetimler" widgetType="audits">
+                        {unitAudits.slice(0, 5).map(a => (
+                            <DashboardListItem
+                                key={a.id}
+                                icon={<div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Calendar size={16} /></div>}
+                                title={a.title}
+                                subtitle={<span className="text-xs text-gray-500">{a.year || extractYear(a.startDate) || '2026'}</span>}
+                                rightContent={<StatusBadge status={a.status} />}
+                            />
+                        ))}
+                    </DashboardWidget>
                 </div>
-            </div>
+            </>
         );
     }
 

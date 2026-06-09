@@ -694,7 +694,7 @@ export default function AuditUniversePage() {
     };
 
     const handleExport = () => {
-        auditApi.exportToExcel(units, 'Denetim_Evreni');
+        auditApi.exportToExcel(filteredUnits, 'Denetim_Evreni');
         showToast('Denetim evreni dışa aktarıldı', 'info');
     };
 

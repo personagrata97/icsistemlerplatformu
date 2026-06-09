@@ -1,6 +1,6 @@
 'use client';
 import { SearchInput } from '@/components/ui/SearchInput';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import {
     Filter, Plus, FileText, Calendar, Loader2, X, CheckSquare, Save, Eye, Download, CheckCircle, Clock, AlertCircle, Trash2, ChevronDown, RefreshCw, Activity, Search
 } from 'lucide-react';
@@ -27,7 +27,7 @@ import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
 import { getStatusBadgeClass } from '@/lib/audit-utils';
 
-export default function AuditsPage() {
+function AuditsPageContent() {
     const router = useRouter();
     const { showToast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
@@ -289,7 +289,7 @@ export default function AuditsPage() {
                 }}
                 addButtonText="Yeni Denetim"
                 showExportButton={true}
-                onExportClick={() => auditApi.exportToExcel(audits.map(a => ({ No: a.code, Başlık: a.title, Tür: a.type, Tarih: a.dates, Durum: a.status })), 'Denetimler')}
+                onExportClick={() => auditApi.exportToExcel(filteredAudits.map(a => ({ No: a.code, Başlık: a.title, Tür: a.type, Tarih: a.dates, Durum: a.status })), 'Denetimler')}
                 filters={
                     <FilterDropdown
                         activeCount={filterType.length + filterStatus.length + filterInspector.length}
@@ -456,6 +456,14 @@ export default function AuditsPage() {
                 type="danger"
             />
         </>
+    );
+}
+
+export default function AuditsPage() {
+    return (
+        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="animate-spin text-primary" size={32} /></div>}>
+            <AuditsPageContent />
+        </Suspense>
     );
 }
 

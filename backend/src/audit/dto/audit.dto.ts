@@ -1,5 +1,17 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, IsBoolean, Min, Max } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, IsBoolean, Min, Max, IsEnum } from 'class-validator';
 
+export enum AuditStatus {
+    TASLAK = 'Taslak',
+    PLANLANDI = 'Planlandı',
+    DEVAM_EDIYOR = 'Devam Ediyor',
+    RAPORLANIYOR = 'Raporlanıyor',
+    RAPORLANDI = 'Raporlandı',
+    CAE_ONAYI = 'CAE Onayı Bekliyor',
+    TAMAMLANDI = 'Tamamlandı',
+    IPTAL = 'İptal',
+    SILINME_ONAYI = 'Silinme Onayı Bekliyor',
+    SILINDI = 'Silindi'
+}
 /**
  * Denetim Oluşturma DTO'su
  * Frontend'den gelen verinin tip güvenliğini sağlar.
@@ -146,9 +158,13 @@ export class UpdateAuditDto {
     @IsOptional()
     type?: string;
 
+    @IsEnum(AuditStatus, { message: 'Geçersiz denetim statüsü. Lütfen geçerli bir statü giriniz.' })
+    @IsOptional()
+    status?: AuditStatus;
+
     @IsString()
     @IsOptional()
-    status?: string;
+    statusJustification?: string;
 
     @IsString()
     @IsOptional()

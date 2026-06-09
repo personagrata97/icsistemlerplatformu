@@ -55,7 +55,7 @@ export default function CustomSelect({
     const [searchTerm, setSearchTerm] = useState('');
 
     // Internal showSearch determination
-    const finalShowSearch = showSearch || isSearchable;
+    const finalShowSearch = showSearch || isSearchable || isCreatable;
     const [position, setPosition] = useState({ top: 0 as number | undefined, bottom: undefined as number | undefined, left: 0, width: 0, maxHeight: 300 });
     const dropdownRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
