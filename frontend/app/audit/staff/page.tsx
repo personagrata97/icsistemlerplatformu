@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import useOnClickOutside from '@/hooks/useOnClickOutside';
-import { Search, Plus, Edit2, Trash2, Filter, Download, Mail, Phone, Shield, Users, Calendar, AlertCircle, ChevronDown, X, RefreshCw, Eye, Briefcase, TrendingUp, History, ArrowRight, FileText, ShieldCheck, Award, Bot, Clock, CheckCircle, UserCheck } from 'lucide-react';
+import { Plus, Edit2, Trash2, Mail, Phone, Shield, Users, Calendar, AlertCircle, X, RefreshCw, Eye, Briefcase, TrendingUp, History, ArrowRight, FileText, ShieldCheck, Award, Clock, CheckCircle, UserCheck } from 'lucide-react';
 import Tooltip from '@/components/ui/Tooltip';
 import OverflowTooltip from '@/components/ui/OverflowTooltip';
 import { auditApi, AuditStaff, StaffExperience, StaffEducation, StaffTraining, StaffPromotion } from '@/lib/audit-api';
@@ -19,14 +19,23 @@ import LoadingState from '@/components/ui/LoadingState';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
+import FormField from '@/components/ui/FormField';
+import ProfileHeader from '@/components/ui/ProfileHeader';
+import UserAvatar from '@/components/ui/UserAvatar';
+import SectionHeader from '@/components/ui/SectionHeader';
+import CodeBadge from '@/components/ui/CodeBadge';
+import InfoItem from '@/components/ui/InfoItem';
 
 import CustomSelect from '@/components/ui/CustomSelect';
+import Alert from '@/components/ui/Alert';
 import StatusBadge from '@/components/ui/StatusBadge';
 import EmptyState from '@/components/ui/EmptyState';
+import StaffTabs from '@/components/audit/staff/StaffTabs';
 import Checkbox from '@/components/ui/Checkbox';
 import { useAuth } from '@/context/AuthContext';
 import { checkRole, ROLES } from '@/lib/auth-constants';
 import { DateDisplay } from '@/components/ui/DateDisplay';
+import Timeline, { TimelineEvent, TimelineActionType } from '@/components/ui/Timeline';
 import { getRiskScoreColor, getRiskLevelFromScore, getAuditCycleFromScore } from '@/lib/audit-utils';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
@@ -35,6 +44,7 @@ import ExperienceModal from '@/components/audit/staff/modals/ExperienceModal';
 import TrainingModal from '@/components/audit/staff/modals/TrainingModal';
 import PromotionModal from '@/components/audit/staff/modals/PromotionModal';
 import BulkTrainingModal from '@/components/audit/staff/modals/BulkTrainingModal';
+import LeaveModal from '@/components/audit/staff/modals/LeaveModal';
 import FormInput from "@/components/ui/FormInput";
 import FormTextarea from "@/components/ui/FormTextarea";
 import DatePicker from "@/components/ui/DatePicker";
@@ -50,14 +60,7 @@ const REASON_OPTIONS = [
     { value: 'Diğer', label: 'Diğer' }
 ];
 
-const getPhotoUrl = (url?: string) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    const origin = apiUrl.replace(/\/api\/v1\/?$/, '');
-    return `${origin}${url}`;
-};
-
+import { getPhotoUrl } from '@/lib/audit-utils';
 // Alt kırılımlı ve Teftiş/Yönetim Kurulu hariç departman listesi oluşturan yardımcı fonksiyon
 const getNestedDepartmentOptions = () => {
     const options: { value: string, label: string }[] = [];
@@ -93,13 +96,7 @@ const getNestedDepartmentOptions = () => {
 export default function AuditStaffPage() {
     const router = useRouter();
     const { hasRole, user } = useAuth();
-    const MANAGER_ROLES_LOWER = [
-        'admin', 'audit_admin', 'audit_manager', 'manager', 'cae',
-        'teftiş kurulu başkanı', 'başkan', 'teftiş kurulu müdürü', 'müdür',
-        'system_admin', 'yönetici'
-    ];
-    const userRoleStr = (user?.role || '').toLowerCase();
-    const canManage = MANAGER_ROLES_LOWER.includes(userRoleStr) || checkRole(hasRole, ROLES.STAFF_MANAGER);
+    const canManage = hasRole ? checkRole(hasRole, ROLES.STAFF_MANAGER) : false;
     const { showToast } = useToast();
     const [staffList, setStaffList] = useState<AuditStaff[]>([]);
     const [loading, setLoading] = useState(true);
@@ -123,7 +120,33 @@ export default function AuditStaffPage() {
         try {
             if (showOverlay) setLoading(true);
             const data = await auditApi.getStaff();
-            setStaffList(Array.isArray(data) ? data : []);
+            
+            // Dinamik Durum (İzinli) Hesaplaması
+            const now = new Date();
+            const processedData = (Array.isArray(data) ? data : []).map(staff => {
+                let currentStatus = staff.status || 'Aktif';
+                
+                // Sadece aktif olan personel izne ayrılabilir. (Pasifler pasif kalır)
+                if (currentStatus !== 'Pasif' && staff.leaves && staff.leaves.length > 0) {
+                    const isActiveLeave = staff.leaves.some((leave: any) => {
+                        if (leave.status === 'İptal Edildi') return false;
+                        const sDate = new Date(leave.startDate);
+                        const eDate = new Date(leave.endDate);
+                        // Start of day vs End of day logic could be applied, but direct Date comparison works for standard cases
+                        return now >= sDate && now <= eDate;
+                    });
+                    if (isActiveLeave) {
+                        currentStatus = 'İzinli';
+                    } else if (currentStatus === 'İzinli') {
+                        // Eğer eskiden manuel "İzinli" kalmış ama aktif izni yoksa, Aktife çek
+                        currentStatus = 'Aktif';
+                    }
+                }
+                
+                return { ...staff, status: currentStatus };
+            });
+            
+            setStaffList(processedData);
         } catch (error) {
             console.error('Personel listesi yükleme hatası:', error);
             showToast('Personel listesi alınırken hata oluştu.', 'error');
@@ -201,10 +224,16 @@ export default function AuditStaffPage() {
     const [bulkTrainingForm, setBulkTrainingForm] = useState({
         name: '',
         provider: '',
-        startDate: '',
-        endDate: '',
+        hours: undefined as number | undefined,
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0],
+        status: 'Tamamlandı',
         participantIds: [] as string[]
     });
+
+    // İzin modal durumu
+    const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+    const [editingLeave, setEditingLeave] = useState<any>(null);
 
     const [selectedParentDept, setSelectedParentDept] = useState<string>('');
     const [selectedParentExp, setSelectedParentExp] = useState<string>('');
@@ -661,6 +690,12 @@ export default function AuditStaffPage() {
 
     const handleBulkTrainingSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!bulkTrainingForm.name.trim() || !bulkTrainingForm.provider.trim() || !bulkTrainingForm.startDate || !bulkTrainingForm.endDate) {
+            showToast('Lütfen zorunlu alanları (Eğitim Adı, Sağlayıcı ve Tarihler) doldurun.', 'error');
+            return;
+        }
+        
         if (bulkTrainingForm.participantIds.length === 0) {
             showToast('En az bir personel seçmelisiniz.', 'error');
             return;
@@ -676,6 +711,127 @@ export default function AuditStaffPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleLeaveSave = async (leaveData: any) => {
+        if (!editingStaff) return;
+        setLoading(true);
+        try {
+            if (editingLeave) {
+                // EDGE CASE FIX: Eğer izin zaten onaylanmışsa ve tarihler değişiyorsa, statüyü tekrar "Planlandı"ya çek!
+                if (leaveData.startDate && leaveData.endDate) {
+                    const isDateChanged = new Date(editingLeave.startDate).getTime() !== new Date(leaveData.startDate).getTime() || 
+                                          new Date(editingLeave.endDate).getTime() !== new Date(leaveData.endDate).getTime();
+                    
+                    if (editingLeave.status === 'Onaylandı' && isDateChanged) {
+                        leaveData.status = 'Planlandı';
+                        showToast('İzin tarihleri değiştiği için onay kaldırılarak "Planlandı" statüsüne çekildi.', 'warning');
+                    }
+                }
+                await auditApi.updateStaffLeave(editingLeave.id, leaveData);
+                if (leaveData.status !== 'Planlandı') {
+                    showToast('İzin güncellendi.', 'success');
+                }
+            } else {
+                await auditApi.addStaffLeave(editingStaff.id, leaveData);
+                showToast('İzin eklendi.', 'success');
+            }
+            setIsLeaveModalOpen(false);
+            const updated = await auditApi.getStaffProfile(editingStaff.id);
+            setEditingStaff(updated);
+        } catch (error: any) {
+            showToast(error.message || 'Hata oluştu.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const [deleteLeaveId, setDeleteLeaveId] = useState<string | null>(null);
+    const [approveLeaveId, setApproveLeaveId] = useState<string | null>(null);
+    const [rejectLeaveId, setRejectLeaveId] = useState<string | null>(null);
+    const [rejectReason, setRejectReason] = useState('');
+
+    const handleDeleteLeave = (id: string) => {
+        setDeleteLeaveId(id);
+    };
+
+    const handleUpdateLeaveStatus = async (id: string, newStatus: string) => {
+        if (!editingStaff) return;
+        try {
+            setLoading(true);
+            await auditApi.updateStaffLeave(id, { status: newStatus });
+            showToast(`İzin durumu '${newStatus}' olarak güncellendi.`, 'success');
+            const updated = await auditApi.getStaffProfile(editingStaff.id);
+            setEditingStaff(updated);
+            loadStaff(false);
+        } catch (error) {
+            console.error('İzin durumu güncellenirken hata:', error);
+            showToast('Durum güncellenirken bir hata oluştu.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleApproveLeaveSubmit = async () => {
+        if (!editingStaff || !approveLeaveId) return;
+        try {
+            setLoading(true);
+            await auditApi.updateStaffLeave(approveLeaveId, { status: 'Onaylandı' });
+            showToast(`İzin durumu 'Onaylandı' olarak güncellendi.`, 'success');
+            setApproveLeaveId(null);
+            const updated = await auditApi.getStaffProfile(editingStaff.id);
+            setEditingStaff(updated);
+            loadStaff(false);
+        } catch (error) {
+            console.error('İzin onaylanırken hata:', error);
+            showToast('Durum güncellenirken bir hata oluştu.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRejectLeaveSubmit = async () => {
+        if (!editingStaff || !rejectLeaveId) return;
+        try {
+            setLoading(true);
+            await auditApi.updateStaffLeave(rejectLeaveId, { status: 'İptal Edildi', managerNote: rejectReason });
+            showToast('İzin reddedildi ve gerekçe eklendi.', 'success');
+            setRejectLeaveId(null);
+            setRejectReason('');
+            const updated = await auditApi.getStaffProfile(editingStaff.id);
+            setEditingStaff(updated);
+            loadStaff(false);
+        } catch (error) {
+            console.error('İzin reddedilirken hata:', error);
+            showToast('Durum güncellenirken bir hata oluştu.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const confirmDeleteLeave = async () => {
+        if (!deleteLeaveId || !editingStaff) return;
+        setLoading(true);
+        try {
+            await auditApi.deleteStaffLeave(deleteLeaveId);
+            showToast('İzin silindi.', 'success');
+            const updated = await auditApi.getStaffProfile(editingStaff.id);
+            setEditingStaff(updated);
+            setDeleteLeaveId(null);
+        } catch (error: any) {
+            showToast(error.message || 'Hata oluştu.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const openLeaveModal = (leave?: any) => {
+        if (leave) {
+            setEditingLeave(leave);
+        } else {
+            setEditingLeave(null);
+        }
+        setIsLeaveModalOpen(true);
     };
 
     const openTrainingModal = (trn?: StaffTraining) => {
@@ -964,9 +1120,11 @@ export default function AuditStaffPage() {
         );
     }
 
+
     const pageContent = (
         <div className="space-y-6">
-            <PageHeader title="Denetim Ekibi" subtitle="Personel listesi, yetkinlik matrisi ve kapasite yönetimi" />
+            <StaffTabs />
+            <PageHeader title="Denetim Ekibi" subtitle="Personel listesi, kaynak planlama, yetkinlik matrisi ve uyum süreçleri" />
             
             <PageToolbar
                 searchPlaceholder="İsim, sicil, ünvan veya rol ara..."
@@ -1001,7 +1159,7 @@ export default function AuditStaffPage() {
                             leftIcon={<Award size={18} />}
                             onClick={() => router.push('/audit/staff/cpe')}
                         >
-                            CPE Raporu
+                            Eğitim Raporu
                         </Button>
                         <Button 
                             variant="secondary" 
@@ -1025,6 +1183,7 @@ export default function AuditStaffPage() {
                         key: 'name',
                         header: 'Personel',
                         type: 'user',
+                        align: 'left' as const,
                         sortable: true,
                         width: '250px'
                     },
@@ -1042,9 +1201,7 @@ export default function AuditStaffPage() {
                                 {staff.certifications && staff.certifications.filter((c: string) => c && c.trim() && c.trim() !== '[]' && c.trim() !== '""').length > 0 && (
                                     <div className="flex gap-1 mt-1.5 flex-wrap">
                                         {staff.certifications.filter((c: string) => c && c.trim() && c.trim() !== '[]' && c.trim() !== '""').map((cert: string, i: number) => (
-                                            <span key={i} className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100 font-bold uppercase tracking-tight">
-                                                {cert}
-                                            </span>
+                                            <CodeBadge key={i} code={cert} size="sm" />
                                         ))}
                                     </div>
                                 )}
@@ -1082,7 +1239,7 @@ export default function AuditStaffPage() {
                         header: 'Durum',
                         sortable: true,
                         width: '120px',
-                        render: (item: any) => <StatusBadge type="status" value={item.status} />
+                        type: 'status'
                     },
                     {
                         key: 'actions',
@@ -1182,6 +1339,7 @@ export default function AuditStaffPage() {
                                 { id: 'experience', label: 'Deneyim (Özgeçmiş)', icon: Briefcase },
                                 { id: 'education', label: 'Eğitim Bilgileri', icon: Calendar },
                                 { id: 'trainings', label: 'Mesleki Eğitim', icon: ShieldCheck },
+                                { id: 'leaves', label: 'İzinler & Vekalet', icon: Clock },
                                 { id: 'independence', label: 'Bağımsızlık Beyanı', icon: Shield }
                             ] : [])
                         ]}
@@ -1249,19 +1407,17 @@ export default function AuditStaffPage() {
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormInput label="Telefon" name="phone" type="tel" value={formData.phone || ''} onChange={e => setFormData({ ...formData, phone: e.target.value })} disabled={isViewMode || !canEditStaff} />
-                                        <div className="form-group">
-                                            <label className="form-label">İşe Giriş Tarihi</label>
+                                        <FormField label="İşe Giriş Tarihi">
                                             <DatePicker 
                                                 value={formData.hireDate || ''} 
                                                 onChange={(val) => setFormData({ ...formData, hireDate: val })} 
                                                 disabled={isViewMode || !canManage} 
                                             />
-                                        </div>
+                                        </FormField>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="form-group">
-                                            <label className="form-label">Ünvan</label>
+                                        <FormField label="Ünvan">
                                             <CustomSelect
                                                 value={formData.title}
                                                 onChange={val => setFormData({ ...formData, title: val })}
@@ -1269,9 +1425,8 @@ export default function AuditStaffPage() {
                                                 disabled={isViewMode || !canManage}
                                                 placeholder="Seçiniz..."
                                             />
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Rol</label>
+                                        </FormField>
+                                        <FormField label="Rol">
                                             <CustomSelect
                                                 value={formData.role}
                                                 onChange={val => setFormData({ ...formData, role: val })}
@@ -1279,46 +1434,46 @@ export default function AuditStaffPage() {
                                                 disabled={isViewMode || !canManage}
                                                 placeholder="Seçiniz..."
                                             />
-                                        </div>
+                                        </FormField>
                                     </div>
 
-                                    <div className="form-group">
-                                        <label className="form-label">Durum</label>
+                                    <FormField label="Durum">
                                         <CustomSelect
                                             value={formData.status}
                                             onChange={val => setFormData({ ...formData, status: val })}
                                             options={[
                                                 { value: "Aktif", label: "Aktif" },
-                                                { value: "İzinli", label: "İzinli" },
                                                 { value: "Pasif", label: "Pasif" }
                                             ]}
                                             disabled={isViewMode || !canManage}
                                         />
-                                    </div>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Not: Personel izindeyse "İzinli" durumu sistem tarafından otomatik hesaplanıp gösterilir.
+                                        </p>
+                                    </FormField>
                                 </div>
                             </div>
                             
                             {formData.status === 'Pasif' && (
                                 <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                                    <div className="form-group">
-                                        <label className="form-label">Pasiflik Nedeni</label>
+                                    <FormField label="Pasiflik Nedeni">
                                         <CustomSelect
                                             value={formData.passiveReason || ''}
                                             onChange={(val) => setFormData({ ...formData, passiveReason: val as string })}
                                             options={[
                                                 { value: "Geçici Görevlendirme", label: "Geçici Görevlendirme" },
-                                                { value: "İstifa", label: "İstifa" },
+                                                { value: "İstifa (Kendi İsteği)", label: "İstifa (Kendi İsteği)" },
+                                                { value: "İşveren Feshi (Şirket Çıkardı)", label: "İşveren Feshi (Şirket Çıkardı)" },
                                                 { value: "Emeklilik", label: "Emeklilik" },
                                                 { value: "Diğer", label: "Diğer" }
                                             ]}
                                             disabled={isViewMode || !canManage}
                                         />
-                                    </div>
+                                    </FormField>
 
                                     {formData.passiveReason === 'Geçici Görevlendirme' && (
                                         <div className="space-y-4 animate-in slide-in-from-top-2 duration-200 pt-2">
-                                            <div className="form-group">
-                                                <label className="form-label">Görevlendirildiği Birim</label>
+                                            <FormField label="Görevlendirildiği Birim">
                                                 <CustomSelect
                                                     value={formData.temporaryUnit || ''}
                                                     onChange={(val) => setFormData({ ...formData, temporaryUnit: val as string })}
@@ -1326,66 +1481,73 @@ export default function AuditStaffPage() {
                                                     disabled={isViewMode || !canManage}
                                                     placeholder="Birim Seçiniz"
                                                 />
-                                            </div>
+                                            </FormField>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <div className="form-group">
-                                                    <label className="form-label">Başlangıç Tarihi</label>
+                                                <FormField label="Başlangıç Tarihi">
                                                     <DatePicker
                                                         value={formData.temporaryStartDate || ''}
                                                         onChange={(val) => setFormData({ ...formData, temporaryStartDate: val })}
                                                         disabled={isViewMode || !canManage}
                                                     />
-                                                </div>
-                                                <div className="form-group">
-                                                    <label className="form-label">Bitiş Tarihi</label>
+                                                </FormField>
+                                                <FormField label="Bitiş Tarihi">
                                                     <DatePicker
                                                         value={formData.temporaryEndDate || ''}
                                                         onChange={(val) => setFormData({ ...formData, temporaryEndDate: val })}
                                                         disabled={isViewMode || !canManage}
                                                     />
-                                                </div>
+                                                </FormField>
                                             </div>
-                                            <div className="form-group">
+                                            <FormField label="Görevlendirme Detayı ve Açıklamalar">
                                                 <FormTextarea
-                                                    label="Görevlendirme Detayı ve Açıklamalar"
                                                     value={formData.temporaryAssignmentDetails || ''}
                                                     onChange={(e) => setFormData({ ...formData, temporaryAssignmentDetails: e.target.value })}
                                                     disabled={isViewMode || !canManage}
                                                     placeholder="Örn: Kredi Tahsis Birimi'ne Kıdemli Uzman ünvanıyla, süreç optimizasyonu projesine destek amacıyla 6 aylığına görevlendirilmiştir."
                                                 />
-                                            </div>
+                                            </FormField>
                                         </div>
                                     )}
 
                                     {formData.passiveReason === 'Diğer' && (
-                                        <div className="form-group animate-in slide-in-from-top-2 duration-200 pt-2">
-                                            <FormTextarea
-                                                label="Lütfen 'Diğer' nedenini açıklayınız"
-                                                value={formData.otherPassiveReasonDetails || ''}
-                                                onChange={(e) => setFormData({ ...formData, otherPassiveReasonDetails: e.target.value })}
-                                                disabled={isViewMode || !canManage}
-                                                required
-                                            />
+                                        <div className="animate-in slide-in-from-top-2 duration-200 pt-2">
+                                            <FormField label="Lütfen 'Diğer' nedenini açıklayınız" required>
+                                                <FormTextarea
+                                                    value={formData.otherPassiveReasonDetails || ''}
+                                                    onChange={(e) => setFormData({ ...formData, otherPassiveReasonDetails: e.target.value })}
+                                                    disabled={isViewMode || !canManage}
+                                                />
+                                            </FormField>
+                                        </div>
+                                    )}
+
+                                    {formData.passiveReason && formData.passiveReason !== 'Geçici Görevlendirme' && (
+                                        <div className="animate-in slide-in-from-top-2 duration-200 pt-2">
+                                            <FormField label="Çıkış / Ayrılış Tarihi">
+                                                <DatePicker
+                                                    value={formData.departureDate || ''}
+                                                    onChange={(val) => setFormData({ ...formData, departureDate: val })}
+                                                    disabled={isViewMode || !canManage}
+                                                />
+                                            </FormField>
                                         </div>
                                     )}
                                 </div>
                             )}
 
-                            <div className="form-group">
+                            <FormField label="Özet">
                                 <FormTextarea
-                                    label="Özet"
                                     className="min-h-[100px]"
                                     value={formData.summary || ''}
                                     onChange={e => setFormData({ ...formData, summary: e.target.value })}
                                     disabled={isViewMode || !canEditStaff}
                                     placeholder="Personel hakkında genel özet bilgisi..."
                                 />
-                            </div>
+                            </FormField>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="form-group">
+                                <FormField label="Sertifikalar">
                                     <CustomSelect
-                                        label="Sertifikalar"
                                         isMulti={true}
                                         isCreatable={true}
                                         disabled={isViewMode || !canEditStaff}
@@ -1412,16 +1574,15 @@ export default function AuditStaffPage() {
                                             { value: 'CPA', label: 'CPA (Certified Public Accountant)' },
                                             { value: 'CRISC', label: 'CRISC (Risk and Information Systems Control)' },
                                             { value: 'CRMA', label: 'CRMA (Risk Management Assurance)' },
-                                            { value: 'ISO 27001', label: 'ISO 27001 Baş Denetçi' },
+                                            { value: 'ISO 27001', label: 'ISO 27001' },
                                             { value: 'MASAK Uyum Görevlisi', label: 'MASAK Uyum Görevlisi' },
                                             { value: 'SMMM', label: 'SMMM (Serbest Muhasebeci Mali Müşavir)' },
                                             { value: 'SPL Düzey 3', label: 'SPL Düzey 3' }
                                         ]}
                                     />
-                                </div>
-                                <div className="form-group">
+                                </FormField>
+                                <FormField label="Yabancı Dil(ler) ve Seviyesi">
                                     <CustomSelect
-                                        label="Yabancı Dil(ler) ve Seviyesi"
                                         isMulti={true}
                                         isCreatable={true}
                                         disabled={isViewMode || !canEditStaff}
@@ -1444,8 +1605,9 @@ export default function AuditStaffPage() {
                                                 // Son seçilen seviye, o dilin önceki seviyesini ezer.
                                                 const languageMap = new Map<string, string>();
                                                 val.forEach(item => {
-                                                    const langName = item.split(' - ')[0].trim();
-                                                    languageMap.set(langName, item);
+                                                    // Normalize base language name (e.g. "İngilizce - İleri" or "ingilizce orta" -> "ingilizce")
+                                                    const langKey = item.split('-')[0].trim().split(' ')[0].toLocaleLowerCase('tr-TR');
+                                                    languageMap.set(langKey, item);
                                                 });
                                                 const finalValues = Array.from(languageMap.values());
                                                 setFormData({ ...formData, languages: finalValues.join(', ') });
@@ -1465,11 +1627,10 @@ export default function AuditStaffPage() {
                                         ]}
                                         placeholder="Dil ve seviye seçiniz..."
                                     />
-                                </div>
+                                </FormField>
                             </div>
                             
-                            <div className="form-group">
-                                <label className="form-label">Yetkinlikler</label>
+                            <FormField label="Yetkinlikler">
                                 <div className="p-3 bg-primary/5 border border-primary/20 rounded-xl flex flex-col gap-2 min-h-[42px] justify-center transition-colors">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
@@ -1480,7 +1641,7 @@ export default function AuditStaffPage() {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </FormField>
                         </div>
                     )}
 
@@ -1516,9 +1677,7 @@ export default function AuditStaffPage() {
                                                 <div className="text-xs font-bold text-primary uppercase tracking-wider">Mevcut Ünvan</div>
                                                 <div className="text-xl font-bold text-gray-900 mt-1">{editingStaff.title}</div>
                                             </div>
-                                            <div className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-100 uppercase tracking-tight">
-                                                Aktif
-                                            </div>
+                                            <StatusBadge status="Aktif" />
                                         </div>
                                         <div className="text-sm text-gray-600 flex items-center gap-4 mt-3">
                                             <span className="flex items-center gap-1.5">
@@ -1565,12 +1724,9 @@ export default function AuditStaffPage() {
                                                     <span>{prevTitle}</span>
                                                     <ArrowRight size={12} className="text-gray-300" />
                                                     <span className="text-gray-600 font-bold">{promo.title}</span>
-                                                    <span className={`ml-auto px-2 py-0.5 rounded uppercase text-[10px] border ${promo.type === 'Terfi' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                                                        promo.type === 'Atama' ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                                                            'bg-gray-100 text-gray-600 border-gray-200'
-                                                        }`}>
-                                                        {promo.type || 'Terfi'}
-                                                    </span>
+                                                    <div className="ml-auto">
+                                                        <StatusBadge status={promo.type || 'Terfi'} />
+                                                    </div>
                                                 </div>
                                                 <div className="flex justify-between items-end">
                                                     <div className="text-sm text-gray-500 flex items-center gap-3">
@@ -1612,6 +1768,104 @@ export default function AuditStaffPage() {
                         </div>
                     )}
 
+                    {/* İzinler & Vekalet Sekmesi */}
+                    {activeTab === 'leaves' && editingStaff && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                            <div className="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <div>
+                                    <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                                        <Clock className="text-primary" size={18} />
+                                        İzin ve Vekalet Yönetimi
+                                    </h3>
+                                    <p className="text-sm text-gray-500 mt-1">Personelin izin planlaması ve yetki devri detayları</p>
+                                </div>
+                                {canManage && (
+                                    <Button size="sm" onClick={() => openLeaveModal()} leftIcon={<Plus size={16} />}>
+                                        İzin Planla
+                                    </Button>
+                                )}
+                            </div>
+
+                            {(!editingStaff.leaves || editingStaff.leaves.length === 0) ? (
+                                <EmptyState
+                                    icon={Clock}
+                                    title="İzin Kaydı Bulunmuyor"
+                                    description="Bu personele ait herhangi bir izin kaydı bulunamadı."
+                                    action={canManage ? {
+                                        label: 'İlk İzni Planla',
+                                        onClick: () => openLeaveModal()
+                                    } : undefined}
+                                />
+                            ) : (
+                                <div className="space-y-4">
+                                    {editingStaff.leaves.map((leave: any) => (
+                                        <div key={leave.id} className="bg-white border border-slate-200 rounded-xl p-5 hover:border-primary/30 transition-colors shadow-sm">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <h4 className="font-semibold text-gray-800">{leave.type}</h4>
+                                                    <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
+                                                        <span className="flex items-center gap-1"><Calendar size={14} /> {formatDate(leave.startDate)} - {formatDate(leave.endDate)}</span>
+                                                        <StatusBadge status={leave.status} />
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    {canManage && (
+                                                        <ActionMenu
+                                                            items={[
+                                                                ...(leave.status === 'Planlandı' ? [
+                                                                    {
+                                                                        label: 'Onayla',
+                                                                        icon: () => <span className="text-emerald-600 font-bold">✓</span>,
+                                                                        onClick: () => setApproveLeaveId(leave.id),
+                                                                    }
+                                                                ] : []),
+                                                                ...(leave.status !== 'İptal Edildi' ? [
+                                                                    {
+                                                                        label: 'İptal Et',
+                                                                        icon: () => <span className="text-rose-600 font-bold">✕</span>,
+                                                                        onClick: () => setRejectLeaveId(leave.id),
+                                                                    }
+                                                                ] : []),
+                                                                {
+                                                                    label: 'Düzenle',
+                                                                    icon: Edit2,
+                                                                    onClick: () => openLeaveModal(leave),
+                                                                    variant: 'default'
+                                                                },
+                                                                {
+                                                                    label: 'Sil',
+                                                                    icon: Trash2,
+                                                                    onClick: () => handleDeleteLeave(leave.id),
+                                                                    variant: 'danger'
+                                                                }
+                                                            ]}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {(leave.proxyUserId || leave.description) && (
+                                                <div className="mt-4 pt-4 border-t border-slate-100 bg-slate-50/50 rounded-lg p-3 grid grid-cols-2 gap-4 text-sm">
+                                                    {leave.proxyUser && (
+                                                        <div>
+                                                            <span className="text-gray-500 block mb-1">Vekalet Eden Kişi</span>
+                                                            <span className="font-medium text-gray-800">{leave.proxyUser.displayName || leave.proxyUser.username}</span>
+                                                        </div>
+                                                    )}
+                                                    {leave.description && (
+                                                        <div className={!leave.proxyUser ? "col-span-2" : ""}>
+                                                            <span className="text-gray-500 block mb-1">Açıklama</span>
+                                                            <span className="text-gray-700">{leave.description}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* Bağımsızlık ve Objektiflik Beyanı Sekmesi */}
                     {activeTab === 'independence' && editingStaff && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -1641,34 +1895,30 @@ export default function AuditStaffPage() {
                                         <h4 className="font-bold text-gray-800 flex items-center gap-2">
                                             <FileText size={16} className="text-primary" /> {new Date().getFullYear()} Yılı Yıllık Bağımsızlık Beyanı
                                         </h4>
-                                        <button 
+                                        <Button 
                                             type="button" 
+                                            variant="ghost"
+                                            size="sm"
+                                            className="px-2 text-slate-400 hover:text-slate-600"
                                             onClick={() => setIsDeclaring(false)}
-                                            className="text-gray-400 hover:text-gray-600 p-1 hover:bg-slate-100 rounded-lg transition-all"
                                         >
                                             <X size={16} />
-                                        </button>
+                                        </Button>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="form-group">
-                                            <label className="form-label">Beyan Yılı</label>
-                                            <input 
-                                                type="number" 
-                                                className="form-input" 
-                                                value={declarationForm.year} 
-                                                disabled 
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Beyan Türü</label>
-                                            <input 
-                                                type="text" 
-                                                className="form-input" 
-                                                value={declarationForm.declarationType} 
-                                                disabled 
-                                            />
-                                        </div>
+                                        <FormInput
+                                            label="Beyan Yılı"
+                                            type="number"
+                                            value={declarationForm.year}
+                                            disabled
+                                        />
+                                        <FormInput
+                                            label="Beyan Türü"
+                                            type="text"
+                                            value={declarationForm.declarationType}
+                                            disabled
+                                        />
                                     </div>
 
                                     {/* BEYAN SORULARI */}
@@ -1858,101 +2108,80 @@ export default function AuditStaffPage() {
 
                                                 if (currentYearDecl.status === 'Onaylandı') {
                                                     return (
-                                                        <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-start gap-4">
-                                                            <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-                                                                <CheckCircle size={24} />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className="font-bold text-emerald-900 text-base">{currentYear} Yılı Bağımsızlık Beyanı Geçerli</h4>
-                                                                <p className="text-sm text-emerald-800 mt-1">
-                                                                    Personelin {currentYear} yılı yıllık bağımsızlık ve objektiflik beyanı incelenmiş ve onaylanmıştır. Herhangi bir çıkar çatışması veya bağımsızlık ihlali bulunmamaktadır.
-                                                                </p>
-                                                                <div className="mt-3 text-xs text-emerald-600 flex items-center gap-2">
-                                                                    <span>Onay Tarihi: {formatDate(currentYearDecl.reviewedAt || currentYearDecl.updated_at)}</span>
-                                                                    {currentYearDecl.reviewNotes && (
-                                                                        <>
-                                                                            <span>•</span>
-                                                                            <span>Not: {currentYearDecl.reviewNotes}</span>
-                                                                        </>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        <Alert
+                                                            variant="success"
+                                                            size="sm"
+                                                            icon={<CheckCircle />}
+                                                            title={`${currentYear} Yılı Bağımsızlık Beyanı Geçerli`}
+                                                            description={
+                                                                <>
+                                                                    <div>Personelin {currentYear} yılı yıllık bağımsızlık ve objektiflik beyanı incelenmiş ve onaylanmıştır. Herhangi bir çıkar çatışması veya bağımsızlık ihlali bulunmamaktadır.</div>
+                                                                    <div className="mt-2 font-semibold">Onay Tarihi: {formatDate(currentYearDecl.reviewedAt || currentYearDecl.updated_at)} {currentYearDecl.reviewNotes ? `• Not: ${currentYearDecl.reviewNotes}` : ''}</div>
+                                                                </>
+                                                            }
+                                                        />
                                                     );
                                                 } else if (currentYearDecl.status === 'Sorun Var' || hasIssues) {
                                                     return (
-                                                        <div className="p-5 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-4">
-                                                            <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-                                                                <AlertCircle size={24} />
-                                                            </div>
-                                                            <div className="flex-1">
-                                                                <h4 className="font-bold text-amber-900 text-base">{currentYear} Yılı İstisna Bildirimi / Riskli Beyan</h4>
-                                                                <p className="text-sm text-amber-800 mt-1">
-                                                                    Bu personel için {currentYear} yılı beyanında çıkar çatışması oluşturabilecek istisna veya ilişkiler bildirilmiştir. Denetim görevlendirmelerinde bu ilişkilerin gözetilmesi gerekmektedir.
-                                                                </p>
-                                                                {/* İstisna Özetleri */}
-                                                                <div className="mt-3 grid grid-cols-1 gap-2 bg-amber-100/50 p-3 rounded-lg border border-amber-200/50 text-xs text-amber-900">
-                                                                    {currentYearDecl.hasFinancialLink && <div><strong>Finansal İlişki:</strong> {currentYearDecl.financialDetails}</div>}
-                                                                    {currentYearDecl.hasFamilyLink && <div><strong>Akrabalık İlişkisi:</strong> {currentYearDecl.familyDetails}</div>}
-                                                                    {currentYearDecl.hasPreviousRole && <div><strong>Yakın Dönem Çalışma:</strong> {currentYearDecl.previousRoleDetails}</div>}
-                                                                    {currentYearDecl.hasConflict && <div><strong>Diğer Çıkar Çatışması:</strong> {currentYearDecl.conflictDetails}</div>}
+                                                        <Alert
+                                                            variant="warning"
+                                                            size="sm"
+                                                            icon={<AlertCircle />}
+                                                            title={`${currentYear} Yılı İstisna Bildirimi / Riskli Beyan`}
+                                                            description={
+                                                                <div className="space-y-2">
+                                                                    <p>Bu personel için {currentYear} yılı beyanında çıkar çatışması oluşturabilecek istisna veya ilişkiler bildirilmiştir. Denetim görevlendirmelerinde bu ilişkilerin gözetilmesi gerekmektedir.</p>
+                                                                    <div className="grid grid-cols-1 gap-1 text-xs">
+                                                                        {currentYearDecl.hasFinancialLink && <div><strong>Finansal İlişki:</strong> {currentYearDecl.financialDetails}</div>}
+                                                                        {currentYearDecl.hasFamilyLink && <div><strong>Akrabalık İlişkisi:</strong> {currentYearDecl.familyDetails}</div>}
+                                                                        {currentYearDecl.hasPreviousRole && <div><strong>Yakın Dönem Çalışma:</strong> {currentYearDecl.previousRoleDetails}</div>}
+                                                                        {currentYearDecl.hasConflict && <div><strong>Diğer Çıkar Çatışması:</strong> {currentYearDecl.conflictDetails}</div>}
+                                                                    </div>
+                                                                    <div className="mt-2 font-semibold">Beyan Tarihi: {formatDate(currentYearDecl.declaredAt)} {currentYearDecl.reviewedAt ? `• İncelenme: ${formatDate(currentYearDecl.reviewedAt)}` : ''}</div>
                                                                 </div>
-                                                                <div className="mt-3 text-xs text-amber-700 flex items-center gap-2">
-                                                                    <span>Beyan Tarihi: {formatDate(currentYearDecl.declaredAt)}</span>
-                                                                    {currentYearDecl.reviewedAt && (
-                                                                        <>
-                                                                            <span>•</span>
-                                                                            <span>İncelenme: {formatDate(currentYearDecl.reviewedAt)}</span>
-                                                                        </>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                            }
+                                                        />
                                                     );
                                                 } else {
                                                     return (
-                                                        <div className="p-5 bg-indigo-50 rounded-2xl border border-indigo-100 flex items-start gap-4">
-                                                            <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-                                                                <Clock size={24} />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className="font-bold text-indigo-900 text-base">{currentYear} Yılı Beyanı İnceleniyor</h4>
-                                                                <p className="text-sm text-indigo-800 mt-1">
-                                                                    Yıllık bağımsızlık beyanı başarıyla gönderilmiştir. Kurul Müdürü veya onaylayıcı yöneticinin incelemesi beklenmektedir.
-                                                                </p>
-                                                                <div className="mt-2.5 text-xs text-indigo-600">
-                                                                    Beyan Tarihi: {formatDate(currentYearDecl.declaredAt)}
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        <Alert
+                                                            variant="info"
+                                                            size="sm"
+                                                            icon={<Clock />}
+                                                            title={`${currentYear} Yılı Beyanı İnceleniyor`}
+                                                            description={
+                                                                <>
+                                                                    <div>Yıllık bağımsızlık beyanı başarıyla gönderilmiştir. Kurul Müdürü veya onaylayıcı yöneticinin incelemesi beklenmektedir.</div>
+                                                                    <div className="mt-2 font-semibold">Beyan Tarihi: {formatDate(currentYearDecl.declaredAt)}</div>
+                                                                </>
+                                                            }
+                                                        />
                                                     );
                                                 }
                                             } else {
                                                 return (
-                                                    <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 flex items-start gap-4">
-                                                        <div className="w-12 h-12 bg-slate-400 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
-                                                            <Shield size={24} />
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="font-bold text-slate-900 text-base">{currentYear} Yılı Yıllık Beyanı Doldurulmamış</h4>
-                                                            <p className="text-sm text-slate-600 mt-1">
-                                                                {user?.id === editingStaff.id 
-                                                                    ? 'Bu yıla ait bağımsızlık ve objektiflik beyanınız henüz oluşturulmamıştır. Her yıl ocak ayında veya göreve başlandığında beyanın yenilenmesi gerekmektedir.'
-                                                                    : 'Personel için bu yıla ait bağımsızlık ve objektiflik beyanı henüz oluşturulmamıştır. Personel tarafından beyan girişi yapılması beklenmektedir.'
-                                                                }
-                                                            </p>
-                                                            {user?.id === editingStaff.id && (
+                                                    <Alert
+                                                        variant="warning"
+                                                        size="sm"
+                                                        icon={<Shield />}
+                                                        title={`${currentYear} Yılı Yıllık Beyanı Doldurulmamış`}
+                                                        description={
+                                                            user?.id === editingStaff.id 
+                                                                ? 'Bu yıla ait bağımsızlık ve objektiflik beyanınız henüz oluşturulmamıştır. Her yıl ocak ayında veya göreve başlandığında beyanın yenilenmesi gerekmektedir.'
+                                                                : 'Personel için bu yıla ait bağımsızlık ve objektiflik beyanı henüz oluşturulmamıştır. Personel tarafından beyan girişi yapılması beklenmektedir.'
+                                                        }
+                                                        action={
+                                                            user?.id === editingStaff.id ? (
                                                                 <Button
                                                                     variant="primary"
                                                                     size="sm"
-                                                                    className="mt-3"
                                                                     onClick={() => setIsDeclaring(true)}
                                                                 >
                                                                     Şimdi Beyan Oluştur
                                                                 </Button>
-                                                            )}
-                                                        </div>
-                                                    </div>
+                                                            ) : undefined
+                                                        }
+                                                    />
                                                 );
                                             }
                                         })()
@@ -2001,23 +2230,16 @@ export default function AuditStaffPage() {
                                                         render: (item: any) => <span className="font-semibold text-gray-900">{item.year ? `${item.year} - Yıllık Beyan` : item.declarationType}</span>
                                                     },
                                                     { 
-                                                        key: 'date',
+                                                        key: 'declaredAt',
                                                         header: 'Beyan Tarihi', 
-                                                        render: (item: any) => <span className="text-gray-500">{formatDate(item.declaredAt)}</span>
+                                                        type: 'date',
+                                                        align: 'center' as const
                                                     },
                                                     { 
                                                         key: 'status',
                                                         header: 'Durum', 
                                                         render: (item: any) => (
-                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                                                item.status === 'Onaylandı' 
-                                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                                    : item.status === 'Sorun Var'
-                                                                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                                                        : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                                                            }`}>
-                                                                {item.status === 'Onaylandı' ? 'Uyumlu' : item.status === 'Sorun Var' ? 'İstisna Mevcut' : 'Bekliyor'}
-                                                            </span>
+                                                            <StatusBadge status={item.status === 'Onaylandı' ? 'Tamamlandı' : item.status === 'Sorun Var' ? 'Uyarı' : 'Bekliyor'} text={item.status === 'Onaylandı' ? 'Uyumlu' : item.status === 'Sorun Var' ? 'İstisna Mevcut' : 'Bekliyor'} />
                                                         )
                                                     },
                                                     { 
@@ -2026,45 +2248,29 @@ export default function AuditStaffPage() {
                                                         render: (item: any) => {
                                                             const hasIssues = item.hasConflict || item.hasFinancialLink || item.hasFamilyLink || item.hasPreviousRole || item.hasOtherIssue;
                                                             return hasIssues ? (
-                                                                <span className="text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded">
-                                                                    İlişki Beyan Edilmiş
-                                                                </span>
+                                                                <StatusBadge status="Kritik" text="İlişki Beyan Edilmiş" />
                                                             ) : (
-                                                                <span className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded font-bold">
-                                                                    Yok (Tam Bağımsız)
-                                                                </span>
+                                                                <StatusBadge status="İyi" text="Yok (Tam Bağımsız)" />
                                                             );
                                                         }
                                                     },
                                                     {
                                                         key: 'actions',
                                                         header: 'Aksiyonlar',
-                                                        render: (item: any) => (
-                                                            <div className="flex gap-2 justify-end">
-                                                                {item.status !== 'Onaylandı' && (checkRole(hasRole, ROLES.TRASH_MANAGER) || hasRole('Teftiş Kurulu Müdürü') || hasRole('SYSTEM_ADMIN')) && (
-                                                                    <Button 
-                                                                        variant="secondary"
-                                                                        size="sm"
-                                                                        onClick={() => {
-                                                                            setReviewingDeclarationId(item.id);
-                                                                            setReviewNotes(item.reviewNotes || '');
-                                                                        }}
-                                                                    >
-                                                                        Değerlendir
-                                                                    </Button>
-                                                                )}
-                                                                {item.status !== 'Onaylandı' && user?.id === item.userId && (
-                                                                    <Button 
-                                                                        variant="danger"
-                                                                        size="sm"
-                                                                        onClick={() => handleDeleteDeclaration(item.id)}
-                                                                        title="Geri Çek / Sil"
-                                                                    >
-                                                                        <Trash2 size={14} />
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-                                                        )
+                                                        render: (item: any) => {
+                                                            const actions = [];
+                                                            if (item.status !== 'Onaylandı' && (checkRole(hasRole, ROLES.TRASH_MANAGER) || hasRole('Teftiş Kurulu Müdürü') || hasRole('SYSTEM_ADMIN'))) {
+                                                                actions.push({ label: 'Değerlendir', icon: UserCheck, onClick: () => { setReviewingDeclarationId(item.id); setReviewNotes(item.reviewNotes || ''); } });
+                                                            }
+                                                            if (item.status !== 'Onaylandı' && user?.id === item.userId) {
+                                                                actions.push({ label: 'Geri Çek / Sil', icon: Trash2, variant: 'danger' as const, onClick: () => handleDeleteDeclaration(item.id) });
+                                                            }
+                                                            return (
+                                                                <div className="flex gap-2 justify-center">
+                                                                    {actions.length > 0 ? <ActionMenu items={actions} /> : <span className="text-gray-400">-</span>}
+                                                                </div>
+                                                            );
+                                                        }
                                                     }
                                                 ]}
                                                 data={declarations}
@@ -2303,6 +2509,55 @@ export default function AuditStaffPage() {
                 loading={loading}
             />
 
+            {/* Silme Onay Modalleri */}
+            <ConfirmModal
+                isOpen={!!deleteLeaveId}
+                onClose={() => setDeleteLeaveId(null)}
+                onConfirm={confirmDeleteLeave}
+                title="İzin Kaydını Sil"
+                message="Bu izin kaydını silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+                type="danger"
+            />
+
+            {/* İzin Onaylama Teyit Modalı */}
+            <ConfirmModal
+                isOpen={!!approveLeaveId}
+                onClose={() => setApproveLeaveId(null)}
+                onConfirm={handleApproveLeaveSubmit}
+                title="İzin Talebini Onayla"
+                message="Bu izin talebini onaylamak istediğinize emin misiniz? Onaylanan izinler personel kapasitesinden düşülecektir."
+                type="success"
+                confirmText="Onayla"
+            />
+
+            {/* İzin Reddetme ve Gerekçe Modalı */}
+            <Modal
+                isOpen={!!rejectLeaveId}
+                onClose={() => { setRejectLeaveId(null); setRejectReason(''); }}
+                title="İzin Talebini Reddet / İptal Et"
+                size="md"
+                footer={
+                    <div className="flex gap-3 justify-end w-full">
+                        <Button variant="secondary" onClick={() => { setRejectLeaveId(null); setRejectReason(''); }}>İptal</Button>
+                        <Button variant="danger" onClick={handleRejectLeaveSubmit} disabled={!rejectReason.trim()}>Reddet</Button>
+                    </div>
+                }
+            >
+                <div className="space-y-4">
+                    <p className="text-sm text-gray-600">
+                        Bu izin talebini reddetmek üzeresiniz. Lütfen personele iletilmek üzere bir ret gerekçesi veya alternatif tarih önerisi yazın.
+                    </p>
+                    <FormField label="Ret Gerekçesi / Yönetici Notu" required>
+                        <textarea
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm min-h-[100px]"
+                            placeholder="Örn: Bu tarihlerde Şube denetimindesin, 15-20 Ağustos arası takvimin boş. Bu tarihler için tekrar talep girebilirsin."
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                        />
+                    </FormField>
+                </div>
+            </Modal>
+
             <TrainingModal
                 isOpen={isTrainingModalOpen}
                 onClose={() => setIsTrainingModalOpen(false)}
@@ -2323,7 +2578,26 @@ export default function AuditStaffPage() {
                 loading={loading}
             />
 
+            <LeaveModal
+                isOpen={isLeaveModalOpen}
+                onClose={() => setIsLeaveModalOpen(false)}
+                onSave={handleLeaveSave}
+                initialData={editingLeave}
+                isViewMode={!canManage}
+                staffList={staffList}
+                currentStaffId={editingStaff?.id}
+            />
+
             {/* Silme Onay Modalleri */}
+            <ConfirmModal
+                isOpen={!!deleteLeaveId}
+                onClose={() => setDeleteLeaveId(null)}
+                onConfirm={confirmDeleteLeave}
+                title="İzin Kaydını Sil"
+                message="Bu izin kaydını silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+                confirmText="Sil"
+                type="danger"
+            />
             < ConfirmModal
                 isOpen={!!deleteConfirmId}
                 onClose={() => setDeleteConfirmId(null)}

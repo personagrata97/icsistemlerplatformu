@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, ConflictException, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException, ConflictException, Logger, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../common/prisma.service';
 import { AuditronService } from '../auditron/auditron.service';
@@ -254,6 +254,46 @@ export class AuditService {
         }
     }
 
+    /**
+     * Kapasite ve Tarih Çakışması Kontrolü: Aynı tarihlerde (overlap) başka bir "Devam Ediyor"
+     * durumundaki denetime atanmış personeller varsa işlemi engeller.
+     */
+    private async checkCapacityOverlap(teamIds: string[], startDate: Date, endDate: Date, currentAuditId?: string, allowCapacityOverlap?: boolean) {
+        if (allowCapacityOverlap || !teamIds || teamIds.length === 0 || !startDate || !endDate) return;
+
+        const overlappingAudits = await this.prisma.audit.findMany({
+            where: {
+                id: currentAuditId ? { not: currentAuditId } : undefined,
+                status: 'Devam Ediyor',
+                isDeleted: false,
+                plannedStartDate: { lte: endDate },
+                plannedEndDate: { gte: startDate }
+            },
+            select: { id: true, title: true, team: true, supervisorId: true }
+        });
+
+        for (const audit of overlappingAudits) {
+            let conflictIds: string[] = [];
+            const existingTeam = typeof audit.team === 'string' ? JSON.parse(audit.team || '[]') : (audit.team || []);
+            const existingMemberIds = existingTeam.map((m: any) => typeof m === 'string' ? m : m.id).filter(Boolean);
+            if (audit.supervisorId) existingMemberIds.push(audit.supervisorId);
+
+            for (const tId of teamIds) {
+                if (existingMemberIds.includes(tId)) {
+                    conflictIds.push(tId);
+                }
+            }
+
+            if (conflictIds.length > 0) {
+                const users = await this.prisma.user.findMany({ where: { id: { in: conflictIds } }, select: { displayName: true, firstName: true } });
+                const names = users.map(u => u.displayName || u.firstName).join(', ');
+                throw new ConflictException(
+                    `Seçilen personel (${names}), belirtilen tarihlerde "${audit.title}" görevine atanmış durumdadır. İşleme devam etmek için onay gereklidir.`
+                );
+            }
+        }
+    }
+
     async createAudit(data: any, user: any) {
         try {
             this.logger.log('Creating audit with data');
@@ -272,6 +312,18 @@ export class AuditService {
 
             // Paralel denetim kontrolü
             await this.checkParallelAudit(data.unitId || null, data.auditableUnitId || null, data.allowParallel);
+
+            // Kapasite Çakışma Kontrolü
+            const teamIdsForCapacity: string[] = [];
+            if (data.supervisorId) teamIdsForCapacity.push(data.supervisorId);
+            if (data.auditors && Array.isArray(data.auditors)) {
+                const memberIds = data.auditors.map((m: any) => typeof m === 'string' ? m : m.id).filter(Boolean);
+                teamIdsForCapacity.push(...memberIds);
+            }
+            
+            const startD = data.plannedStartDate ? new Date(data.plannedStartDate) : new Date();
+            const endD = data.plannedEndDate ? new Date(data.plannedEndDate) : new Date(startD.getTime() + 30 * 24 * 60 * 60 * 1000);
+            await this.checkCapacityOverlap(teamIdsForCapacity, startD, endD, undefined, data.allowCapacityOverlap);
 
             const auditData = { ...data };
 
@@ -312,6 +364,7 @@ export class AuditService {
             delete auditData.createdAt;
             delete auditData.updatedAt;
             delete auditData.allowParallel; // Paralel denetim flag'i schema'da yok
+            delete auditData.allowCapacityOverlap; // Kapasite flag'i schema'da yok
 
             // Date parsing
             if (auditData.plannedStartDate) auditData.plannedStartDate = new Date(auditData.plannedStartDate);
@@ -570,6 +623,29 @@ export class AuditService {
                 if (memberId) await this.validateIndependence(memberId, targetDepartment);
             }
         }
+
+        // --- Kapasite (Tarih Çakışması) Kontrolü ---
+        const startD = updateData.plannedStartDate ? new Date(updateData.plannedStartDate) : audit.plannedStartDate;
+        const endD = updateData.plannedEndDate ? new Date(updateData.plannedEndDate) : audit.plannedEndDate;
+        
+        const teamIdsForCapacity: string[] = [];
+        const supervisorIdForCap = updateData.supervisorId !== undefined ? updateData.supervisorId : audit.supervisorId;
+        if (supervisorIdForCap) teamIdsForCapacity.push(supervisorIdForCap);
+        
+        let currentTeamArray = [];
+        if (updateData.team) {
+            currentTeamArray = typeof updateData.team === 'string' ? JSON.parse(updateData.team || '[]') : updateData.team;
+        } else {
+            currentTeamArray = typeof audit.team === 'string' ? JSON.parse(audit.team || '[]') : (audit.team || []);
+        }
+        const memberIdsForCap = currentTeamArray.map((m: any) => typeof m === 'string' ? m : m.id).filter(Boolean);
+        teamIdsForCapacity.push(...memberIdsForCap);
+        
+        if (startD && endD && teamIdsForCapacity.length > 0) {
+             await this.checkCapacityOverlap(teamIdsForCapacity, startD, endD, id, updateData.allowCapacityOverlap);
+        }
+        delete updateData.allowCapacityOverlap; // Schema'da yok
+        delete updateData.allowParallel; // Schema'da yok
 
         const diff: Record<string, any> = {};
         const auditRecord = audit as Record<string, any>;
@@ -1804,35 +1880,46 @@ export class AuditService {
     // --- NEW TRAINING METHODS ---
 
     async createTrainingBatch(data: any) {
-        const { participantIds, ...batchData } = data;
+        console.log("==> createTrainingBatch STARTED with data:", data);
+        try {
+            const { participantIds, ...batchData } = data;
 
-        return this.prisma.$transaction(async (tx) => {
+            return await this.prisma.$transaction(async (tx) => {
+            console.log("==> Transaction started");
             const batch = await tx.trainingBatch.create({
                 data: {
                     ...batchData,
+                    hours: batchData.hours,
                     startDate: new Date(batchData.startDate),
                     endDate: new Date(batchData.endDate),
+                    status: new Date(batchData.endDate) < new Date() ? 'Tamamlandı' : 'Planlandı'
                 }
             });
+            console.log("==> Batch created:", batch.id);
 
-            const trainings = await Promise.all(
-                participantIds.map((userId: string) =>
-                    tx.userTraining.create({
-                        data: {
-                            userId,
-                            batchId: batch.id,
-                            name: batch.name,
-                            provider: batch.provider,
-                            startDate: new Date(batchData.startDate),
-                            endDate: new Date(batchData.endDate),
-                            status: 'Planlandı'
-                        }
-                    })
-                )
-            );
+            await tx.userTraining.createMany({
+                data: participantIds.map((userId: string) => ({
+                    userId,
+                    batchId: batch.id,
+                    name: batch.name,
+                    provider: batch.provider,
+                    hours: batch.hours,
+                    startDate: new Date(batchData.startDate),
+                    endDate: new Date(batchData.endDate),
+                    status: new Date(batchData.endDate) < new Date() ? 'Tamamlandı' : 'Planlandı'
+                }))
+            });
+            console.log("==> User trainings created. Finishing transaction...");
 
-            return { batch, trainings };
+            return { batch, trainings: participantIds };
+        }, {
+            maxWait: 10000, // 10s
+            timeout: 30000  // 30s
         });
+        } catch (error: any) {
+            console.error("CREATE TRAINING BATCH ERROR:", error);
+            throw new BadRequestException(`Toplu eğitim kaydedilirken hata oluştu: ${error.message || error}`);
+        }
     }
 
     async cancelTrainingBatch(batchId: string, notes: string) {
@@ -2226,7 +2313,7 @@ export class AuditService {
     }
 
     // AUDITABLE UNITS
-    async getUnits(user: any) {
+    async getUnits(user: any, summaryOnly: boolean = true) {
         const where: any = {};
         if (!this.isAdmin(user)) {
             const roles = user.roles?.map((r: any) => typeof r === 'string' ? r : r.code || r.role?.code) || [];
@@ -2236,23 +2323,21 @@ export class AuditService {
                 where.name = { contains: user.department };
             }
         }
-        return this.prisma.auditableUnit.findMany({
-            where,
-            orderBy: { name: 'asc' },
-            include: {
-                processes: {
-                    include: {
-                        risks: {
-                            include: {
-                                controls: {
-                                    include: {
-                                        tests: {
-                                            orderBy: { testDate: 'desc' },
-                                            take: 1,
-                                            include: {
-                                                audit: {
-                                                    select: { auditCode: true, title: true }
-                                                }
+        
+        const includeObj: any = {};
+        if (!summaryOnly) {
+            includeObj.processes = {
+                include: {
+                    risks: {
+                        include: {
+                            controls: {
+                                include: {
+                                    tests: {
+                                        orderBy: { testDate: 'desc' },
+                                        take: 1,
+                                        include: {
+                                            audit: {
+                                                select: { auditCode: true, title: true }
                                             }
                                         }
                                     }
@@ -2261,7 +2346,13 @@ export class AuditService {
                         }
                     }
                 }
-            }
+            };
+        }
+
+        return this.prisma.auditableUnit.findMany({
+            where,
+            orderBy: { name: 'asc' },
+            include: Object.keys(includeObj).length > 0 ? includeObj : undefined
         });
     }
     async createUnit(data: any) {
@@ -2525,28 +2616,313 @@ export class AuditService {
     }
 
     // EXECUTIVE SUMMARY STATS
-    async getExecutiveStats(user: any) {
+    async getExecutiveStats(user: any, year?: string) {
+        try {
+            const whereAudit: any = { isDeleted: false };
+            const whereFinding: any = { isDeleted: false };
+            
+            const roles = user.roles?.map((r: any) => typeof r === 'string' ? r : r.code || r.role?.code) || [];
+            const isExecutive = this.isAdmin(user) || roles.includes('EXECUTIVE') || roles.includes('AUDIT_EXECUTIVE') || roles.includes('STAFF_MANAGER');
+        
+        // RBAC: Data Isolation for Non-Admins
+        if (!this.isAdmin(user)) {
+            if (roles.includes('AUDIT_UNIT')) {
+                if (user.department) {
+                    whereFinding.department = user.department;
+                }
+            }
+        }
+
+        if (year && year !== 'Tümü') {
+            const startOfYear = new Date(`${year}-01-01T00:00:00.000Z`);
+            const endOfYear = new Date(`${year}-12-31T23:59:59.999Z`);
+            whereAudit.createdAt = { gte: startOfYear, lte: endOfYear };
+            whereFinding.createdAt = { gte: startOfYear, lte: endOfYear };
+        }
+
         // 1. Audit Stats
-        const totalAudits = await this.prisma.audit.count({ where: { isDeleted: false } });
-        const activeAudits = await this.prisma.audit.count({ where: { status: 'Devam Ediyor', isDeleted: false } });
-        const completedAudits = await this.prisma.audit.count({ where: { status: 'Tamamlandı', isDeleted: false } });
+        const totalAudits = await this.prisma.audit.count({ where: whereAudit });
+        const activeAudits = await this.prisma.audit.count({ where: { ...whereAudit, status: 'Devam Ediyor' } });
+        const completedAudits = await this.prisma.audit.count({ where: { ...whereAudit, status: 'Tamamlandı' } });
 
         // 2. Finding Stats
-        const totalFindings = await this.prisma.finding.count({ where: { isDeleted: false } });
-        const criticalFindings = await this.prisma.finding.count({ where: { risk: 'Kritik', isDeleted: false } });
-        const highFindings = await this.prisma.finding.count({ where: { risk: 'Yüksek', isDeleted: false } });
-        const openFindings = await this.prisma.finding.count({ where: { status: { notIn: ['Kapalı', 'Taslak'] }, isDeleted: false } });
+        const totalFindings = await this.prisma.finding.count({ where: whereFinding });
+        const criticalFindings = await this.prisma.finding.count({ where: { ...whereFinding, risk: 'Kritik' } });
+        const highFindings = await this.prisma.finding.count({ where: { ...whereFinding, risk: 'Yüksek' } });
+        const mediumFindings = await this.prisma.finding.count({ where: { ...whereFinding, risk: 'Orta' } });
+        const lowFindings = await this.prisma.finding.count({ where: { ...whereFinding, risk: 'Düşük' } });
+        const openFindings = await this.prisma.finding.count({ where: { ...whereFinding, status: { notIn: ['Kapalı', 'Taslak', 'İptal'] } } });
 
-        // 3. Pending Actions (Approvals)
-        // Logic depends on user role, but for executive overview we might show global pending counts or specific
-        const pendingDeletions = await this.prisma.finding.count({ where: { status: 'Silinme Onayı Bekliyor' } }) +
-            await this.prisma.audit.count({ where: { status: 'Silinme Onayı Bekliyor' } });
+        // Calculate REAL breakdowns by Audit Type
+        const allFindingsList = await this.prisma.finding.findMany({
+            where: whereFinding,
+            include: { audit: { select: { type: true } } }
+        });
+
+        const breakdownMap: Record<string, Record<string, number>> = {
+            'Kritik': {},
+            'Yüksek': {},
+            'Orta': {},
+            'Düşük': {}
+        };
+
+        allFindingsList.forEach(f => {
+            const risk = f.risk || 'Düşük';
+            const type = f.audit?.type || 'Genel';
+            if (breakdownMap[risk]) {
+                if (!breakdownMap[risk][type]) breakdownMap[risk][type] = 0;
+                breakdownMap[risk][type]++;
+            }
+        });
+
+        const formatBreakdown = (riskLevel: string) => {
+            return Object.entries(breakdownMap[riskLevel] || {})
+                .map(([label, value]) => ({ label, value }))
+                .sort((a, b) => (b.value as number) - (a.value as number));
+        };
+
+        const findingBreakdowns = {
+            critical: formatBreakdown('Kritik'),
+            high: formatBreakdown('Yüksek'),
+            medium: formatBreakdown('Orta'),
+            low: formatBreakdown('Düşük')
+        };
+
+        // Calculate REAL breakdowns by Audit Type for Audits
+        const allAuditsList = await this.prisma.audit.findMany({
+            where: whereAudit,
+            select: { status: true, type: true }
+        });
+
+        const auditBreakdownMap: Record<string, Record<string, number>> = {
+            'Toplam': {},
+            'Devam Ediyor': {},
+            'Tamamlandı': {}
+        };
+
+        allAuditsList.forEach(a => {
+            const type = a.type || 'Genel';
+            // Total
+            if (!auditBreakdownMap['Toplam'][type]) auditBreakdownMap['Toplam'][type] = 0;
+            auditBreakdownMap['Toplam'][type]++;
+            
+            // Status Specific
+            if (a.status === 'Devam Ediyor') {
+                if (!auditBreakdownMap['Devam Ediyor'][type]) auditBreakdownMap['Devam Ediyor'][type] = 0;
+                auditBreakdownMap['Devam Ediyor'][type]++;
+            } else if (a.status === 'Tamamlandı' || a.status === 'Kapalı') {
+                if (!auditBreakdownMap['Tamamlandı'][type]) auditBreakdownMap['Tamamlandı'][type] = 0;
+                auditBreakdownMap['Tamamlandı'][type]++;
+            }
+        });
+
+        const formatAuditBreakdown = (cat: string) => {
+            return Object.entries(auditBreakdownMap[cat] || {})
+                .map(([label, value]) => ({ label, value }))
+                .sort((a, b) => (b.value as number) - (a.value as number));
+        };
+
+        const auditBreakdowns = {
+            total: formatAuditBreakdown('Toplam'),
+            active: formatAuditBreakdown('Devam Ediyor'),
+            completed: formatAuditBreakdown('Tamamlandı')
+        };
+
+        // 3. Workflow Stats
+        const pendingApprovals = await this.prisma.finding.count({ where: { ...whereFinding, status: 'Onay Bekliyor' } });
+        const pendingNotifications = await this.prisma.finding.count({ where: { ...whereFinding, status: { in: ['Tebliğ Edildi', 'Birim Yanıtladı'] } } });
+        const pendingVerification = await this.prisma.finding.count({ where: { ...whereFinding, status: 'Doğrulama Bekliyor' } });
+        const pendingRevisions = await this.prisma.finding.count({ where: { ...whereFinding, status: 'Revizyon Gerekli' } }) +
+            await this.prisma.audit.count({ where: { ...whereAudit, status: 'Revizyon Gerekli' } });
+
+        // 4. Pending Deletions
+        let pendingDeletionsAudits: any[] = [];
+        let pendingDeletionsFindings: any[] = [];
+        if (isExecutive) {
+            pendingDeletionsAudits = await this.prisma.audit.findMany({ where: { status: 'Silinme Onayı Bekliyor' }, select: { id: true, auditCode: true, title: true, deletionReason: true, deletionComment: true } });
+            pendingDeletionsFindings = await this.prisma.finding.findMany({ where: { status: 'Silinme Onayı Bekliyor' }, select: { id: true, code: true, title: true, deletionReason: true, deletionComment: true } });
+        }
+        
+        // 5. Recent Records
+        const recentAudits = await this.prisma.audit.findMany({ where: { ...whereAudit, status: 'Devam Ediyor' }, take: 5, orderBy: { created_at: 'desc' }, include: { AuditableUnit: true } });
+        const recentFindings = await this.prisma.finding.findMany({ where: whereFinding, take: 5, orderBy: { created_at: 'desc' }, include: { audit: { select: { type: true } } } });
+
+        // 6. Action Stats
+        const followUps = await this.prisma.auditFollowUp.findMany({ where: { finding: whereFinding } });
+        let overdueActionsCount = 0;
+        let dueSoonActionsCount = 0;
+        const now = new Date();
+        const fifteenDaysFromNow = new Date();
+        fifteenDaysFromNow.setDate(now.getDate() + 15);
+        
+        followUps.forEach(a => {
+            if (a.status !== 'Kapalı' && a.status !== 'Tamamlandı' && a.status !== 'İptal') {
+                if (a.deadline) {
+                    const dl = new Date(a.deadline);
+                    if (dl < now) overdueActionsCount++;
+                    else if (dl <= fifteenDaysFromNow) dueSoonActionsCount++;
+                }
+            }
+        });
+
+        // 7. Staff for Skill Gaps & Workload
+        let staffsData: any[] = [];
+        if (isExecutive) {
+            staffsData = await this.prisma.user.findMany({
+                where: { isDeleted: false },
+                include: { education: true, certificates: true, experiences: true, leaves: true, declarations: true }
+            });
+        }
+
+        // 7.1 Calculate Active Workload for each staff
+        const allActiveAudits = await this.prisma.audit.findMany({ 
+            where: { ...whereAudit, status: 'Devam Ediyor' }, 
+            select: { id: true, title: true, team: true, supervisor: true, startDate: true, endDate: true, supervisorUser: { select: { id: true, displayName: true } } } 
+        });
+
+        const staffs = staffsData.map(staff => {
+            let activeCount = 0;
+            const activeAssignmentsList: {id: string, auditId: string, title: string, role: string, startDate: string | null, endDate: string | null}[] = [];
+
+            allActiveAudits.forEach(audit => {
+                const sDate = audit.startDate || audit.plannedStartDate?.toISOString() || null;
+                const eDate = audit.endDate || audit.plannedEndDate?.toISOString() || null;
+                
+                // Check supervisor
+                if (audit.supervisor === staff.displayName || audit.supervisorUser?.id === staff.id) {
+                    activeCount++;
+                    activeAssignmentsList.push({ id: audit.id, auditId: audit.id, title: audit.title, role: 'Gözetmen', startDate: sDate, endDate: eDate });
+                    return;
+                }
+                // Check team array
+                let teamArray: any[] = [];
+                if (typeof audit.team === 'string') {
+                    try { teamArray = JSON.parse(audit.team); } catch(e) {}
+                } else if (Array.isArray(audit.team)) {
+                    teamArray = audit.team;
+                }
+                
+                const isInTeam = teamArray.some((member: any) => 
+                    member === staff.id || 
+                    member === staff.displayName || 
+                    member?.id === staff.id || 
+                    member?.displayName === staff.displayName
+                );
+                
+                if (isInTeam) {
+                    activeCount++;
+                    activeAssignmentsList.push({ id: audit.id, auditId: audit.id, title: audit.title, role: 'Müfettiş', startDate: sDate, endDate: eDate });
+                }
+            });
+            return { ...staff, activeAssignmentsCount: activeCount, activeAssignmentsList };
+        });
+
+        // 7.5 Recent Logs
+        const recentLogs = await this.prisma.auditLog.findMany({
+            take: 5,
+            orderBy: { date: 'desc' },
+            select: { id: true, action: true, user: true, date: true, targetId: true, targetType: true, details: true }
+        });
+
+        // 8. Monthly Trend (for charts)
+        const targetYearForChart = year && year !== 'Tümü' ? parseInt(year) : new Date().getFullYear();
+        const monthlyChartData = [];
+        for (let i = 0; i < 12; i++) {
+            const monthStart = new Date(targetYearForChart, i, 1);
+            const monthEnd = new Date(targetYearForChart, i + 1, 0);
+            const monthName = monthStart.toLocaleString('tr-TR', { month: 'short' });
+
+            const mOpen = await this.prisma.finding.count({
+                where: {
+                    isDeleted: false,
+                    created_at: { gte: monthStart, lte: monthEnd },
+                    status: { notIn: ['Kapalı', 'Kapalı (Mutabık Değil)', 'Tamamlandı', 'Risk Kabul Edildi', 'Denetim Esnasında Giderildi'] }
+                }
+            });
+            const mClosed = await this.prisma.finding.count({
+                where: {
+                    isDeleted: false,
+                    OR: [
+                        { responseDate: { gte: monthStart, lte: monthEnd } },
+                        { updated_at: { gte: monthStart, lte: monthEnd } }
+                    ],
+                    status: { in: ['Kapalı', 'Kapalı (Mutabık Değil)', 'Tamamlandı', 'Risk Kabul Edildi', 'Denetim Esnasında Giderildi'] }
+                }
+            });
+            monthlyChartData.push({ month: monthName, open: mOpen, closed: mClosed });
+        }
+
+        // 9. Average Audit Duration
+        const completedAuditsWithDates = await this.prisma.audit.findMany({
+            where: { ...whereAudit, status: 'Tamamlandı', endDate: { not: null } },
+            select: { startDate: true, endDate: true }
+        });
+        
+        const allAuditsForCapacity = await this.prisma.audit.findMany({
+            where: { ...whereAudit, status: { notIn: ['İptal'] } },
+            select: { startDate: true, endDate: true }
+        });
+        let totalPlannedDays = 0;
+        allAuditsForCapacity.forEach(a => {
+            if (a.startDate && a.endDate) {
+                let current = new Date(a.startDate);
+                const end = new Date(a.endDate);
+                let businessDays = 0;
+                while (current <= end) {
+                    if (current.getDay() !== 0 && current.getDay() !== 6) businessDays++;
+                    current.setDate(current.getDate() + 1);
+                }
+                totalPlannedDays += businessDays;
+            }
+        });
+        
+        let avgDuration = 0;
+        if (completedAuditsWithDates.length > 0) {
+            let totalBusinessDays = 0;
+            completedAuditsWithDates.forEach(a => {
+                let current = new Date(a.startDate);
+                const end = new Date(a.endDate);
+                let businessDays = 0;
+                while (current <= end) {
+                    if (current.getDay() !== 0 && current.getDay() !== 6) businessDays++;
+                    current.setDate(current.getDate() + 1);
+                }
+                totalBusinessDays += businessDays;
+            });
+            avgDuration = Math.round(totalBusinessDays / completedAuditsWithDates.length);
+        }
 
         return {
+            // Flat props for backward compatibility
+            totalAudits, activeAudits, completedAudits,
+            totalFindings, criticalFindings, highFindings, mediumFindings, lowFindings, openFindings,
+            findingBreakdowns,
+            auditBreakdowns,
+            pendingApprovals, pendingNotifications, pendingVerification, pendingRevisions,
+            overdueActionsCount, dueSoonActionsCount,
+            avgDuration,
+            totalPlannedDays,
+            monthlyChartData,
+            recentLogs,
+            staffs,
+            
+            // Nested original props for backward compatibility
             audits: { total: totalAudits, active: activeAudits, completed: completedAudits },
             findings: { total: totalFindings, critical: criticalFindings, high: highFindings, open: openFindings },
-            pendingActions: { deletions: pendingDeletions }
+            pendingActions: { deletions: pendingDeletionsAudits.length + pendingDeletionsFindings.length },
+            
+            // Rich payload for Executive Dashboard
+            pendingItems: [
+                ...pendingDeletionsAudits.map(a => ({ id: a.id, code: a.auditCode, title: a.title, deletionReason: a.deletionReason, deletionComment: a.deletionComment, type: 'Audit' })),
+                ...pendingDeletionsFindings.map(f => ({ id: f.id, code: f.code, title: f.title, deletionReason: f.deletionReason, deletionComment: f.deletionComment, type: 'Finding' }))
+            ],
+            recentAudits,
+            recentFindings
         };
+        } catch (error: any) {
+            console.error('getExecutiveStats CRASH:', error);
+            throw new InternalServerErrorException(`getExecutiveStats Hatası: ${error.message}`);
+        }
     }
 
     // TRASH METHODS

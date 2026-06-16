@@ -3,9 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createPortal } from 'react-dom';
-import { ArrowLeft, Plus, Trash2, Edit2, ChevronRight, ChevronDown, Shield, AlertTriangle, Activity, X, RefreshCw, Globe, BookOpen, Database, Copy } from 'lucide-react';
+import { Plus, Trash2, Edit2, ChevronRight, ChevronDown, Shield, AlertTriangle, Activity, RefreshCw, BookOpen, Database, Copy } from 'lucide-react';
 import { BackButton } from '@/components/ui/BackButton';
 import CustomSelect from '@/components/ui/CustomSelect';
+import FormInput from '@/components/ui/FormInput';
+import CodeBadge from '@/components/ui/CodeBadge';
+import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 import { auditApi } from '@/lib/audit-api';
 import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';
@@ -16,6 +20,7 @@ import ActionMenu from '@/components/ui/ActionMenu';
 import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import StatusBadge from '@/components/ui/StatusBadge';
+import Badge from '@/components/ui/Badge';
 
 // Risk renkleri - Düşük=Sarı, Orta=Turuncu, Yüksek=Kırmızı, Kritik=Bordo
 const getRiskColor = (level: string | undefined) => {
@@ -184,6 +189,8 @@ export default function UnitRcmPage() {
     const params = useParams();
     const router = useRouter();
     const { showToast } = useToast();
+    const { hasRole } = useAuth();
+    const canManage = checkRole(hasRole, ROLES.UNIVERSE_MANAGER);
     const unitId = params.unitId as string;
 
     const [unit, setUnit] = useState<any>(null);
@@ -510,21 +517,23 @@ export default function UnitRcmPage() {
                     </h1>
                     <p className="text-sm text-gray-500">Risk Kontrol Matrisi (RCM) - Süreç, Risk ve Kontrol Yönetimi</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="secondary"
-                        onClick={() => setShowTemplateModal(true)}
-                        leftIcon={<BookOpen size={20} />}
-                    >
-                        Şablondan Yükle
-                    </Button>
-                    <Button
-                        onClick={() => openProcessModal()}
-                        leftIcon={<Plus size={22} />}
-                    >
-                        Yeni Süreç Ekle
-                    </Button>
-                </div>
+                {canManage && (
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowTemplateModal(true)}
+                            leftIcon={<BookOpen size={20} />}
+                        >
+                            Şablondan Yükle
+                        </Button>
+                        <Button
+                            onClick={() => openProcessModal()}
+                            leftIcon={<Plus size={22} />}
+                        >
+                            Yeni Süreç Ekle
+                        </Button>
+                    </div>
+                )}
             </div>
 
             {/* PROCESS LIST */}
@@ -533,9 +542,11 @@ export default function UnitRcmPage() {
                     <div className="card text-center py-12">
                         <Activity size={48} className="mx-auto mb-4 text-gray-300" />
                         <p className="text-gray-500 mb-4">Henüz tanımlanmış bir süreç yok.</p>
-                        <Button onClick={() => openProcessModal()} leftIcon={<Plus size={20} />}>
-                            İlk Süreci Ekle
-                        </Button>
+                        {canManage && (
+                            <Button onClick={() => openProcessModal()} leftIcon={<Plus size={20} />}>
+                                İlk Süreci Ekle
+                            </Button>
+                        )}
                     </div>
                 ) : (
                     processes.map(proc => (
@@ -559,21 +570,23 @@ export default function UnitRcmPage() {
                                         </span>
                                     )}
                                 </div>
-                                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => openRiskModal(proc.id)}
-                                        className="ml-2"
-                                        leftIcon={<Plus size={16} />}
-                                    >
-                                        Risk Ekle
-                                    </Button>
-                                    <ActionMenu items={[
-                                        { label: 'Düzenle', icon: Edit2, onClick: () => openProcessModal(proc) },
-                                        { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => setDeleteProcessId(proc.id) }
-                                    ]} />
-                                </div>
+                                {canManage && (
+                                    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={() => openRiskModal(proc.id)}
+                                            className="ml-2"
+                                            leftIcon={<Plus size={16} />}
+                                        >
+                                            Risk Ekle
+                                        </Button>
+                                        <ActionMenu items={[
+                                            { label: 'Düzenle', icon: Edit2, onClick: () => openProcessModal(proc) },
+                                            { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => setDeleteProcessId(proc.id) }
+                                        ]} />
+                                    </div>
+                                )}
                             </div>
 
                             {/* RISKS LIST */}
@@ -603,29 +616,31 @@ export default function UnitRcmPage() {
                                                                 </span>
                                                                 <StatusBadge value={risk.level || 'Belirsiz'} type="risk" size="sm" />
                                                                 {risk.category && (
-                                                                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">
+                                                                    <CodeBadge>
                                                                         {risk.category}
-                                                                    </span>
+                                                                    </CodeBadge>
                                                                 )}
                                                             </div>
-                                                            <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                                                                <Button
-                                                                    variant="secondary"
-                                                                    size="sm"
-                                                                    onClick={() => openControlModal(risk.id)}
-                                                                    className="ml-2 !py-1"
-                                                                    leftIcon={<Plus size={16} />}
-                                                                >
-                                                                    Kontrol Ekle
-                                                                </Button>
-                                                                <ActionMenu items={[
-                                                                    { label: 'Düzenle', icon: Edit2, onClick: () => openRiskModal(proc.id, risk) },
-                                                                    { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => {
-                                                                        setDeleteRiskId(risk.id);
-                                                                        setDeleteRiskProcessId(proc.id);
-                                                                    } }
-                                                                ]} />
-                                                            </div>
+                                                            {canManage && (
+                                                                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                                                                    <Button
+                                                                        variant="secondary"
+                                                                        size="sm"
+                                                                        onClick={() => openControlModal(risk.id)}
+                                                                        className="ml-2 !py-1"
+                                                                        leftIcon={<Plus size={16} />}
+                                                                    >
+                                                                        Kontrol Ekle
+                                                                    </Button>
+                                                                    <ActionMenu items={[
+                                                                        { label: 'Düzenle', icon: Edit2, onClick: () => openRiskModal(proc.id, risk) },
+                                                                        { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => {
+                                                                            setDeleteRiskId(risk.id);
+                                                                            setDeleteRiskProcessId(proc.id);
+                                                                        } }
+                                                                    ]} />
+                                                                </div>
+                                                            )}
                                                         </div>
 
                                                         {/* CONTROLS LIST */}
@@ -657,15 +672,17 @@ export default function UnitRcmPage() {
                                                                                         <p className="mt-2 text-xs text-gray-600">{control.description}</p>
                                                                                     )}
                                                                                 </div>
-                                                                                <div className="flex items-center gap-1 ml-4" onClick={e => e.stopPropagation()}>
-                                                                                    <ActionMenu items={[
-                                                                                        { label: 'Düzenle', icon: Edit2, onClick: () => openControlModal(risk.id, control) },
-                                                                                        { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => {
-                                                                                            setDeleteControlId(control.id);
-                                                                                            setDeleteControlRiskId(risk.id);
-                                                                                        } }
-                                                                                    ]} />
-                                                                                </div>
+                                                                                {canManage && (
+                                                                                    <div className="flex items-center gap-1 ml-4" onClick={e => e.stopPropagation()}>
+                                                                                        <ActionMenu items={[
+                                                                                            { label: 'Düzenle', icon: Edit2, onClick: () => openControlModal(risk.id, control) },
+                                                                                            { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => {
+                                                                                                setDeleteControlId(control.id);
+                                                                                                setDeleteControlRiskId(risk.id);
+                                                                                            } }
+                                                                                        ]} />
+                                                                                    </div>
+                                                                                )}
                                                                             </div>
                                                                         ))}
                                                                     </div>
@@ -736,20 +753,18 @@ export default function UnitRcmPage() {
             >
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Süreç Adı *</label>
-                        <input
+                        <FormInput
+                            label="Süreç Adı *"
                             type="text"
-                            className="form-input"
                             value={formData.name || ''}
                             onChange={e => setFormData({ ...formData, name: e.target.value })}
                             placeholder="Örn: Kredi Onay Süreci"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Süreç Sahibi</label>
-                        <input
+                        <FormInput
+                            label="Süreç Sahibi"
                             type="text"
-                            className="form-input"
                             value={formData.owner || ''}
                             onChange={e => setFormData({ ...formData, owner: e.target.value })}
                             placeholder="Örn: Ahmet Yılmaz"
@@ -791,10 +806,9 @@ export default function UnitRcmPage() {
                 <div className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Risk No</label>
-                            <input
+                            <FormInput
+                                label="Risk No"
                                 type="text"
-                                className="form-input"
                                 value={formData.code || ''}
                                 onChange={e => setFormData({ ...formData, code: e.target.value })}
                                 placeholder="R01"
@@ -818,10 +832,9 @@ export default function UnitRcmPage() {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Risk Adı *</label>
-                        <input
+                        <FormInput
+                            label="Risk Adı *"
                             type="text"
-                            className="form-input"
                             value={formData.name || ''}
                             onChange={e => setFormData({ ...formData, name: e.target.value })}
                             placeholder="Örn: Yetkisiz işlem riski"
@@ -876,30 +889,27 @@ export default function UnitRcmPage() {
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Kontrol No</label>
-                            <input
+                            <FormInput
+                                label="Kontrol No"
                                 type="text"
-                                className="form-input"
                                 value={formData.code || ''}
                                 onChange={e => setFormData({ ...formData, code: e.target.value })}
                                 placeholder="C01"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Kontrol Adı *</label>
-                            <input
+                            <FormInput
+                                label="Kontrol Adı *"
                                 type="text"
-                                className="form-input"
                                 value={formData.name || ''}
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 placeholder="Örn: Onay mekanizması"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Kontrol Sahibi (1. Hat)</label>
-                            <input
+                            <FormInput
+                                label="Kontrol Sahibi (1. Hat)"
                                 type="text"
-                                className="form-input"
                                 value={formData.owner || ''}
                                 onChange={e => setFormData({ ...formData, owner: e.target.value })}
                                 placeholder="Örn: Operasyon Müdürü"
@@ -1001,19 +1011,19 @@ export default function UnitRcmPage() {
                                             <Activity size={18} className="text-blue-600" />
                                             {tmpl.name}
                                         </h3>
-                                        <span className="text-xs font-semibold bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full border">
+                                        <Badge variant="secondary" size="md">
                                             {tmpl.owner}
-                                        </span>
+                                        </Badge>
                                     </div>
                                     <p className="text-sm text-gray-500">{tmpl.description}</p>
 
                                     <div className="pt-2 flex items-center gap-4 text-xs">
-                                        <span className="flex items-center gap-1 font-medium text-gray-600 bg-red-50 text-red-700 px-2 py-0.5 rounded border border-red-100">
+                                        <Badge variant="danger" size="md" className="gap-1 font-medium">
                                             ⚠️ {tmpl.risks.length} Risk Tanımı
-                                        </span>
-                                        <span className="flex items-center gap-1 font-medium text-gray-600 bg-green-50 text-green-700 px-2 py-0.5 rounded border border-green-100">
+                                        </Badge>
+                                        <Badge variant="success" size="md" className="gap-1 font-medium">
                                             🛡️ {tmpl.risks.reduce((acc, r) => acc + r.controls.length, 0)} Kontrol Kartı
-                                        </span>
+                                        </Badge>
                                     </div>
                                 </div>
 

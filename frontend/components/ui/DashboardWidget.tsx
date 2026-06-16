@@ -6,7 +6,7 @@ import Tooltip from '@/components/ui/Tooltip';
 import { Info } from 'lucide-react';
 
 // Widget türleri Entity türleriyle örtüşüyor, ancak dashboarda özel isimlendirmeler için bir mapper:
-export type WidgetType = 'audits' | 'findings' | 'status' | 'risk' | 'actions' | 'activities' | 'metrics' | 'heatmap' | 'trend' | 'reports';
+export type WidgetType = 'audits' | 'findings' | 'status' | 'risk' | 'actions' | 'activities' | 'metrics' | 'heatmap' | 'trend' | 'reports' | 'skills';
 
 export interface DashboardWidgetProps {
     widgetType?: WidgetType;
@@ -35,7 +35,8 @@ const widgetTypeToEntityMap: Record<WidgetType, EntityType> = {
     metrics: 'METRIC',
     heatmap: 'HEATMAP',
     trend: 'TREND',
-    reports: 'REPORT'
+    reports: 'REPORT',
+    skills: 'USER'
 };
 
 const widgetTypeTitles: Record<WidgetType, string> = {
@@ -48,7 +49,19 @@ const widgetTypeTitles: Record<WidgetType, string> = {
     metrics: 'Kalite Metrikleri',
     heatmap: 'Risk Isı Haritası',
     trend: 'Trend Analizi',
-    reports: 'Raporlar'
+    reports: 'Raporlar',
+    skills: 'Yetkinlik Matrisi'
+};
+
+const COLOR_MAP: Record<string, { bg: string, text: string }> = {
+    amber: { bg: 'bg-amber-50', text: 'text-amber-600' },
+    purple: { bg: 'bg-purple-50', text: 'text-purple-600' },
+    emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600' },
+    indigo: { bg: 'bg-indigo-50', text: 'text-indigo-600' },
+    blue: { bg: 'bg-blue-50', text: 'text-blue-600' },
+    red: { bg: 'bg-red-50', text: 'text-red-600' },
+    sky: { bg: 'bg-sky-50', text: 'text-sky-600' },
+    rose: { bg: 'bg-rose-50', text: 'text-rose-600' }
 };
 
 export default function DashboardWidget({
@@ -75,8 +88,8 @@ export default function DashboardWidget({
                 <div>
                     <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                         {CustomIcon ? (
-                            <div className={`p-2 rounded-lg bg-${customColor}-50`}>
-                                <CustomIcon className={`text-${customColor}-600`} size={20} />
+                            <div className={`p-2 rounded-lg ${customColor && COLOR_MAP[customColor] ? COLOR_MAP[customColor].bg : 'bg-primary/10'}`}>
+                                <CustomIcon className={`${customColor && COLOR_MAP[customColor] ? COLOR_MAP[customColor].text : 'text-primary'}`} size={20} />
                             </div>
                         ) : (
                             <EntityIcon type={entityType} size={20} variant="pill" />

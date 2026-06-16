@@ -496,21 +496,12 @@ export default function TrashPage() {
                         header: 'KAYIT TÜRÜ',
                         align: 'center' as const,
                         width: '120px',
-                        render: (item: any) => <StatusBadge type="status" value={item.typeLabel} size="sm" />
-                    }] : []),
+                        type: 'status'
+                    } as Column<any>] : []),
                     ...(selectedRecordTypes.length === 1 && selectedRecordTypes[0] === 'audits' ? [
-                        { key: 'type', header: 'TÜR', align: 'center' as const, render: (item: any) => <span className="badge badge-gray">{item.type}</span> },
-                        {
-                            key: 'status',
-                            header: 'DURUM',
-                            align: 'center' as const,
-                            render: (item: any) => (
-                                <span className={`badge ${item.status === 'Tamamlandı' ? 'badge-green' : item.status === 'Devam Ediyor' ? 'badge-blue' : 'badge-gray'}`}>
-                                    {item.status}
-                                </span>
-                            )
-                        }
-                    ] : []),
+                        { key: 'type', header: 'TÜR', align: 'center' as const, type: 'status' },
+                        { key: 'status', header: 'DURUM', align: 'center' as const, type: 'status' }
+                    ] as Column<any>[] : []),
                     ...(selectedRecordTypes.length === 1 && selectedRecordTypes[0] === 'findings' ? [
                         { key: 'code', header: 'KOD', align: 'center' as const, type: 'code' },
                         { key: 'auditTitle', header: 'İLGİLİ DENETİM', align: 'left' as const, render: (item: any) => <div className="cell-subtitle line-clamp-1">{item.audit?.title || '-'}</div> },
@@ -612,7 +603,7 @@ export default function TrashPage() {
                                     <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Durum:</span><span className="text-gray-900">{selectedItem.status || '-'}</span></li>
                                     {selectedItem.riskLevel && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Risk:</span><span className="font-bold text-gray-900">{selectedItem.riskLevel}</span></li>}
                                     {selectedItem.risk && !selectedItem.riskLevel && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Risk:</span><span className="font-bold text-gray-900">{selectedItem.risk}</span></li>}
-                                    {(selectedItem.audit?.title || selectedItem.auditTitle) && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Denetim:</span><Tooltip content={selectedItem.audit?.title || selectedItem.auditTitle} position="left"><span className="text-right truncate max-w-[200px] text-gray-900">{selectedItem.audit?.title || selectedItem.auditTitle}</span></Tooltip></li>}
+                                    {(selectedItem.audit?.title || selectedItem.auditTitle) && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Denetim:</span><OverflowTooltip content={selectedItem.audit?.title || selectedItem.auditTitle} className="max-w-[200px] text-right text-gray-900">{selectedItem.audit?.title || selectedItem.auditTitle}</OverflowTooltip></li>}
                                     {selectedItem.period && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Dönem:</span><span className="text-gray-900">{selectedItem.period}</span></li>}
                                     {selectedItem.category && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Kategori:</span><span className="text-gray-900">{selectedItem.category}</span></li>}
                                 </ul>

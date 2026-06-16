@@ -64,7 +64,7 @@ const SAMPLING_METHODS = [
     { value: 'Katmanlı', label: 'Katmanlı (Tabakalı) Örnekleme', description: 'Popülasyon alt gruplara (tabaka) ayrılır ve her gruptan oransal seçim yapılır.' },
     { value: 'Küme', label: 'Blok/Küme Örneklemesi', description: 'Doğal kümeler (şube, bölge, dönem) rastgele seçilir ve seçilen kümelerin tüm kayıtları incelenir.' },
     { value: 'Parasal Birim', label: 'Parasal Birim Örneklemesi (MUS)', description: 'Parasal büyüklükle orantılı seçim. Yüksek tutarlı işlemlerin seçilme olasılığı daha fazladır.' },
-    { value: 'Yargısal', label: 'Yargısal Örnekleme', description: 'Denetçinin mesleki bilgi ve deneyimine dayalı bilinçli seçim. İstatistiksel olmayan, risk odaklı yaklaşım.' }
+    { value: 'Yargısal', label: 'Yargısal Örnekleme', description: 'Müfettişin mesleki bilgi ve deneyimine dayalı bilinçli seçim. İstatistiksel olmayan, risk odaklı yaklaşım.' }
 ];
 
 

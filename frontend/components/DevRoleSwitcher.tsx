@@ -20,18 +20,22 @@ export default function DevRoleSwitcher() {
 
     const handleSwitchRole = (roleType: string) => {
         let newRoles: string[] = [];
-        if (roleType === 'SYS_ADMIN') newRoles = ['ADMIN', 'SYSTEM_ADMIN'];
-        if (roleType === 'CAE') newRoles = ['AUDIT_ADMIN']; // Only Audit Admin, NOT System Admin
-        if (roleType === 'SUPERVISOR') newRoles = ['AUDIT_SUPERVISOR'];
-        if (roleType === 'INSPECTOR') newRoles = ['AUDIT_INSPECTOR'];
-        if (roleType === 'UNIT') newRoles = ['AUDIT_VIEWER', 'AUDIT_UNIT'];
-        if (roleType === 'EMPLOYEE') newRoles = ['STANDARD_EMPLOYEE'];
+        let newName = user.displayName;
+        let newUsername = user.username;
 
-        setRoles(newRoles);
-        setIsOpen(false);
+        if (roleType === 'SYS_ADMIN') { newRoles = ['ADMIN', 'SYSTEM_ADMIN']; newName = 'Sistem Yöneticisi'; newUsername = 'admin'; }
+        if (roleType === 'CAE') { newRoles = ['AUDIT_ADMIN']; newName = 'Kerem Yılmaz'; newUsername = 'cae'; }
+        if (roleType === 'SUPERVISOR') { newRoles = ['AUDIT_SUPERVISOR']; newName = 'Taha Turunç'; newUsername = 'supervisor'; }
+        if (roleType === 'INSPECTOR') { newRoles = ['AUDIT_INSPECTOR']; newName = 'Selim Kaya'; newUsername = 'mufettis'; }
+        if (roleType === 'UNIT') { newRoles = ['AUDIT_VIEWER', 'AUDIT_UNIT']; newName = 'Birim Yöneticisi'; newUsername = 'birim'; }
+        if (roleType === 'EMPLOYEE') { newRoles = ['STANDARD_EMPLOYEE']; newName = 'Yasin Köktaş'; newUsername = 'calisan'; }
 
-        // HARD RELOAD: Force browser to reload the app from the root audit path
-        // This guarantees all states are reset and new permissions are applied from scratch
+        // HARD RELOAD ve KİMLİK DEĞİŞİMİ: Sadece rolleri değil, kullanıcının adını da güncelliyoruz.
+        // Böylece UI üzerindeki "Sadece kendini görme (checkIsSelf)" kalkanı doğru satırı açar.
+        const updatedUser = { ...user, roles: newRoles, displayName: newName, username: newUsername };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        
+        // Context'i güncellemek yerine sayfayı sıfırdan yüklüyoruz ki tüm hooklar taze veriyle çalışsın
         window.location.href = '/audit';
     };
 

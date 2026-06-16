@@ -38,13 +38,14 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
         <header className="header flex items-center justify-between h-20 bg-white border-b border-gray-200 px-8">
             <div className="flex items-center">
                 {!hideSidebarToggle && (
-                    <button
-                        title="Menüyü Aç/Kapat"
-                        onClick={onToggleSidebar}
-                        className="mr-4 p-2 text-gray-600 hover:text-primary rounded-lg transition-colors"
-                    >
-                        <Menu size={24} />
-                    </button>
+                    <Tooltip content="Menüyü Aç/Kapat" position="bottom">
+                        <button
+                            onClick={onToggleSidebar}
+                            className="mr-4 p-2 text-gray-600 hover:text-primary rounded-lg transition-colors"
+                        >
+                            <Menu size={24} />
+                        </button>
+                    </Tooltip>
                 )}
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">

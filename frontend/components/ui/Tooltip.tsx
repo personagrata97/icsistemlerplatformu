@@ -7,13 +7,15 @@ interface TooltipProps {
     children: React.ReactElement;
     position?: 'top' | 'bottom' | 'left' | 'right';
     delay?: number;
+    disabled?: boolean;
 }
 
 const Tooltip: React.FC<TooltipProps> = ({
     content,
     children,
     position = 'top',
-    delay = 100 // Reduced delay for better feel
+    delay = 100, // Reduced delay for better feel
+    disabled = false
 }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [coords, setCoords] = useState({ top: 0, left: 0 });
@@ -71,6 +73,7 @@ const Tooltip: React.FC<TooltipProps> = ({
     };
 
     const handleMouseEnter = () => {
+        if (disabled) return;
         timerRef.current = setTimeout(() => {
             setIsVisible(true);
         }, delay);
@@ -84,7 +87,7 @@ const Tooltip: React.FC<TooltipProps> = ({
     const [activePosition, setActivePosition] = useState(position);
 
     useEffect(() => {
-        if (isVisible) {
+        if (isVisible && !disabled) {
             const newPos = updateCoords();
             if (newPos) setActivePosition(newPos);
 
@@ -95,11 +98,19 @@ const Tooltip: React.FC<TooltipProps> = ({
             }, 0);
             return () => clearTimeout(timeoutId);
         }
-    }, [isVisible]);
+    }, [isVisible, disabled]);
 
-    // Clone the child to attach event listeners
+    // Clone the child to attach event listeners and merge refs
     const trigger = React.cloneElement(children, {
-        ref: triggerRef,
+        ref: (node: HTMLElement) => {
+            (triggerRef as React.MutableRefObject<HTMLElement | null>).current = node;
+            const childRef = (children as any).ref;
+            if (typeof childRef === 'function') {
+                childRef(node);
+            } else if (childRef && typeof childRef === 'object') {
+                childRef.current = node;
+            }
+        },
         onMouseEnter: (e: React.MouseEvent) => {
             handleMouseEnter();
             if (children.props.onMouseEnter) children.props.onMouseEnter(e);
@@ -113,7 +124,7 @@ const Tooltip: React.FC<TooltipProps> = ({
     return (
         <>
             {trigger}
-            {isVisible && createPortal(
+            {isVisible && !disabled && createPortal(
                 <div
                     ref={tooltipRef}
                     style={{
@@ -126,7 +137,7 @@ const Tooltip: React.FC<TooltipProps> = ({
                     }}
                     className="tooltip-container z-[100010] pointer-events-none"
                 >
-                    <div className="relative bg-white/95 text-slate-700 text-xs font-medium py-1.5 px-3 rounded-lg shadow-xl border border-slate-200/80 backdrop-blur-md animate-tooltip-in">
+                    <div className="relative bg-white/95 text-slate-700 text-xs font-medium py-1.5 px-3 rounded-lg shadow-xl border border-slate-200/80 backdrop-blur-md animate-tooltip-in w-max max-w-none">
                         {content}
                         {/* Arrow */}
                         <div className={`absolute w-2 h-2 bg-white border-slate-200/80 transform rotate-45 ${activePosition === 'top' ? 'bottom-[-5px] left-1/2 -translate-x-1/2 border-r border-b' :

@@ -8,6 +8,7 @@ import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
 import Tooltip from '@/components/ui/Tooltip';
 import { AlertCircle } from 'lucide-react';
+import FormField from '@/components/ui/FormField';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 
 interface ExperienceForm {
@@ -64,9 +65,9 @@ export default function ExperienceModal({
                     value={experienceForm.companyName}
                     onChange={e => setExperienceForm({ ...experienceForm, companyName: e.target.value })}
                     required={true}
+                    placeholder="Örn: X Bankası A.Ş., Y Bağımsız Denetim"
                 />
-                <div className="form-group">
-                    <label className="form-label">Departman / Birim</label>
+                <FormField label="Departman / Birim">
                     <div className="space-y-3">
                         <CustomSelect
                             value={selectedParentExp}
@@ -120,25 +121,24 @@ export default function ExperienceModal({
                             />
                         )}
                     </div>
-                </div>
+                </FormField>
                 <FormInput
                     label="Pozisyon"
                     type="text"
                     value={experienceForm.position}
                     onChange={e => setExperienceForm({ ...experienceForm, position: e.target.value })}
                     required={true}
+                    placeholder="Örn: Kıdemli Müfettiş, Müfettiş Yardımcısı"
                 />
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="form-group">
-                        <label className="form-label">Başlangıç</label>
+                    <FormField label="Başlangıç">
                         <DatePicker 
                             value={experienceForm.startDate} 
                             onChange={(val) => setExperienceForm({ ...experienceForm, startDate: val })} 
                             required={true} 
                         />
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Bitiş</label>
+                    </FormField>
+                    <FormField label="Bitiş">
                         <DatePicker 
                             value={experienceForm.endDate} 
                             onChange={(val) => setExperienceForm({ ...experienceForm, endDate: val })} 
@@ -152,22 +152,25 @@ export default function ExperienceModal({
                                 label="Devam Ediyor"
                             />
                         </div>
-                    </div>
+                    </FormField>
                 </div>
-                <div className="form-group">
-                    <div className="flex items-center gap-2 mb-1.5">
-                        <label className="text-sm font-semibold text-slate-700">Kariyer Detayları (Ünvan & Yıllar)</label>
-                        <Tooltip content="Şirket içi ünvan değişikliklerini ve tarihlerini buraya yazabilirsiniz.">
-                            <AlertCircle size={14} className="text-gray-400 cursor-help" />
-                        </Tooltip>
-                    </div>
+                <FormField 
+                    label={
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <span className="text-sm font-semibold text-slate-700">Kariyer Detayları (Ünvan & Yıllar)</span>
+                            <Tooltip content="Şirket içi ünvan değişikliklerini ve tarihlerini buraya yazabilirsiniz.">
+                                <AlertCircle size={14} className="text-gray-400 cursor-help" />
+                            </Tooltip>
+                        </div>
+                    }
+                >
                     <FormTextarea 
                         className="min-h-[60px]" 
                         value={experienceForm.careerPaths} 
                         onChange={e => setExperienceForm({ ...experienceForm, careerPaths: e.target.value })} 
                         placeholder="Örn: 2020-2022: Uzman Yardımcısı, 2022-2024: Uzman (Her satıra bir ünvan)" 
                     />
-                </div>
+                </FormField>
 
                 <FormTextarea
                     label="Açıklama / Başarılar"

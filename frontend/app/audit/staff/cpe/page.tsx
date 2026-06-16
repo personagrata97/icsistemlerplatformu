@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { auditApi } from '@/lib/audit-api';
-import { Users, TrendingUp, TrendingDown, Minus, Clock, BookOpen, Award, FileText } from 'lucide-react';
+import { Users, TrendingUp, TrendingDown, Minus, Clock, BookOpen, FileText, Eye } from 'lucide-react';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
@@ -14,30 +14,54 @@ import ActionMenu from '@/components/ui/ActionMenu';
 import PageHeader from '@/components/audit/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import EmptyState from '@/components/ui/EmptyState';
-import { Eye } from 'lucide-react';
-import { formatDate } from '@/lib/audit-utils';
+import { formatDate, getPhotoUrl } from '@/lib/audit-utils';
+import { useAuth } from '@/context/AuthContext';
+import { ROLES, checkRole } from '@/lib/auth-constants';
+import Badge from '@/components/ui/Badge';
+import { Lock } from 'lucide-react';
 import StatCard from '@/components/ui/StatCard';
-import { BackButton } from '@/components/ui/BackButton';
+import StaffTabs from '@/components/audit/staff/StaffTabs';
 
-// Fotoğraf URL yardımcısı
-const getPhotoUrl = (url?: string) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    const origin = apiUrl.replace(/\/api\/v1\/?$/, '');
-    return `${origin}${url}`;
+const normalizeName = (name: string) => {
+    return name.toLowerCase()
+        .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+        .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+        .replace(/[^a-z0-9]/g, '');
 };
 
+const TITLES = [
+    'Müfettiş Yardımcısı', 
+    'Yetkili Müfettiş Yardımcısı', 
+    'Müfettiş', 
+    'Kıdemli Müfettiş', 
+    'Başmüfettiş', 
+    'Teftiş Kurulu Müdürü'
+];
+
 export default function CpePage() {
+    const { user, hasRole } = useAuth();
+    const canManage = hasRole ? checkRole(hasRole, ROLES.STAFF_MANAGER) : false;
+
+    const checkIsSelf = (row: any) => {
+        const isIdMatch = String(row.id) === String(user?.id);
+        const userName = user?.displayName || (user as any)?.name || user?.username || '';
+        const normUser = normalizeName(userName);
+        const normStaff = normalizeName(row.name || '');
+        return isIdMatch || Boolean(normUser && normStaff && (normUser.includes(normStaff) || normStaff.includes(normUser)));
+    };
+
     const { showToast } = useToast();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [cpeFilterMode, setCpeFilterMode] = useState<'all' | 'above_avg'>('all');
     
-    // Yıl Seçimi
+    // Filters
     const currentYear = new Date().getFullYear();
     const [selectedYear, setSelectedYear] = useState(currentYear.toString());
+    const [selectedTitleFilter, setSelectedTitleFilter] = useState<string[]>([]);
+    const [selectedStaffFilter, setSelectedStaffFilter] = useState<string[]>([]);
+    const [cpeFilterMode, setCpeFilterMode] = useState<string>('');
+    
     const yearOptions = Array.from({ length: 3 }, (_, i) => ({
         value: (currentYear - i).toString(),
         label: `${currentYear - i} Yılı`
@@ -56,8 +80,8 @@ export default function CpePage() {
             const data = await auditApi.getCpeStats(parseInt(selectedYear));
             setStats(Array.isArray(data) ? data : []);
         } catch (error) {
-            console.error('CPE verisi yüklenemedi:', error);
-            showToast('CPE verileri alınırken bir hata oluştu.', 'error');
+            console.error('Eğitim verisi yüklenemedi:', error);
+            showToast('Eğitim verileri alınırken bir hata oluştu.', 'error');
         } finally {
             setLoading(false);
         }
@@ -68,101 +92,178 @@ export default function CpePage() {
     const avgCpe = stats.length > 0 ? (totalCpe / stats.length).toFixed(1) : '0';
     const activeStaffCount = stats.length;
 
-    // Arama ve Mod Filtresi
+    // Arama ve Filtreleme İşlemi
     const filteredStats = stats.filter(row => {
         const matchesSearch = (row.name || '').toLocaleLowerCase('tr-TR').includes(searchTerm.toLocaleLowerCase('tr-TR')) ||
             (row.title || '').toLocaleLowerCase('tr-TR').includes(searchTerm.toLocaleLowerCase('tr-TR'));
         
-        let matchesMode = true;
+        if (!matchesSearch) return false;
+
+        if (selectedTitleFilter.length > 0) {
+            if (!row.title || !selectedTitleFilter.includes(row.title)) return false;
+        }
+
+        if (selectedStaffFilter.length > 0 && !selectedStaffFilter.includes(row.id)) return false;
+
         if (cpeFilterMode === 'above_avg') {
-            matchesMode = row.totalHours >= parseFloat(avgCpe);
+            if (row.totalHours < parseFloat(avgCpe)) return false;
+        } else if (cpeFilterMode === 'below_target') {
+            if (row.totalHours >= 40) return false;
         }
         
-        return matchesSearch && matchesMode;
+        return true;
     });
 
-    // Trend Formatı
-    const getTrendDisplay = (trend: string, current: number, previous: number) => {
-        if (trend === 'up') return <div className="flex items-center gap-1 text-green-600 font-medium"><TrendingUp size={16} /> <span>+{current - previous} (Artış)</span></div>;
-        if (trend === 'down') return <div className="flex items-center gap-1 text-red-500 font-medium"><TrendingDown size={16} /> <span>{current - previous} (Düşüş)</span></div>;
-        return <div className="flex items-center gap-1 text-gray-400 font-medium"><Minus size={16} /> <span>Değişim Yok</span></div>;
-    };
+    const belowTargetCount = stats.filter(s => s.totalHours < 40).length;
 
     const columns = [
         {
             key: 'name',
             header: 'Personel',
-            sortable: true,
-            render: (row: any) => (
-                <div className="flex items-center gap-3 py-1">
-                    <div className="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-500 font-bold tracking-tighter shadow-inner overflow-hidden">
-                        {getPhotoUrl(row.photoUrl) ? (
-                            <img src={getPhotoUrl(row.photoUrl)!} alt={row.name} className="w-full h-full object-cover" />
-                        ) : (
-                            row.name.substring(0, 2).toUpperCase()
-                        )}
-                    </div>
-                    <div>
-                        <div className="font-bold text-gray-900">{row.name}</div>
-                        <div className="text-xs text-gray-500 mt-0.5">{row.title}</div>
-                    </div>
-                </div>
-            )
+            type: 'user',
+            align: 'left' as const,
+            sortable: true
         },
         {
             key: 'totalHours',
-            header: 'Toplam Süre',
+            header: 'Toplam Eğitim Süresi',
             align: 'center' as const,
             sortable: true,
-            render: (row: any) => (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-bold text-sm">
-                    <Clock size={14} />
-                    {row.totalHours} Saat
-                </span>
-            )
+            render: (row: any) => {
+                if (!canManage && !checkIsSelf(row)) return <div className="text-slate-300 flex justify-center py-2"><Lock size={16} /></div>;
+                const isBelowTarget = row.totalHours < 40;
+                return (
+                    <div className="flex justify-center">
+                        <Badge variant={isBelowTarget ? "warning" : "success"} size="md" className="gap-1.5 font-bold">
+                            <Clock size={14} />
+                            {row.totalHours} Saat
+                        </Badge>
+                    </div>
+                );
+            }
         },
         {
             key: 'previousYearHours',
             header: `Geçen Yıl (${parseInt(selectedYear) - 1})`,
             align: 'center' as const,
             sortable: true,
-            render: (row: any) => (
-                <span className="text-gray-500 font-medium">
-                    {row.previousYearHours} Saat
-                </span>
-            )
+            render: (row: any) => {
+                if (!canManage && !checkIsSelf(row)) return <div className="text-slate-300 flex justify-center py-2"><Lock size={16} /></div>;
+                return (
+                    <Badge variant="gray" className="text-gray-500 font-medium">
+                        {row.previousYearHours} Saat
+                    </Badge>
+                );
+            }
         },
         {
             key: 'trend',
-            header: 'Trend',
+            header: 'Yıllık Değişim',
             align: 'center' as const,
-            render: (row: any) => getTrendDisplay(row.trend, row.totalHours, row.previousYearHours)
+            sortable: true,
+            render: (row: any) => {
+                if (!canManage && !checkIsSelf(row)) return <div className="text-slate-300 flex justify-center py-2"><Lock size={16} /></div>;
+                const trend = row.trend;
+                const current = row.totalHours;
+                const previous = row.previousYearHours;
+                return (
+                    <div className="flex justify-center">
+                        <Badge variant={trend === 'up' ? 'success' : trend === 'down' ? 'danger' : 'secondary'} size="sm" className="gap-1 font-bold">
+                            {trend === 'up' && <TrendingUp size={14} />}
+                            {trend === 'down' && <TrendingDown size={14} />}
+                            {trend === 'neutral' && <Minus size={14} />}
+                            {trend === 'up' ? `+${current - previous} Saat` : trend === 'down' ? `${current - previous} Saat` : 'Değişim Yok'}
+                        </Badge>
+                    </div>
+                );
+            }
         },
         {
             key: 'actions',
             header: 'İşlemler',
             width: '120px',
             align: 'center' as const,
-            render: (row: any) => (
-                <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                    <ActionMenu
-                        items={[
-                            { label: 'Detayı İncele', icon: <Eye size={14} />, onClick: () => setSelectedStaff(row) }
-                        ]}
-                    />
-                </div>
-            )
+            render: (row: any) => {
+                const isSelfRow = checkIsSelf(row);
+                const canViewDetails = canManage || isSelfRow;
+                if (!canViewDetails) return null;
+                
+                return (
+                    <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                        <ActionMenu
+                            items={[
+                                { label: 'Eğitim Detayları', icon: <Eye size={14} />, onClick: () => setSelectedStaff(row) }
+                            ]}
+                        />
+                    </div>
+                );
+            }
         }
     ];
 
     if (loading && stats.length === 0) {
-        return <div className="flex items-center justify-center h-64"><LoadingState message="CPE Raporları yükleniyor..." /></div>;
+        return <div className="flex items-center justify-center h-64"><LoadingState message="Eğitim Raporları yükleniyor..." /></div>;
     }
 
     return (
         <div className="space-y-6">
-            <BackButton href="/audit/staff" label="Denetim Ekibi Listesine Dön" />
-            <PageHeader title="CPE (Mesleki Eğitim) Raporu" subtitle="Personel eğitim süreleri ve mesleki gelişim istatistikleri" />
+            <StaffTabs />
+            <PageHeader title="Eğitim Raporu" subtitle="Personel eğitim süreleri ve gelişim istatistikleri" />
+
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatCard
+                    title="Toplam Mesleki Eğitim Süresi"
+                    value={`${totalCpe} Saat`}
+                    entityType="SKILL_IT"
+                    subtext={`${selectedYear} Yılı Geneli`}
+                    onClick={() => setCpeFilterMode('')}
+                    className={`transition-all hover:scale-[1.02] cursor-pointer ${!cpeFilterMode ? 'ring-2 ring-indigo-500 scale-[1.02] bg-indigo-50/10' : ''}`}
+                />
+
+                <StatCard
+                    title="Kişi Başı Ortalama"
+                    value={`${avgCpe} Saat`}
+                    entityType="SKILL_FINANCE"
+                    subtext="Kurum Ortalaması"
+                    onClick={() => setCpeFilterMode(prev => prev === 'above_avg' ? '' : 'above_avg')}
+                    className={`transition-all hover:scale-[1.02] cursor-pointer ${cpeFilterMode === 'above_avg' ? 'ring-2 ring-emerald-500 scale-[1.02] bg-emerald-50/10' : ''}`}
+                />
+
+                <StatCard
+                    title="Değerlendirilen Personel"
+                    value={`${activeStaffCount} Kişi`}
+                    entityType="AUDIT_FINDING"
+                    subtext="Aktif Kadro"
+                    onClick={() => setCpeFilterMode('')}
+                />
+            </div>
+
+            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 p-4 rounded-2xl flex items-start gap-4 mb-2 shadow-sm">
+                <div className="bg-indigo-100 p-2.5 rounded-xl text-indigo-600 shrink-0 mt-0.5 shadow-inner">
+                    <TrendingUp size={24} />
+                </div>
+                <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h4 className="font-bold text-indigo-900 text-sm mb-1">
+                            Yıllık Eğitim ve Gelişim Hedefi Takibi
+                        </h4>
+                        <p className="text-sm text-indigo-800/80 leading-relaxed max-w-none">
+                            Yıllık <strong>40 saatlik</strong> mesleki eğitim hedefinin altında kalan {belowTargetCount > 0 ? <strong className="text-rose-600">{belowTargetCount} personel</strong> : <strong>personel</strong>} bulunmaktadır. Planlamalarda bu durumu göz önünde bulundurabilirsiniz.
+                        </p>
+                    </div>
+                    {canManage && belowTargetCount > 0 && (
+                        <Button 
+                            variant="primary" 
+                            size="sm" 
+                            className="shrink-0 shadow-sm"
+                            onClick={() => setCpeFilterMode('below_target')}
+                        >
+                            İlgili Personeli Listele
+                        </Button>
+                    )}
+                </div>
+            </div>
 
             <PageToolbar
                 searchPlaceholder="Personel veya ünvan ara..."
@@ -170,89 +271,96 @@ export default function CpePage() {
                 onSearchChange={setSearchTerm}
                 onRefresh={loadData}
                 showExportButton={true}
-                onExportClick={() => auditApi.exportToExcel(stats, 'CPE_Raporu')}
+                onExportClick={() => auditApi.exportToExcel(stats, 'Egitim_Raporu')}
                 filters={
                     <FilterDropdown
-                        activeCount={selectedYear !== currentYear.toString() ? 1 : 0}
-                        onClear={() => setSelectedYear(currentYear.toString())}
+                        activeCount={(selectedYear !== currentYear.toString() ? 1 : 0) + (selectedTitleFilter.length > 0 ? 1 : 0) + (selectedStaffFilter.length > 0 ? 1 : 0) + (cpeFilterMode ? 1 : 0)}
+                        onClear={() => {
+                            setSelectedYear(currentYear.toString());
+                            setSelectedTitleFilter([]);
+                            setSelectedStaffFilter([]);
+                            setCpeFilterMode('');
+                            setSearchTerm('');
+                        }}
                     >
+                        <CustomSelect
+                            label="Personel Filtresi"
+                            options={stats.map(s => ({ value: s.id, label: s.name }))}
+                            value={selectedStaffFilter}
+                            onChange={(val) => setSelectedStaffFilter(val as string[])}
+                            isMulti
+                            showSearch
+                            placeholder="Personel seçiniz..."
+                        />
                         <CustomSelect
                             label="Rapor Yılı"
                             options={yearOptions}
                             value={selectedYear}
                             onChange={(val) => setSelectedYear(val as string)}
                         />
+                        <CustomSelect
+                            label="Ünvan"
+                            options={TITLES.map(t => ({ value: t, label: t }))}
+                            value={selectedTitleFilter}
+                            onChange={(val) => setSelectedTitleFilter(val as string[])}
+                            isMulti
+                            placeholder="Ünvan seçiniz..."
+                        />
+                        <CustomSelect
+                            label="Eğitim Durumu"
+                            placeholder="Tüm Durumlar"
+                            options={[
+                                { value: 'above_avg', label: 'Ortalama Üzeri' },
+                                { value: 'below_target', label: 'Hedef Altı (<40 Saat)' }
+                            ]}
+                            value={cpeFilterMode}
+                            onChange={(val) => setCpeFilterMode(val as any)}
+                        />
                     </FilterDropdown>
                 }
             />
 
-            {/* Toplam Gösterge Kartları (Merkezi Bileşen) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatCard
-                    title="Toplam Mesleki Eğitim Süresi"
-                    value={`${totalCpe} Saat`}
-                    icon={Clock}
-                    color="indigo"
-                    subtext={`${selectedYear} Yılı Geneli`}
-                    badgeText="Yeni"
-                    infoTooltip="Seçili yıl içerisinde denetim ekibinin tamamladığı toplam eğitim (CPE) saati miktarıdır."
-                    onClick={() => setCpeFilterMode('all')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${cpeFilterMode === 'all' ? 'ring-2 ring-indigo-500 scale-[1.02] bg-indigo-50/10' : ''}`}
-                />
-
-                <StatCard
-                    title="Kişi Başı Ortalama"
-                    value={`${avgCpe} Saat`}
-                    icon={TrendingUp}
-                    color="emerald"
-                    subtext="Kurum Ortalaması"
-                    infoTooltip="Toplam eğitim saatinin, aktif değerlendirilen personel sayısına bölünmesiyle elde edilen kişi başı ortalama saattir."
-                    onClick={() => setCpeFilterMode(prev => prev === 'above_avg' ? 'all' : 'above_avg')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${cpeFilterMode === 'above_avg' ? 'ring-2 ring-emerald-500 scale-[1.02] bg-emerald-50/10' : ''}`}
-                />
-
-                <StatCard
-                    title="Değerlendirilen Personel"
-                    value={`${activeStaffCount} Kişi`}
-                    icon={Users}
-                    color="orange"
-                    subtext="Aktif Kadro"
-                    infoTooltip="Eğitim programı kapsamında takip edilen ve bu yıl için eğitim saati (CPE) hesabı yapılan aktif personel sayısıdır."
-                    onClick={() => setCpeFilterMode('all')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${cpeFilterMode === 'all' ? 'ring-2 ring-orange-500 scale-[1.02] bg-orange-50/10' : ''}`}
-                />
-            </div>
-
-            {/* Veri Tablosu */}
-            <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
-                <DataTable
-                    columns={columns}
-                    data={filteredStats}
-                    loading={loading}
-                    rowKey="id"
-                    paginated={true}
-                    itemsPerPage={15}
-                    itemUnit="personel"
-                    searchTerm={searchTerm}
-                    onClearFilters={() => setSearchTerm('')}
-                    emptyIcon={FileText}
-                    emptyTitle="Kayıt Bulunamadı"
-                    emptyDescription="Seçili yıl için henüz CPE (Eğitim) saati istatistiği oluşmamış."
-                />
-            </div>
+            <DataTable
+                columns={columns}
+                data={filteredStats}
+                loading={loading}
+                rowKey="id"
+                paginated={true}
+                itemsPerPage={15}
+                itemUnit="personel"
+                searchTerm={searchTerm}
+                onClearFilters={() => {
+                    setSearchTerm('');
+                    setCpeFilterMode('all');
+                    setSelectedTitleFilter([]);
+                    setSelectedStaffFilter([]);
+                    setSelectedYear(currentYear.toString());
+                }}
+                className="mt-4 shadow-sm border border-gray-100"
+            />
 
             {/* Detay Modalı */}
             <Modal
                 isOpen={!!selectedStaff}
                 onClose={() => setSelectedStaff(null)}
-                title={`${selectedStaff?.name} - ${selectedYear} Yılı CPE Detayları`}
-                size="2xl"
+                title={
+                    <div className="flex items-center gap-2">
+                        <BookOpen className="text-primary" size={22} />
+                        <span>{selectedStaff?.name || ''} - {selectedYear} Yılı Eğitim Detayları</span>
+                    </div>
+                }
+                size="lg"
+                footer={
+                    <div className="flex justify-end w-full">
+                        <Button variant="secondary" onClick={() => setSelectedStaff(null)}>Kapat</Button>
+                    </div>
+                }
             >
                 {selectedStaff && (
                     <div className="space-y-6">
                         <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-white border-2 border-primary/20 flex items-center justify-center text-primary font-bold text-xl shadow-sm overflow-hidden">
+                                <div className="w-12 h-12 rounded-full bg-white border-2 border-primary/20 flex items-center justify-center text-primary font-bold text-xl shadow-sm overflow-hidden shrink-0">
                                     {getPhotoUrl(selectedStaff.photoUrl) ? (
                                         <img src={getPhotoUrl(selectedStaff.photoUrl)!} alt={selectedStaff.name} className="w-full h-full object-cover" />
                                     ) : (
@@ -264,16 +372,19 @@ export default function CpePage() {
                                     <div className="text-sm text-gray-500">{selectedStaff.title}</div>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <div className="text-sm text-gray-500 font-medium mb-1">Toplam Alınan Eğitim</div>
-                                <div className="text-2xl font-black text-primary bg-primary/10 px-4 py-1 rounded-lg border border-primary/20 inline-block">{selectedStaff.totalHours} Saat</div>
+                            <div className="shrink-0 flex items-center gap-2">
+                                <span className="text-sm text-gray-500 font-medium">Toplam Süre:</span>
+                                <Badge variant={selectedStaff.totalHours < 40 ? "warning" : "success"} size="md" className="font-bold">
+                                    <Clock size={14} className="mr-1 inline-block" />
+                                    {selectedStaff.totalHours} Saat
+                                </Badge>
                             </div>
                         </div>
 
                         <div>
                             <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2 px-1">
                                 <BookOpen size={18} className="text-primary" />
-                                Alınan Eğitimler ({selectedStaff.trainings.length})
+                                Tamamlanan Eğitimler ({selectedStaff.trainings.length})
                             </h3>
                             
                             {selectedStaff.trainings.length === 0 ? (
@@ -283,7 +394,7 @@ export default function CpePage() {
                                     icon={Clock}
                                 />
                             ) : (
-                                <div className="space-y-3">
+                                <div className="space-y-3 max-h-[50vh] overflow-y-auto custom-scrollbar pr-1">
                                     {selectedStaff.trainings.map((t: any, idx: number) => (
                                         <div key={idx} className="flex justify-between items-center p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-primary/30 transition-colors">
                                             <div>
@@ -291,9 +402,9 @@ export default function CpePage() {
                                                 <div className="text-sm text-gray-500 font-medium">{t.provider || 'Kurum İçi'}</div>
                                                 <div className="text-xs text-gray-400 mt-1">{formatDate(t.startDate)}</div>
                                             </div>
-                                            <div className="font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
+                                            <Badge variant="info" size="md" className="font-black text-sm">
                                                 +{t.hours || 0} Saat
-                                            </div>
+                                            </Badge>
                                         </div>
                                     ))}
                                 </div>

@@ -3,6 +3,7 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
 import FormInput from '@/components/ui/FormInput';
+import FormField from '@/components/ui/FormField';
 
 interface EducationForm {
     schoolName: string;
@@ -51,6 +52,7 @@ export default function EducationModal({
                     value={educationForm.schoolName}
                     onChange={e => setEducationForm({ ...educationForm, schoolName: e.target.value })}
                     required={true}
+                    placeholder="Örn: Boğaziçi Üniversitesi, ODTÜ"
                 />
                 <div className="grid grid-cols-2 gap-4">
                     <FormInput
@@ -69,8 +71,7 @@ export default function EducationModal({
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="form-group">
-                        <label className="form-label">Derece</label>
+                    <FormField label="Derece">
                         <CustomSelect
                             value={educationForm.degree}
                             onChange={val => setEducationForm({ ...educationForm, degree: val as string })}
@@ -80,7 +81,7 @@ export default function EducationModal({
                                 { value: 'Doktora', label: 'Doktora' }
                             ]}
                         />
-                    </div>
+                    </FormField>
                     <FormInput
                         label="Mezuniyet Yılı"
                         type="number"

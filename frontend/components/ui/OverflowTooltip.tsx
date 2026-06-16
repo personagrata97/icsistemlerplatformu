@@ -21,22 +21,26 @@ export default function OverflowTooltip({ content, children, className = '' }: O
         };
 
         checkTruncation();
-        
+
+        let resizeObserver: ResizeObserver | null = null;
+        if (textRef.current && typeof ResizeObserver !== 'undefined') {
+            resizeObserver = new ResizeObserver(() => {
+                checkTruncation();
+            });
+            resizeObserver.observe(textRef.current);
+        }
+
         // Handle window resize which might change the truncation state
         window.addEventListener('resize', checkTruncation);
-        return () => window.removeEventListener('resize', checkTruncation);
+        
+        return () => {
+            window.removeEventListener('resize', checkTruncation);
+            if (resizeObserver) resizeObserver.disconnect();
+        };
     }, [content, children]);
 
-    if (!isTruncated) {
-        return (
-            <div ref={textRef} className={`truncate w-full block ${className}`}>
-                {children}
-            </div>
-        );
-    }
-
     return (
-        <Tooltip content={content}>
+        <Tooltip content={content} disabled={!isTruncated}>
             <div ref={textRef} className={`truncate w-full block ${className}`}>
                 {children}
             </div>

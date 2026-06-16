@@ -11,6 +11,7 @@ import { useToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
 import Modal from '@/components/ui/Modal';
 import Tooltip from '@/components/ui/Tooltip';
+import OverflowTooltip from '@/components/ui/OverflowTooltip';
 import CreateFindingModal from './CreateFindingModal';
 import ConfirmModal from '../ConfirmModal';
 import Button from '@/components/ui/Button';
@@ -149,7 +150,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
         });
     };
 
-    // Otomatik sonuç önerisi (denetçi override edebilir)
+    // Otomatik sonuç önerisi (müfettiş override edebilir)
     const getSuggestedResult = () => {
         if (testFormData.operatingEffectiveness === 'Etkin Değil' ||
             testFormData.designEffectiveness === 'Etkin Değil') return 'Başarısız';
@@ -160,7 +161,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
 
     const handleSaveTest = async (id: string, submitForReview: boolean = false) => {
         try {
-            // Test sonucu: önce denetçi seçimi, yoksa otomatik hesaplama
+            // Test sonucu: önce müfettiş seçimi, yoksa otomatik hesaplama
             const result = manualTestResult || getSuggestedResult();
 
             // Sadece schema'da scalar olan alanları gönder (notes relation, completedAt yok)
@@ -545,9 +546,9 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                                                         return Array.isArray(evs) ? evs.map((ev: any, idx: number) => (
                                                             <div key={idx} className="flex items-center gap-2 bg-gray-50 border px-3 py-1.5 rounded text-sm group">
                                                                 <FileText size={14} className="text-gray-500" />
-                                                                <Tooltip content={ev.name}>
-                                                                    <span className="truncate max-w-[150px]">{ev.name}</span>
-                                                                </Tooltip>
+                                                                <OverflowTooltip content={ev.name} className="max-w-[150px]">
+                                                                    {ev.name}
+                                                                </OverflowTooltip>
                                                                 <Tooltip content="Sil">
                                                                     <button
                                                                         type="button"

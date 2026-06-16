@@ -638,7 +638,7 @@ export default function AdvancedSamplingModal({ isOpen, onClose, onGenerate, aud
 
                                 <div className="mt-3 bg-indigo-50 border-l-4 border-indigo-500 p-3 rounded text-xs text-indigo-800 space-y-2">
                                     <p><strong>Neyi Seçmeliyim?</strong></p>
-                                    {samplingMethod === 'Yargısal' && <p>Denetçi inisiyatifiyle filtreleri uyuyan <u>en riskli kayıtlar</u> (Orn: En yüksek bakiye veya gecikme) doğrudan seçilir.</p>}
+                                    {samplingMethod === 'Yargısal' && <p>Müfettiş inisiyatifiyle filtreleri uyuyan <u>en riskli kayıtlar</u> (Orn: En yüksek bakiye veya gecikme) doğrudan seçilir.</p>}
                                     {samplingMethod === 'Rastgele' && <p>Filtreden geçen tüm kayıtlar torbaya atılır ve bilgisayar tarafından <u>tamamen tesadüfî</u> bir seçim yapılır.</p>}
                                     {samplingMethod === 'Sistematik' && <p>Kayıtlar sıraya dizilir. Örneğin 100 kişi havuzda var ve 10 kişi seçeceksiniz; her 10. kaydı (10., 20., 30.) <u>periyodik sıçramayla</u> seçer.</p>}
                                     {samplingMethod === 'Tabakalı' && <p>Popülasyonu belirli bir özelliğe göre böler (Örn: Şube). İstenilen örneklemi (Örn: 50 kişi) <u>kendi içinde adil dağıtarak</u> tesadüfi çeker.</p>}

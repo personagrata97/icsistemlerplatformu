@@ -5,6 +5,7 @@ import { Award, Save, CheckCircle, Lightbulb, AlertTriangle } from 'lucide-react
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Tooltip from '@/components/ui/Tooltip';
+import SectionHeader from '@/components/ui/SectionHeader';
 
 interface AuditOpinionSectionProps {
     selectedOpinion: string;
@@ -49,11 +50,8 @@ const AuditOpinionSection: React.FC<AuditOpinionSectionProps> = ({
     const suggestion = getSuggestedOpinion(findings || []);
 
     return (
-        <div className="card !p-0 shadow-sm">
-            <div className="p-4 border-b bg-gray-50/50 rounded-t-lg flex items-center gap-3">
-                <Award size={20} className="text-gray-600" />
-                <h3 className="font-semibold text-gray-800">Denetim Görüşü</h3>
-            </div>
+        <div className="card !p-0 shadow-sm border border-gray-100 overflow-hidden">
+            <SectionHeader title="Denetim Görüşü" icon={Award} />
 
             <div className="p-5 space-y-4">
                 {/* Otomatik Öneri Banner */}

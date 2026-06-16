@@ -26,15 +26,17 @@ export default function DashboardListItem({
 }: DashboardListItemProps) {
     const Content = (
         <div className={`flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg hover:border-emerald-300 hover:shadow-sm transition-all group ${className}`}>
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="flex items-center gap-4 min-w-0 flex-1">
                 {code ? (
-                    <CodeBadge code={code} />
+                    <div className="w-[110px] shrink-0">
+                        <CodeBadge code={code} />
+                    </div>
                 ) : icon ? (
-                    <div className="shrink-0">
+                    <div className="w-[110px] shrink-0 flex items-center justify-start pl-1">
                         {icon}
                     </div>
                 ) : null}
-                <div className="flex flex-col min-w-0 flex-1">
+                <div className="flex flex-col min-w-0 flex-1 border-l border-gray-100 pl-4 py-0.5">
                     <span className="text-sm text-gray-700 font-medium line-clamp-1 group-hover:text-emerald-600 transition-colors">
                         {title}
                     </span>

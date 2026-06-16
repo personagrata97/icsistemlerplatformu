@@ -59,18 +59,18 @@ export default function Alert({
 }: AlertProps) {
     const styles = variantStyles[variant];
     const isSm = size === 'sm';
-    const IconComponent = icon || <styles.DefaultIcon size={isSm ? 18 : 24} className={styles.iconColor} />;
+    const IconComponent = icon || <styles.DefaultIcon size={isSm ? 16 : 20} className={styles.iconColor} />;
 
     return (
-        <div className={`border flex items-center justify-between shadow-sm ${styles.wrapper} ${className} ${isSm ? 'rounded-lg p-3' : 'rounded-xl p-4'}`}>
-            <div className={`flex items-center ${isSm ? 'gap-3' : 'gap-4'}`}>
-                <div className={`bg-white rounded-lg shadow-sm shrink-0 ${styles.iconWrapper} ${isSm ? 'p-2' : 'p-3'}`}>
+        <div className={`border flex items-center justify-between shadow-sm ${styles.wrapper} ${className} ${isSm ? 'rounded-lg p-2.5' : 'rounded-xl p-3.5'}`}>
+            <div className={`flex items-center ${isSm ? 'gap-2.5' : 'gap-3'}`}>
+                <div className={`bg-white rounded-lg shadow-sm shrink-0 flex items-center justify-center ${styles.iconWrapper} ${isSm ? 'p-1.5' : 'p-2'}`}>
                     {IconComponent}
                 </div>
                 <div>
-                    <h3 className={`${isSm ? 'text-sm font-semibold' : 'text-lg font-bold'} ${styles.titleColor}`}>{title}</h3>
+                    <h3 className={`${isSm ? 'text-sm font-semibold' : 'text-base font-bold'} ${styles.titleColor}`}>{title}</h3>
                     {description && (
-                        <div className={`${isSm ? 'text-xs mt-0.5' : 'text-sm mt-1'} ${styles.descColor}`}>
+                        <div className={`${isSm ? 'text-xs' : 'text-sm'} mt-0.5 ${styles.descColor}`}>
                             {description}
                         </div>
                     )}

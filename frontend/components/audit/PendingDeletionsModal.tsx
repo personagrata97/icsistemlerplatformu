@@ -3,6 +3,7 @@ import { Trash2, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import { formatDateTime } from '@/lib/audit-utils';
 import Tooltip from '@/components/ui/Tooltip';
+import OverflowTooltip from '@/components/ui/OverflowTooltip';
 import Button from '@/components/ui/Button';
 
 interface PendingItem {
@@ -54,11 +55,11 @@ export default function PendingDeletionsModal({ isOpen, onClose, items, onApprov
                                         </span>
                                         <span className="font-mono text-xs text-gray-500">{item.code}</span>
                                     </div>
-                                    <Tooltip content={item.title || item.code}>
-                                        <h4 className="font-medium text-gray-900 mb-2 truncate max-w-[400px]">
+                                    <OverflowTooltip content={item.title || item.code}>
+                                        <h4 className="font-medium text-gray-900 mb-2 truncate max-w-full">
                                             {item.title || item.code}
                                         </h4>
-                                    </Tooltip>
+                                    </OverflowTooltip>
 
                                     <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-100 mb-2">
                                         <p><span className="font-semibold">Gerekçe:</span> {item.deletionReason}</p>

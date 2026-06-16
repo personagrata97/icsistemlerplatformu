@@ -589,6 +589,32 @@ export const auditApi = {
         return handleResponse(res);
     },
 
+    // --- LEAVE MANAGEMENT ---
+    addStaffLeave: async (userId: string, data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/staff/${userId}/leave`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+    updateStaffLeave: async (id: string, data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/staff/leave/${id}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+    deleteStaffLeave: async (id: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/staff/leave/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        return handleResponse(res);
+    },
+    // ------------------------
+
     addStaffEducation: async (userId: string, data: any) => {
         const res = await fetchWithTimeout(`${API_BASE_URL}/audit/staff/${userId}/education`, {
             method: 'POST',
@@ -644,8 +670,9 @@ export const auditApi = {
         const res = await fetchWithTimeout(`${API_BASE_URL}/audit/staff/trainings/bulk`, {
             method: 'POST',
             headers: getHeaders(),
-            body: JSON.stringify(data)
-        });
+            body: JSON.stringify(data),
+            timeout: 60000 // Increase client timeout to 60s for bulk operations
+        } as RequestInit & { timeout: number });
         return handleResponse(res);
     },
 
@@ -1205,8 +1232,9 @@ export const auditApi = {
 
 
     // AUDITABLE UNITS (UNIVERSE)
-    getAuditableUnits: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/units`, { headers: getHeaders() });
+    getAuditableUnits: async (summaryOnly: boolean = true) => {
+        const query = summaryOnly ? '?summary=true' : '';
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/units${query}`, { headers: getHeaders() });
         return handleResponse(res);
     },
     createUnit: async (data: any) => {

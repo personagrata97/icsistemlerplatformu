@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import StatCard from '@/components/ui/StatCard';
 import Tooltip from '@/components/ui/Tooltip';
+import OverflowTooltip from '@/components/ui/OverflowTooltip';
 import { auditApi, AuditStaff } from '@/lib/audit-api';
 import RefreshButton from '@/components/ui/RefreshButton';
 import { getStatusColor, formatDate } from '@/lib/audit-utils';
@@ -351,15 +352,13 @@ function AuditsPageContent() {
                         header: 'Denetim Adı',
                         sortable: true,
                         render: (item: any) => (
-                            <div className="flex flex-col items-start text-left">
-                                <div className="cell-title">
-                                    <Tooltip content={item.title}>
-                                        <span className="truncate max-w-[300px] block">
-                                            {item.title}
-                                        </span>
-                                    </Tooltip>
+                            <div className="flex flex-col items-start text-left w-full min-w-0">
+                                <div className="cell-title w-full min-w-0">
+                                    <OverflowTooltip content={item.title} className="max-w-full min-w-0">
+                                        {item.title}
+                                    </OverflowTooltip>
                                 </div>
-                                <div className="cell-subtitle flex items-center gap-2 mt-1 justify-start">
+                                <div className="cell-subtitle flex items-center gap-2 mt-1 justify-start w-full min-w-0">
                                     <span>{item.type}</span>
                                     {item.linkedEthicsReportId && (
                                         <>

@@ -573,7 +573,7 @@ Lutfen SADECE asagidaki JSON formatinda yanit ver:
 
         // --- GUVENLIK KONTROLU ---
         if ((msg.includes('mail') || msg.includes('e-posta')) && (msg.includes('gonder') || msg.includes('ilet'))) {
-            return `[GUVENLIK IHLALI GIRISIMI ENGELLENDI]: Kurum ici bilgi guvenligi ve kimlik avi (phishing) politikalari gereg ince, yapay zeka asistani uzerinden personellere otomatik e-posta gonderim yetkisi KILITLENMISTIR.`;
+            return `[GUVENLIK IHLALI GIRISIMI ENGELLENDI]: Kurum ici bilgi guvenligi ve kimlik avi (phishing) politikalari gereg ince, yapay zeka asistani uzerinden personele otomatik e-posta gonderim yetkisi KILITLENMISTIR.`;
         }
 
         try {

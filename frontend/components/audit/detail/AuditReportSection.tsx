@@ -4,6 +4,7 @@ import React from 'react';
 import { FileText, Eye, Download, FileType, PenTool, Upload } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Tooltip from '@/components/ui/Tooltip';
+import SectionHeader from '@/components/ui/SectionHeader';
 
 interface AuditReportSectionProps {
     status: string;
@@ -24,12 +25,8 @@ const AuditReportSection: React.FC<AuditReportSectionProps> = ({
     if (!reportableStatuses.includes(status)) return null;
 
     return (
-        <div className="card !p-0 shadow-sm">
-            <div className="p-4 border-b flex flex-wrap justify-between items-center gap-3 bg-gray-50/50 rounded-t-lg">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
-                    <FileText size={20} className="text-primary" /> Denetim Raporu
-                </h3>
-            </div>
+        <div className="card !p-0 shadow-sm border border-gray-100 overflow-hidden">
+            <SectionHeader title="Denetim Raporu" icon={FileText} />
             <div className="p-5">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* PDF Report */}

@@ -6,6 +6,7 @@ import { formatDateTime } from '@/lib/audit-utils';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import ConfirmModal from '@/components/ConfirmModal';
+import Timeline, { TimelineEvent } from '@/components/ui/Timeline';
 
 interface DocumentHistoryModalProps {
     isOpen: boolean;
@@ -110,56 +111,46 @@ export default function DocumentHistoryModal({ isOpen, onClose, docId, docName, 
                     <div className="flex justify-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
-                ) : history.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 text-sm border-2 border-dashed border-gray-200 rounded-xl">
-                        Bu dokümanın versiyon geçmişi bulunmamaktadır.
-                    </div>
                 ) : (
-                    <div className="mt-2 space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                        {history.map((record) => (
-                            <div key={record.id} className="relative flex items-start p-3 border rounded-xl hover:bg-gray-50 transition-colors group">
-                                <div className="flex-shrink-0 mt-1">
-                                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs ring-4 ring-blue-50">
-                                        v{record.version}
-                                    </div>
-                                </div>
-                                <div className="ml-3 flex-1 min-w-0">
-                                    <div className="flex justify-between items-start">
-                                        <p className="text-sm font-medium text-gray-900 truncate pr-2">
-                                            {record.fileName}
-                                        </p>
-                                        <span className="text-[10px] text-gray-400 font-mono bg-gray-100 px-1.5 py-0.5 rounded">
-                                            {(record.fileSize / 1024).toFixed(1)} KB
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                                        <span>{formatDateTime(record.uploadedAt)}</span>
-                                        <span>•</span>
-                                        <span className="font-medium text-gray-700">{record.uploadedBy}</span>
-                                    </p>
-                                    {record.changeReason && (
-                                        <p className="text-xs text-gray-600 mt-2 italic border-l-2 border-blue-200 pl-2 py-0.5 bg-blue-50/50 rounded-r">
-                                            "{record.changeReason}"
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="ml-3 flex-shrink-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        title="Bu versiyona geri dön"
-                                        onClick={() => handleRestore(record.id, record.version)}
-                                        className="text-blue-600 hover:bg-blue-100 p-2 rounded-lg transition-colors flex items-center justify-center"
-                                        disabled={restoringId === record.id}
-                                        type="button"
-                                    >
-                                        {restoringId === record.id ? (
-                                            <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" />
-                                        ) : (
-                                            <RotateCcw size={16} />
+                    <div className="mt-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <Timeline 
+                            events={history.map((record) => ({
+                                id: record.id,
+                                timestamp: formatDateTime(record.uploadedAt),
+                                user: record.uploadedBy,
+                                title: `${record.fileName} (v${record.version})`,
+                                actionType: record.version === 1 ? 'create' : 'update',
+                                description: (
+                                    <div className="flex flex-col gap-2">
+                                        {record.changeReason && (
+                                            <p className="text-sm text-slate-700 italic border-l-2 border-primary/30 pl-2 py-0.5">
+                                                "{record.changeReason}"
+                                            </p>
                                         )}
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                                        <div className="flex items-center gap-3 mt-1">
+                                            <span className="text-[10px] text-slate-500 font-mono bg-slate-100 px-2 py-1 rounded">
+                                                {(record.fileSize / 1024).toFixed(1)} KB
+                                            </span>
+                                            <button
+                                                title="Bu versiyona geri dön"
+                                                onClick={() => handleRestore(record.id, record.version)}
+                                                className="text-primary hover:bg-primary/5 px-2 py-1 rounded text-xs font-semibold transition-colors flex items-center gap-1 border border-primary/20"
+                                                disabled={restoringId === record.id}
+                                                type="button"
+                                            >
+                                                {restoringId === record.id ? (
+                                                    <div className="animate-spin h-3 w-3 border-2 border-primary border-t-transparent rounded-full" />
+                                                ) : (
+                                                    <RotateCcw size={12} />
+                                                )}
+                                                Geri Dön
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                            }))}
+                            emptyStateMessage="Bu dokümanın versiyon geçmişi bulunmamaktadır."
+                        />
                     </div>
                 )}
             </div>

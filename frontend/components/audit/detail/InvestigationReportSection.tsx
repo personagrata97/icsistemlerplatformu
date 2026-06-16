@@ -13,6 +13,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import { auditApi } from '@/lib/audit-api';
 import { DISCIPLINARY_ACTIONS } from '@/lib/audit-utils';
 import Tooltip from '@/components/ui/Tooltip';
+import SectionHeader from '@/components/ui/SectionHeader';
 
 interface InvestigationReportSectionProps {
     status: string;
@@ -222,42 +223,31 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
     };
 
     return (
-        <div className="card !p-0 shadow-sm border border-slate-200 rounded-3xl overflow-hidden bg-white">
-            {/* Header */}
-            <div className="p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3 bg-slate-50/50 rounded-t-3xl">
-                <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-rose-50 text-rose-600 rounded-xl border border-rose-100/60 shadow-sm">
-                        <ShieldAlert size={22} />
+        <div className="card !p-0 shadow-sm border border-gray-100 overflow-hidden bg-white">
+            <SectionHeader
+                icon={ShieldAlert}
+                iconClassName="text-rose-600"
+                title="İnceleme & Soruşturma Raporlama Merkezi"
+                actionButton={
+                    <div className="flex items-center gap-3">
+                        {lastSaved && (
+                            <span className="text-[11px] text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100 flex items-center gap-1">
+                                <CheckCircle size={12} />
+                                Senkronize ({lastSaved})
+                            </span>
+                        )}
+                        <Button 
+                            size="sm" 
+                            onClick={handleSave} 
+                            disabled={isSaving}
+                            className="gap-1.5 shadow-sm text-xs font-semibold"
+                            leftIcon={<Save size={14} />}
+                        >
+                            {isSaving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
+                        </Button>
                     </div>
-                    <div>
-                        <h3 className="text-base font-bold text-slate-800">
-                            İnceleme & Soruşturma Raporlama Merkezi
-                        </h3>
-                        <p className="text-xs text-slate-500 mt-0.5 font-medium flex items-center gap-1">
-                            <Lock size={12} className="text-rose-500" />
-                            Gizlilik Derecesi: Çok Gizli (KVKK / Suistimal)
-                        </p>
-                    </div>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                    {lastSaved && (
-                        <span className="text-[11px] text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100/60 flex items-center gap-1">
-                            <CheckCircle size={12} />
-                            Senkronize ({lastSaved})
-                        </span>
-                    )}
-                    <Button 
-                        size="sm" 
-                        onClick={handleSave} 
-                        disabled={isSaving}
-                        className="gap-1.5 shadow-sm text-xs font-semibold"
-                        leftIcon={<Save size={14} />}
-                    >
-                        {isSaving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
-                    </Button>
-                </div>
-            </div>
+                }
+            />
 
             {/* Menu Tabs */}
             <div className="flex border-b border-slate-100 px-4 bg-slate-50/20">

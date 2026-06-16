@@ -105,7 +105,7 @@ async function main() {
             risk: 'Yüksek',
             category: 'Operasyonel',
             department: 'Aydın Şubesi',
-            status: 'Çözüldü',
+            status: 'Kapalı',
             code: 'BUL-002'
         }
     });
@@ -121,3 +121,5 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+export {};

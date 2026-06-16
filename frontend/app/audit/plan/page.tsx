@@ -94,9 +94,9 @@ export default function AuditPlanPage() {
     const loadData = async (showOverlay = true) => {
         if (showOverlay) setLoading(true);
         try {
-            const [data, auditsData, staffData] = await Promise.all([
+            const [data, statsData, staffData] = await Promise.all([
                 auditApi.getPlans(),
-                auditApi.getAudits().catch(() => []),
+                auditApi.getExecutiveStats(),
                 auditApi.getStaff().catch(() => [])
             ]);
             // Tüm planları yükle (yıl filtresi client-side yapılacak)
@@ -112,9 +112,7 @@ export default function AuditPlanPage() {
             const tCapacity = totalAuditorCount * 220;
             setTotalCapacity(tCapacity);
 
-            const plannedAudits = Array.isArray(auditsData) ? auditsData : [];
-            const pDays = plannedAudits.reduce((acc, curr) => acc + (Number(curr.duration) || 0), 0);
-            setPlannedCapacity(pDays);
+            setPlannedCapacity(statsData?.totalPlannedDays || 0);
 
         } catch (error) {
             console.error('Plan listesi yükleme hatası:', error);

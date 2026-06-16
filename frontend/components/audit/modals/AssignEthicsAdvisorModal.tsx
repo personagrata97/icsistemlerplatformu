@@ -117,7 +117,7 @@ export default function AssignEthicsAdvisorModal({
                         options={staff.map(s => ({
                             value: s.id,
                             label: s.name,
-                            subtitle: s.title || 'Denetçi'
+                            subtitle: s.title || 'Müfettiş'
                         }))}
                         placeholder="Kişi veya kurul üyelerini seçiniz..."
                         showSearch

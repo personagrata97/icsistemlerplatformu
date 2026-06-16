@@ -7,6 +7,7 @@ import CodeBadge from '@/components/ui/CodeBadge';
 import AuditActionButtons from './AuditActionButtons';
 import EmptyState from '@/components/ui/EmptyState';
 import Tooltip from '@/components/ui/Tooltip';
+import OverflowTooltip from '@/components/ui/OverflowTooltip';
 import DataTable, { Column } from '@/components/ui/DataTable';
 
 export interface AuditTableItem {
@@ -67,15 +68,13 @@ const AuditTable: React.FC<AuditTableProps> = ({
             sortable: true,
             align: 'left',
             render: (item: AuditTableItem) => (
-                <div className="flex flex-col items-start pr-4">
-                    <div className="cell-title font-medium text-gray-900 flex items-center gap-2">
-                        <Tooltip content={item.title}>
-                            <span className="truncate max-w-[400px]">
-                                {item.title}
-                            </span>
-                        </Tooltip>
+                <div className="flex flex-col items-start pr-4 w-full min-w-0">
+                    <div className="cell-title font-medium text-gray-900 flex items-center gap-2 w-full min-w-0">
+                        <OverflowTooltip content={item.title} className="max-w-full flex-1 min-w-0">
+                            {item.title}
+                        </OverflowTooltip>
                         {item.linkedEthicsReportId && (
-                            <span className="flex items-center gap-1 text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 uppercase tracking-tight">
+                            <span className="flex items-center gap-1 text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 uppercase tracking-tight shrink-0">
                                 <Search size={10} /> Etik Bağlantılı
                             </span>
                         )}

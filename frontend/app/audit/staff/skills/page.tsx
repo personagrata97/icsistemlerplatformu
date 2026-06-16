@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { auditApi, AuditStaff } from '@/lib/audit-api';
-import { Users, Shield, Cpu, BookOpen, BarChart3, Database, Globe, Star, Search, Edit2, RefreshCw, Eye } from 'lucide-react';
+import { Edit2, Eye, Lock, TrendingUp, History } from 'lucide-react';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
@@ -16,10 +16,13 @@ import Badge from '@/components/ui/Badge';
 import EntityIcon from '@/components/ui/EntityIcon';
 import { EntityType } from '@/lib/entity-config';
 import PageHeader from '@/components/audit/PageHeader';
-import { BackButton } from '@/components/ui/BackButton';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import Tooltip from '@/components/ui/Tooltip';
+import EmptyState from '@/components/ui/EmptyState';
+import Timeline, { TimelineEvent } from '@/components/ui/Timeline';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES, checkRole } from '@/lib/auth-constants';
+import StaffTabs from '@/components/audit/staff/StaffTabs';
 
 const normalizeName = (name: string) => {
     return name.toLowerCase()
@@ -28,14 +31,8 @@ const normalizeName = (name: string) => {
         .replace(/[^a-z0-9]/g, ''); // Nokta, boşluk, parantez her şeyi sil
 };
 
-// Fotoğraf URL yardımcısı
-const getPhotoUrl = (url?: string) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    const origin = apiUrl.replace(/\/api\/v1\/?$/, '');
-    return `${origin}${url}`;
-};
+import { getPhotoUrl, calculateDynamicSkills } from '@/lib/audit-utils';
+import RatingStars from '@/components/ui/RatingStars';
 
 interface SkillRatings {
     risk_assessment: number; // Risk ve Kontrol Güvence (COSO/COBIT)
@@ -105,26 +102,24 @@ const SKILL_LEVELS = [
 
 export default function SkillsMatrixPage() {
     const { user, hasRole } = useAuth();
-    // Yöneticileri belirleme (Büyük/Küçük Harf Duyarsız)
-    const MANAGER_ROLES = [
-        'admin', 'audit_admin', 'audit_manager', 'manager', 'cae',
-        'teftiş kurulu başkanı', 'başkan', 'teftiş kurulu müdürü', 'müdür',
-        'system_admin', 'yönetici'
-    ];
-    const userRoleStr = (user?.role || '').toLowerCase();
-    const canManage = MANAGER_ROLES.includes(userRoleStr) || (hasRole ? checkRole(hasRole, ROLES.STAFF_MANAGER) : false);
+    const canManage = hasRole ? checkRole(hasRole, ROLES.STAFF_MANAGER) : false;
     const { showToast } = useToast();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [staffList, setStaffList] = useState<AuditStaff[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedSkillFilter, setSelectedSkillFilter] = useState<string>('all');
-    const [selectedLevelFilter, setSelectedLevelFilter] = useState<string>('all');
     const [selectedTitleFilter, setSelectedTitleFilter] = useState<string[]>([]);
+    const [selectedStaffFilter, setSelectedStaffFilter] = useState<string[]>([]);
+    const [selectedSkillFilter, setSelectedSkillFilter] = useState<string>('');
+    const [selectedLevelFilter, setSelectedLevelFilter] = useState<string>('');
 
     // Yetkinlik düzenleme modalı
     const [selectedStaff, setSelectedStaff] = useState<AuditStaff | null>(null);
     const [modalSkills, setModalSkills] = useState<SkillRatings>({ ...DEFAULT_SKILLS });
+    const [originalSkills, setOriginalSkills] = useState<SkillRatings>({ ...DEFAULT_SKILLS });
+    const [justifications, setJustifications] = useState<Record<string, string>>({});
+    const [historyModalOpen, setHistoryModalOpen] = useState(false);
+    const [historyStaff, setHistoryStaff] = useState<AuditStaff | null>(null);
 
     useEffect(() => {
         loadData();
@@ -143,44 +138,68 @@ export default function SkillsMatrixPage() {
         }
     };
 
-    const parseSkills = (skillsStr?: string): SkillRatings => {
-        if (!skillsStr) return { ...DEFAULT_SKILLS };
-        try {
-            const parsed = JSON.parse(skillsStr);
-            return {
-                risk_assessment: parsed.risk_assessment ?? DEFAULT_SKILLS.risk_assessment,
-                it_audit: parsed.it_audit ?? DEFAULT_SKILLS.it_audit,
-                financial_audit: parsed.financial_audit ?? DEFAULT_SKILLS.financial_audit,
-                data_analysis: parsed.data_analysis ?? DEFAULT_SKILLS.data_analysis,
-                reporting_english: parsed.reporting_english ?? DEFAULT_SKILLS.reporting_english
-            };
-        } catch (e) {
-            return { ...DEFAULT_SKILLS };
-        }
-    };
-
     const handleEditSkills = (staff: AuditStaff) => {
         setSelectedStaff(staff);
-        setModalSkills(parseSkills(staff.skills));
+        setJustifications({});
+        try {
+            const parsed = JSON.parse(staff.skills || '{}');
+            setModalSkills(parsed);
+            setOriginalSkills(parsed);
+        } catch (e) {
+            setModalSkills({ ...DEFAULT_SKILLS });
+            setOriginalSkills({ ...DEFAULT_SKILLS });
+        }
     };
 
     const handleSaveSkills = async () => {
         if (!selectedStaff) return;
+
+        const changedKeys = Object.keys(SKILL_LABELS).filter(key => 
+            (modalSkills[key as keyof SkillRatings] || 0) !== (originalSkills[key as keyof SkillRatings] || 0)
+        );
+
+        const missingJustification = changedKeys.find(key => !(justifications[key] || '').trim());
+
+        if (missingJustification) {
+            const skillName = SKILL_LABELS[missingJustification as keyof typeof SKILL_LABELS].label;
+            showToast(`${skillName} puanını değiştirdiğiniz için gerekçe girmelisiniz.`, 'warning');
+            return;
+        }
+
         setSaving(true);
         try {
             const updatedSkillsStr = JSON.stringify(modalSkills);
+            
+            // Log oluşturma (Audit Trail)
+            let newNotes = selectedStaff.notes || '';
+            if (changedKeys.length > 0) {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('tr-TR');
+                const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                const userName = user?.displayName || (user as any)?.name || user?.username || 'Sistem Yöneticisi';
+                
+                const logEntries = changedKeys.map(key => {
+                    const skillName = SKILL_LABELS[key as keyof typeof SKILL_LABELS].label;
+                    const oldVal = originalSkills[key as keyof SkillRatings] || 0;
+                    const newVal = modalSkills[key as keyof SkillRatings] || 0;
+                    // Format: [DD.MM.YYYY HH:MM] [USER] [SKILL] [OLD->NEW] JUSTIFICATION
+                    return `[${dateStr} ${timeStr}] [${userName}] [${skillName}] [${oldVal} -> ${newVal}] ${justifications[key]}`;
+                }).join('\n');
+                newNotes = newNotes ? `${newNotes}\n\n${logEntries}` : logEntries;
+            }
+
             await auditApi.updateStaff(selectedStaff.id, {
-                skills: updatedSkillsStr
+                skills: updatedSkillsStr,
+                notes: newNotes
             });
             
-            // Optimistic Update: Tablo ve istatistiklerin anında güncellenmesi için yerel state'i eziyoruz.
-            // (Backend'in önbellekleme/gecikme yapma ihtimaline karşı loadData()'yı beklemeyiz)
             setStaffList(prev => prev.map(staff => 
-                staff.id === selectedStaff.id ? { ...staff, skills: updatedSkillsStr } : staff
+                staff.id === selectedStaff.id ? { ...staff, skills: updatedSkillsStr, notes: newNotes } : staff
             ));
 
             showToast(`${selectedStaff.name} yetkinlik matrisi güncellendi.`, 'success');
             setSelectedStaff(null);
+            setJustifications({});
         } catch (error: any) {
             console.error('Yetkinlik güncellenemedi:', error);
             showToast(error.message || 'Güncelleme sırasında bir hata oluştu.', 'error');
@@ -189,7 +208,6 @@ export default function SkillsMatrixPage() {
         }
     };
 
-    // Filtreleme mantığı
     const filteredStaff = staffList.filter(staff => {
         const matchesSearch = (staff.name || '').toLocaleLowerCase('tr-TR').includes(searchTerm.toLocaleLowerCase('tr-TR')) ||
                              (staff.title || '').toLocaleLowerCase('tr-TR').includes(searchTerm.toLocaleLowerCase('tr-TR'));
@@ -200,166 +218,148 @@ export default function SkillsMatrixPage() {
             if (!staff.title || !selectedTitleFilter.includes(staff.title)) return false;
         }
 
-        if (selectedSkillFilter !== 'all') {
-            const skills = parseSkills(staff.skills);
-            const level = skills[selectedSkillFilter as keyof SkillRatings] ?? 0;
-            if (selectedLevelFilter !== 'all') {
+        if (selectedStaffFilter.length > 0 && !selectedStaffFilter.includes(staff.id)) return false;
+
+        if (selectedSkillFilter) {
+            const dynamic = calculateDynamicSkills(staff);
+            const level = dynamic[selectedSkillFilter]?.total ?? 0;
+            if (selectedLevelFilter) {
                 return level >= parseInt(selectedLevelFilter);
             }
             return true;
         }
 
         return true;
-    }).map(staff => {
-        // DataTable'ın sortable özelliğini kullanabilmesi için parse edilmiş skilleri objenin en üst seviyesine taşıyoruz
-        const parsed = parseSkills(staff.skills);
-        return {
-            ...staff,
-            risk_assessment: parsed.risk_assessment,
-            it_audit: parsed.it_audit,
-            financial_audit: parsed.financial_audit,
-            data_analysis: parsed.data_analysis,
-            reporting_english: parsed.reporting_english
-        };
     });
 
-    // İstatistik Hesaplamaları
-    const getAvgSkill = (key: keyof SkillRatings): number => {
+    const getAvgSkill = (key: string): number => {
         if (filteredStaff.length === 0) return 0;
         const total = filteredStaff.reduce((sum, staff) => {
-            const skills = parseSkills(staff.skills);
-            return sum + (skills[key] || 0);
+            const dynamic = calculateDynamicSkills(staff);
+            return sum + (dynamic[key]?.total || 0);
         }, 0);
         return total / filteredStaff.length;
     };
 
-    const countExperts = (key: keyof SkillRatings): number => {
+    const countExperts = (key: string): number => {
         return filteredStaff.filter(staff => {
-            const skills = parseSkills(staff.skills);
-            return skills[key] >= 3; // İleri veya Uzman Düzey
+            const dynamic = calculateDynamicSkills(staff);
+            return (dynamic[key]?.total || 0) >= 3; // İleri veya Uzman Düzey
         }).length;
     };
 
-    const renderStars = (level: number) => {
+    const getLevelBadgeVariant = (level: number): any => {
+        if (level >= 4) return 'warning';
+        if (level >= 3) return 'success';
+        if (level >= 2) return 'primary';
+        if (level >= 1) return 'info';
+        return 'gray';
+    };
+
+    const checkIsSelf = (row: AuditStaff) => {
+        const isIdMatch = String(row.id) === String(user?.id);
+        const userName = user?.displayName || (user as any)?.name || user?.username || '';
+        const normUser = normalizeName(userName);
+        const normStaff = normalizeName(row.name || '');
+        return isIdMatch || Boolean(normUser && normStaff && (normUser.includes(normStaff) || normStaff.includes(normUser)));
+    };
+
+    const renderSkillCell = (row: AuditStaff, skillKey: keyof ReturnType<typeof calculateDynamicSkills>) => {
+        if (!canManage && !checkIsSelf(row)) return <div className="text-slate-300 flex justify-center py-2"><Lock size={16} /></div>;
+        
+        const dynamic = calculateDynamicSkills(row);
+        const skill = dynamic[skillKey];
+        const label = SKILL_LEVELS.find(l => l.value === Math.floor(skill.total))?.label.split(' ')[0] || 'Temel';
+        
+        const tooltipContent = (
+            <div className="min-w-[260px] whitespace-nowrap text-[12px] p-1.5 pr-2">
+                <div className="font-bold text-indigo-700 mb-2 border-b border-slate-200 pb-2 flex items-center gap-1.5">
+                    <TrendingUp size={13}/> Dinamik Hesaplama
+                </div>
+                <div className="flex justify-between py-1 gap-6">
+                    <span className="text-slate-500 font-medium">Yönetici Puanı:</span> 
+                    <span className="font-bold text-slate-700">{skill.base.toFixed(1)}</span>
+                </div>
+                <div className="mt-1 space-y-1">
+                    {skill.reasons.map((r, i) => {
+                        const isZero = r.includes('(+0.0)');
+                        const parts = r.split(' (+');
+                        const rName = parts[0];
+                        const rVal = parts.length > 1 ? `+${parts[1].replace(')', '')}` : '';
+                        
+                        return (
+                            <div key={i} className={`flex items-start justify-between gap-4 font-medium whitespace-nowrap ${isZero ? 'text-slate-400' : 'text-emerald-600'}`}>
+                                <div className="flex gap-1.5 items-center">
+                                    <span className="shrink-0 font-bold">{isZero ? '-' : '+'}</span> 
+                                    <span>{rName}</span>
+                                </div>
+                                <span className="font-bold">{rVal}</span>
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="font-bold mt-2 pt-2 border-t border-slate-200 flex justify-between gap-6 text-indigo-900">
+                    <span>Toplam (Max 4.0):</span> 
+                    <span>{skill.total.toFixed(1)}</span>
+                </div>
+            </div>
+        );
+
         return (
-            <div className="flex gap-0.5">
-                {[0, 1, 2, 3].map((idx) => (
-                    <Star
-                        key={idx}
-                        size={13}
-                        className={idx < level ? "fill-amber-400 text-amber-500" : "text-slate-200 fill-slate-100"}
-                    />
-                ))}
+            <div className="flex justify-center">
+                <Tooltip content={tooltipContent} position="top">
+                    <div className="flex flex-col items-center gap-1.5 cursor-help w-full px-2">
+                        <Badge variant={getLevelBadgeVariant(skill.total)} size="sm" className={skill.bonus > 0 ? "border-indigo-300 bg-indigo-50 text-indigo-700 font-bold ring-1 ring-indigo-200" : ""}>
+                            {label} {skill.bonus > 0 && <span className="ml-1 text-[10px] text-indigo-600 font-bold">+{skill.bonus}</span>}
+                        </Badge>
+                        <RatingStars level={skill.total} />
+                    </div>
+                </Tooltip>
             </div>
         );
     };
-
-    const getLevelBadgeVariant = (level: number): any => {
-        switch(level) {
-            case 0: return 'gray';
-            case 1: return 'info';
-            case 2: return 'primary';
-            case 3: return 'success';
-            case 4: return 'warning';
-            default: return 'gray';
-        }
-    };
-
     const columns = [
         {
             key: 'name',
             header: 'Personel',
+            type: 'user',
             sortable: true,
-            render: (row: AuditStaff) => (
-                <div className="flex items-center gap-3 py-1">
-                    <div className="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-500 font-bold tracking-tighter shadow-inner overflow-hidden">
-                        {getPhotoUrl(row.photoUrl) ? (
-                            <img src={getPhotoUrl(row.photoUrl)!} alt={row.name} className="w-full h-full object-cover" />
-                        ) : (
-                            row.name.substring(0, 2).toUpperCase()
-                        )}
-                    </div>
-                    <div>
-                        <div className="font-bold text-gray-900">{row.name}</div>
-                        <div className="text-xs text-gray-500 mt-0.5">{row.title}</div>
-                    </div>
-                </div>
-            )
+            align: 'left' as const
         },
         {
             key: 'risk_assessment',
             header: SKILL_LABELS.risk_assessment.label,
             align: 'center' as const,
             sortable: true,
-            render: (row: AuditStaff) => {
-                const skills = parseSkills(row.skills);
-                return (
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-semibold text-gray-600">{SKILL_LEVELS.find(l => l.value === skills.risk_assessment)?.label.split(' ')[0]}</span>
-                        {renderStars(skills.risk_assessment)}
-                    </div>
-                );
-            }
+            render: (row: AuditStaff) => renderSkillCell(row, 'risk_assessment')
         },
         {
             key: 'it_audit',
             header: SKILL_LABELS.it_audit.label,
             align: 'center' as const,
             sortable: true,
-            render: (row: AuditStaff) => {
-                const skills = parseSkills(row.skills);
-                return (
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-semibold text-gray-600">{SKILL_LEVELS.find(l => l.value === skills.it_audit)?.label.split(' ')[0]}</span>
-                        {renderStars(skills.it_audit)}
-                    </div>
-                );
-            }
+            render: (row: AuditStaff) => renderSkillCell(row, 'it_audit')
         },
         {
             key: 'financial_audit',
             header: SKILL_LABELS.financial_audit.label,
             align: 'center' as const,
             sortable: true,
-            render: (row: AuditStaff) => {
-                const skills = parseSkills(row.skills);
-                return (
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-semibold text-gray-600">{SKILL_LEVELS.find(l => l.value === skills.financial_audit)?.label.split(' ')[0]}</span>
-                        {renderStars(skills.financial_audit)}
-                    </div>
-                );
-            }
+            render: (row: AuditStaff) => renderSkillCell(row, 'financial_audit')
         },
         {
             key: 'data_analysis',
             header: SKILL_LABELS.data_analysis.label,
             align: 'center' as const,
             sortable: true,
-            render: (row: AuditStaff) => {
-                const skills = parseSkills(row.skills);
-                return (
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-semibold text-gray-600">{SKILL_LEVELS.find(l => l.value === skills.data_analysis)?.label.split(' ')[0]}</span>
-                        {renderStars(skills.data_analysis)}
-                    </div>
-                );
-            }
+            render: (row: AuditStaff) => renderSkillCell(row, 'data_analysis')
         },
         {
             key: 'reporting_english',
             header: SKILL_LABELS.reporting_english.label,
             align: 'center' as const,
             sortable: true,
-            render: (row: AuditStaff) => {
-                const skills = parseSkills(row.skills);
-                return (
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs font-semibold text-gray-600">{SKILL_LEVELS.find(l => l.value === skills.reporting_english)?.label.split(' ')[0]}</span>
-                        {renderStars(skills.reporting_english)}
-                    </div>
-                );
-            }
+            render: (row: AuditStaff) => renderSkillCell(row, 'reporting_english')
         },
         {
             key: 'actions',
@@ -367,20 +367,10 @@ export default function SkillsMatrixPage() {
             width: '120px',
             align: 'center' as const,
             render: (row: AuditStaff) => {
-                const isIdMatch = String(row.id) === String(user?.id);
-                let userName = user?.displayName || (user as any)?.name || user?.username || '';
-                const rawUsername = (user?.username || '').toLowerCase();
-                
-                // DEVMODE HACK: Admin/CAE hesaplarını Kerem Yılmaz olarak kabul et
-                if (rawUsername === 'admin' || rawUsername === 'cae' || userName.toLowerCase().includes('admin') || userName.toLowerCase().includes('cae') || userName.toLowerCase().includes('yönetici')) {
-                    userName = 'Kerem Yılmaz';
-                }
+                const isSelfRow = checkIsSelf(row);
+                const canEditThisRow = canManage || isSelfRow;
+                if (!canManage && !isSelfRow) return null;
 
-                const normUser = normalizeName(userName);
-                const normStaff = normalizeName(row.name || '');
-                const isNameMatch = Boolean(normUser && normStaff && (normUser.includes(normStaff) || normStaff.includes(normUser)));
-                const isSelfRow = isIdMatch || isNameMatch;
-                const canEditThisRow = canManage && !isSelfRow;
                 return (
                     <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
                         <ActionMenu
@@ -389,6 +379,11 @@ export default function SkillsMatrixPage() {
                                     label: canEditThisRow ? 'Yetkinlikleri Düzenle' : 'Yetkinlikleri Görüntüle', 
                                     icon: canEditThisRow ? <Edit2 size={14} /> : <Eye size={14} />, 
                                     onClick: () => handleEditSkills(row) 
+                                },
+                                { 
+                                    label: 'Yetkinlik Geçmişi', 
+                                    icon: <History size={14} />, 
+                                    onClick: () => { setHistoryStaff(row); setHistoryModalOpen(true); } 
                                 }
                             ]}
                         />
@@ -398,20 +393,7 @@ export default function SkillsMatrixPage() {
         }
     ];
 
-    const isSelfStaffId = selectedStaff && user ? String(selectedStaff.id) === String(user.id) : false;
-    let modalUserName = user?.displayName || (user as any)?.name || user?.username || '';
-    const rawModalUsername = (user?.username || '').toLowerCase();
-    
-    // DEVMODE HACK: Admin/CAE hesaplarını Kerem Yılmaz olarak kabul et
-    if (rawModalUsername === 'admin' || rawModalUsername === 'cae' || modalUserName.toLowerCase().includes('admin') || modalUserName.toLowerCase().includes('cae') || modalUserName.toLowerCase().includes('yönetici')) {
-        modalUserName = 'Kerem Yılmaz';
-    }
-
-    const normModalUser = normalizeName(modalUserName);
-    const normModalStaff = normalizeName(selectedStaff?.name || '');
-    const isSelfStaffName = Boolean(selectedStaff && normModalUser && normModalStaff && (normModalUser.includes(normModalStaff) || normModalStaff.includes(normModalUser)));
-    const isSelfStaff = isSelfStaffId || isSelfStaffName;
-    const canEditStaff = selectedStaff ? (canManage && !isSelfStaff) : false;
+    const canEditStaff = selectedStaff ? (canManage) : false;
 
     if (loading && staffList.length === 0) {
         return <div className="flex items-center justify-center h-64"><LoadingState message="Yetkinlik Matrisi yükleniyor..." /></div>;
@@ -419,8 +401,37 @@ export default function SkillsMatrixPage() {
 
     return (
         <div className="space-y-6">
-            <BackButton href="/audit/staff" label="Denetim Ekibi Listesine Dön" />
+            <StaffTabs />
             <PageHeader title="Yetkinlik Matrisi" subtitle="Personel uzmanlık alanları ve denetim kabiliyetleri" />
+
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {Object.entries(SKILL_LABELS).map(([key, config]) => (
+                    <StatCard
+                        key={key}
+                        title={`${config.shortLabel} Ort.`}
+                        value={`${getAvgSkill(key).toFixed(1)} / 4.0`}
+                        entityType={config.entityType}
+                        subtext={`${countExperts(key)} İleri/Uzman Seviye Personel`}
+                        onClick={() => setSelectedSkillFilter(prev => prev === key ? '' : key)}
+                        className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === key ? 'ring-2 ring-indigo-500 scale-[1.02] bg-indigo-50/10' : ''}`}
+                    />
+                ))}
+            </div>
+
+            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 p-4 rounded-2xl flex items-start gap-4 mb-2 shadow-sm">
+                <div className="bg-indigo-100 p-2.5 rounded-xl text-indigo-600 shrink-0 mt-0.5 shadow-inner">
+                    <TrendingUp size={24} />
+                </div>
+                <div className="w-full">
+                    <h4 className="font-bold text-indigo-900 text-sm mb-1">
+                        Dinamik Yetkinlik Değerlendirmesi
+                    </h4>
+                    <p className="text-sm text-indigo-800/80 leading-relaxed max-w-none">
+                        Personelin yetkinlik seviyeleri; yöneticiler tarafından atanan temel değerlendirme puanlarına ek olarak, tamamlanan <strong>Mesleki Eğitimler (CPE)</strong> ve <strong>Kıdem/Ünvan</strong> durumu dikkate alınarak sistem tarafından otomatik olarak güncellenmektedir. Hesaplama detaylarını görmek için tablodaki seviye etiketlerinin üzerine gelebilirsiniz.
+                    </p>
+                </div>
+            </div>
 
             <PageToolbar
                 searchPlaceholder="Personel veya ünvan ara..."
@@ -430,15 +441,25 @@ export default function SkillsMatrixPage() {
                 showExportButton={true}
                 onExportClick={() => auditApi.exportToExcel(filteredStaff, 'Yetkinlik_Matrisi')}
                 filters={
-                        <FilterDropdown
-                        activeCount={(selectedSkillFilter !== 'all' ? (selectedLevelFilter !== 'all' ? 2 : 1) : 0) + (selectedTitleFilter.length > 0 ? 1 : 0)}
+                    <FilterDropdown
+                        activeCount={(selectedSkillFilter ? (selectedLevelFilter ? 2 : 1) : 0) + (selectedTitleFilter.length > 0 ? 1 : 0) + (selectedStaffFilter.length > 0 ? 1 : 0)}
                         onClear={() => {
-                            setSelectedSkillFilter('all');
-                            setSelectedLevelFilter('all');
+                            setSelectedSkillFilter('');
+                            setSelectedLevelFilter('');
                             setSelectedTitleFilter([]);
+                            setSelectedStaffFilter([]);
                             setSearchTerm('');
                         }}
                     >
+                        <CustomSelect
+                            label="Personel Filtresi"
+                            options={staffList.map(s => ({ value: s.id, label: s.name }))}
+                            value={selectedStaffFilter}
+                            onChange={(val) => setSelectedStaffFilter(val as string[])}
+                            isMulti
+                            showSearch
+                            placeholder="Personel seçiniz..."
+                        />
                         <CustomSelect
                             label="Ünvan"
                             options={TITLES.map(t => ({ value: t, label: t }))}
@@ -449,8 +470,8 @@ export default function SkillsMatrixPage() {
                         />
                         <CustomSelect
                             label="Yetkinlik Alanı"
+                            placeholder="Tüm Yetkinlikler"
                             options={[
-                                { value: 'all', label: 'Tüm Yetkinlikler' },
                                 ...Object.entries(SKILL_LABELS).map(([key, value]) => ({
                                     value: key,
                                     label: value.label
@@ -459,14 +480,14 @@ export default function SkillsMatrixPage() {
                             value={selectedSkillFilter}
                             onChange={(val) => {
                                 setSelectedSkillFilter(val as string);
-                                if (val === 'all') setSelectedLevelFilter('all');
+                                if (!val) setSelectedLevelFilter('');
                             }}
                         />
-                        {selectedSkillFilter !== 'all' && (
+                        {selectedSkillFilter && (
                             <CustomSelect
                                 label="Yetkinlik Seviyesi"
+                                placeholder="Tüm Seviyeler"
                                 options={[
-                                    { value: 'all', label: 'Tüm Seviyeler' },
                                     { value: '1', label: 'Temel ve Üzeri' },
                                     { value: '2', label: 'Orta ve Üzeri' },
                                     { value: '3', label: 'İleri ve Üzeri' },
@@ -480,75 +501,35 @@ export default function SkillsMatrixPage() {
                 }
             />
 
-            {/* İstatistik Kartları */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <StatCard
-                    title={`${SKILL_LABELS.risk_assessment.shortLabel} Ort.`}
-                    value={`${getAvgSkill('risk_assessment').toFixed(1)} / 4.0`}
-                    entityType="SKILL_RISK"
-                    subtext={`${countExperts('risk_assessment')} İleri/Uzman Seviye Personel`}
-                    onClick={() => setSelectedSkillFilter(prev => prev === 'risk_assessment' ? 'all' : 'risk_assessment')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'risk_assessment' ? 'ring-2 ring-indigo-500 scale-[1.02] bg-indigo-50/10' : ''}`}
-                />
-                <StatCard
-                    title={`${SKILL_LABELS.it_audit.shortLabel} Ort.`}
-                    value={`${getAvgSkill('it_audit').toFixed(1)} / 4.0`}
-                    entityType="SKILL_IT"
-                    subtext={`${countExperts('it_audit')} İleri/Uzman Seviye Personel`}
-                    onClick={() => setSelectedSkillFilter(prev => prev === 'it_audit' ? 'all' : 'it_audit')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'it_audit' ? 'ring-2 ring-cyan-500 scale-[1.02] bg-cyan-50/10' : ''}`}
-                />
-                <StatCard
-                    title={`${SKILL_LABELS.financial_audit.shortLabel} Ort.`}
-                    value={`${getAvgSkill('financial_audit').toFixed(1)} / 4.0`}
-                    entityType="SKILL_FINANCE"
-                    subtext={`${countExperts('financial_audit')} İleri/Uzman Seviye Personel`}
-                    onClick={() => setSelectedSkillFilter(prev => prev === 'financial_audit' ? 'all' : 'financial_audit')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'financial_audit' ? 'ring-2 ring-emerald-500 scale-[1.02] bg-emerald-50/10' : ''}`}
-                />
-                <StatCard
-                    title={`${SKILL_LABELS.data_analysis.shortLabel} Ort.`}
-                    value={`${getAvgSkill('data_analysis').toFixed(1)} / 4.0`}
-                    entityType="SKILL_DATA"
-                    subtext={`${countExperts('data_analysis')} İleri/Uzman Seviye Personel`}
-                    onClick={() => setSelectedSkillFilter(prev => prev === 'data_analysis' ? 'all' : 'data_analysis')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'data_analysis' ? 'ring-2 ring-orange-500 scale-[1.02] bg-orange-50/10' : ''}`}
-                />
-                <StatCard
-                    title={`${SKILL_LABELS.reporting_english.shortLabel} Ort.`}
-                    value={`${getAvgSkill('reporting_english').toFixed(1)} / 4.0`}
-                    entityType="SKILL_REPORT"
-                    subtext={`${countExperts('reporting_english')} İleri/Uzman Seviye Personel`}
-                    onClick={() => setSelectedSkillFilter(prev => prev === 'reporting_english' ? 'all' : 'reporting_english')}
-                    className={`transition-all hover:scale-[1.02] cursor-pointer ${selectedSkillFilter === 'reporting_english' ? 'ring-2 ring-purple-500 scale-[1.02] bg-purple-50/10' : ''}`}
-                />
-            </div>
-
-            {/* Veri Tablosu */}
-            <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
-                <DataTable
-                    columns={columns}
-                    data={filteredStaff}
-                    loading={loading}
-                    rowKey="id"
-                    paginated={true}
-                    itemsPerPage={15}
-                    itemUnit="personel"
-                    searchTerm={searchTerm}
-                    onClearFilters={() => {
-                        setSearchTerm('');
-                        setSelectedSkillFilter('all');
-                        setSelectedLevelFilter('all');
-                        setSelectedTitleFilter([]);
-                    }}
-                />
-            </div>
+            <DataTable
+                columns={columns}
+                data={filteredStaff}
+                loading={loading}
+                rowKey="id"
+                paginated={true}
+                itemsPerPage={15}
+                itemUnit="personel"
+                searchTerm={searchTerm}
+                onClearFilters={() => {
+                    setSearchTerm('');
+                    setSelectedSkillFilter('');
+                    setSelectedLevelFilter('');
+                    setSelectedTitleFilter([]);
+                    setSelectedStaffFilter([]);
+                }}
+                className="mt-4 shadow-sm border border-gray-100"
+            />
 
             {/* Yetkinlik Düzenleme Modalı */}
             <Modal
                 isOpen={!!selectedStaff}
                 onClose={() => setSelectedStaff(null)}
-                title={`${selectedStaff?.name || ''} - Yetkinlik ${canEditStaff ? 'Profilini Düzenle' : 'Profili'}`}
+                title={
+                    <div className="flex items-center gap-2">
+                        <Edit2 className="text-indigo-500" size={22} />
+                        <span>{selectedStaff?.name || ''} - Yetkinlik {canEditStaff ? 'Profilini Düzenle' : 'Profili'}</span>
+                    </div>
+                }
                 size="lg"
                 footer={
                     <div className="flex justify-end gap-3 w-full">
@@ -592,7 +573,7 @@ export default function SkillsMatrixPage() {
                                                 {canEditStaff ? (
                                                     <div className="w-full">
                                                         <CustomSelect
-                                                            value={modalSkills[key].toString()}
+                                                            value={(modalSkills[key] || 0).toString()}
                                                             onChange={(val) => setModalSkills({ ...modalSkills, [key]: parseInt(val as string) })}
                                                             options={SKILL_LEVELS.map(l => ({ value: l.value.toString(), label: l.label }))}
                                                         />
@@ -604,12 +585,107 @@ export default function SkillsMatrixPage() {
                                                 )}
                                             </div>
                                         </div>
+                                        
+                                        {canEditStaff && (modalSkills[key] || 0) !== (originalSkills[key] || 0) && (
+                                            <div className="mt-4 pl-12 pr-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                                                <div className="bg-indigo-50/50 border border-indigo-100 p-3 rounded-lg relative">
+                                                    <div className="absolute -top-1.5 left-6 w-3 h-3 bg-indigo-50/50 border-t border-l border-indigo-100 transform rotate-45"></div>
+                                                    <label className="block text-xs font-bold text-indigo-800 mb-1.5">
+                                                        Puan Değişikliği Gerekçesi <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <textarea
+                                                        className="w-full text-[13px] border border-indigo-200 rounded p-2 outline-none focus:ring-2 focus:ring-indigo-400 bg-white resize-none shadow-sm"
+                                                        rows={2}
+                                                        placeholder={`${skill.shortLabel} yetkinliğini güncellediniz. Nedenini kısaca belirtiniz.`}
+                                                        value={justifications[key] || ''}
+                                                        onChange={(e) => setJustifications({...justifications, [key]: e.target.value})}
+                                                    ></textarea>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
                         </div>
                     </div>
                 )}
+            </Modal>
+
+            {/* History Modal */}
+            <Modal
+                isOpen={historyModalOpen}
+                onClose={() => { setHistoryModalOpen(false); setHistoryStaff(null); }}
+                title={
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100">
+                            <History size={20} />
+                        </div>
+                        <div>
+                            <div className="font-bold text-gray-900">Yetkinlik Güncelleme Tarihçesi</div>
+                            <div className="text-sm font-medium text-gray-500 mt-0.5">{historyStaff?.name}</div>
+                        </div>
+                    </div>
+                }
+                size="lg"
+            >
+                <div className="bg-slate-50/50 border rounded-xl overflow-hidden p-6 max-h-[60vh] overflow-y-auto min-h-[300px]">
+                    <Timeline events={
+                        historyStaff?.notes ? historyStaff.notes.split('\n\n').reverse().flatMap((logGroup, index) => {
+                            if (!logGroup.trim()) return [];
+                            return logGroup.split('\n').filter(line => line.trim()).map((line, i) => {
+                                let datetime = '';
+                                let userName = 'Sistem Yöneticisi';
+                                let skill = '';
+                                let change = '';
+                                let reason = line;
+
+                                const matchNew = line.match(/^\[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\] (.*)$/);
+                                if (matchNew) {
+                                    datetime = matchNew[1];
+                                    userName = matchNew[2];
+                                    skill = matchNew[3];
+                                    change = matchNew[4];
+                                    reason = matchNew[5];
+                                } else {
+                                    const matchOld = line.match(/^\[(.*?)\] Yetkinlik Güncellemesi - (.*?) \((.*?)\): (.*)$/);
+                                    if (matchOld) {
+                                        datetime = matchOld[1];
+                                        skill = matchOld[2];
+                                        change = matchOld[3];
+                                        reason = matchOld[4];
+                                    }
+                                }
+
+                                if (!datetime) {
+                                    return {
+                                        id: `${index}-${i}`,
+                                        timestamp: '',
+                                        user: 'Sistem',
+                                        title: 'Sistem Notu',
+                                        actionType: 'comment' as TimelineActionType,
+                                        description: line
+                                    };
+                                }
+
+                                const [oldVal, newVal] = change.split('->').map(v => v.trim());
+
+                                return {
+                                    id: `${index}-${i}`,
+                                    timestamp: datetime,
+                                    user: userName,
+                                    title: skill,
+                                    actionType: 'update' as TimelineActionType,
+                                    details: {
+                                        oldValue: oldVal,
+                                        newValue: newVal,
+                                        label: 'Puan Değişimi'
+                                    },
+                                    description: reason
+                                };
+                            });
+                        }).filter(e => e.timestamp) : []
+                    } emptyStateMessage="Bu personel için henüz kaydedilmiş bir yetkinlik değişikliği geçmiş kaydı bulunmamaktadır." />
+                </div>
             </Modal>
         </div>
     );

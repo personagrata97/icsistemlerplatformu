@@ -1,36 +1,26 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-    Briefcase, CheckCircle, PieChart, RefreshCw, AlertCircle, Calendar,
-    AlertTriangle, FileText, TrendingUp
-} from 'lucide-react';
-import ExecutiveActionCards from '@/components/audit/ExecutiveActionCards';
+import { Briefcase, CheckCircle, Users, CheckSquare, XCircle, Clock, Calendar } from 'lucide-react';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { auditApi } from '@/lib/audit-api';
 import LoadingState from '@/components/ui/LoadingState';
 import RefreshButton from '@/components/ui/RefreshButton';
-import { formatDateTime } from '@/lib/audit-utils';
+import { formatDateTime, calculateDynamicSkills } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
 import { checkRole, ROLES } from '@/lib/auth-constants';
-import { useRouter } from 'next/navigation';
-
-import QualityMetrics from '@/components/audit/QualityMetrics';
-import CodeBadge from '@/components/ui/CodeBadge';
-import StatusBadge from '@/components/ui/StatusBadge';
+import Alert from '@/components/ui/Alert';
 import Button from '@/components/ui/Button';
 import PageHeader from '@/components/audit/PageHeader';
 import PendingDeletionsModal from '@/components/audit/PendingDeletionsModal';
-import EmptyState from '@/components/ui/EmptyState';
-import ActionLink from '@/components/ui/ActionLink';
 import PageToolbar from '@/components/ui/PageToolbar';
-import StatCard from '@/components/ui/StatCard';
 import CustomSelect from '@/components/ui/CustomSelect';
-import Alert from '@/components/ui/Alert';
-import DashboardListItem from '@/components/ui/DashboardListItem';
-import DashboardWidget from '@/components/ui/DashboardWidget';
+import QualityMetrics from '@/components/audit/QualityMetrics';
+import ExecutiveOverview from '@/components/audit/executive/ExecutiveOverview';
+import ExecutiveTeam from '@/components/audit/executive/ExecutiveTeam';
 
 export default function ExecutiveDashboard() {
     const router = useRouter();
@@ -39,110 +29,43 @@ export default function ExecutiveDashboard() {
     const [loading, setLoading] = useState(true);
     const isExecutive = checkRole(hasRole, ROLES.EXECUTIVE);
 
-    const [activeTab, setActiveTab] = useState<'overview' | 'quality'>('overview');
-    const [audits, setAudits] = useState<any[]>([]);
-    const [findings, setFindings] = useState<any[]>([]);
+    const [activeTab, setActiveTab] = useState<'overview' | 'quality' | 'team'>('overview');
+    const [stats, setStats] = useState<any>(null);
     const [pendingItems, setPendingItems] = useState<any[]>([]);
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<string>('');
 
     const [selectedYear, setSelectedYear] = useState<string>('Tümü');
-    const [availableYears, setAvailableYears] = useState<{value: string, label: string}[]>([
-        { value: 'Tümü', label: 'Tüm Yıllar' }
-    ]);
-
-    const extractYear = (dateValue: any) => {
-        if (!dateValue) return null;
-        const d = new Date(dateValue);
-        if (isNaN(d.getTime())) return null;
-        return d.getFullYear().toString();
-    };
-
-    const filterByYear = (items: any[], dateFields: string[]) => {
-        if (selectedYear === 'Tümü') return items;
-        return items.filter(item => {
-            return dateFields.some(field => {
-                const year = extractYear(item[field]);
-                return year === selectedYear;
-            });
-        });
-    };
+    const availableYears = [
+        { value: 'Tümü', label: 'Tüm Yıllar' },
+        { value: '2026', label: '2026' },
+        { value: '2025', label: '2025' },
+        { value: '2024', label: '2024' },
+        { value: '2023', label: '2023' }
+    ];
 
     useEffect(() => {
-        loadData();
-    }, []);
-
-    useEffect(() => {
-        if (!loading && !isExecutive) {
+        if (!isExecutive) {
+            setLoading(false);
+            showToast('Bu sayfayı görüntüleme yetkiniz yok.', 'error');
             router.push('/audit');
+            return;
         }
-    }, [loading, isExecutive, router]);
+        loadData();
+    }, [selectedYear, isExecutive, router]);
 
     const loadData = async (showOverlay = true) => {
+        if (!isExecutive) {
+            setLoading(false);
+            return;
+        }
+
         if (showOverlay) setLoading(true);
         try {
-            const [auditsData, findingsData] = await Promise.all([
-                auditApi.getAudits(),
-                auditApi.getFindings()
-            ]);
-            const normalizedFindings = (Array.isArray(findingsData) ? findingsData : []).map(f => {
-                let status = f.status || 'Taslak';
-                if (status === 'Açık') status = 'Tebliğ Edildi';
-                if (status === 'Çözüldü' || status === 'Kapalı' || status === 'Kapalı (Mutabık Değil)') status = 'Tamamlandı';
-                return { ...f, status };
-            });
-
-            setAudits(Array.isArray(auditsData) ? auditsData : []);
-            setFindings(normalizedFindings);
-
-            // Yıl filtresi seçeneklerini oluştur
-            const years = new Set<string>();
-            const addYear = (dateStr: string) => {
-                if (dateStr) {
-                    const year = new Date(dateStr).getFullYear().toString();
-                    if (!isNaN(Number(year))) years.add(year);
-                }
-            };
-            
-            (Array.isArray(auditsData) ? auditsData : []).forEach((a: any) => {
-                if (a.createdAt) addYear(a.createdAt);
-                if (a.startDate) addYear(a.startDate);
-                if (a.created_at) addYear(a.created_at);
-            });
-            normalizedFindings.forEach((f: any) => {
-                if (f.createdAt) addYear(f.createdAt);
-                if (f.created_at) addYear(f.created_at);
-                if (f.updated_at) addYear(f.updated_at);
-            });
-            
-            const sortedYears = Array.from(years).sort().reverse();
-            setAvailableYears([
-                { value: 'Tümü', label: 'Tüm Yıllar' },
-                ...sortedYears.map(y => ({ value: y, label: y }))
-            ]);
-
-            // Silinme onayı bekleyen kayıtları filtrele
-            const pAudits = (Array.isArray(auditsData) ? auditsData : []).filter((a: any) => a.status === 'Silinme Onayı Bekliyor').map((a: any) => ({
-                id: a.id,
-                code: a.auditCode || a.code, // farklı alan adları
-                title: a.title,
-                deletionReason: a.deletionReason,
-                deletionComment: a.deletionComment,
-                type: 'Audit'
-            }));
-
-            const pFindings = (Array.isArray(findingsData) ? findingsData : []).filter((f: any) => f.status === 'Silinme Onayı Bekliyor').map((f: any) => ({
-                id: f.id,
-                code: f.code,
-                title: f.headline || f.title, // farklı alan adları
-                deletionReason: f.deletionReason,
-                deletionComment: f.deletionComment,
-                type: 'Finding'
-            }));
-
-            setPendingItems([...pAudits, ...pFindings]);
+            const data = await auditApi.getExecutiveStats(selectedYear);
+            setStats(data);
+            setPendingItems(data.pendingItems || []);
             setLastUpdate(formatDateTime(new Date()));
-
         } catch (error) {
             console.error('Yönetici paneli veri yükleme hatası:', error);
             showToast('Veriler yüklenirken hata oluştu', 'error');
@@ -159,22 +82,6 @@ export default function ExecutiveDashboard() {
                 await auditApi.approveDeleteFinding(id);
             }
             showToast('Silme işlemi onaylandı', 'success');
-            loadData(); // Listeyi yenile
-            if (pendingItems.length <= 1) setShowPendingModal(false);
-        } catch (error) {
-            console.error(error);
-            showToast('İşlem başarısız', 'error');
-        }
-    };
-
-    const handleRejectDelete = async (id: string, type: 'Audit' | 'Finding') => {
-        try {
-            if (type === 'Audit') {
-                await auditApi.rejectDeleteAudit(id);
-            } else {
-                await auditApi.rejectDeleteFinding(id);
-            }
-            showToast('Silme talebi reddedildi', 'success');
             loadData();
             if (pendingItems.length <= 1) setShowPendingModal(false);
         } catch (error) {
@@ -183,46 +90,91 @@ export default function ExecutiveDashboard() {
         }
     };
 
+    const handleRejectDelete = async () => {
+        // İptal logici
+        setShowPendingModal(false);
+    };
 
-    // İstatistik hesaplama
-    const filteredAudits = filterByYear(audits, ['startDate', 'createdAt', 'created_at', 'updatedAt']);
-    const filteredFindings = filterByYear(findings, ['createdAt', 'created_at', 'updatedAt']);
+    // Teftiş Kurulu Yetkinlik Analizi (Skill Gap) Hesaplaması
+    const skillAverages: Record<string, any> = {
+        risk_assessment: { label: 'Risk Yönetimi', total: 0, scores: [] },
+        it_audit: { label: 'BT ve Siber', total: 0, scores: [] },
+        financial_audit: { label: 'Finansal & Uyum', total: 0, scores: [] },
+        data_analysis: { label: 'Veri Analitiği', total: 0, scores: [] },
+        reporting_english: { label: 'Raporlama', total: 0, scores: [] }
+    };
 
-    const pendingApprovals = filteredFindings.filter(f => f.status === 'Onay Bekliyor').length;
-    const activeAudits = filteredAudits.filter(a => a.status === 'Devam Ediyor').length;
-    const pendingNotifications = filteredFindings.filter(f => f.status === 'Tebliğ Edildi' || f.status === 'Birim Yanıtladı').length;
-    const pendingVerification = filteredFindings.filter(f => f.status === 'Doğrulama Bekliyor').length;
-    const criticalFindings = filteredFindings.filter(f => f.riskLevel === 'Kritik' || f.riskLevel === 'Yüksek').length;
-    const completedAudits = filteredAudits.filter(a => a.status === 'Tamamlandı').length;
-    const pendingRevisions = filteredFindings.filter(f => f.status === 'Revizyon Gerekli').length + filteredAudits.filter(a => a.status === 'Revizyon Gerekli').length;
+    if (stats?.staffs && stats.staffs.length > 0) {
+        stats.staffs.forEach((staff: any) => {
+            const dynamic = calculateDynamicSkills(staff);
+            const name = staff.displayName || staff.user?.displayName || staff.firstName || 'Personel';
+            
+            skillAverages.risk_assessment.total += dynamic.risk_assessment.total;
+            skillAverages.risk_assessment.scores.push({ name, val: dynamic.risk_assessment.total });
+            
+            skillAverages.it_audit.total += dynamic.it_audit.total;
+            skillAverages.it_audit.scores.push({ name, val: dynamic.it_audit.total });
+            
+            skillAverages.financial_audit.total += dynamic.financial_audit.total;
+            skillAverages.financial_audit.scores.push({ name, val: dynamic.financial_audit.total });
+            
+            skillAverages.data_analysis.total += dynamic.data_analysis.total;
+            skillAverages.data_analysis.scores.push({ name, val: dynamic.data_analysis.total });
+            
+            skillAverages.reporting_english.total += dynamic.reporting_english.total;
+            skillAverages.reporting_english.scores.push({ name, val: dynamic.reporting_english.total });
+        });
+        
+        Object.keys(skillAverages).forEach(k => {
+            const sk = skillAverages[k];
+            sk.total = Number((sk.total / stats.staffs.length).toFixed(1));
+            sk.breakdowns = sk.scores
+                .sort((a: any, b: any) => b.val - a.val)
+                .slice(0, 3)
+                .map((s: any) => ({ label: s.name, value: Number(s.val.toFixed(1)) }));
+        });
+    }
 
-    let overdueActionsCount = 0;
-    let dueSoonActionsCount = 0;
+    const sortedSkills = Object.values(skillAverages).sort((a, b) => a.total - b.total);
+    const weakestSkill = stats?.staffs?.length > 0 ? sortedSkills[0] : null;
+    const strongestSkill = stats?.staffs?.length > 0 ? sortedSkills[sortedSkills.length - 1] : null;
+    const minScore = weakestSkill ? weakestSkill.total : 0;
+    const weakestSkillsList = sortedSkills.filter(s => s.total === minScore);
+
+    const pendingLeaves: any[] = [];
+    const activeLeaves: any[] = [];
+    const upcomingLeaves: any[] = [];
+    const pendingDeclarations: any[] = [];
     const now = new Date();
-    const fifteenDaysFromNow = new Date();
-    fifteenDaysFromNow.setDate(now.getDate() + 15);
-    const CLOSED_STATUSES = ['Tamamlandı', 'Kapatıldı', 'İptal', 'Kapalı', 'Çözüldü'];
-
-    filteredFindings.forEach((f: any) => {
-        if (!CLOSED_STATUSES.includes(f.status) && f.status !== 'İptal') {
-            const actions = f.actions || f.followUps;
-            if (Array.isArray(actions)) {
-                actions.forEach((a: any) => {
-                    if (a.status !== 'Kapalı' && a.status !== 'Tamamlandı' && (a.deadline || a.dueDate)) {
-                        const deadline = new Date(a.deadline || a.dueDate);
-                        if (deadline < now) overdueActionsCount++;
-                        else if (deadline <= fifteenDaysFromNow) dueSoonActionsCount++;
-                    }
+    
+    if (stats?.staffs) {
+        stats.staffs.forEach((staff: any) => {
+            const name = staff.displayName || staff.user?.displayName || staff.firstName || 'Personel';
+            if (staff.leaves) {
+                staff.leaves.forEach((leave: any) => {
+                    if (leave.status === 'İptal Edildi') return;
+                    const sDate = new Date(leave.startDate);
+                    const eDate = new Date(leave.endDate);
+                    if (leave.status === 'Planlandı') pendingLeaves.push({ ...leave, name, staffId: staff.id });
+                    if (now >= sDate && now <= eDate) activeLeaves.push({ name, type: leave.type, eDate, status: leave.status });
+                    else if (sDate > now && (sDate.getTime() - now.getTime()) < 30 * 24 * 60 * 60 * 1000) upcomingLeaves.push({ name, type: leave.type, sDate, eDate, status: leave.status });
                 });
             }
-        }
-    });
+            if (staff.declarations) {
+                staff.declarations.forEach((decl: any) => {
+                    if (decl.status === 'Bekliyor') pendingDeclarations.push({ ...decl, name, staffId: staff.id });
+                });
+            }
+        });
+    }
 
-    // Yetkisiz kullanıcıları yönlendir
     if (!isExecutive) {
         return (
-            <div className="flex items-center justify-center h-[calc(100vh-100px)] w-full">
-                <LoadingState message="Yönlendiriliyorsunuz..." className="bg-transparent" />
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-100px)] w-full gap-4">
+                <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                    <span className="text-red-600 text-2xl font-bold">!</span>
+                </div>
+                <h2 className="text-xl font-semibold text-gray-800">Yetkisiz Erişim</h2>
             </div>
         );
     }
@@ -244,20 +196,12 @@ export default function ExecutiveDashboard() {
                     <Alert 
                         variant="warning"
                         title={`Silinme Onayı Bekleyen ${pendingItems.length} Kayıt Var`}
-                        description="Denetçi veya uzmanlar tarafından silinmek istenen kayıtlar onayınızı bekliyor."
-                        action={
-                            <Button
-                                variant="secondary"
-                                onClick={() => setShowPendingModal(true)}
-                            >
-                                İncele ve Yönet
-                            </Button>
-                        }
+                        description="Müfettiş veya uzmanlar tarafından silinmek istenen kayıtlar onayınızı bekliyor."
+                        action={<Button variant="secondary" onClick={() => setShowPendingModal(true)}>İncele ve Yönet</Button>}
                     />
                 </div>
             )}
 
-            {/* Tab Navigation ve Yenile Butonu */}
             <PageToolbar
                 noSearch={true}
                 onRefresh={() => loadData(false)}
@@ -266,6 +210,7 @@ export default function ExecutiveDashboard() {
                         <SegmentedTabs
                             tabs={[
                                 { id: 'overview', label: 'Genel Bakış', icon: Briefcase },
+                                { id: 'team', label: 'Kadro & Onaylar', icon: Users },
                                 { id: 'quality', label: 'Kalite Metrikleri', icon: CheckCircle }
                             ]}
                             activeTab={activeTab}
@@ -287,153 +232,24 @@ export default function ExecutiveDashboard() {
 
             {activeTab === 'quality' ? (
                 <QualityMetrics />
+            ) : activeTab === 'team' ? (
+                <ExecutiveTeam 
+                    pendingLeaves={pendingLeaves}
+                    activeLeaves={activeLeaves}
+                    upcomingLeaves={upcomingLeaves}
+                    pendingDeclarations={pendingDeclarations}
+                    sortedSkills={sortedSkills}
+                    weakestSkill={weakestSkill}
+                    strongestSkill={strongestSkill}
+                    minScore={minScore}
+                    weakestSkillsList={weakestSkillsList}
+                    staffs={stats?.staffs || []}
+                    onDataChange={() => loadData(false)}
+                />
             ) : (
-                <>
-                    {/* İş Akışı Özeti */}
-                    <DashboardWidget 
-                        widgetType="actions" 
-                        variant="transparent"
-                        infoTooltip="Yöneticinin ilgilenmesi gereken acil aksiyonlar, onay bekleyen raporlar ve gecikmiş görevlerin özet görünümüdür."
-                    >
-                        <ExecutiveActionCards
-                            variant="dashboard"
-                            pendingApprovals={pendingApprovals}
-                            ongoingAudits={activeAudits}
-                            pendingNotifications={pendingNotifications}
-                            pendingVerification={pendingVerification}
-                            pendingRevisions={pendingRevisions}
-                            overdueActionsCount={overdueActionsCount}
-                            dueSoonActionsCount={dueSoonActionsCount}
-                        />
-                    </DashboardWidget>
-
-                    {/* Genel İstatistikler */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        {/* Denetim Durumu */}
-                        <DashboardWidget 
-                            widgetType="status"
-                            infoTooltip="Sistemde kayıtlı olan denetimlerin güncel iş akışı durumlarına göre sayısal dağılımıdır."
-                        >
-                            <div className="grid grid-cols-3 gap-4">
-                                <StatCard
-                                    title="Toplam"
-                                    value={filteredAudits.length.toString()}
-                                    color="blue"
-                                />
-                                <StatCard
-                                    title="Devam Ediyor"
-                                    value={activeAudits.toString()}
-                                    color="yellow"
-                                />
-                                <StatCard
-                                    title="Tamamlandı"
-                                    value={completedAudits.toString()}
-                                    color="green"
-                                />
-                            </div>
-                        </DashboardWidget>
-
-                        {/* Bulgu Risk Dağılımı */}
-                        <DashboardWidget 
-                            widgetType="risk"
-                            infoTooltip="Bulguların risk seviyelerine göre dağılımı. Kritik veya Yüksek bulgular için sistem ek uyarı üretebilir."
-                        >
-                            <div className="grid grid-cols-4 gap-3">
-                                <StatCard
-                                    title="Kritik"
-                                    value={filteredFindings.filter(f => f.riskLevel === 'Kritik').length.toString()}
-                                    color="rose"
-                                />
-                                <StatCard
-                                    title="Yüksek"
-                                    value={filteredFindings.filter(f => f.riskLevel === 'Yüksek').length.toString()}
-                                    color="red"
-                                />
-                                <StatCard
-                                    title="Orta"
-                                    value={filteredFindings.filter(f => f.riskLevel === 'Orta').length.toString()}
-                                    color="orange"
-                                />
-                                <StatCard
-                                    title="Düşük"
-                                    value={filteredFindings.filter(f => f.riskLevel === 'Düşük').length.toString()}
-                                    color="yellow"
-                                />
-                            </div>
-                            {criticalFindings > 0 && (
-                                <div className="mt-4">
-                                    <Alert
-                                        variant="error"
-                                        size="sm"
-                                        title={`${criticalFindings} adet yüksek/kritik öncelikli bulgu mevcut`}
-                                        description="Bu bulguların aksiyon planlarının ivedilikle gözden geçirilmesi gerekmektedir."
-                                    />
-                                </div>
-                            )}
-                        </DashboardWidget>
-                    </div>
-
-                    {/* Son Aktiviteler & Yaklaşan Tarihler */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Son Bulgular */}
-                        {/* Son Eklenen Bulgular */}
-                        <DashboardWidget 
-                            widgetType="findings"
-                            infoTooltip="Sisteme yakın zamanda işlenmiş olan güncel bulguları içerir."
-                            actionHref="/audit/findings" 
-                            actionLabel="Tüm Bulguları Görüntüle"
-                        >
-                            {filteredFindings.length === 0 ? (
-                                <div className="flex-1 flex items-center justify-center py-8 bg-gray-50/30 rounded-lg border border-dashed border-gray-200">
-                                    <EmptyState variant="minimal" entityType="FINDING" title="Kayıt Bulunamadı" description="Görüntülenecek bulgu kaydı bulunmuyor." />
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {filteredFindings.slice(0, 5).map((finding: any) => {
-                                        const displayStatus = finding.status === 'Çözüldü' ? 'Kapalı' : finding.status;
-                                        return (
-                                            <DashboardListItem 
-                                                key={finding.id}
-                                                href={`/audit/findings?id=${finding.id}`}
-                                                code={finding.code || (typeof finding.id === 'string' ? `#${finding.id.substring(0, 7)}` : `#${finding.id}`)}
-                                                title={finding.title || 'İsimsiz Bulgu'}
-                                                subtitle={finding.unit || finding.businessUnit || 'Birim Yok'}
-                                                status={displayStatus}
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </DashboardWidget>
-
-                        {/* Denetim Takvimi */}
-                        <DashboardWidget 
-                            widgetType="audits"
-                            infoTooltip="Durumu 'Devam Ediyor' olan denetimlerin anlık özet listesidir."
-                            actionHref="/audit/audits?status=Devam%20Ediyor" 
-                            actionLabel="Tüm Denetimleri Görüntüle"
-                        >
-                            {filteredAudits.length === 0 ? (
-                                <div className="flex-1 flex items-center justify-center py-8 bg-gray-50/30 rounded-lg border border-dashed border-gray-200">
-                                    <EmptyState variant="minimal" entityType="AUDIT" title="Kayıt Bulunamadı" description="Görüntülenecek denetim kaydı bulunmuyor." />
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {filteredAudits.filter(a => a.status === 'Devam Ediyor').slice(0, 5).map((audit: any) => (
-                                        <DashboardListItem 
-                                            key={audit.id}
-                                            href={`/audit/audits/${audit.id}`}
-                                            code={audit.code || audit.auditCode || (typeof audit.id === 'string' ? `#${audit.id.substring(0, 7)}` : `#${audit.id}`)}
-                                            title={audit.title || 'İsimsiz Denetim'}
-                                            subtitle={audit.auditableUnit?.name || audit.scope || '-'}
-                                            status={audit.status}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </DashboardWidget>
-                    </div>
-                </>
+                <ExecutiveOverview
+                    stats={stats}
+                />
             )}
 
             <PendingDeletionsModal

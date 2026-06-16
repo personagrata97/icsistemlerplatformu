@@ -5,12 +5,13 @@ import LoadingSpinner from './LoadingSpinner';
 import LoadingState from './LoadingState';
 import EmptyState, { NoResultsState } from './EmptyState';
 import Pagination, { usePagination } from './Pagination';
-import { LucideIcon, Calendar, Clock, User as UserIcon, Mail, Phone } from 'lucide-react';
-import { formatDate, formatDateTime } from '@/lib/audit-utils';
+import { LucideIcon, Calendar, Clock, User as UserIcon, Mail, Phone, Info } from 'lucide-react';
+import { formatDate, formatDateTime, getPhotoUrl } from '@/lib/audit-utils';
 import CodeBadge from './CodeBadge';
 import StatusBadge from './StatusBadge';
 import UserCell from './UserCell';
 import OverflowTooltip from './OverflowTooltip';
+import Tooltip from './Tooltip';
 
 export interface Column<T> {
     key: string;
@@ -20,6 +21,7 @@ export interface Column<T> {
     type?: 'text' | 'date' | 'datetime' | 'currency' | 'status' | 'risk' | 'code' | 'user' | 'number' | 'percentage' | 'email' | 'phone' | 'filesize';
     render?: (item: T, index: number) => React.ReactNode;
     sortable?: boolean;
+    infoTooltip?: string;
 }
 
 interface DataTableProps<T> {
@@ -261,13 +263,14 @@ export default function DataTable<T>({
                     </span>
                 );
             case 'user':
-                const userObj = val as any;
-                const nameStr = typeof userObj === 'object' ? (userObj.displayName || userObj.name || `${userObj.firstName || ''} ${userObj.lastName || ''}`.trim() || 'İsimsiz') : String(val);
-                const titleStr = typeof userObj === 'object' ? userObj.title : undefined;
+                const userObj = val && typeof val === 'object' ? val : item as any;
+                const nameStr = typeof val === 'object' ? (val.displayName || val.name || `${val.firstName || ''} ${val.lastName || ''}`.trim() || 'İsimsiz') : String(val);
+                const titleStr = typeof val === 'object' ? val.title : (item as any).title;
+                const photoUrlStr = typeof val === 'object' ? val.photoUrl : (item as any).photoUrl;
                 const userAlignClass = col.align === 'left' ? 'justify-start' : col.align === 'right' ? 'justify-end' : 'justify-center';
                 return (
                     <div className="w-full">
-                        <UserCell name={nameStr} title={titleStr} className={userAlignClass} />
+                        <UserCell name={nameStr} title={titleStr} avatarUrl={photoUrlStr ? getPhotoUrl(photoUrlStr) || undefined : undefined} className={userAlignClass} />
                     </div>
                 );
             default:
@@ -320,7 +323,20 @@ export default function DataTable<T>({
     if (data.length === 0) {
         if (onClearFilters) {
             return (
-                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className={`card !p-0 overflow-hidden ${className}`}>
+                    {(title || rightElement) && (
+                        <div className="px-6 py-5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4 bg-white">
+                            <div className="flex items-center gap-2">
+                                {title && <h3 className="text-base font-black text-slate-900 tracking-tight">{title}</h3>}
+                                {description && <p className="text-xs text-slate-500 font-medium mt-1">{description}</p>}
+                            </div>
+                            {rightElement && (
+                                <div className="flex items-center gap-2">
+                                    {rightElement}
+                                </div>
+                            )}
+                        </div>
+                    )}
                     <NoResultsState 
                         searchTerm={searchTerm} 
                         onClear={onClearFilters} 
@@ -329,12 +345,27 @@ export default function DataTable<T>({
             );
         }
         return (
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
-                <EmptyState
-                    icon={emptyIcon}
-                    title={emptyTitle}
-                    description={emptyDescription}
-                />
+            <div className={`card !p-0 overflow-hidden ${className}`}>
+                {(title || rightElement) && (
+                    <div className="px-6 py-5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4 bg-white">
+                        <div className="flex items-center gap-2">
+                            {title && <h3 className="text-base font-black text-slate-900 tracking-tight">{title}</h3>}
+                            {description && <p className="text-xs text-slate-500 font-medium mt-1">{description}</p>}
+                        </div>
+                        {rightElement && (
+                            <div className="flex items-center gap-2">
+                                {rightElement}
+                            </div>
+                        )}
+                    </div>
+                )}
+                <div className="p-8">
+                    <EmptyState
+                        icon={emptyIcon}
+                        title={emptyTitle}
+                        description={emptyDescription}
+                    />
+                </div>
             </div>
         );
     }
@@ -380,6 +411,11 @@ export default function DataTable<T>({
                                 >
                                     <div className={`flex items-center gap-1 ${col.align === 'right' ? 'justify-end' : col.align === 'left' ? 'justify-start' : 'justify-center'}`}>
                                         {col.header}
+                                        {col.infoTooltip && (
+                                            <Tooltip content={col.infoTooltip}>
+                                                <Info size={14} className="text-gray-400 cursor-help" />
+                                            </Tooltip>
+                                        )}
                                         {col.sortable && (
                                             <span className={`text-[10px] ${activeSortCol === col.key ? 'text-primary opacity-100 font-bold' : 'text-gray-400 opacity-40'}`}>
                                                 {activeSortCol === col.key ? (activeSortDir === 'asc' ? '▲' : '▼') : '▼'}
@@ -430,7 +466,7 @@ export default function DataTable<T>({
                                                 className={`${col.align === 'right' ? '!text-right' : col.align === 'left' ? '!text-left' : '!text-center'}`}
                                             >
                                                 {isActionCol ? (
-                                                    <div className="w-full flex items-center justify-center">
+                                                    <div className={`w-full flex items-center ${col.align === 'right' ? 'justify-end' : col.align === 'left' ? 'justify-start' : 'justify-center'}`}>
                                                         {rendered}
                                                     </div>
                                                 ) : rendered}

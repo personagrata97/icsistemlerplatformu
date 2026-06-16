@@ -235,8 +235,8 @@ export default function OfficialReportingPage() {
                     title="Plan Uyum Oranı"
                     value={totalAudits > 0 ? `%${Math.round((completedAudits / totalAudits) * 100)}` : '%0'}
                     entityType="TREND"
-                    subtext="Hedef: %90"
-                    infoTooltip="Planlanan denetimlerden tamamlananların yüzdesel oranıdır. BDDK/BRSA standartları gereği min %90 beklenir."
+                    subtext="Gerçekleşme Oranı"
+                    infoTooltip="Yıllık denetim planında yer alan denetimlerden tamamlananların yüzdesel oranıdır."
                     onClick={() => router.push('/audit')}
                     className="transition-all hover:scale-[1.02] cursor-pointer hover:ring-2 hover:ring-purple-500"
                 />
@@ -331,25 +331,25 @@ export default function OfficialReportingPage() {
                             key: 'generatedAt',
                             header: 'Oluşturma Tarihi',
                             sortable: true,
-                            render: (report: any) => <DateDisplay date={report.generatedAt} />
+                            type: 'datetime'
                         },
                         {
                             key: 'generatedBy',
                             header: 'Oluşturan',
                             sortable: true,
-                            render: (report: any) => <span className="text-sm text-gray-600">{report.generatedBy}</span>
+                            type: 'user'
                         },
                         {
                             key: 'fileSize',
                             header: 'Boyut',
                             sortable: true,
-                            render: (report: any) => <span className="text-sm text-gray-500">{report.fileSize}</span>
+                            type: 'filesize'
                         },
                         {
                             key: 'status',
                             header: 'Durum',
                             sortable: true,
-                            render: (report: any) => getStatusBadge(report.status)
+                            type: 'status'
                         },
                         {
                             key: 'actions',

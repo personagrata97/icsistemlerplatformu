@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react"
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format, addMonths, subMonths, isSameMonth, isSameDay, isToday } from "date-fns"
 import { tr } from "date-fns/locale"
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
 import { clsx } from "clsx"
 import { createPortal } from "react-dom"
 
@@ -30,6 +29,17 @@ export default function DatePicker({ value, onChange, placeholder = "Tarih seçi
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (value) {
+      const d = new Date(value)
+      if (!isNaN(d.getTime())) {
+        setCurrentMonth(d)
+      }
+    } else {
+      setCurrentMonth(new Date())
+    }
+  }, [value])
 
   const monthStart = startOfMonth(currentMonth)
   const monthEnd = endOfMonth(monthStart)
@@ -137,20 +147,14 @@ export default function DatePicker({ value, onChange, placeholder = "Tarih seçi
         </span>
       </div>
 
-      {mounted && createPortal(
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              ref={popupRef}
-              data-ignore-outside-clicks="true"
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              style={popupStyle}
-              className="absolute z-[99999] p-4 rounded-xl bg-white border border-slate-200 shadow-xl"
-            >
-              <div className="flex justify-between items-center mb-4">
+      {mounted && isOpen && createPortal(
+        <div
+            ref={popupRef}
+            data-ignore-outside-clicks="true"
+            style={popupStyle}
+            className="absolute z-[99999] p-4 rounded-xl bg-white border border-slate-200 shadow-xl animate-in fade-in zoom-in-95 duration-150"
+        >
+            <div className="flex justify-between items-center mb-4">
                 <button 
                   type="button"
                   onClick={prevMonth}
@@ -208,9 +212,7 @@ export default function DatePicker({ value, onChange, placeholder = "Tarih seçi
                   )
                 })}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
+        </div>,
         document.body
       )}
     </div>

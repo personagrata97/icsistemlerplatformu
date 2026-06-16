@@ -31,6 +31,7 @@ interface CustomSelectProps {
     className?: string; // Added for extra flexibility
     labelClassName?: string; // Added for custom label styling
     checkAllOption?: boolean;
+    readOnlyView?: boolean;
 }
 
 export default function CustomSelect({
@@ -49,7 +50,8 @@ export default function CustomSelect({
     size = 'md',
     className = '',
     labelClassName = '',
-    checkAllOption = false
+    checkAllOption = false,
+    readOnlyView = false
 }: CustomSelectProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -251,39 +253,51 @@ export default function CustomSelect({
                 </label>
             )}
 
-            <div
-                className={`
-                    w-full flex items-center justify-between cursor-pointer transition-all gap-2 select-none outline-none focus:outline-none
-                    ${variantClass} ${sizeClass} ${variant === 'default' ? 'min-h-[42px] py-2.5' : ''}
-                    ${isOpen && variant === 'default' ? 'border-primary ring-4 ring-primary/10' : ''}
-                    ${isOpen && variant !== 'default' ? 'ring-2 ring-primary/20 border-primary' : ''}
-                    ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : ''}
-                    ${containerDynamicClass} 
-                `}
-                style={{ WebkitTapHighlightColor: 'transparent' }}
-                onClick={toggleDropdown}
-                tabIndex={0}
-            >
-                <div className="flex-1 overflow-hidden flex items-center">
-                    {/* If we applied the class to the container, we don't need to wrap the text in another span with same class, or we do specific text color handling */}
-                    {/* Improved strategy: pass 'className' which usually contains bg and text colors. */}
-                    {/* If container has bg, text should optionally be white or colored. */}
-                    {/* Let's simplify: Only apply class to container if it exists. */}
-                    {/* But getDisplayValue wraps it in a span too. Let's adjust getDisplayValue. */}
+            {readOnlyView ? (
+                <div className={clsx(
+                    'w-full rounded-xl border border-transparent bg-slate-50/50 px-3.5 py-2.5 text-sm font-semibold text-slate-900',
+                    className
+                )}>
                     {!value || (Array.isArray(value) && value.length === 0) ? (
-                        <span className="text-slate-400 font-semibold">{placeholder}</span>
+                        <span className="text-slate-400">-</span>
                     ) : isMulti ? (
-                        <span className="text-slate-700 font-semibold text-sm">{(value as string[]).length} seçildi</span>
+                        <span className="text-slate-900 font-semibold text-sm">{(value as string[]).join(', ')}</span>
                     ) : (
-                        <OverflowTooltip content={selectedOption?.label || value as string}>
-                            <span className={`truncate font-semibold block ${selectedOption?.className ? 'text-inherit' : (variant === 'secondary' ? 'text-slate-700' : 'text-slate-700')}`}>
-                                {selectedOption?.label || value}
-                            </span>
-                        </OverflowTooltip>
+                        <span className="text-slate-900 font-semibold">
+                            {selectedOption?.label || value}
+                        </span>
                     )}
                 </div>
-                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${selectedOption?.className ? 'text-current opacity-70' : ''}`} />
-            </div>
+            ) : (
+                <div
+                    className={`
+                        w-full flex items-center justify-between cursor-pointer transition-all gap-2 select-none outline-none focus:outline-none
+                        ${variantClass} ${sizeClass} ${variant === 'default' ? 'min-h-[42px] py-2.5' : ''}
+                        ${isOpen && variant === 'default' ? 'border-primary ring-4 ring-primary/10' : ''}
+                        ${isOpen && variant !== 'default' ? 'ring-2 ring-primary/20 border-primary' : ''}
+                        ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : ''}
+                        ${containerDynamicClass} 
+                    `}
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                    onClick={toggleDropdown}
+                    tabIndex={0}
+                >
+                    <div className="flex-1 overflow-hidden flex items-center">
+                        {!value || (Array.isArray(value) && value.length === 0) ? (
+                            <span className="text-slate-400 font-semibold">{placeholder}</span>
+                        ) : isMulti ? (
+                            <span className="text-slate-700 font-semibold text-sm">{(value as string[]).length} seçildi</span>
+                        ) : (
+                            <OverflowTooltip content={selectedOption?.label || value as string}>
+                                <span className={`truncate font-semibold block ${selectedOption?.className ? 'text-inherit' : (variant === 'secondary' ? 'text-slate-700' : 'text-slate-700')}`}>
+                                    {selectedOption?.label || value}
+                                </span>
+                            </OverflowTooltip>
+                        )}
+                    </div>
+                    <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${selectedOption?.className ? 'text-current opacity-70' : ''}`} />
+                </div>
+            )}
 
             {
                 isOpen && position.width > 0 && typeof document !== 'undefined' && createPortal(

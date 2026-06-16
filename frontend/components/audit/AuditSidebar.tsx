@@ -131,12 +131,14 @@ export default function AuditSidebar() {
                                         <span>Ana Panel</span>
                                     </Link>
                                 </li>
-                            <li className="nav-item">
-                                <Link href="/audit/executive" className={`nav-link ${isActive('/audit/executive') ? 'active' : ''}`}>
-                                    <Target size={18} />
-                                    <span>Yönetici Paneli</span>
-                                </Link>
-                            </li>
+                            {(isManager || hasRole('EXECUTIVE')) && (
+                                <li className="nav-item">
+                                    <Link href="/audit/executive" className={`nav-link ${isActive('/audit/executive') ? 'active' : ''}`}>
+                                        <Target size={18} />
+                                        <span>Yönetici Paneli</span>
+                                    </Link>
+                                </li>
+                            )}
                             <li className="nav-item">
                                 <Link href="/audit/staff" className={`nav-link ${isActive('/audit/staff') && !isActive('/audit/staff/cpe') ? 'active' : ''}`}>
                                     <Users size={18} />

@@ -785,7 +785,7 @@ export default function FindingDetailPage() {
                             <div className="border rounded-xl p-5 border-l-4 border-l-emerald-500 bg-white shadow-sm">
                                 <div className="flex justify-between items-center mb-4">
                                     <h4 className="font-bold flex items-center gap-2 text-gray-800">
-                                        <CheckCircle size={18} className="text-emerald-500" /> Denetçi Değerlendirmesi
+                                        <CheckCircle size={18} className="text-emerald-500" /> Müfettiş Değerlendirmesi
                                     </h4>
                                     <Button variant="ghost" size="sm" className="text-primary text-xs" onClick={() => showToast('Mutabakat formu PDF olarak hazırlanıyor...', 'info')}>
                                         <Download size={14} className="mr-1" /> Mutabakat Formu

@@ -700,6 +700,8 @@ model User {
   lockedUntil         DateTime?
   certifications      String?
   jobStartDate        String?
+  departureDate       String?
+  separationReason    String?
   phoneNumber         String?
   registerNumber      String?
   title               String?
@@ -744,6 +746,8 @@ model User {
 
   notifications       Notification[]            @relation("UserNotifications")
   sentCommunications  AuditCommunication[]      @relation("LetterSender")
+  leaves              UserLeave[]               @relation("UserLeaves")
+  proxyLeaves         UserLeave[]               @relation("ProxyLeaves")
 
   @@map("user")
 }
@@ -1327,6 +1331,7 @@ model TrainingBatch {
   provider          String?
   startDate         DateTime
   endDate           DateTime
+  hours             Int?
   status            String         @default("Planlandı")
   cancellationNotes String?
   created_at        DateTime       @default(now())
@@ -1462,5 +1467,24 @@ model AuditMeeting {
 
   @@index([auditId])
   @@map("audit_meeting")
+}
+
+model UserLeave {
+    id            String    @id @default(cuid())
+    userId        String
+    type          String    // Yıllık İzin, Sağlık Raporu, Mazeret İzni, vb.
+    startDate     DateTime
+    endDate       DateTime
+    status        String    @default("Planlandı") // Planlandı, Onaylandı, İptal Edildi
+    proxyUserId   String?   // Vekaleten bakacak kişi
+    description   String?
+    managerNote   String?   // Yönetici notu / Ret gerekçesi
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+
+    user          User      @relation("UserLeaves", fields: [userId], references: [id], onDelete: Cascade)
+    proxyUser     User?     @relation("ProxyLeaves", fields: [proxyUserId], references: [id], onDelete: SetNull)
+
+    @@map("user_leave")
 }
 

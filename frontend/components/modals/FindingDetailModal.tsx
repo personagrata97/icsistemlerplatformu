@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AlertTriangle, Clock, AlertCircle, CheckCircle, User, Tag, FileText, Check, Shield, Activity, Calendar, History, Search, Send, PlayCircle, XCircle, FileSearch, Edit2, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
@@ -8,8 +7,8 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
 import Modal from '@/components/ui/Modal';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
-import ProcessTimeline from '@/components/ui/ProcessTimeline';
-import { formatDate } from '@/lib/audit-utils';
+import Timeline from '@/components/ui/Timeline';
+import { formatDate, renderSmartText, formatLogDetails } from '@/lib/audit-utils';
 import Button from '@/components/ui/Button';
 
 interface FindingDetailModalProps {
@@ -463,15 +462,20 @@ export default function FindingDetailModal({
                 ) : (
                     /* History Tab */
                     <div className="max-w-3xl mx-auto py-4">
-                        <ProcessTimeline
-                            items={finding.history?.map((record: any, index: number) => ({
+                        <Timeline
+                            events={finding.history?.map((record: any, index: number) => ({
                                 id: index.toString(),
-                                action: record.action || 'İşlem',
-                                date: record.date,
-                                user: record.user,
-                                details: record.details || record.description
+                                timestamp: record.date ? new Date(record.date).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '',
+                                user: record.user || 'Sistem',
+                                title: record.action || 'İşlem',
+                                actionType: record.action?.toLowerCase().includes('güncelle') ? 'update' : 'default',
+                                description: (
+                                    <div className="leading-relaxed">
+                                        {renderSmartText(formatLogDetails(record.details || record.description || ''))}
+                                    </div>
+                                )
                             })) || []}
-                            emptyMessage="İşlem geçmişi bulunmuyor"
+                            emptyStateMessage="İşlem geçmişi bulunmuyor"
                         />
                     </div>
                 )}

@@ -97,41 +97,20 @@ export default function ReportsPage() {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [audits, findings, reports] = await Promise.all([
-                auditApi.getAudits(),
-                auditApi.getFindings(),
-                auditApi.getGeneratedReports()
+            const [reports, statsData] = await Promise.all([
+                auditApi.getGeneratedReports(),
+                auditApi.getExecutiveStats()
             ]);
 
             setGeneratedReports(Array.isArray(reports) ? reports : []);
 
-            const auditList = Array.isArray(audits) ? audits : [];
-            const findingList = Array.isArray(findings) ? findings : [];
-
-            // Tamamlanan denetimlerden ortalama süre hesabı
-            const completedWithDates = auditList.filter((a: any) =>
-                a.status === 'Tamamlandı' && a.startDate && a.endDate
-            );
-            let avgDuration = 0;
-            if (completedWithDates.length > 0) {
-                const totalDays = completedWithDates.reduce((sum: number, a: any) => {
-                    const start = new Date(a.startDate);
-                    const end = new Date(a.endDate);
-                    const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-                    return sum + (days > 0 ? days : 0);
-                }, 0);
-                avgDuration = Math.round(totalDays / completedWithDates.length);
-            }
-
-            const CLOSED_STATUSES = ['Kapalı', 'Kapalı (Mutabık Değil)', 'Tamamlandı', 'Risk Kabul Edildi'];
-
             setStats({
-                totalAudits: auditList.length,
-                completedAudits: auditList.filter((a: any) => a.status === 'Tamamlandı').length,
-                openFindings: findingList.filter((f: any) => !CLOSED_STATUSES.includes(f.status)).length,
-                closedFindings: findingList.filter((f: any) => CLOSED_STATUSES.includes(f.status)).length,
-                criticalFindings: findingList.filter((f: any) => (f.risk || f.riskLevel) === 'Kritik').length,
-                avgDuration
+                totalAudits: statsData.totalAudits || 0,
+                completedAudits: statsData.completedAudits || 0,
+                openFindings: statsData.openFindings || 0,
+                closedFindings: (statsData.totalFindings || 0) - (statsData.openFindings || 0),
+                criticalFindings: statsData.criticalFindings || 0,
+                avgDuration: statsData.avgDuration || 0
             });
 
         } catch (error) {
@@ -269,17 +248,7 @@ export default function ReportsPage() {
                     {
                         key: 'generatedBy',
                         header: 'Oluşturan',
-                        render: (item: any) => {
-                            const name = item.generatedBy || 'Bilinmiyor';
-                            return (
-                                <div className="flex items-center gap-2">
-                                    <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-                                        {name.charAt(0).toUpperCase()}
-                                    </div>
-                                    <span className="font-medium text-gray-700">{name}</span>
-                                </div>
-                            );
-                        }
+                        type: 'user'
                     },
                     {
                         key: 'generatedAt',

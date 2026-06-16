@@ -4,6 +4,7 @@ import React from 'react';
 import { AlertCircle, Plus } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import FindingsTable from '@/components/audit/FindingsTable';
+import SectionHeader from '@/components/ui/SectionHeader';
 
 interface AuditFindingsTabProps {
     findings: any[];
@@ -30,14 +31,15 @@ const AuditFindingsTab: React.FC<AuditFindingsTabProps> = ({
 }) => {
     return (
         <div className="card !p-0 shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-4 border-b flex flex-wrap justify-between items-center gap-3 bg-gray-50/50 rounded-t-lg">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
-                    <AlertCircle size={20} className="text-primary" /> Bulgular
-                </h3>
-                <Button size="sm" onClick={onAddFinding} className="gap-2">
-                    <Plus size={16} /> Yeni Bulgu Ekle
-                </Button>
-            </div>
+            <SectionHeader 
+                title="Bulgular" 
+                icon={AlertCircle} 
+                actionButton={
+                    <Button size="sm" onClick={onAddFinding} className="gap-2">
+                        <Plus size={16} /> Yeni Bulgu Ekle
+                    </Button>
+                }
+            />
             <FindingsTable
                 findings={findings}
                 loading={loading}

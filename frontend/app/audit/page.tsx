@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Activity, AlertTriangle, CheckCircle, Calendar, History, FileText, TrendingUp, PieChart, Users, Zap, RefreshCw, ShieldAlert, FileSignature, ArrowRight } from 'lucide-react';
+import { TrendingUp, FolderOpen, Activity as ActivityIcon } from 'lucide-react';
 import RiskHeatmap from '@/components/audit/RiskHeatmap';
 import ExecutiveActionCards from '@/components/audit/ExecutiveActionCards';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import LoadingState from '@/components/ui/LoadingState';
 import { auditApi } from '@/lib/audit-api';
 import RefreshButton from '@/components/ui/RefreshButton';
 import { useToast } from '@/components/Toast';
-import { formatDate, formatDateTime } from '@/lib/audit-utils';
+import { formatDate, formatDateTime, extractYear, filterByYear } from '@/lib/audit-utils';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { useRouter } from 'next/navigation';
 
@@ -25,10 +25,13 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import CodeBadge from '@/components/ui/CodeBadge';
 import DashboardListItem from '@/components/ui/DashboardListItem';
 import DashboardWidget from '@/components/ui/DashboardWidget';
+import Badge from '@/components/ui/Badge';
+import EntityIcon from '@/components/ui/EntityIcon';
 
 import EmptyState from '@/components/ui/EmptyState';
 import { checkRole, ROLES } from '@/lib/auth-constants';
-import { Search, FolderOpen, Activity as ActivityIcon } from 'lucide-react';
+
+import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
 interface AuditStats {
     total: number;
@@ -81,74 +84,14 @@ export default function AuditDashboard() {
     const isAuditor = isManager || isInspector || isSupervisor;
     const isUnit = checkRole(hasRole, ROLES.UNIT);
 
-    // Kısıtlı Görünüm: Denetçi veya Sistem Yöneticisi OLMAYAN kullanıcılar.
+    // Kısıtlı Görünüm: Müfettiş veya Sistem Yöneticisi OLMAYAN kullanıcılar.
     // Standart çalışanlar ve Birim kullanıcıları bu gruba dahildir.
     // Bu kullanıcılar Ana Panel yerine Portal görünümünü görmelidir.
     const isRestrictedUser = !isAuditor && !hasRole('SYSTEM_ADMIN');
 
-    const extractYear = (dateValue: any) => {
-        if (!dateValue) return null;
-        const d = new Date(dateValue);
-        if (isNaN(d.getTime())) return null;
-        return d.getFullYear().toString();
-    };
 
-    const filterByYear = (items: any[], dateFields: string[]) => {
-        if (selectedYear === 'Tümü') return items;
-        return items.filter(item => {
-            // Check if any of the provided date fields match the selected year
-            return dateFields.some(field => {
-                const year = extractYear(item[field]);
-                return year === selectedYear;
-            });
-        });
-    };
 
-    const filteredAudits = filterByYear(audits, ['startDate', 'createdAt', 'created_at', 'updatedAt']);
-    const filteredFindings = filterByYear(findings, ['createdAt', 'created_at', 'updatedAt']);
-
-    // Gerçek veriden istatistik hesaplama
-    const auditStats: AuditStats = {
-        total: filteredAudits.length,
-        ongoing: filteredAudits.filter(a => a.status === 'Devam Ediyor').length,
-        completed: filteredAudits.filter(a => a.status === 'Tamamlandı').length,
-        planned: filteredAudits.filter(a => a.status === 'Planlandı').length,
-    };
-
-    const CLOSED_STATUSES = ['Tamamlandı', 'Risk Kabul Edildi', 'Denetim Esnasında Giderildi'];
-    const findingStats: FindingStats = {
-        total: filteredFindings.length,
-        open: filteredFindings.filter(f => !CLOSED_STATUSES.includes(f.status)).length,
-        closed: filteredFindings.filter(f => CLOSED_STATUSES.includes(f.status)).length,
-        critical: filteredFindings.filter(f => (f.risk || f.riskLevel) === 'Kritik').length,
-        high: filteredFindings.filter(f => (f.risk || f.riskLevel) === 'Yüksek').length,
-        medium: filteredFindings.filter(f => (f.risk || f.riskLevel) === 'Orta').length,
-        low: filteredFindings.filter(f => (f.risk || f.riskLevel) === 'Düşük').length,
-    };
-
-    // Seçilen yıla ait 12 aylık açık/kapalı bulgu verisi oluştur (Grafik için)
-    const targetYearForChart = selectedYear === 'Tümü' ? new Date().getFullYear() : parseInt(selectedYear);
-    const monthlyChartData = Array.from({ length: 12 }).map((_, i) => {
-        const monthStart = new Date(targetYearForChart, i, 1);
-        const monthEnd = new Date(targetYearForChart, i + 1, 0);
-        const monthName = monthStart.toLocaleString('tr-TR', { month: 'short' });
-
-        const open = filteredFindings.filter((f: any) => {
-            const d = new Date(f.created_at || f.createdAt);
-            return d >= monthStart && d <= monthEnd && !CLOSED_STATUSES.includes(f.status);
-        }).length;
-
-        const closed = filteredFindings.filter((f: any) => {
-            const d = new Date(f.closedAt || f.updatedAt || f.updated_at || f.created_at);
-            return d >= monthStart && d <= monthEnd && CLOSED_STATUSES.includes(f.status);
-        }).length;
-
-        return {
-            month: monthName,
-            open,
-            closed
-        };
-    });
+    const [stats, setStats] = useState<any>(null);
 
     const handleHeatmapClick = (inherentRisk: string, controlEffectiveness: string) => {
         const filteredUnits = units.filter(u => 
@@ -167,153 +110,63 @@ export default function AuditDashboard() {
         }
     };
 
-    let overdueActionsCount = 0;
-    let dueSoonActionsCount = 0;
-    const now = new Date();
-    const fifteenDaysFromNow = new Date();
-    fifteenDaysFromNow.setDate(now.getDate() + 15);
-
-    filteredFindings.forEach((f: any) => {
-        if (!CLOSED_STATUSES.includes(f.status) && f.status !== 'İptal') {
-            const actions = f.actions || f.followUps;
-            if (Array.isArray(actions)) {
-                actions.forEach((a: any) => {
-                    if (a.status !== 'Kapalı' && a.status !== 'Tamamlandı' && (a.deadline || a.dueDate)) {
-                        const deadline = new Date(a.deadline || a.dueDate);
-                        if (deadline < now) overdueActionsCount++;
-                        else if (deadline <= fifteenDaysFromNow) dueSoonActionsCount++;
-                    }
-                });
-            }
-        }
-    });
-
     const loadData = async (showOverlay = true) => {
         if (showOverlay) setLoading(true);
-        // Kısıtlı kullanıcılar için veri yüklemeyi atla
-        if (isRestrictedUser) {
+        // GÜVENLİK VE MANTIK: Kısıtlı kullanıcılar (Örn: Etik İhbarcı) sayfaya girmeden yönlendirilir,
+        // bu yüzden veri yüklemeyi tamamen kilitliyoruz.
+        // ANCAK! Kullanıcı bir Birim (Unit) ise, kendi paneli için veriye ihtiyacı vardır.
+        if (isRestrictedUser && !isUnit) {
             setLoading(false);
             return;
         }
 
         try {
-            const [auditsData, findingsData, unitsData, logsData] = await Promise.all([
-                auditApi.getAudits(),
-                auditApi.getFindings(),
-                auditApi.getAuditableUnits(),
-                auditApi.getLogs().catch(() => [])
-            ]);
+            let auditsData: any = [];
+            let findingsData: any = [];
+            let unitsData: any = [];
+            let logsData: any = [];
 
-            let parsedAudits = Array.isArray(auditsData) ? auditsData : [];
-            let parsedFindings = (Array.isArray(findingsData) ? findingsData : []).map(f => {
-                let status = f.status || 'Taslak';
-                if (status === 'Açık') status = 'Tebliğ Edildi';
-                if (status === 'Çözüldü' || status === 'Kapalı' || status === 'Kapalı (Mutabık Değil)') status = 'Tamamlandı';
-                return { ...f, status };
-            });
-            let parsedUnits = Array.isArray(unitsData) ? unitsData : [];
-
-            // ROL BAZLI FİLTRELEME (RBAC)
-            if (isInspector && !isManager && !isSupervisor && user?.id) {
-                // Sadece yetkili olduğu denetimleri getir (Kendi oluşturduğu veya ekibinde olduğu)
-                parsedAudits = parsedAudits.filter((a: any) => 
-                    String(a.auditorId) === String(user.id) || 
-                    String(a.supervisorId) === String(user.id) ||
-                    (Array.isArray(a.team) && a.team.some((t: any) => String(t.id) === String(user.id)))
-                );
+            if (isUnit) {
+                // Sadece Birim yetkilisi ise: Gereksiz risk haritası veya sistem loglarını çekme
+                const [auditsData, findingsData] = await Promise.all([
+                    auditApi.getAudits(),
+                    auditApi.getFindings()
+                ]);
                 
-                const myAuditIds = new Set(parsedAudits.map((a: any) => String(a.id)));
-
-                // Sadece kendi denetimlerine VEYA kendisine atanmış bulguları getir
-                parsedFindings = parsedFindings.filter((f: any) => 
-                    String(f.assignedUserId) === String(user.id) || 
-                    myAuditIds.has(String(f.auditId))
-                );
+                setAudits(Array.isArray(auditsData) ? auditsData : []);
+                setFindings(Array.isArray(findingsData) ? findingsData : []);
+            } else {
+                // Müfettiş veya Yönetici: Tüm paneli besleyecek dataları Server-Side'dan çek (Data Leakage Fix)
+                const [execStats, unitsData] = await Promise.all([
+                    auditApi.getExecutiveStats(selectedYear),
+                    auditApi.getAuditableUnits()
+                ]);
+                
+                setStats(execStats);
+                setUnits(Array.isArray(unitsData) ? unitsData : []);
+                if (execStats.recentLogs) {
+                    setActivities(execStats.recentLogs.map((log: any) => ({
+                        id: log.id,
+                        action: log.action || 'İşlem',
+                        user: log.user || 'Sistem',
+                        date: log.date ? formatDate(log.date) : 'Bugün',
+                        status: 'Bilgi',
+                        targetId: log.targetId,
+                        targetType: log.targetType,
+                        details: log.details
+                    })));
+                }
             }
 
-            setAudits(parsedAudits);
-            setFindings(parsedFindings);
-            setUnits(parsedUnits);
-
-            const years = new Set<string>();
-            const addYear = (dateStr: string) => {
-                if (dateStr) {
-                    const year = new Date(dateStr).getFullYear().toString();
-                    if (!isNaN(Number(year))) years.add(year);
-                }
-            };
-            
-            parsedAudits.forEach((a: any) => {
-                if (a.startDate) addYear(a.startDate);
-                else if (a.createdAt) addYear(a.createdAt);
-                else if (a.created_at) addYear(a.created_at);
-            });
-            parsedFindings.forEach((f: any) => {
-                if (f.createdAt) addYear(f.createdAt);
-                else if (f.created_at) addYear(f.created_at);
-            });
-            
-            const sortedYears = Array.from(years).sort().reverse();
+            // Yıl filtresi seçeneklerini (Şimdilik statik tutuyoruz)
             setAvailableYears([
                 { value: 'Tümü', label: 'Tüm Yıllar' },
-                ...sortedYears.map(y => ({ value: y, label: y }))
+                { value: '2026', label: '2026' },
+                { value: '2025', label: '2025' },
+                { value: '2024', label: '2024' },
+                { value: '2023', label: '2023' }
             ]);
 
-            let recentActivities: ActivityLog[] = [];
-
-            if (Array.isArray(logsData) && logsData.length > 0) {
-                let filteredLogs = logsData;
-                
-                if (isInspector && !isManager && !isSupervisor && user?.id) {
-                    const myAuditIds = new Set(parsedAudits.map((a: any) => String(a.id)));
-                    const myFindingIds = new Set(parsedFindings.map((f: any) => String(f.id)));
-                    
-                    filteredLogs = logsData.filter((l: any) => 
-                        (l.targetType === 'Audit' && myAuditIds.has(String(l.targetId))) ||
-                        (l.targetType === 'Finding' && myFindingIds.has(String(l.targetId))) ||
-                        String(l.user) === String(user.displayName) ||
-                        String(l.userId) === String(user.id)
-                    );
-                }
-
-                recentActivities = filteredLogs.slice(0, 8).map((log: any) => ({
-                    id: log.id,
-                    action: log.action || 'İşlem',
-                    user: log.user || 'Sistem',
-                    date: log.date ? formatDate(log.date) : 'Bugün',
-                    status: 'Bilgi',
-                    targetId: log.targetId,
-                    targetType: log.targetType,
-                    details: log.details
-                }));
-            } else {
-                // Fallback to old mock logic if logs fail
-                parsedAudits.slice(0, 3).forEach((audit: any, idx: number) => {
-                    recentActivities.push({
-                        id: `audit-${audit.id || idx}`,
-                        action: `Denetim: ${audit.title || audit.auditNumber || 'Güncellendi'}`,
-                        user: audit.supervisor || audit.creatorName || 'Sistem',
-                        date: audit.updatedAt ? formatDate(audit.updatedAt) : 'Bugün',
-                        status: audit.status || 'Bilinmiyor',
-                        targetId: audit.id,
-                        targetType: 'Audit'
-                    });
-                });
-
-                parsedFindings.slice(0, 3).forEach((finding: any, idx: number) => {
-                    recentActivities.push({
-                        id: `finding-${finding.id || idx}`,
-                        action: `Bulgu: ${finding.title || finding.code || 'Güncellendi'}`,
-                        user: finding.assignedUser?.displayName || finding.assignedTo || finding.creatorName || 'Müfettiş',
-                        date: finding.updated_at ? formatDate(finding.updated_at) : (finding.updatedAt ? formatDate(finding.updatedAt) : 'Bugün'),
-                        status: finding.status || 'Tebliğ Edildi',
-                        targetId: finding.id,
-                        targetType: 'Finding'
-                    });
-                });
-            }
-
-            setActivities(recentActivities.slice(0, 5));
             setLastUpdate(formatDateTime(new Date()));
             showToast('Veriler başarıyla yüklendi', 'success');
         } catch (error) {
@@ -330,7 +183,7 @@ export default function AuditDashboard() {
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [selectedYear]);
 
     useEffect(() => {
         if (!loading && isRestrictedUser && !isUnit) {
@@ -353,8 +206,8 @@ export default function AuditDashboard() {
     // KISITLI KULLANICILAR İÇİN GÖRÜNÜM (Standart Çalışan ve Birim)
     if (isRestrictedUser) {
         // Merkezi Bileşenlerle Gerçek Birim Görünümü (Unit Dashboard)
-        const unitAudits = filteredAudits.filter((a: any) => String(a.unitId) === String(user?.departmentId) || a.unit === user?.department || true); // Demo için hepsi
-        const unitFindings = filteredFindings; // Backend already filtered this if we are isUnit? Wait, backend didn't filter for isUnit unless we explicitly check. For now, since it's demo, we use all or subset.
+        const unitAudits = filterByYear(audits, ['startDate', 'createdAt', 'created_at'], selectedYear);
+        const unitFindings = filterByYear(findings, ['createdAt', 'created_at'], selectedYear); 
         
         const requiresAction = unitFindings.filter(f => ['Tebliğ Edildi', 'Revizyon Gerekli'].includes(f.status)).length;
         const followUp = unitFindings.filter(f => f.status === 'Takip Ediliyor').length;
@@ -367,25 +220,25 @@ export default function AuditDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
                     <StatCard 
                         title="Yanıt Bekleyen" 
-                        value={requiresAction} 
+                        value={requiresAction.toString()} 
                         color="red"
                         infoTooltip="Aksiyon planı girmeniz gereken bulgular"
                     />
                     <StatCard 
                         title="Kanıt Bekleyen" 
-                        value={followUp} 
+                        value={followUp.toString()} 
                         color="orange"
                         infoTooltip="Aksiyonu tamamlayıp kanıt yüklemeniz gereken bulgular"
                     />
                     <StatCard 
                         title="Onayda Bekleyen" 
-                        value={pendingReview} 
+                        value={pendingReview.toString()} 
                         color="blue"
                         infoTooltip="Müfettişin incelediği yanıt/kanıtlar"
                     />
                     <StatCard 
                         title="Toplam Bulgu" 
-                        value={unitFindings.length} 
+                        value={unitFindings.length.toString()} 
                         color="green"
                         infoTooltip="Tüm aktif ve kapanmış bulgular"
                     />
@@ -399,7 +252,7 @@ export default function AuditDashboard() {
                                 href={`/audit/conciliation`}
                                 code={f.code || `#${String(f.id).substring(0, 7)}`}
                                 title={f.title || f.headline}
-                                subtitle={<span className="text-xs text-gray-500">Vade: {f.dueDate ? formatDate(f.dueDate) : 'Belirtilmedi'}</span>}
+                                subtitle={<span className="text-xs text-gray-500">Vade:&nbsp;{f.dueDate ? formatDate(f.dueDate) : 'Belirtilmedi'}</span>}
                                 status={f.status}
                             />
                         ))}
@@ -408,11 +261,11 @@ export default function AuditDashboard() {
                         )}
                     </DashboardWidget>
 
-                    <DashboardWidget title="Biriminizin Son Denetimleri" subtitle="Geçmiş ve devam eden denetimler" widgetType="audits">
+                    <DashboardWidget title="Biriminizin Son Denetimleri" subtitle="Geçmiş ve devam eden denetimler" widgetType="audits" actionHref="/audit/audits" actionLabel="Tüm Denetimlere Git">
                         {unitAudits.slice(0, 5).map(a => (
                             <DashboardListItem
                                 key={a.id}
-                                icon={<div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Calendar size={16} /></div>}
+                                icon={<EntityIcon type="AUDIT" variant="square" size={16} />}
                                 title={a.title}
                                 subtitle={<span className="text-xs text-gray-500">{a.year || extractYear(a.startDate) || '2026'}</span>}
                                 rightContent={<StatusBadge status={a.status} />}
@@ -423,6 +276,8 @@ export default function AuditDashboard() {
             </>
         );
     }
+
+    const CLOSED_STATUSES = ['Kapalı', 'Tamamlandı', 'Risk Kabul Edildi', 'Denetim Esnasında Giderildi'];
 
     return (
         <>
@@ -451,13 +306,13 @@ export default function AuditDashboard() {
             <DashboardWidget widgetType="actions" variant="transparent">
                 <ExecutiveActionCards 
                     variant="dashboard"
-                    pendingApprovals={filteredAudits.filter(a => a.status === 'Onay Bekliyor').length}
-                    ongoingAudits={filteredAudits.filter(a => a.status === 'Devam Ediyor' || a.status === 'Sürüyor').length}
-                    pendingNotifications={filteredFindings.filter(f => f.status === 'Tebliğ Edildi' || f.status === 'Birim Yanıtladı').length}
-                    pendingVerification={filteredFindings.filter(f => f.status === 'Doğrulama Bekliyor').length}
-                    pendingRevisions={filteredFindings.filter(f => f.status === 'Revizyon Gerekli').length + filteredAudits.filter(a => a.status === 'Revizyon Gerekli').length}
-                    overdueActionsCount={overdueActionsCount}
-                    dueSoonActionsCount={dueSoonActionsCount}
+                    pendingApprovals={stats?.pendingApprovals || 0}
+                    ongoingAudits={stats?.activeAudits || 0}
+                    pendingNotifications={stats?.pendingNotifications || 0}
+                    pendingVerification={stats?.pendingVerification || 0}
+                    pendingRevisions={stats?.pendingRevisions || 0}
+                    overdueActionsCount={stats?.overdueActionsCount || 0}
+                    dueSoonActionsCount={stats?.dueSoonActionsCount || 0}
                 />
             </DashboardWidget>
 
@@ -473,34 +328,25 @@ export default function AuditDashboard() {
                     <div className="grid grid-cols-2 gap-4 h-[calc(100%-3rem)]">
                         <StatCard
                             title="Denetim Tamamlama Oranı"
-                            value={`%${auditStats.total > 0 ? Math.round((auditStats.completed / auditStats.total) * 100) : 0}`}
+                            value={`%${stats?.totalAudits > 0 ? Math.round((stats.completedAudits / stats.totalAudits) * 100) : 0}`}
                             color="blue"
                             infoTooltip="Tamamlanan denetimlerin toplam denetimlere oranını ifade eder. Hedef: %90"
                         />
                         <StatCard
                             title="Bulgu Kapatma Oranı"
-                            value={`%${findingStats.total > 0 ? Math.round((findingStats.closed / findingStats.total) * 100) : 0}`}
+                            value={`%${stats?.totalFindings > 0 ? Math.round(((stats.totalFindings - stats.openFindings) / stats.totalFindings) * 100) : 0}`}
                             color="green"
                             infoTooltip="Kapatılan veya tamamlanan bulguların tüm açık/kapalı bulgulara oranını gösterir. Hedef: %85"
                         />
                         <StatCard
-                            title="Ort. Denetim Süresi (Gün)"
-                            value={(() => {
-                                const completedAudits = filteredAudits.filter((a: any) => a.status === 'Tamamlandı' && a.startDate && a.endDate);
-                                if (completedAudits.length === 0) return '-';
-                                const totalDays = completedAudits.reduce((sum: number, a: any) => {
-                                    const start = new Date(a.startDate);
-                                    const end = new Date(a.endDate);
-                                    return sum + Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-                                }, 0);
-                                return Math.round(totalDays / completedAudits.length).toString();
-                            })()}
+                            title="Ort. Denetim Süresi (İş Günü)"
+                            value={(stats?.avgDuration || '-').toString()}
                             color="orange"
-                            infoTooltip="Sadece 'Tamamlandı' statüsündeki denetimlerin başlangıç ve bitiş tarihleri arasındaki net gün sayısının ortalamasıdır. Hedef: Maks 30 gün"
+                            infoTooltip="Sadece 'Tamamlandı' statüsündeki denetimlerin başlangıç ve bitiş tarihleri arasındaki net iş günü sayısının ortalamasıdır. (Hafta sonları hariç) Hedef: Maks 20 iş günü"
                         />
                         <StatCard
                             title="Yüksek Öncelikli Bulgu"
-                            value={(findingStats.critical + findingStats.high).toString()}
+                            value={((stats?.criticalFindings || 0) + (stats?.highFindings || 0)).toString()}
                             color="purple"
                             infoTooltip="Sistemdeki durumu henüz kapanmamış olan Kritik ve Yüksek riskli bulguların toplam sayısıdır."
                         />
@@ -515,20 +361,24 @@ export default function AuditDashboard() {
 
                     <div className="space-y-4">
                         {[
-                            { label: 'Kritik', count: findingStats.critical, color: '#881337', percent: (findingStats.critical / Math.max(findingStats.total, 1)) * 100 },
-                            { label: 'Yüksek', count: findingStats.high, color: '#ef4444', percent: (findingStats.high / Math.max(findingStats.total, 1)) * 100 },
-                            { label: 'Orta', count: findingStats.medium, color: '#f97316', percent: (findingStats.medium / Math.max(findingStats.total, 1)) * 100 },
-                            { label: 'Düşük', count: findingStats.low, color: '#facc15', percent: (findingStats.low / Math.max(findingStats.total, 1)) * 100 },
+                            { label: 'Kritik', count: stats?.criticalFindings || 0, colorClass: 'bg-rose-900', percent: ((stats?.criticalFindings || 0) / Math.max(stats?.totalFindings || 1, 1)) * 100 },
+                            { label: 'Yüksek', count: stats?.highFindings || 0, colorClass: 'bg-red-500', percent: ((stats?.highFindings || 0) / Math.max(stats?.totalFindings || 1, 1)) * 100 },
+                            { label: 'Orta', count: stats?.mediumFindings || 0, colorClass: 'bg-orange-500', percent: ((stats?.mediumFindings || 0) / Math.max(stats?.totalFindings || 1, 1)) * 100 },
+                            { label: 'Düşük', count: stats?.lowFindings || 0, colorClass: 'bg-yellow-400', percent: ((stats?.lowFindings || 0) / Math.max(stats?.totalFindings || 1, 1)) * 100 },
                         ].map((item) => (
-                            <div key={item.label}>
+                            <div 
+                                key={item.label} 
+                                className="cursor-pointer hover:bg-gray-50/50 p-1 -mx-1 rounded transition-colors"
+                                onClick={() => router.push(`/audit/findings?risk=${item.label}`)}
+                            >
                                 <div className="flex justify-between text-sm mb-1">
-                                    <span className="text-gray-600">{item.label}</span>
+                                    <span className="text-gray-600 group-hover:text-gray-900">{item.label}</span>
                                     <span className="font-semibold">{item.count}</span>
                                 </div>
                                 <div className="w-full bg-gray-100 rounded-full h-2">
                                     <div
-                                        className="h-2 rounded-full transition-all duration-500"
-                                        style={{ width: `${item.percent}%`, backgroundColor: item.color }}
+                                        className={`h-2 rounded-full transition-all duration-500 ${item.colorClass}`}
+                                        style={{ width: `${item.percent}%` }}
                                     />
                                 </div>
                             </div>
@@ -538,7 +388,7 @@ export default function AuditDashboard() {
                     <div className="mt-6 pt-4 border-t">
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-500">Toplam Bulgu</span>
-                            <span className="font-bold text-lg">{findingStats.total}</span>
+                            <span className="font-bold text-lg">{stats?.totalFindings || 0}</span>
                         </div>
                     </div>
                 </DashboardWidget>
@@ -556,26 +406,16 @@ export default function AuditDashboard() {
                 >
 
                         <div className="h-48 flex flex-col justify-end">
-                            {monthlyChartData.some(d => d.open > 0 || d.closed > 0) ? (
-                                <div className="flex-1 flex items-end gap-2 px-1 border-b border-gray-100 pb-2">
-                                    {monthlyChartData.map((d, i) => {
-                                        const maxVal = Math.max(...monthlyChartData.map(x => x.open + x.closed));
-                                        const openHeight = maxVal > 0 ? (d.open / maxVal) * 100 : 0;
-                                        const closedHeight = maxVal > 0 ? (d.closed / maxVal) * 100 : 0;
-
-                                        return (
-                                            <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group cursor-pointer">
-                                                <Tooltip content={<><span className="font-bold">{d.month}</span>: {d.open} Açık, {d.closed} Kapalı</>} position="top">
-                                                    <div className="w-full flex items-end justify-center gap-0.5 h-full relative">
-                                                        <div style={{ height: `${openHeight}%` }} className="w-2.5 rounded-t-sm bg-gradient-to-t from-red-500 to-rose-400 group-hover:brightness-110 transition-all duration-300 shadow-sm" />
-                                                        <div style={{ height: `${closedHeight}%` }} className="w-2.5 rounded-t-sm bg-gradient-to-t from-green-600 to-emerald-500 group-hover:brightness-110 transition-all duration-300 shadow-sm" />
-                                                    </div>
-                                                </Tooltip>
-                                                <span className="text-[9px] font-bold text-gray-400 mt-2 group-hover:text-gray-700 transition-colors tracking-wider">{d.month}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                            {stats?.monthlyChartData && stats.monthlyChartData.some((d: any) => d.open > 0 || d.closed > 0) ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={stats.monthlyChartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} />
+                                        <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                        <Bar dataKey="open" name="Açık" stackId="a" fill="#ef4444" radius={[0, 0, 4, 4]} barSize={12} onClick={() => router.push('/audit/findings?status=Açık')} style={{ cursor: 'pointer' }} />
+                                        <Bar dataKey="closed" name="Kapalı" stackId="a" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} onClick={() => router.push('/audit/findings?status=Kapalı')} style={{ cursor: 'pointer' }} />
+                                    </BarChart>
+                                </ResponsiveContainer>
                             ) : (
                                 <div className="flex-1 flex items-center justify-center bg-gray-50/30 rounded-lg border border-dashed border-gray-200">
                                     <EmptyState 
@@ -598,7 +438,7 @@ export default function AuditDashboard() {
                     actionLabel="Tüm Bulguları Görüntüle"
                 >
 
-                    {filteredFindings.length === 0 ? (
+                    {!stats?.recentFindings || stats.recentFindings.length === 0 ? (
                         <div className="flex-1 flex items-center justify-center min-h-[200px] bg-gray-50/30 rounded-lg border border-dashed border-gray-200">
                             <EmptyState 
                                 variant="minimal" 
@@ -609,7 +449,7 @@ export default function AuditDashboard() {
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            {filteredFindings.slice(0, 5).map((finding) => {
+                            {stats.recentFindings.map((finding: any) => {
                                 const displayStatus = finding.status;
                                 const isClosed = CLOSED_STATUSES.includes(displayStatus);
                                 return (
@@ -622,7 +462,7 @@ export default function AuditDashboard() {
                                             <div className="flex items-center text-[11px] text-gray-400">
                                                 {finding.department || 'Birim Belirtilmedi'}
                                                 <span className="mx-1.5">•</span>
-                                                Vade: <span className={!finding.dueDate ? (isClosed ? 'text-gray-500' : 'italic text-amber-600') : ''}>{
+                                                Vade:&nbsp;<span className={!finding.dueDate ? (isClosed ? 'text-gray-500' : 'italic text-amber-600') : ''}>{
                                                     finding.dueDate ? formatDate(finding.dueDate) : (isClosed ? 'Kapatıldı' : 'Bekleniyor')
                                                 }</span>
                                             </div>
@@ -657,18 +497,17 @@ export default function AuditDashboard() {
                         ) : (
                             <div className="space-y-3">
                                 {activities.slice(0, 5).map((activity) => {
-                                    const isLogin = activity.action.includes('Giriş');
-                                    const isAudit = (activity as any).entityType === 'Denetim' || activity.action.includes('Denetim');
+                                    const avatarInitials = activity.user && activity.user !== 'Sistem' 
+                                        ? activity.user.substring(0, 2).toUpperCase() 
+                                        : 'SYS';
+                                    const avatarColor = activity.user === 'Sistem' ? 'bg-slate-100 text-slate-500' : 'bg-primary/10 text-primary';
                                     
                                     return (
                                         <DashboardListItem
                                             key={activity.id}
                                             icon={
-                                                <div className={`p-2 rounded-lg ${
-                                                    isLogin ? 'bg-blue-50 text-blue-600' : 
-                                                    isAudit ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-600'
-                                                }`}>
-                                                    {isLogin ? <ShieldAlert size={16} /> : isAudit ? <RefreshCw size={16} /> : <FileSignature size={16} />}
+                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${avatarColor}`}>
+                                                    {avatarInitials}
                                                 </div>
                                             }
                                             title={activity.action}
@@ -702,8 +541,8 @@ export default function AuditDashboard() {
                 <div className="mb-4">
                     <p className="text-sm text-gray-500 mb-2 font-medium">Seçilen Risk Seviyesi:</p>
                     <div className="flex gap-2 items-center">
-                        <span className="bg-rose-100 text-rose-800 px-3 py-1 rounded-md text-xs font-bold shadow-sm">Doğal Risk: {heatmapModal.inherent}</span>
-                        <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-xs font-bold shadow-sm">Kontrol Etkinliği: {heatmapModal.control}</span>
+                        <Badge variant="danger" size="md">Doğal Risk: {heatmapModal.inherent}</Badge>
+                        <Badge variant="secondary" size="md">Kontrol Etkinliği: {heatmapModal.control}</Badge>
                     </div>
                 </div>
                 

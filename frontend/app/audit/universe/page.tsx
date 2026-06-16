@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createPortal } from 'react-dom';
-import { Globe, Building, Users, MapPin, Search, Plus, Filter, ChevronDown, ChevronRight, ChevronUp, Edit2, Trash2, X, RefreshCw, Download, AlertTriangle, CheckCircle, Shield, TrendingUp, Calendar, FileText, Briefcase, Scale, Activity, Upload, Table, LayoutGrid, GitBranch, Maximize } from 'lucide-react';
+import { Building, Users, MapPin, Plus, ChevronDown, ChevronRight, Edit2, Trash2, Download, AlertTriangle, CheckCircle, Shield, TrendingUp, Calendar, FileText, Briefcase, Scale, Activity, Upload, Table, LayoutGrid, GitBranch, Maximize } from 'lucide-react';
 import { DateDisplay } from '@/components/ui/DateDisplay';
 import PageHeader from '@/components/audit/PageHeader';
 import LoadingState from '@/components/ui/LoadingState';
@@ -36,12 +36,16 @@ import { AuditStaff } from '@/lib/audit-api';
 import UnitScorecardModal from '@/components/audit/UnitScorecardModal';
 import { ActivitySquare } from 'lucide-react';
 import { FileUpload } from '@/components/ui/FileUpload';
+import ControlPickerModal from '@/components/audit/ControlPickerModal';
 import { getRiskScoreColor, getRiskLevelFromScore, getAuditCycleFromScore, formatDate } from '@/lib/audit-utils';
 import { useAuth } from '@/context/AuthContext';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 import FormInput from "@/components/ui/FormInput";
+import FormTextarea from "@/components/ui/FormTextarea";
+import DatePicker from "@/components/ui/DatePicker";
+import FormField from "@/components/ui/FormField";
+import Badge from "@/components/ui/Badge";
 import { checkRole, ROLES } from '@/lib/auth-constants';
-
 interface AuditableUnit {
     id: string;
     name: string;
@@ -223,7 +227,7 @@ const INITIAL_UNIT: NewUnitType = {
 };
 
 // Ağaç Düğümü Bileşeni (Rekürsif)
-const TreeNode = ({ node, units, level, onEdit, onDelete, onViewRCM, onAdd, onViewScorecard }: { node: any, units: AuditableUnit[], level: number, onEdit: (unit: AuditableUnit) => void, onDelete: (unitId: string) => void, onViewRCM: (unitId: string) => void, onAdd: () => void, onViewScorecard: (unitName: string) => void }) => {
+const TreeNode = ({ node, units, level, canManage, onEdit, onDelete, onViewRCM, onAdd, onViewScorecard }: { node: any, units: AuditableUnit[], level: number, canManage: boolean, onEdit: (unit: AuditableUnit) => void, onDelete: (unitId: string) => void, onViewRCM: (unitId: string) => void, onAdd: () => void, onViewScorecard: (unitName: string) => void }) => {
     const [isOpen, setIsOpen] = useState(level < 1);
     const matchingUnits = units.filter(u =>
         u.name === node.title ||
@@ -261,15 +265,17 @@ const TreeNode = ({ node, units, level, onEdit, onDelete, onViewRCM, onAdd, onVi
                     {node.title}
                 </span>
 
-                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    <button
-                        title="Birim Ekle"
-                        onClick={onAdd}
-                        className="p-1 text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
-                    >
-                        <Plus size={16} />
-                    </button>
-                </div>
+                {canManage && (
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <button
+                            title="Birim Ekle"
+                            onClick={onAdd}
+                            className="p-1 text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
+                        >
+                            <Plus size={16} />
+                        </button>
+                    </div>
+                )}
             </div>
 
             {isOpen && (
@@ -286,7 +292,7 @@ const TreeNode = ({ node, units, level, onEdit, onDelete, onViewRCM, onAdd, onVi
                                             <p className="text-sm font-semibold text-gray-800 group-hover:text-primary transition-colors">{unit.name}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
                                                 <span className="text-[10px] uppercase font-bold tracking-wider text-gray-500">{unit.type}</span>
-                                                {unit.code && <span className="text-[10px] text-gray-400 bg-gray-100 px-1 rounded">{unit.code}</span>}
+                                                {unit.code && <CodeBadge code={unit.code} size="sm" variant="secondary" />}
                                             </div>
                                         </div>
                                     </div>
@@ -301,9 +307,11 @@ const TreeNode = ({ node, units, level, onEdit, onDelete, onViewRCM, onAdd, onVi
                                                 items={[
                                                     { label: 'RCM Görüntüle', icon: Shield, onClick: () => onViewRCM(unit.id) },
                                                     { label: 'Karne', icon: ActivitySquare, onClick: () => onViewScorecard(unit.name) },
-                                                    { label: 'Düzenle', icon: Edit2, onClick: () => onEdit(unit) },
-                                                    { type: 'divider' as const },
-                                                    { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => onDelete(unit.id) }
+                                                    ...(canManage ? [
+                                                        { label: 'Düzenle', icon: Edit2, onClick: () => onEdit(unit) },
+                                                        { type: 'divider' as const },
+                                                        { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => onDelete(unit.id) }
+                                                    ] : [])
                                                 ]}
                                             />
                                         </div>
@@ -316,7 +324,7 @@ const TreeNode = ({ node, units, level, onEdit, onDelete, onViewRCM, onAdd, onVi
                     {hasChildren && (
                         <div className="flex flex-col gap-0.5 ml-2 mt-1">
                             {node.children.map((child: any) => (
-                                <TreeNode key={child.id} node={child} units={units} level={level + 1} onEdit={onEdit} onDelete={onDelete} onViewRCM={onViewRCM} onAdd={onAdd} onViewScorecard={onViewScorecard} />
+                                <TreeNode key={child.id} node={child} units={units} level={level + 1} canManage={canManage} onEdit={onEdit} onDelete={onDelete} onViewRCM={onViewRCM} onAdd={onAdd} onViewScorecard={onViewScorecard} />
                             ))}
                         </div>
                     )}
@@ -327,14 +335,24 @@ const TreeNode = ({ node, units, level, onEdit, onDelete, onViewRCM, onAdd, onVi
 };
 
 // Organizasyon Ağacı Kapsayıcısı
-const OrganizationTree = ({ hierarchy, units, onEdit, onDelete, onViewRCM, onAdd, onViewScorecard }: { hierarchy: any[], units: AuditableUnit[], onEdit: (unit: AuditableUnit) => void, onDelete: (unitId: string) => void, onViewRCM: (unitId: string) => void, onAdd: () => void, onViewScorecard: (unitName: string) => void }) => {
+const OrganizationTree = ({ hierarchy, units, canManage, onEdit, onDelete, onViewRCM, onAdd, onViewScorecard }: { hierarchy: any[], units: AuditableUnit[], canManage: boolean, onEdit: (unit: AuditableUnit) => void, onDelete: (unitId: string) => void, onViewRCM: (unitId: string) => void, onAdd: () => void, onViewScorecard: (unitName: string) => void }) => {
     return (
         <div className="p-2">
             {hierarchy.map((node) => (
-                <TreeNode key={node.id} node={node} units={units} level={0} onEdit={onEdit} onDelete={onDelete} onViewRCM={onViewRCM} onAdd={onAdd} onViewScorecard={onViewScorecard} />
+                <TreeNode key={node.id} node={node} units={units} level={0} canManage={canManage} onEdit={onEdit} onDelete={onDelete} onViewRCM={onViewRCM} onAdd={onAdd} onViewScorecard={onViewScorecard} />
             ))}
         </div>
     );
+};
+
+const getRiskCardClass = (riskLevel: string) => {
+    switch (riskLevel) {
+        case 'Kritik': return 'border-rose-900 bg-rose-50';
+        case 'Yüksek': return 'border-red-600 bg-red-50';
+        case 'Orta': return 'border-orange-500 bg-orange-50';
+        case 'Düşük': return 'border-yellow-400 bg-yellow-50';
+        default: return 'border-gray-300 bg-gray-50';
+    }
 };
 
 export default function AuditUniversePage() {
@@ -358,6 +376,7 @@ export default function AuditUniversePage() {
     const [expandedCategories, setExpandedCategories] = useState<string[]>(['Şube', 'Birim', 'Süreç', 'Departman']);
     const [showAddModal, setShowAddModal] = useState(false);
     const [isCreateAuditModalOpen, setIsCreateAuditModalOpen] = useState(false);
+    const [isControlPickerOpen, setIsControlPickerOpen] = useState(false);
     const [selectedUnitForAudit, setSelectedUnitForAudit] = useState<AuditableUnit | null>(null);
     const [staffList, setStaffList] = useState<AuditStaff[]>([]);
     const [editingUnit, setEditingUnit] = useState<AuditableUnit | null>(null);
@@ -399,23 +418,24 @@ export default function AuditUniversePage() {
     };
 
     const handleAddNewControl = () => {
-        if (!editingUnit) return;
-        const newControl = {
+        setIsControlPickerOpen(true);
+    };
+
+    const handleControlsSelected = (selectedControls: any[]) => {
+        const newRcmRows = selectedControls.map(c => ({
             id: Math.random().toString(),
-            unitId: editingUnit.id,
-            processName: 'Müşteri İlişkileri Yönetimi',
-            riskName: 'Hatalı veri girişi ve işlem aksamaları',
-            inherentRisk: 'Yüksek',
-            controlName: 'Günlük mutabakat ve işlem onay kontrolleri',
-            controlType: 'Manuel',
-            effectiveness: 'Güçlü',
-            testResult: 'Olumlu',
-            testAuditCode: 'DEN-2026-004',
-            testDate: '2026-04-10',
-            residualRisk: 'Düşük'
-        };
-        setCustomRcmRows(prev => [...prev, newControl]);
-        showToast('Yeni denetim kontrolü matrise başarıyla eklendi', 'success');
+            unitId: editingUnit?.id || 'new-unit',
+            processName: newUnit.name || 'Genel Süreç',
+            riskName: 'Seçili kontrol için risk tanımı giriniz',
+            inherentRisk: 'Orta',
+            controlName: c.name,
+            controlType: c.type || c.automation || 'Manuel',
+            effectiveness: 'Bilinmiyor',
+            testResult: 'Test Edilmedi',
+            testDate: '',
+            residualRisk: 'Orta'
+        }));
+        setCustomRcmRows(prev => [...prev, ...newRcmRows]);
     };
 
     const handleExportRCM = () => {
@@ -551,9 +571,8 @@ export default function AuditUniversePage() {
 
     // RCM Verisi (Modal Sekme 5) — Hook ihlalini önlemek için render dışına taşındı
     const rcmData = useMemo(() => {
-        if (!editingUnit) return [];
         const flattened: any[] = [];
-        if (editingUnit.processes) {
+        if (editingUnit?.processes) {
             editingUnit.processes.forEach(p => {
                 p.risks?.forEach(r => {
                     r.controls?.forEach(c => {
@@ -575,7 +594,8 @@ export default function AuditUniversePage() {
             });
         }
         // Append dynamically added custom RCM rows
-        const customRows = customRcmRows.filter(row => row.unitId === editingUnit.id);
+        const currentUnitId = editingUnit?.id || 'new-unit';
+        const customRows = customRcmRows.filter(row => row.unitId === currentUnitId);
         return [...flattened, ...customRows];
     }, [editingUnit, customRcmRows]);
 
@@ -992,9 +1012,9 @@ export default function AuditUniversePage() {
                                 <div className="flex flex-col items-center">
                                     <div className="cell-title">{unit.name}</div>
                                     {unit.mandatoryAudit && (
-                                        <span className="text-[10px] text-purple-600 flex items-center justify-center gap-1 mt-0.5 font-bold uppercase">
+                                        <Badge variant="primary" size="sm" className="mt-0.5 gap-1 uppercase">
                                             <Shield size={10} /> Zorunlu
-                                        </span>
+                                        </Badge>
                                     )}
                                 </div>
                             )
@@ -1065,9 +1085,9 @@ export default function AuditUniversePage() {
                             width: '100px',
                             render: (unit: AuditableUnit) => (
                                 (unit.openFindingsCount || 0) > 0 ? (
-                                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700">
+                                    <Badge variant="danger" size="sm">
                                         {unit.openFindingsCount}
-                                    </span>
+                                    </Badge>
                                 ) : (
                                     <span className="text-gray-300">-</span>
                                 )
@@ -1094,9 +1114,10 @@ export default function AuditUniversePage() {
                                             { label: 'RCM', icon: Shield, onClick: () => router.push(`/audit/universe/${unit.id}`) },
                                              { label: 'Karne', icon: ActivitySquare, onClick: () => setScorecardModal({ isOpen: true, unitName: unit.name }) },
                                             { label: 'Planla', icon: Calendar, onClick: () => handleOpenCreateAuditModal(unit) },
-
-                                            { label: 'Düzenle', icon: Edit2, onClick: () => handleOpenEditModal(unit, { stopPropagation: () => {} } as any) },
-                                            { label: 'Sil', icon: Trash2, variant: 'danger', onClick: () => handleDeleteClick(unit.id, { stopPropagation: () => {} } as any) }
+                                            ...(canManage ? [
+                                                { label: 'Düzenle', icon: Edit2, onClick: () => handleOpenEditModal(unit, { stopPropagation: () => {} } as any) },
+                                                { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => handleDeleteClick(unit.id, { stopPropagation: () => {} } as any) }
+                                            ] : [])
                                         ]}
                                     />
                                 </div>
@@ -1198,14 +1219,14 @@ export default function AuditUniversePage() {
                                         const diff = (new Date(unit.nextAuditDate!).getTime() - now2.getTime()) / (86400000);
                                         return diff <= 90;
                                     })();
-                                    let stColor = 'bg-emerald-100 text-emerald-800';
+                                    let variant: 'success' | 'danger' | 'warning' = 'success';
                                     let stText = 'Güncel';
-                                    if (!hasAudited) { stColor = 'bg-red-100 text-red-800'; stText = 'Hiç Denetlenmedi'; }
-                                    else if (isOver) { stColor = 'bg-red-100 text-red-800'; stText = 'Gecikmiş'; }
-                                    else if (isDueSoon) { stColor = 'bg-amber-100 text-amber-800'; stText = 'Yaklaşıyor'; }
+                                    if (!hasAudited) { variant = 'danger'; stText = 'Hiç Denetlenmedi'; }
+                                    else if (isOver) { variant = 'danger'; stText = 'Gecikmiş'; }
+                                    else if (isDueSoon) { variant = 'warning'; stText = 'Yaklaşıyor'; }
                                     return (
                                         <div className="flex justify-center">
-                                            <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${stColor}`}>{stText}</span>
+                                            <Badge variant={variant} size="md">{stText}</Badge>
                                         </div>
                                     );
                                     }
@@ -1215,14 +1236,14 @@ export default function AuditUniversePage() {
                                     header: 'İşlemler',
                                     width: '180px',
                                     render: (unit: AuditableUnit) => {
-                                        const { user } = useAuth();
-                                        const canManage = checkRole(hasRole, ROLES.BASIC_MANAGER);
+                                        const { hasRole: localHasRole } = useAuth();
+                                        const localCanManage = checkRole(localHasRole, ROLES.UNIVERSE_MANAGER);
                                         
                                         const items = [
                                             { label: 'RCM', icon: Shield, onClick: () => router.push(`/audit/universe/${unit.id}`) }
                                         ];
 
-                                        if (canManage) {
+                                        if (localCanManage) {
                                             items.push({ label: 'Düzenle', icon: Edit2, onClick: () => handleOpenEditModal(unit, { stopPropagation: () => {} } as any) });
                                             items.push({ label: 'Sil', icon: Trash2, variant: 'danger', onClick: () => handleDeleteClick(unit.id, { stopPropagation: () => {} } as any) } as any);
                                         }
@@ -1260,6 +1281,7 @@ export default function AuditUniversePage() {
                             <OrganizationTree
                                 hierarchy={HIERARCHY}
                                 units={filteredUnits}
+                                canManage={canManage}
                                 onEdit={(unit) => handleOpenEditModal(unit, { stopPropagation: () => {} } as any)}
                                 onDelete={(unitId) => handleDeleteClick(unitId, { stopPropagation: () => {} } as any)}
                                 onViewRCM={(unitId) => router.push(`/audit/universe/${unitId}`)}
@@ -1276,12 +1298,7 @@ export default function AuditUniversePage() {
                         {displayedUnits.map(item => (
                             <div key={item.id} className="card !p-0 overflow-hidden hover:shadow-lg transition-shadow">
                                 {/* Kart Başlığı — Risk Rengi */}
-                                <div className={`p-4 border-b-4 ${
-                                    item.riskLevel === 'Kritik' ? 'border-[#7f1d1d] bg-rose-50' :
-                                    item.riskLevel === 'Yüksek' ? 'border-[#dc2626] bg-red-50' :
-                                    item.riskLevel === 'Orta' ? 'border-[#f97316] bg-orange-50' :
-                                    'border-[#facc15] bg-yellow-50'
-                                }`}>
+                                <div className={`p-4 border-b-4 ${getRiskCardClass(item.riskLevel)}`}>
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2">
@@ -1371,8 +1388,10 @@ export default function AuditUniversePage() {
                                             items={[
                                                 { label: 'RCM Görüntüle', icon: Shield, onClick: () => router.push(`/audit/universe/${item.id}`) },
                                                 { label: 'Karne', icon: ActivitySquare, onClick: () => setScorecardModal({ isOpen: true, unitName: item.name }) },
-                                                { label: 'Düzenle', icon: Edit2, onClick: () => handleOpenEditModal(item, { stopPropagation: () => {} } as any) },
-                                                { label: 'Sil', icon: Trash2, variant: 'danger', onClick: () => handleDeleteClick(item.id, { stopPropagation: () => {} } as any) }
+                                                ...(canManage ? [
+                                                    { label: 'Düzenle', icon: Edit2, onClick: () => handleOpenEditModal(item, { stopPropagation: () => {} } as any) },
+                                                    { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => handleDeleteClick(item.id, { stopPropagation: () => {} } as any) }
+                                                ] : [])
                                             ]}
                                         />
                                     </div>
@@ -1433,8 +1452,7 @@ export default function AuditUniversePage() {
                                 {activeTab === 0 && (
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Birim Adı *</label>
+                                            <FormField label="Birim Adı" required>
                                                 {(!newUnit.type || newUnit.type === 'Departman' || newUnit.type === 'Birim' || newUnit.type === 'Süreç') ? (
                                                     <div className="space-y-3">
                                                         <CustomSelect
@@ -1484,58 +1502,45 @@ export default function AuditUniversePage() {
                                                         )}
                                                     </div>
                                                 ) : (
-                                                    <input type="text" className="form-input" required value={newUnit.name} onChange={e => setNewUnit({ ...newUnit, name: e.target.value })} placeholder="Örn: İstanbul Şubesi" />
+                                                    <FormInput required value={newUnit.name} onChange={e => setNewUnit({ ...newUnit, name: e.target.value })} placeholder="Örn: İstanbul Şubesi" />
                                                 )}
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Birim No</label>
-                                                <input type="text" className="form-input" value={newUnit.code || ''} onChange={e => setNewUnit({ ...newUnit, code: e.target.value })} placeholder="Örn: IST-001" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Sorumlu</label>
-                                                <input type="text" className="form-input" value={newUnit.manager || ''} onChange={e => setNewUnit({ ...newUnit, manager: e.target.value })} placeholder="Örn: Ahmet Yılmaz" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Lokasyon</label>
-                                                <input type="text" className="form-input" value={newUnit.location || ''} onChange={e => setNewUnit({ ...newUnit, location: e.target.value })} placeholder="Örn: İstanbul" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Personel Sayısı</label>
-                                                <input type="number" min="0" className="form-input" value={newUnit.employeeCount || ''} onChange={e => setNewUnit({ ...newUnit, employeeCount: parseInt(e.target.value) || undefined })} placeholder="Örn: 25" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Tahmini Denetim Süresi (Gün)</label>
-                                                <input type="number" min="1" className="form-input" value={newUnit.estimatedDays || ''} onChange={e => setNewUnit({ ...newUnit, estimatedDays: parseInt(e.target.value) || undefined })} placeholder="Örn: 5" />
-                                            </div>
-                                            <div>
-                                                <CustomSelect
-                                                    label="Durum"
-                                                    value={newUnit.status || 'Aktif'}
-                                                    onChange={(val) => setNewUnit({ ...newUnit, status: val as any })}
-                                                    options={[
-                                                        { value: "Aktif", label: "Aktif" },
-                                                        { value: "Pasif", label: "Pasif" }
-                                                    ]}
-                                                />
-                                            </div>
-                                            <div>
-                                                <CustomSelect
-                                                    label="Tür *"
-                                                    value={newUnit.type}
-                                                    onChange={(val) => setNewUnit({ ...newUnit, type: val as any })}
-                                                    options={[
-                                                        { value: "Süreç", label: "Süreç" },
-                                                        { value: "Şube", label: "Şube" },
-                                                        { value: "Birim", label: "Birim" },
-                                                        { value: "Departman", label: "Departman" }
-                                                    ]}
-                                                />
-                                            </div>
+                                            </FormField>
+                                            
+                                            <FormInput label="Birim Kodu" value={newUnit.code || ''} onChange={e => setNewUnit({ ...newUnit, code: e.target.value })} placeholder="Örn: IST-001" />
+                                            
+                                            <FormInput label="Sorumlu" value={newUnit.manager || ''} onChange={e => setNewUnit({ ...newUnit, manager: e.target.value })} placeholder="Örn: Ahmet Yılmaz" />
+                                            
+                                            <FormInput label="Lokasyon" value={newUnit.location || ''} onChange={e => setNewUnit({ ...newUnit, location: e.target.value })} placeholder="Örn: İstanbul" />
+                                            
+                                            <FormInput label="Personel Sayısı" type="number" min="0" value={newUnit.employeeCount || ''} onChange={e => setNewUnit({ ...newUnit, employeeCount: parseInt(e.target.value) || undefined })} placeholder="Örn: 25" />
+                                            
+                                            <FormInput label="Tahmini Denetim Süresi (Gün)" type="number" min="1" value={newUnit.estimatedDays || ''} onChange={e => setNewUnit({ ...newUnit, estimatedDays: parseInt(e.target.value) || undefined })} placeholder="Örn: 5" />
+                                            
+                                            <CustomSelect
+                                                label="Durum"
+                                                value={newUnit.status || 'Aktif'}
+                                                onChange={(val) => setNewUnit({ ...newUnit, status: val as any })}
+                                                options={[
+                                                    { value: "Aktif", label: "Aktif" },
+                                                    { value: "Pasif", label: "Pasif" }
+                                                ]}
+                                            />
+                                            
+                                            <CustomSelect
+                                                label="Tür *"
+                                                value={newUnit.type}
+                                                onChange={(val) => setNewUnit({ ...newUnit, type: val as any })}
+                                                options={[
+                                                    { value: "Süreç", label: "Süreç" },
+                                                    { value: "Şube", label: "Şube" },
+                                                    { value: "Birim", label: "Birim" },
+                                                    { value: "Departman", label: "Departman" }
+                                                ]}
+                                            />
                                         </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
-                                            <textarea className="form-input" rows={2} value={newUnit.description || ''} onChange={e => setNewUnit({ ...newUnit, description: e.target.value })} placeholder="Birim hakkında kısa açıklama..." />
-                                        </div>
+                                        <FormField label="Açıklama">
+                                            <FormTextarea rows={2} value={newUnit.description || ''} onChange={e => setNewUnit({ ...newUnit, description: e.target.value })} placeholder="Birim hakkında kısa açıklama..." />
+                                        </FormField>
                                     </div>
                                 )}
 
@@ -1545,7 +1550,7 @@ export default function AuditUniversePage() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <CustomSelect
-                                                    label="Dinamik Etki (Impact) Skoru - 1 ile 5 Arası"
+                                                    label="Dinamik Etki Skoru (1-5 Arası)"
                                                     value={newUnit.impactScore?.toString() || ''}
                                                     onChange={(val) => setNewUnit({ ...newUnit, impactScore: Number(val) })}
                                                     options={[
@@ -1560,7 +1565,7 @@ export default function AuditUniversePage() {
                                             </div>
                                             <div>
                                                 <CustomSelect
-                                                    label="Dinamik Olasılık (Likelihood) Skoru - 1 ile 5 Arası"
+                                                    label="Dinamik Olasılık Skoru (1-5 Arası)"
                                                     value={newUnit.likelihoodScore?.toString() || ''}
                                                     onChange={(val) => setNewUnit({ ...newUnit, likelihoodScore: Number(val) })}
                                                     options={[
@@ -1575,7 +1580,7 @@ export default function AuditUniversePage() {
                                             </div>
                                             <div>
                                                 <CustomSelect
-                                                    label="Doğal Risk (Inherent)"
+                                                    label="Doğal Risk"
                                                     value={newUnit.inherentRisk || 'Orta'}
                                                     onChange={(val) => setNewUnit({ ...newUnit, inherentRisk: val as any })}
                                                     options={[
@@ -1734,11 +1739,17 @@ export default function AuditUniversePage() {
                                 {activeTab === 2 && (
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Tabi Olduğu Mevzuatlar</label>
-                                            <input type="text" className="form-input" value={newUnit.regulations || ''} onChange={e => setNewUnit({ ...newUnit, regulations: e.target.value })} placeholder="Örn: Yasal Mevzuat, SPK, KVKK (virgülle ayırın)" />
-                                            <p className="text-xs text-gray-500 mt-1">Birden fazla mevzuatı virgülle ayırarak yazın</p>
+                                            <CustomSelect
+                                                label="Tabi Olduğu Mevzuatlar"
+                                                isMulti
+                                                isCreatable
+                                                value={newUnit.regulations ? newUnit.regulations.split(',').map((s: string) => s.trim()).filter(Boolean) : []}
+                                                onChange={(val) => setNewUnit({ ...newUnit, regulations: Array.isArray(val) ? val.join(', ') : val })}
+                                                options={[]}
+                                                placeholder="Örn: Yasal Mevzuat, SPK, KVKK (Yazıp Enter'a basın)"
+                                            />
                                         </div>
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-3 mt-4">
                                             <Checkbox
                                                 id="mandatoryAudit"
                                                 checked={newUnit.mandatoryAudit || false}
@@ -1746,13 +1757,17 @@ export default function AuditUniversePage() {
                                                 label="Zorunlu denetim gereksinimi var"
                                             />
                                         </div>
+                                        <FormInput label="Stratejik Hedef Bağlantısı" value={newUnit.strategicAlignment || ''} onChange={e => setNewUnit({ ...newUnit, strategicAlignment: e.target.value })} placeholder="Örn: Müşteri memnuniyetini artırma" />
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Stratejik Hedef Bağlantısı</label>
-                                            <input type="text" className="form-input" value={newUnit.strategicAlignment || ''} onChange={e => setNewUnit({ ...newUnit, strategicAlignment: e.target.value })} placeholder="Örn: Müşteri memnuniyetini artırma" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Gerekli Uzmanlık Alanları</label>
-                                            <input type="text" className="form-input" value={newUnit.requiredExpertise || ''} onChange={e => setNewUnit({ ...newUnit, requiredExpertise: e.target.value })} placeholder="Örn: IT, Finans, Hukuk (virgülle ayırın)" />
+                                            <CustomSelect
+                                                label="Gerekli Uzmanlık Alanları"
+                                                isMulti
+                                                isCreatable
+                                                value={newUnit.requiredExpertise ? newUnit.requiredExpertise.split(',').map((s: string) => s.trim()).filter(Boolean) : []}
+                                                onChange={(val) => setNewUnit({ ...newUnit, requiredExpertise: Array.isArray(val) ? val.join(', ') : val })}
+                                                options={[]}
+                                                placeholder="Örn: IT, Finans, Hukuk (Yazıp Enter'a basın)"
+                                            />
                                         </div>
                                     </div>
                                 )}
@@ -1761,10 +1776,9 @@ export default function AuditUniversePage() {
                                 {activeTab === 3 && (
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Son Denetim Tarihi</label>
-                                                <FormInput type="date"  value={newUnit.lastAuditDate || ''} onChange={e => setNewUnit({ ...newUnit, lastAuditDate: e.target.value })} />
-                                            </div>
+                                            <FormField label="Son Denetim Tarihi">
+                                                <DatePicker value={newUnit.lastAuditDate || ''} onChange={date => setNewUnit({ ...newUnit, lastAuditDate: date })} />
+                                            </FormField>
                                             <div>
                                                 <CustomSelect
                                                     label="Son Denetim Sonucu"
@@ -1777,22 +1791,12 @@ export default function AuditUniversePage() {
                                                     ]}
                                                 />
                                             </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Sonraki Planlanan Denetim</label>
-                                                <FormInput type="date"  value={newUnit.nextAuditDate || ''} onChange={e => setNewUnit({ ...newUnit, nextAuditDate: e.target.value })} />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Açık Bulgu Sayısı</label>
-                                                <input type="number" min="0" className="form-input" value={newUnit.openFindingsCount || 0} onChange={e => setNewUnit({ ...newUnit, openFindingsCount: parseInt(e.target.value) || 0 })} />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Önceki Denetim Süresi (Adam/Gün)</label>
-                                                <input type="number" min="0" className="form-input" value={newUnit.previousAuditDays || ''} onChange={e => setNewUnit({ ...newUnit, previousAuditDays: parseInt(e.target.value) || undefined })} placeholder="Örn: 15" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Denetim Döngüsü (Yıl)</label>
-                                                <input type="number" min="1" max="10" className="form-input" value={newUnit.auditCycle || ''} onChange={e => setNewUnit({ ...newUnit, auditCycle: parseInt(e.target.value) || undefined })} placeholder="Otomatik hesaplanır" />
-                                            </div>
+                                            <FormField label="Sonraki Planlanan Denetim">
+                                                <DatePicker value={newUnit.nextAuditDate || ''} onChange={date => setNewUnit({ ...newUnit, nextAuditDate: date })} />
+                                            </FormField>
+                                            <FormInput label="Açık Bulgu Sayısı" type="number" min="0" value={newUnit.openFindingsCount || 0} onChange={e => setNewUnit({ ...newUnit, openFindingsCount: parseInt(e.target.value) || 0 })} />
+                                            <FormInput label="Önceki Denetim Süresi (Adam/Gün)" type="number" min="0" value={newUnit.previousAuditDays || ''} onChange={e => setNewUnit({ ...newUnit, previousAuditDays: parseInt(e.target.value) || undefined })} placeholder="Örn: 15" />
+                                            <FormInput label="Denetim Döngüsü (Yıl)" type="number" min="1" max="10" value={newUnit.auditCycle || ''} onChange={e => setNewUnit({ ...newUnit, auditCycle: parseInt(e.target.value) || undefined })} placeholder="Otomatik hesaplanır" />
                                         </div>
                                     </div>
                                 )}
@@ -1809,14 +1813,13 @@ export default function AuditUniversePage() {
                                                 <h4 className="font-semibold text-gray-800">Çalışma Notları</h4>
                                             </div>
                                             <div className="pl-10">
-                                                <textarea
-                                                    className="form-input !min-h-[100px] border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
+                                                <FormTextarea
                                                     rows={4}
                                                     value={newUnit.notes || ''}
                                                     onChange={e => setNewUnit({ ...newUnit, notes: e.target.value })}
                                                     placeholder="Birim hakkındaki özel gözlemleriniz, denetim stratejisi önerileri veya genel notları buraya girebilirsiniz..."
                                                 />
-                                                <p className="text-xs text-gray-500 mt-2">Bu notlar denetim planlaması aşamasında denetçilere referans olarak sunulur.</p>
+                                                <p className="text-xs text-gray-500 mt-2">Bu notlar denetim planlaması aşamasında müfettişlere referans olarak sunulur.</p>
                                             </div>
                                         </div>
 
@@ -1831,33 +1834,49 @@ export default function AuditUniversePage() {
                                             />
                                             {uploadedFiles.length > 0 && (
                                                 <div className="mt-4 border border-gray-100 rounded-lg overflow-hidden">
-                                                    <div className="bg-gray-50 px-3 py-2 text-xs font-bold text-gray-500 border-b border-gray-100 grid grid-cols-12 gap-2">
-                                                        <span className="col-span-6">Dosya Adı</span>
-                                                        <span className="col-span-2">Boyut</span>
-                                                        <span className="col-span-3">Yükleyen</span>
-                                                        <span className="col-span-1 text-center">İşlem</span>
-                                                    </div>
-                                                    <div className="divide-y divide-gray-50">
-                                                        {uploadedFiles.map((file) => (
-                                                            <div key={file.id} className="px-3 py-2.5 text-xs text-gray-600 grid grid-cols-12 gap-2 items-center hover:bg-gray-50/50">
-                                                                <span className="col-span-6 font-medium truncate flex items-center gap-2">
-                                                                    <FileText size={14} className="text-slate-400" />
-                                                                    {file.name}
-                                                                </span>
-                                                                <span className="col-span-2 text-gray-400">{file.size}</span>
-                                                                <span className="col-span-3 text-gray-400">{file.uploadedBy} ({file.uploadedAt})</span>
-                                                                <div className="col-span-1 flex justify-center">
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => handleDeleteFile(file.id)}
-                                                                        className="text-gray-400 hover:text-red-500 p-1 rounded hover:bg-red-50 transition-colors"
-                                                                    >
-                                                                        <Trash2 size={14} />
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                                    <DataTable
+                                                        data={uploadedFiles}
+                                                        columns={[
+                                                            {
+                                                                key: 'name',
+                                                                header: 'Dosya Adı',
+                                                                render: (file: any) => (
+                                                                    <div className="font-medium flex items-center gap-2 text-xs">
+                                                                        <FileText size={14} className="text-slate-400" />
+                                                                        {file.name}
+                                                                    </div>
+                                                                )
+                                                            },
+                                                            {
+                                                                key: 'size',
+                                                                header: 'Boyut',
+                                                                render: (file: any) => <span className="text-xs text-gray-500">{file.size}</span>
+                                                            },
+                                                            {
+                                                                key: 'uploadedBy',
+                                                                header: 'Yükleyen',
+                                                                render: (file: any) => <span className="text-xs text-gray-500">{file.uploadedBy} ({file.uploadedAt})</span>
+                                                            },
+                                                            {
+                                                                key: 'actions',
+                                                                header: 'İşlem',
+                                                                align: 'center',
+                                                                render: (file: any) => (
+                                                                    <div className="flex justify-center">
+                                                                        <Tooltip content="Dosyayı Sil">
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => handleDeleteFile(file.id)}
+                                                                                className="text-gray-400 hover:text-red-500 p-1 rounded hover:bg-red-50 transition-colors"
+                                                                            >
+                                                                                <Trash2 size={16} />
+                                                                            </button>
+                                                                        </Tooltip>
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        ]}
+                                                    />
                                                 </div>
                                             )}
                                         </div>
@@ -1867,52 +1886,43 @@ export default function AuditUniversePage() {
                                 {/* Tab 5: Kontrol Matrisi (RCM) */}
                                 {activeTab === 5 && (
                                     <div className="space-y-4">
-                                        <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 mb-4">
-                                            <h4 className="font-semibold text-gray-800 flex items-center gap-2">
-                                                <Shield size={18} className="text-primary" />
-                                                Süreç, Risk & Kontrol Matrisi (RCM)
-                                            </h4>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    onClick={handleExportRCM}
-                                                    leftIcon={<Download size={14} />}
-                                                >
-                                                    Dışa Aktar
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant="primary"
-                                                    size="sm"
-                                                    onClick={handleAddNewControl}
-                                                    leftIcon={<Plus size={14} />}
-                                                >
-                                                    Kontrol Ekle
-                                                </Button>
-                                            </div>
-                                        </div>
-
-                                        {/* IIA Std 2120: RCM Bilgi Kartı */}
-                                        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
-                                            <Shield size={16} className="text-blue-600 mt-0.5 shrink-0" />
-                                            <div className="text-xs text-blue-800">
-                                                <strong>Risk Kontrol Matrisi (RCM)</strong> — IIA Std 2120 uyarınca, her denetlenebilir birim için süreç-risk-kontrol ilişkisini yapılandırılmış biçimde gösterir.
-                                                Bu matris, kontrol etkinliğinin değerlendirilmesi ve denetim kapsamının belirlenmesi için temel referanstır.
-                                            </div>
-                                        </div>
-
                                         <DataTable
+                                            title="Süreç, Risk & Kontrol Matrisi (RCM)"
+                                            rightElement={
+                                                <>
+                                                    <Button
+                                                        type="button"
+                                                        variant="secondary"
+                                                        size="sm"
+                                                        onClick={handleExportRCM}
+                                                        leftIcon={<Download size={14} />}
+                                                    >
+                                                        Dışa Aktar
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="primary"
+                                                        size="sm"
+                                                        onClick={handleAddNewControl}
+                                                        leftIcon={<Plus size={14} />}
+                                                    >
+                                                        Kontrol Ekle
+                                                    </Button>
+                                                </>
+                                            }
+                                            searchTerm={searchTerm}
+                                            onClearFilters={() => setSearchTerm('')}
                                             columns={[
                                                 {
                                                     key: 'process',
                                                     header: 'Süreç / Alt Süreç',
+                                                    sortable: true,
                                                     render: (row: any) => row.processName || row.process || '-'
                                                 },
                                                 {
                                                     key: 'risk',
                                                     header: 'Risk Tanımı',
+                                                    sortable: true,
                                                     render: (row: any) => (
                                                         <Tooltip content={row.riskName || row.risk || '-'}>
                                                             <div className="flex items-center gap-1.5 max-w-[200px]">
@@ -1925,20 +1935,16 @@ export default function AuditUniversePage() {
                                                 {
                                                     key: 'inherentRisk',
                                                     header: 'Doğal Risk',
+                                                    sortable: true,
                                                     align: 'center',
                                                     render: (row: any) => (
-                                                        <span className={clsx(
-                                                            "px-2 py-0.5 rounded text-[10px] font-bold",
-                                                            row.inherentRisk === 'Kritik' ? 'bg-rose-100 text-rose-700' :
-                                                                row.inherentRisk === 'Yüksek' ? 'bg-red-100 text-red-700' :
-                                                                    'bg-orange-100 text-orange-700'
-                                                        )}>
-                                                            {row.inherentRisk || row.level || '-'}
-                                                        </span>
+                                                        <div className="flex justify-center">
+                                                            <StatusBadge value={row.inherentRisk || row.level || '-'} type="risk" size="sm" />
+                                                        </div>
                                                     )
                                                 },
                                                 {
-                                                    key: 'control',
+                                                    key: 'controlName',
                                                     header: 'Kontrol Tanımı',
                                                     sortable: true,
                                                     render: (row: any) => (
@@ -1951,7 +1957,7 @@ export default function AuditUniversePage() {
                                                     )
                                                 },
                                                 {
-                                                    key: 'type',
+                                                    key: 'controlType',
                                                     header: 'Kontrol Türü',
                                                     sortable: true,
                                                     render: (row: any) => <span className="text-gray-600 text-xs">{row.controlType || row.type || '-'}</span>
@@ -1962,39 +1968,33 @@ export default function AuditUniversePage() {
                                                     align: 'center',
                                                     sortable: true,
                                                     render: (row: any) => (
-                                                        <span className={clsx(
-                                                            "px-2 py-0.5 rounded text-[10px] font-bold",
-                                                            row.effectiveness === 'Güçlü' ? 'bg-emerald-100 text-emerald-700' :
-                                                                'bg-yellow-100 text-yellow-700'
-                                                        )}>
-                                                            {row.effectiveness || '-'}
-                                                        </span>
+                                                        <div className="flex justify-center">
+                                                            <StatusBadge value={row.effectiveness || '-'} type="control" size="sm" />
+                                                        </div>
                                                     )
                                                 },
                                                 {
                                                     key: 'testResult',
                                                     header: 'Son Test Sonucu',
+                                                    sortable: true,
                                                     align: 'center',
                                                     render: (row: any) => (
-                                                        row.testResult ? (
-                                                            <span className={clsx(
-                                                                "px-2 py-0.5 rounded text-[10px] font-bold",
-                                                                row.testResult === 'Olumlu' ? 'bg-emerald-100 text-emerald-700' :
-                                                                    row.testResult === 'Koşullu' ? 'bg-amber-100 text-amber-700' :
-                                                                        'bg-red-100 text-red-700'
-                                                            )}>
-                                                                {row.testResult}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="text-gray-400 text-[10px] italic">Test Edilmedi</span>
-                                                        )
+                                                        <div className="flex justify-center">
+                                                            {row.testResult ? (
+                                                                <StatusBadge value={row.testResult} type="result" size="sm" />
+                                                            ) : (
+                                                                <span className="text-gray-400 text-[10px] italic">Test Edilmedi</span>
+                                                            )}
+                                                        </div>
                                                     )
                                                 },
                                                 {
-                                                    key: 'testAuditCode',
-                                                    header: 'Denetim Referansı',
+                                                    key: 'testDate',
+                                                    header: 'Son Test Tarihi',
+                                                    sortable: true,
+                                                    align: 'center',
                                                     render: (row: any) => (
-                                                        row.testAuditCode ? (
+                                                        row.testDate ? (
                                                             <div className="flex flex-col">
                                                                 <span className="text-[10px] font-medium text-primary">{row.testAuditCode}</span>
                                                                 <span className="text-[9px] text-gray-500">{formatDate(row.testDate)}</span>
@@ -2008,13 +2008,28 @@ export default function AuditUniversePage() {
                                                     align: 'center',
                                                     sortable: true,
                                                     render: (row: any) => (
-                                                        <span className={clsx(
-                                                            "px-2 py-0.5 rounded text-[10px] font-bold",
-                                                            row.residualRisk === 'Düşük' ? 'bg-green-100 text-green-700' :
-                                                                'bg-orange-100 text-orange-700'
-                                                        )}>
-                                                            {row.residualRisk || '-'}
-                                                        </span>
+                                                        <div className="flex justify-center">
+                                                            <StatusBadge value={row.residualRisk || '-'} type="risk" size="sm" />
+                                                        </div>
+                                                    )
+                                                },
+                                                {
+                                                    key: 'actions',
+                                                    header: 'İşlemler',
+                                                    align: 'center',
+                                                    render: (row: any) => (
+                                                        <Button
+                                                            type="button"
+                                                            variant="danger"
+                                                            size="sm"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setCustomRcmRows(prev => prev.filter(item => item.id !== row.id));
+                                                            }}
+                                                            leftIcon={<Trash2 size={14} />}
+                                                        >
+                                                            Kaldır
+                                                        </Button>
                                                     )
                                                 }
                                             ]}
@@ -2055,6 +2070,15 @@ export default function AuditUniversePage() {
                     isOpen={scorecardModal.isOpen}
                     onClose={() => setScorecardModal({ isOpen: false, unitName: '' })}
                     unitName={scorecardModal.unitName}
+                />
+            )}
+
+            {/* Kontrol Seçim Modalı */}
+            {isControlPickerOpen && (
+                <ControlPickerModal
+                    isOpen={isControlPickerOpen}
+                    onClose={() => setIsControlPickerOpen(false)}
+                    onAddControls={handleControlsSelected}
                 />
             )}
         </div>

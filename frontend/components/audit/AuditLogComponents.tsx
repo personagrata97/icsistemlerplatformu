@@ -2,7 +2,7 @@ import React from 'react';
 import { ShieldCheck, User, Clock, Database, Activity, FileText, X } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import { AuditLog } from '@/app/audit/logs/page';
-import { formatDateTime } from '@/lib/audit-utils';
+import { formatDateTime, renderSmartText, formatLogDetails } from '@/lib/audit-utils';
 
 // Internal Audit Standard Colors
 export const TYPE_COLORS: Record<string, string> = {
@@ -156,8 +156,8 @@ export function DetailModal({ log, onClose }: { log: AuditLog, onClose: () => vo
                         <Activity size={16} className="text-primary" />
                         İşlem Özeti
                     </h4>
-                    <div className="bg-gray-50/80 p-5 rounded-2xl text-sm text-gray-700 leading-relaxed border border-gray-200/50 italic">
-                        "{String(log.details || '-')}"
+                    <div className="bg-gray-50/80 p-5 rounded-2xl text-sm text-gray-700 leading-relaxed border border-gray-200/50">
+                        {renderSmartText(formatLogDetails(String(log.details || '-')))}
                     </div>
                 </div>
 

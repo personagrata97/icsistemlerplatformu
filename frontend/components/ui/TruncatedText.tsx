@@ -47,29 +47,20 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
         return () => observer.disconnect();
     }, [text, checkTruncation]);
 
-    const content = (
-        <div className={`flex items-center gap-1.5 ${className}`} style={{ maxWidth }}>
-            {icon && (
-                <span className="flex-shrink-0">
-                    {React.isValidElement(icon) ? icon : (() => { const Icon: any = icon; return <Icon size={14} />; })()}
+    return (
+        <Tooltip content={text} position={tooltipPosition} disabled={!isTruncated}>
+            <div className={`flex items-center gap-1.5 ${className}`} style={{ maxWidth }}>
+                {icon && (
+                    <span className="flex-shrink-0">
+                        {React.isValidElement(icon) ? icon : (() => { const Icon: any = icon; return <Icon size={14} />; })()}
+                    </span>
+                )}
+                <span ref={textRef} className="truncate">
+                    {text || '-'}
                 </span>
-            )}
-            <span ref={textRef} className="truncate">
-                {text || '-'}
-            </span>
-        </div>
+            </div>
+        </Tooltip>
     );
-
-    // Sadece metin kırpılmışsa Tooltip göster
-    if (isTruncated) {
-        return (
-            <Tooltip content={text} position={tooltipPosition}>
-                {content}
-            </Tooltip>
-        );
-    }
-
-    return content;
 };
 
 export default TruncatedText;

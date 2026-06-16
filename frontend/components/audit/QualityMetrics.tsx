@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart3, TrendingUp, TrendingDown, CheckCircle, Clock, AlertTriangle, Target, Award, Shield, ListChecks, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, CheckCircle, Clock, AlertTriangle, Shield, ListChecks, AlertCircle } from 'lucide-react';
 import StatCard from '@/components/ui/StatCard';
 import StatusBadge from '@/components/ui/StatusBadge';
 import LoadingState from '@/components/ui/LoadingState';
@@ -196,9 +196,9 @@ export default function QualityMetrics() {
                                                 {metric.trend === 'down' && <TrendingDown size={14} className="text-red-500" />}
                                             </div>
                                         </div>
-                                        <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                        <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2 overflow-hidden">
                                             <div
-                                                className={`h-1.5 rounded-full transition-all duration-500 ${
+                                                className={`h-full transition-all duration-500 ${
                                                     metric.actual >= metric.target ? 'bg-green-500' :
                                                     metric.actual >= metric.target * 0.8 ? 'bg-yellow-500' : 'bg-red-500'
                                                 }`}
@@ -206,14 +206,9 @@ export default function QualityMetrics() {
                                             />
                                         </div>
                                     </div>
-                                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0 ${
-                                        metric.status === 'İyi' ? 'bg-green-100 text-green-700 border-green-200' :
-                                        metric.status === 'Uyarı' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
-                                        metric.status === 'Kritik' ? 'bg-red-100 text-red-700 border-red-200' :
-                                        'bg-gray-100 text-gray-700 border-gray-200'
-                                    }`}>
-                                        {metric.status}
-                                    </span>
+                                    <div className="shrink-0">
+                                        <StatusBadge status={metric.status} />
+                                    </div>
                                 </div>
                             ))}
                             {metrics.length > 6 && (
@@ -229,6 +224,8 @@ export default function QualityMetrics() {
                     <DashboardWidget 
                         widgetType="activities"
                         title="Son Değerlendirmeler"
+                        actionHref="/audit/quality"
+                        actionLabel="Tüm Değerlendirmeleri Gör"
                     >
 
                         {assessments.length === 0 ? (
@@ -245,13 +242,7 @@ export default function QualityMetrics() {
                                 {assessments.slice(0, 4).map((assessment: any) => (
                                     <DashboardListItem
                                         key={assessment.id}
-                                        icon={
-                                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${
-                                                assessment.type === 'İç' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-purple-50 text-purple-600 border-purple-100'
-                                            }`}>
-                                                {assessment.type}
-                                            </span>
-                                        }
+                                        icon={<StatusBadge status={assessment.type === 'İç' ? 'Bilgi' : 'Uyarı'} text={assessment.type} />}
                                         title={assessment.assessor}
                                         rightContent={
                                             <span className="text-xs text-gray-500 font-medium">{formatDate(assessment.date)}</span>
@@ -286,6 +277,8 @@ export default function QualityMetrics() {
                             color="red"
                             icon={Clock}
                             className="border-l-4 border-l-red-500"
+                            actionHref="/audit/quality"
+                            actionLabel="Tüm Aksiyonları Gör"
                         >
                             <div className="space-y-2">
                                 {actions

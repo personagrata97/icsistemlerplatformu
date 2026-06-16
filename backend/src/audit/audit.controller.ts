@@ -39,8 +39,8 @@ export class AuditController {
     // REPORTS & EXECUTIVE SUMMARY
     @Get('executive/stats')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getExecutiveStats(@Request() req: any) {
-        return this.auditService.getExecutiveStats(req.user);
+    async getExecutiveStats(@Request() req: any, @Query('year') year?: string) {
+        return this.auditService.getExecutiveStats(req.user, year);
     }
 
     @Post('reports/generate')
@@ -345,8 +345,10 @@ export class AuditController {
     // AUDITABLE UNITS (UNIVERSE)
     @Get('units')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getUnits(@Request() req: any) {
-        return this.auditService.getUnits(req.user);
+    async getUnits(@Request() req: any, @Query('summary') summary?: string) {
+        // frontend'den /audit/units çağrılırsa default olarak payload bloat'u önlemek için summary=true gibi davranacak
+        const isSummary = summary !== 'false';
+        return this.auditService.getUnits(req.user, isSummary);
     }
     @Post('units')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
@@ -558,13 +560,13 @@ export class AuditController {
     // Staff Career & Education
     @Get('staff/:id/profile')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getStaffProfile(@Param('id') id: string) { return this.auditStaffService.getStaffProfile(id); }
+    async getStaffProfile(@Param('id') id: string, @Req() req: any) { return this.auditStaffService.getStaffProfile(id, req.user); }
 
     @Get('staff/cpe-stats')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getCpeStats(@Query('year') year: string) {
+    async getCpeStats(@Query('year') year: string, @Req() req: any) {
         const targetYear = year ? parseInt(year) : new Date().getFullYear();
-        return this.auditStaffService.getCpeStats(targetYear);
+        return this.auditStaffService.getCpeStats(targetYear, req.user);
     }
 
     // --- Mesleki Eğitim Endpoints ---
@@ -604,6 +606,24 @@ export class AuditController {
     async addStaffExperience(@Param('userId') userId: string, @Body() data: any, @Req() req: any) {
         return this.auditStaffService.addStaffExperience(userId, data, req.user);
     }
+
+    // --- LEAVE ENDPOINTS ---
+    @Post('staff/:userId/leave')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async addStaffLeave(@Param('userId') userId: string, @Body() data: any, @Req() req: any) {
+        return this.auditStaffService.addStaffLeave(userId, data, req.user);
+    }
+    @Put('staff/leave/:id')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async updateStaffLeave(@Param('id') id: string, @Body() data: any, @Req() req: any) {
+        return this.auditStaffService.updateStaffLeave(id, data, req.user);
+    }
+    @Delete('staff/leave/:id')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async deleteStaffLeave(@Param('id') id: string, @Req() req: any) {
+        return this.auditStaffService.deleteStaffLeave(id, req.user);
+    }
+    // -----------------------
     @Put('staff/experience/:id')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
     async updateStaffExperience(@Param('id') id: string, @Body() data: any, @Req() req: any) {

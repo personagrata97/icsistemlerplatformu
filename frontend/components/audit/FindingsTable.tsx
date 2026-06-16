@@ -1,10 +1,12 @@
 import React from 'react';
-import { Clock, Search, FolderOpen } from 'lucide-react';
+import { Clock, Search, FolderOpen, Calendar } from 'lucide-react';
 import Tooltip from '@/components/ui/Tooltip';
+import OverflowTooltip from '@/components/ui/OverflowTooltip';
 import FindingActionButtons from './FindingActionButtons';
 import { getRiskBadgeClass, formatDate } from '@/lib/audit-utils';
 import CodeBadge from '@/components/ui/CodeBadge';
 import StatusBadge from '@/components/ui/StatusBadge';
+import UserCell from '@/components/ui/UserCell';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import { Finding } from '@/lib/audit-api';
 
@@ -53,28 +55,26 @@ const FindingsTable: React.FC<FindingsTableProps> = ({
             sortable: true,
             align: 'left',
             render: (finding: Finding) => (
-                <div className="flex flex-col items-start text-left">
-                    <div className="cell-title">
-                        <Tooltip content={finding.title}>
-                            <span className="truncate max-w-[300px] block">
-                                {finding.title}
-                            </span>
-                        </Tooltip>
+                <div className="flex flex-col items-start text-left w-full min-w-0">
+                    <div className="cell-title w-full min-w-0">
+                        <OverflowTooltip content={finding.title} className="max-w-full min-w-0">
+                            {finding.title}
+                        </OverflowTooltip>
                     </div>
-                    <div className="cell-subtitle flex items-center gap-2 mt-1 justify-start">
-                        <Tooltip content={finding.audit?.title || ''}>
-                            <span className="truncate max-w-[200px] block">{finding.audit?.title || (finding.auditId ? `Denetim #${finding.auditId}` : '')}</span>
-                        </Tooltip>
+                    <div className="cell-subtitle flex items-center gap-2 mt-1 justify-start w-full min-w-0">
+                        <OverflowTooltip content={finding.audit?.title || ''} className="max-w-full flex-1 min-w-0">
+                            {finding.audit?.title || (finding.auditId ? `Denetim #${finding.auditId}` : '')}
+                        </OverflowTooltip>
                         {finding.category && (
                             <>
-                                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                                <span className="truncate max-w-[150px] text-gray-500">{finding.category}</span>
+                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0"></span>
+                                <span className="truncate max-w-[150px] text-gray-500 shrink-0">{finding.category}</span>
                             </>
                         )}
                         {finding.linkedEthicsReportId && (
                             <>
-                                <span className="w-1 h-1 rounded-full bg-blue-300"></span>
-                                <span className="flex items-center gap-1 text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 uppercase tracking-tight">
+                                <span className="w-1 h-1 rounded-full bg-blue-300 shrink-0"></span>
+                                <span className="flex items-center gap-1 text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 uppercase tracking-tight shrink-0">
                                     <Search size={10} /> Etik Bağlantılı
                                 </span>
                             </>
@@ -84,21 +84,12 @@ const FindingsTable: React.FC<FindingsTableProps> = ({
             )
         },
         ...(!isUnit ? [{
-            key: 'risk',
+            key: 'riskLevel',
             header: 'Risk',
             sortable: true,
             width: '120px',
             align: 'center',
-            type: 'risk',
-            render: (item: any) => {
-                const val = item.risk || item.riskLevel;
-                if (!val) return '-';
-                return (
-                    <div className="flex justify-center">
-                        <span className={`badge ${getRiskBadgeClass(val)}`}>{val}</span>
-                    </div>
-                );
-            }
+            type: 'risk'
         } as Column<Finding>] : []),
         {
             key: 'status',
@@ -109,17 +100,12 @@ const FindingsTable: React.FC<FindingsTableProps> = ({
             type: 'status'
         },
         {
-            key: 'dueDate',
+            key: 'computedDueDate',
             header: 'Aksiyon Tarihi',
             sortable: true,
             width: '150px',
             align: 'center',
-            render: (item: any) => {
-                // followUps dizisindeki son tarihi veya eylem tarihini almaya çalışalım
-                const date = item.dueDate || (item.followUps && item.followUps.length > 0 ? item.followUps[0].deadline : null);
-                if (!date) return <span className="text-gray-400">-</span>;
-                return formatDate(date);
-            }
+            type: 'date'
         },
         ...(!isUnit ? [{
             key: 'assignedUser',
@@ -127,22 +113,7 @@ const FindingsTable: React.FC<FindingsTableProps> = ({
             sortable: true,
             width: '180px',
             align: 'center',
-            render: (item: any) => {
-                // Denetim ekibinden başmüfettişi veya ilgiliyi çekebiliriz ya da owner bilgisini gösterebiliriz
-                // Prisma Finding modelinde direkt assignedUser yok, audit.team den çekilebilir
-                const team = item.audit?.team;
-                let userStr = '-';
-                if (typeof team === 'string') {
-                    try {
-                        const parsed = JSON.parse(team);
-                        userStr = parsed[0]?.name || '-';
-                    } catch { }
-                } else if (Array.isArray(team) && team.length > 0) {
-                    userStr = team[0].name;
-                }
-                
-                return <span className="text-gray-600 font-medium">{userStr}</span>;
-            }
+            type: 'user'
         } as Column<Finding>] : []),
         {
             key: 'actions',
@@ -167,10 +138,31 @@ const FindingsTable: React.FC<FindingsTableProps> = ({
         }
     ];
 
+    const enhancedFindings = findings.map(item => {
+        const date = item.dueDate || (item.followUps && item.followUps.length > 0 ? item.followUps[0].deadline : null);
+        
+        let userStr = '';
+        const team = item.audit?.team;
+        if (typeof team === 'string') {
+            try {
+                const parsed = JSON.parse(team);
+                userStr = parsed[0]?.name || '';
+            } catch { }
+        } else if (Array.isArray(team) && team.length > 0) {
+            userStr = team[0].name;
+        }
+
+        return {
+            ...item,
+            computedDueDate: date,
+            assignedUser: userStr || undefined
+        };
+    });
+
     return (
         <DataTable
             columns={columns}
-            data={findings}
+            data={enhancedFindings}
             loading={loading}
             rowKey="id"
             paginated={false}

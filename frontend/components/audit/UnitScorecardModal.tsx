@@ -75,7 +75,7 @@ export default function UnitScorecardModal({ isOpen, onClose, unitName }: UnitSc
                             value={scorecard.kapaliBulgu}
                             icon={<CheckCircle size={20} />}
                             color="green"
-                            infoTooltip="Aksiyonu alınmış ve denetçi tarafından onaylanarak tamamen kapatılmış bulgu sayısıdır."
+                            infoTooltip="Aksiyonu alınmış ve müfettiş tarafından onaylanarak tamamen kapatılmış bulgu sayısıdır."
                         />
                         <StatCard
                             title="Tekerrür"

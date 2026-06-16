@@ -4,6 +4,7 @@ import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
 import DatePicker from '@/components/ui/DatePicker';
 import FormTextarea from '@/components/ui/FormTextarea';
+import FormField from '@/components/ui/FormField';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 
 const TITLES = [
@@ -68,8 +69,7 @@ export default function PromotionModal({
                     </div>
                 )}
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="form-group">
-                        <label className="form-label">İşlem Tipi</label>
+                    <FormField label="İşlem Tipi">
                         <CustomSelect
                             value={promotionForm.type}
                             onChange={val => setPromotionForm({ ...promotionForm, type: val as string })}
@@ -79,20 +79,18 @@ export default function PromotionModal({
                                 { value: 'Geçici Görevlendirme', label: 'Geçici Görevlendirme' }
                             ]}
                         />
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Tarih</label>
+                    </FormField>
+                    <FormField label="Tarih">
                         <DatePicker 
                             value={promotionForm.promotionDate} 
                             onChange={(val) => setPromotionForm({ ...promotionForm, promotionDate: val })} 
                             required={true} 
                         />
-                    </div>
+                    </FormField>
                 </div>
                 {(promotionForm.type === 'Atama' || promotionForm.type === 'Geçici Görevlendirme') && (
                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
-                        <div className="form-group">
-                            <label className="form-label">Yeni Üst Birim / Grup</label>
+                        <FormField label="Yeni Üst Birim / Grup">
                             <CustomSelect
                                 value={selectedParentDept}
                                 onChange={val => {
@@ -107,49 +105,49 @@ export default function PromotionModal({
                                 )}
                                 placeholder="Grup seçiniz..."
                             />
-                        </div>
+                        </FormField>
                         {selectedParentDept && (
-                            <div className="form-group animate-in fade-in slide-in-from-top-1">
-                                <label className="form-label">Yeni Birim / Servis</label>
-                                <CustomSelect
-                                    value={promotionForm.department}
-                                    onChange={val => setPromotionForm({ ...promotionForm, department: val as string })}
-                                    options={(function () {
-                                        const flatten = (items: Array<{ title: string; children?: any[] }>, level: number = 0): Array<{ value: string; label: string }> => {
-                                            return items.flatMap(item => {
-                                                const current = {
-                                                    value: item.title,
-                                                    label: (level > 0 ? '→ '.repeat(level) + ' ' : '') + item.title
-                                                };
-                                                if (item.children) {
-                                                    return [current, ...flatten(item.children, level + 1)];
-                                                }
-                                                return [current];
-                                            });
-                                        };
+                            <div className="animate-in fade-in slide-in-from-top-1">
+                                <FormField label="Yeni Birim / Servis">
+                                    <CustomSelect
+                                        value={promotionForm.department}
+                                        onChange={val => setPromotionForm({ ...promotionForm, department: val as string })}
+                                        options={(function () {
+                                            const flatten = (items: Array<{ title: string; children?: any[] }>, level: number = 0): Array<{ value: string; label: string }> => {
+                                                return items.flatMap(item => {
+                                                    const current = {
+                                                        value: item.title,
+                                                        label: (level > 0 ? '→ '.repeat(level) + ' ' : '') + item.title
+                                                    };
+                                                    if (item.children) {
+                                                        return [current, ...flatten(item.children, level + 1)];
+                                                    }
+                                                    return [current];
+                                                });
+                                            };
 
-                                        for (const group of HIERARCHY) {
-                                            const child = group.children.find(c => c.title === selectedParentDept);
-                                            if (child && 'children' in child) {
-                                                return flatten((child as { children: any[] }).children);
+                                            for (const group of HIERARCHY) {
+                                                const child = group.children.find(c => c.title === selectedParentDept);
+                                                if (child && 'children' in child) {
+                                                    return flatten((child as { children: any[] }).children);
+                                                }
                                             }
-                                        }
-                                        return DEPARTMENTS.map(d => ({ value: d, label: d }));
-                                    })()}
-                                    placeholder="Birim seçiniz..."
-                                />
+                                            return DEPARTMENTS.map(d => ({ value: d, label: d }));
+                                        })()}
+                                        placeholder="Birim seçiniz..."
+                                    />
+                                </FormField>
                             </div>
                         )}
                     </div>
                 )}
-                <div className="form-group">
-                    <label className="form-label">Yeni Ünvan</label>
+                <FormField label="Yeni Ünvan">
                     <CustomSelect
                         value={promotionForm.title}
                         onChange={val => setPromotionForm({ ...promotionForm, title: val as string })}
                         options={TITLES.map(t => ({ value: t, label: t }))}
                     />
-                </div>
+                </FormField>
                 <FormTextarea
                     label="Notlar"
                     className="min-h-[80px]"

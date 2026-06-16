@@ -9,11 +9,11 @@ import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import { Edit2, CheckCircle, MessageSquare, AlertTriangle, FileText, Link2, UserPlus, ShieldCheck, X, Paperclip, ExternalLink, Download, Send, History, Briefcase, ChevronDown, ChevronUp, Save, User, Clock, Copy } from 'lucide-react';
 import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
-import ProcessTimeline from '@/components/ui/ProcessTimeline';
+import Timeline from '@/components/ui/Timeline';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/ui/Button';
 import Switch from '@/components/ui/Switch';
-import { formatDate, formatDateTime, DISCIPLINARY_ACTIONS } from '@/lib/audit-utils';
+import { formatDate, formatDateTime, DISCIPLINARY_ACTIONS, renderSmartText, formatLogDetails } from '@/lib/audit-utils';
 import StaffMultiSelect from '@/components/audit/StaffMultiSelect';
 import EvidenceList from '@/components/audit/ethics/EvidenceList';
 
@@ -711,7 +711,21 @@ export default function ViewEthicsReportModal({
                             </div>
                         ) : (
                             <div className="relative pl-0">
-                                <ProcessTimeline items={fullReport?.logs || []} />
+                                <Timeline 
+                                    events={fullReport?.logs?.map((log: any, index: number) => ({
+                                        id: index.toString(),
+                                        timestamp: log.date ? new Date(log.date).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '',
+                                        user: log.user || 'Sistem',
+                                        title: log.action || 'İşlem',
+                                        actionType: log.action?.toLowerCase().includes('güncelle') ? 'update' : 'default',
+                                        description: (
+                                            <div className="leading-relaxed">
+                                                {renderSmartText(formatLogDetails(log.details || log.description || ''))}
+                                            </div>
+                                        )
+                                    })) || []} 
+                                    emptyStateMessage="Süreç geçmişi bulunmuyor."
+                                />
                             </div>
                         )}
                     </div>

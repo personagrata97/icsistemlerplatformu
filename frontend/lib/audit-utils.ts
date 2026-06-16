@@ -1,6 +1,27 @@
 // import type { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { ORG } from './org-config';
+import { AuditStaff } from './audit-api';
+
+export const extractYear = (dateValue: any) => {
+    if (!dateValue) return null;
+    const d = new Date(dateValue);
+    if (isNaN(d.getTime())) return null;
+    return d.getFullYear().toString();
+};
+
+export const filterByYear = (items: any[], dateFieldPriorities: string[], selectedYear: string) => {
+    if (selectedYear === 'Tümü') return items;
+    return items.filter(item => {
+        // Check fields in priority order to prevent duplicate multi-year counting
+        for (const field of dateFieldPriorities) {
+            if (item[field]) {
+                return extractYear(item[field]) === selectedYear;
+            }
+        }
+        return false;
+    });
+};
 
 // Eski Durum Renkleri - HEX formatı (stil nitelikleri için)
 export const getStatusColor = (status: string): string => {
@@ -14,6 +35,7 @@ export const getStatusColor = (status: string): string => {
         case 'Açık': return '#ef4444';
         case 'Kapalı': return '#10b981';
         case 'Onaylandı': return '#10b981';
+        case 'Risk Kabul Edildi': return '#8b5cf6';
         case 'Onayda': return '#f59e0b';
         case 'Reddedildi': return '#ef4444';
         case 'Yeni': return '#3b82f6';
@@ -231,6 +253,70 @@ export const formatPhone = (phone?: string): string => {
     }
     
     return phone;
+};
+
+// ============================================================
+// LOG FORMATTING & SMART TEXT (Merkezi Log Ayrıştırıcıları)
+// ============================================================
+
+export const translateLogKey = (key: string): string => {
+    const dictionary: Record<string, string> = {
+        title: 'Başlık', status: 'Durum', code: 'Denetim No', type: 'Tür', period: 'Dönem', objective: 'Amaç', scope: 'Kapsam',
+        methodology: 'Metodoloji', expectedStartDate: 'Beklenen Başlangıç', expectedEndDate: 'Beklenen Bitiş',
+        assignedTo: 'Atanan', targetType: 'Hedef Türü', targetId: 'Hedef ID', targetValue: 'Hedef Değer', resultValue: 'Sonuç',
+        comments: 'Yorumlar', conclusion: 'Sonuç', riskScore: 'Risk Skoru', priority: 'Öncelik', recommendedAction: 'Önerilen Aksiyon',
+        dueDate: 'Son Tarih', actualStartDate: 'Gerçekleşen Başlangıç', actualEndDate: 'Gerçekleşen Bitiş', totalHours: 'Toplam Saat',
+        team: 'Denetim Ekibi', createdAt: 'Oluşturulma Tarihi', updatedAt: 'Güncellenme Tarihi', startDate: 'Başlangıç Tarihi',
+        endDate: 'Bitiş Tarihi', auditCode: 'Denetim Kodu', creatorId: 'Oluşturan ID', isDeleted: 'Silinme Durumu',
+        description: 'Açıklama', name: 'İsim'
+    };
+    return dictionary[key] || key;
+};
+
+export const formatTargetType = (type: string): string => {
+    const map: Record<string, string> = {
+        'Audit': 'Denetim', 'AuditTeam': 'Denetim Ekip Üyesi', 'Finding': 'Bulgu', 'Action': 'Aksiyon',
+        'User': 'Kullanıcı', 'Report': 'Rapor'
+    };
+    return map[type] || type;
+};
+
+export const formatLogDetails = (details: string): string => {
+    if (!details) return '';
+    let formatted = details;
+    formatted = formatted.replace(/Audit updated/gi, 'Denetim bilgileri güncellendi');
+    formatted = formatted.replace(/Audit created/gi, 'Yeni denetim oluşturuldu');
+    formatted = formatted.replace(/Meeting scheduled/gi, 'Yeni toplantı planlandı');
+    formatted = formatted.replace(/Meeting updated/gi, 'Toplantı güncellendi');
+    formatted = formatted.replace(/Communication added/gi, 'Yeni iletişim kaydı eklendi');
+    formatted = formatted.replace(/Team member added/gi, 'Ekibe yeni üye eklendi');
+    formatted = formatted.replace(/Team member removed/gi, 'Ekip üyesi çıkarıldı');
+    formatted = formatted.replace(/Attachment added/gi, 'Çalışma kâğıdı eklendi');
+    formatted = formatted.replace(/Target updated: (.*)/gi, '$1 güncellendi');
+    formatted = formatted.replace(/Değişiklikler: (.*)/gi, (match, p1) => {
+        const translatedFields = p1.split(',').map((f: string) => translateLogKey(f.trim())).join(', ');
+        return `Güncellenen alanlar: ${translatedFields}`;
+    });
+    formatted = formatted.replace(/Sistem üzerinde (.*?) nesnesine yönelik veri (.*?) işlemi yapıldı\./gi, (match, p1, p2) => {
+        return `${formatTargetType(p1.trim())} modülünde başarıyla ${p2} işlemi gerçekleştirildi.`;
+    });
+    formatted = formatted.replace(/undefined ekipten çıkarıldı/gi, 'Belirtilmeyen bir kişi ekipten çıkarıldı');
+    formatted = formatted.replace(/undefined/gi, 'Bilinmeyen Veri');
+    return formatted;
+};
+
+import React from 'react';
+export const renderSmartText = (text: string): React.ReactNode[] | null => {
+    if (!text) return null;
+    const parts = text.split(/([\w.-]+@[\w.-]+\.\w+)|(".*?")|([A-Z]{2,4}-\d{4}-\d{3,4})|(Alıcı:|Sorumlu:|Gerekçe:|Açıklama:)/g);
+    return parts.map((part, i) => {
+        if (!part) return null;
+        if (/^[\w.-]+@[\w.-]+\.\w+$/.test(part)) return React.createElement('a', { key: i, href: `mailto:${part}`, className: "font-bold text-indigo-600 hover:text-indigo-800 hover:underline" }, part);
+        if (/^".*"$/.test(part)) return React.createElement('span', { key: i, className: "font-bold text-slate-900 bg-slate-100/50 px-1 rounded mx-0.5" }, part);
+        if (/^[A-Z]{2,4}-\d{4}-\d{3,4}$/.test(part)) return React.createElement('span', { key: i, className: "inline-flex items-center px-1.5 py-0.5 bg-slate-200/70 text-slate-700 text-[11px] font-bold rounded font-mono mx-0.5 border border-slate-300/50" }, part);
+        if (/^(Alıcı:|Sorumlu:|Gerekçe:|Açıklama:)$/.test(part)) return React.createElement('span', { key: i, className: "font-extrabold text-slate-800" }, part);
+        return React.createElement('span', { key: i }, part);
+    });
 };
 
 // Holiday Cache
@@ -568,7 +654,7 @@ export const generateSamplingReport = async (plan: any) => {
 
     autoTable(doc, {
         startY: currentY,
-        head: [['Denetçi Analizi / Kriter', 'Değerlendirme Özeti ve Gerekçeler']],
+        head: [['Müfettiş Analizi / Kriter', 'Değerlendirme Özeti ve Gerekçeler']],
         body: results,
         theme: 'grid',
         headStyles: { fillColor: PDF_COLORS.primary as any, textColor: PDF_COLORS.white as any, fontStyle: 'bold' },
@@ -762,4 +848,106 @@ export const generateEnhancedSamplingExcel = async (plan: any, rawData?: any[]) 
     // Download the workbook
     const fileName = `Orneklem_Raporu_${plan.title?.substring(0, 20).replace(/\s+/g, '_') || 'Detay'}.xlsx`;
     XLSX.writeFile(workbook, fileName);
+};
+
+// Fotoğraf URL yardımcısı
+export const getPhotoUrl = (url?: string) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const origin = apiUrl.replace(/\/api\/v1\/?$/, '');
+    return `${origin}${url}`;
+};
+
+// Skill Engine: Dinamik Yetkinlik Hesaplama Motoru (Auto-Scoring - Teammate/Pentana Standardı)
+export const calculateDynamicSkills = (row: AuditStaff) => {
+    // 1. Temel Puanlar (Yöneticinin manuel verdiği baz puanlar)
+    let baseSkills: Record<string, number> = {};
+    try {
+        baseSkills = JSON.parse(row.skills || '{}');
+    } catch (e) {
+        baseSkills = {};
+    }
+
+    const hybridSkills: Record<string, { total: number, base: number, bonus: number, reasons: string[] }> = {};
+    const keys = ['risk_assessment', 'it_audit', 'financial_audit', 'data_analysis', 'reporting_english'];
+    
+    // Eğitim (CPE) Puanı Hesaplama Algoritması İçin Veri Toplama
+    let dataHours = 0;
+    let itHours = 0;
+    let riskHours = 0;
+
+    const currentYear = new Date().getFullYear();
+
+    if (row.trainings && Array.isArray(row.trainings)) {
+        row.trainings.forEach(t => {
+            // Yıl Sonu Devir İşlemi: Yalnızca mevcut yıla ait CPE eğitimleri Dinamik Puanı etkiler
+            const tDateStr = t.date || t.startDate || t.endDate;
+            let tYear = currentYear; // Tarih yoksa varsayılan olarak kabul et
+            if (tDateStr) {
+                const d = new Date(tDateStr);
+                if (!isNaN(d.getTime())) {
+                    tYear = d.getFullYear();
+                }
+            }
+
+            // Geçmiş yıllara ait eğitimler arşivlenir, bu yılın Dinamik Çarpanına katılmaz
+            if (tYear !== currentYear) return;
+
+            const h = Number(t.duration || t.hours || t.cpeCredits || 0);
+            const name = (t.name || t.title || '').toLowerCase();
+            if (name.includes('veri') || name.includes('data') || name.includes('sql') || name.includes('analiz') || name.includes('python') || name.includes('yapay zeka') || name.includes(' ai') || name.includes('machine learning') || name.includes('powerbi') || name.includes('tableau')) dataHours += h;
+            if (name.includes('siber') || name.includes('it ') || name.includes('bilgi') || name.includes('cyber') || name.includes('network') || name.includes('ağ') || name.includes('pentest')) itHours += h;
+            if (name.includes('risk') || name.includes('kontrol') || name.includes('mevzuat') || name.includes('uyum') || name.includes('compliance') || name.includes('fraud') || name.includes('suistimal') || name.includes('denetim')) riskHours += h;
+        });
+    }
+
+    keys.forEach(key => {
+        const base = Number(baseSkills[key] || 0);
+        let bonus = 0;
+        const reasons: string[] = [];
+
+        // Kıdem / Tecrübe Katsayısı
+        let titleBonus = 0;
+        if (row.title?.includes('Kıdemli')) {
+            titleBonus = 0.5;
+            reasons.push('Kıdem Katsayısı (+0.5)');
+        } else if (row.title?.includes('Başmüfettiş') || row.title?.includes('Müdür') || row.title?.includes('CAE') || row.title?.includes('Yönetici') || row.title?.includes('Başkan')) {
+            titleBonus = 1.0;
+            reasons.push('Yönetici Katsayısı (+1.0)');
+        } else {
+            reasons.push('Ünvan/Kıdem Katsayısı (+0.0)');
+        }
+        bonus += titleBonus;
+
+        // Eğitim (CPE) Bazlı Otomatik Katsayı Puan (Her 15 saatte +0.5)
+        let eduBonus = 0;
+        let eduName = '';
+        
+        if (key === 'data_analysis') {
+            eduBonus = Math.min(1.0, Math.floor(dataHours / 15) * 0.5);
+            eduName = 'Veri Analitiği Eğitimi (CPE)';
+        } else if (key === 'it_audit') {
+            eduBonus = Math.min(1.0, Math.floor(itHours / 15) * 0.5);
+            eduName = 'Siber Güvenlik Eğitimi (CPE)';
+        } else if (key === 'risk_assessment') {
+            eduBonus = Math.min(1.0, Math.floor(riskHours / 15) * 0.5);
+            eduName = 'Risk/Kontrol Eğitimi (CPE)';
+        } else if (key === 'financial_audit') {
+            eduName = 'Finansal Denetim Eğitimi (CPE)';
+        } else if (key === 'reporting_english') {
+            eduName = 'Raporlama Eğitimi (CPE)';
+        }
+
+        bonus += eduBonus;
+        reasons.push(`${eduName} (+${eduBonus.toFixed(1)})`);
+
+        // Final Puanı max limiti (4.0) aşamaz
+        let total = base + bonus;
+        if (total > 4.0) total = 4.0;
+
+        hybridSkills[key] = { base, bonus, total, reasons };
+    });
+
+    return hybridSkills;
 };

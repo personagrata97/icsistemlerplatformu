@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Suspense } from 'react';
+import LoadingState from '@/components/ui/LoadingState';
 import { createPortal } from 'react-dom';
 import {
     AlertCircle, Eye, History as HistoryIcon, Trash2, Send, Save, ArrowLeft, Loader2, Wand2,
@@ -96,16 +97,19 @@ function FindingsPageContent() {
         loadData();
     }, []);
 
-    // URL parametrelerini doğrudan bağlantı için işle
     const searchParams = useSearchParams();
     const linkedId = searchParams.get('id');
     const linkedStatus = searchParams.get('status');
+    const linkedRisk = searchParams.get('risk');
 
     useEffect(() => {
         if (linkedStatus) {
             setFilterStatus(linkedStatus.split(','));
         }
-    }, [linkedStatus]);
+        if (linkedRisk) {
+            setFilterRisk(linkedRisk.split(','));
+        }
+    }, [linkedStatus, linkedRisk]);
 
     useEffect(() => {
         if (linkedId && findings.length > 0) {
@@ -1002,7 +1006,7 @@ function FindingsPageContent() {
 
 export default function FindingsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-400">Yükleniyor...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingState message="Sayfa Yükleniyor..." /></div>}>
       <FindingsPageContent />
     </Suspense>
   );

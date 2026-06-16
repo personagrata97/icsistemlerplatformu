@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, FileText, Target, Users, Bot, Sparkles, ChevronRight, X } from 'lucide-react';
+import { Calendar, FileText, Target, Users, Sparkles } from 'lucide-react';
 import { auditApi, AuditStaff } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -9,8 +9,8 @@ import StaffSelect from '@/components/audit/StaffSelect';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import Checkbox from '@/components/ui/Checkbox';
 import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
+import { calculateDynamicSkills } from '@/lib/audit-utils';
 
 interface CreateAuditModalProps {
     isOpen: boolean;
@@ -158,6 +158,39 @@ export default function CreateAuditModal({ isOpen, onClose, onSuccess, staffList
             setHasSubUnits(true);
         }
     }, [selectedParentDept]);
+
+    // Kaynak Planlama: İzin Kontrolü
+    const leaveWarnings = React.useMemo(() => {
+        if (!formData.plannedStartDate || !formData.plannedEndDate) return [];
+        const warnings: { name: string; dateStr: string; type: string }[] = [];
+        const selectedIds = [...formData.auditors];
+        if (formData.supervisor) selectedIds.push(formData.supervisor);
+
+        const sDate = new Date(formData.plannedStartDate);
+        const eDate = new Date(formData.plannedEndDate);
+
+        selectedIds.forEach(id => {
+            const staff = staffList.find(s => s.id === id);
+            if (staff && staff.leaves) {
+                const overlappingLeaves = staff.leaves.filter((leave: any) => {
+                    if (leave.status === 'İptal Edildi') return false;
+                    const lsDate = new Date(leave.startDate);
+                    const leDate = new Date(leave.endDate);
+                    // Overlap logic: Start A <= End B and End A >= Start B
+                    return sDate <= leDate && eDate >= lsDate;
+                });
+                
+                overlappingLeaves.forEach((leave: any) => {
+                    warnings.push({
+                        name: staff.name,
+                        dateStr: `${new Date(leave.startDate).toLocaleDateString('tr-TR')} - ${new Date(leave.endDate).toLocaleDateString('tr-TR')}`,
+                        type: leave.type
+                    });
+                });
+            }
+        });
+        return warnings;
+    }, [formData.auditors, formData.supervisor, formData.plannedStartDate, formData.plannedEndDate, staffList]);
 
     // Fetch processes when department changes and type is 'Süreç Denetimi'
     useEffect(() => {
@@ -528,6 +561,24 @@ export default function CreateAuditModal({ isOpen, onClose, onSuccess, staffList
                             />
                         </div>
 
+                        {leaveWarnings.length > 0 && (
+                            <div className="bg-red-50 p-4 rounded-xl border border-red-200 animate-in fade-in slide-in-from-top-2">
+                                <h4 className="text-sm font-bold text-red-800 mb-2 flex items-center gap-2">
+                                    <Target size={16} /> Kapasite / İzin Uyarısı
+                                </h4>
+                                <ul className="space-y-1.5">
+                                    {leaveWarnings.map((warn, idx) => (
+                                        <li key={idx} className="text-sm text-red-700 flex items-start gap-2">
+                                            <span className="mt-1">•</span>
+                                            <span>
+                                                <strong>{warn.name}</strong>, planlanan tarihler arasında ({warn.dateStr}) <strong>{warn.type}</strong> iznindedir. Lütfen planlamayı gözden geçirin.
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
                         <div className="bg-orange-50/50 p-4 rounded-xl border border-orange-100">
                             <h4 className="text-sm font-bold text-orange-800 mb-3 flex items-center gap-2">
                                 <Users size={16} /> Denetim Ekibi
@@ -552,6 +603,66 @@ export default function CreateAuditModal({ isOpen, onClose, onSuccess, staffList
                                         isMulti
                                         excludeIds={formData.supervisor ? [formData.supervisor] : []}
                                     />
+                                    
+                                    {/* Smart Resource Allocation (Akıllı Kaynak Atama) */}
+                                    {(() => {
+                                        if (!staffList || staffList.length === 0) return null;
+                                        
+                                        let targetSkill: 'risk_assessment' | 'it_audit' | 'financial_audit' | 'data_analysis' | 'reporting_english' = 'risk_assessment';
+                                        
+                                        if (formData.type === 'Bilgi Teknolojileri Denetimi' || formData.department.includes('Bilgi Teknolojileri') || formData.department.includes('Sistem') || formData.department.includes('Yazılım')) {
+                                            targetSkill = 'it_audit';
+                                        } else if (formData.type === 'Soruşturma' || formData.title.toLowerCase().includes('veri')) {
+                                            targetSkill = 'data_analysis';
+                                        } else if (formData.type === 'Birim Denetimi' && (formData.department.includes('Finans') || formData.department.includes('Muhasebe'))) {
+                                            targetSkill = 'financial_audit';
+                                        } else if (formData.title.toLowerCase().includes('rapor')) {
+                                            targetSkill = 'reporting_english';
+                                        }
+
+                                        const skillNames = {
+                                            risk_assessment: 'Risk Yönetimi',
+                                            it_audit: 'BT ve Siber Güvenlik',
+                                            financial_audit: 'Finansal & Uyum',
+                                            data_analysis: 'Veri Analitiği',
+                                            reporting_english: 'Raporlama'
+                                        };
+
+                                        const ranked = staffList
+                                            .filter(s => (s.title || s.role || '').toLowerCase().includes('müfettiş') || (s.title || s.role || '').toLowerCase().includes('uzman'))
+                                            .filter(s => !formData.auditors.includes(s.id) && formData.supervisor !== s.id)
+                                            .map(s => ({
+                                                id: s.id,
+                                                name: s.name,
+                                                score: calculateDynamicSkills(s as any)[targetSkill].total
+                                            }))
+                                            .sort((a, b) => b.score - a.score)
+                                            .slice(0, 3);
+
+                                        if (ranked.length === 0) return null;
+
+                                        return (
+                                            <div className="mt-3 bg-indigo-50/60 p-3 rounded-lg border border-indigo-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <div className="text-[11px] font-bold text-indigo-800 flex items-center gap-1.5 mb-2.5">
+                                                    <Sparkles size={13} className="text-indigo-500" />
+                                                    Akıllı Önerme (En Yüksek {skillNames[targetSkill]} Puanı)
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {ranked.map(rec => (
+                                                        <button
+                                                            key={rec.id}
+                                                            type="button"
+                                                            onClick={() => setFormData({...formData, auditors: [...formData.auditors, rec.id]})}
+                                                            className="group flex items-center gap-2 bg-white border border-indigo-200 text-indigo-700 pl-2.5 pr-1 py-1 rounded-full hover:bg-indigo-500 hover:text-white hover:border-indigo-600 transition-all shadow-sm"
+                                                        >
+                                                            <span className="text-[11px] font-medium">{rec.name}</span>
+                                                            <span className="text-[10px] font-bold bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded-full group-hover:bg-indigo-600 group-hover:text-white transition-colors">{rec.score}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         </div>

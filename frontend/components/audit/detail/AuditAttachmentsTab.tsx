@@ -7,6 +7,7 @@ import DataTable, { Column } from '@/components/ui/DataTable';
 import ActionMenu from '@/components/ui/ActionMenu';
 import Modal from '@/components/ui/Modal';
 import TruncatedText from '@/components/ui/TruncatedText';
+import SectionHeader from '@/components/ui/SectionHeader';
 
 interface Attachment {
     id: string;
@@ -137,19 +138,15 @@ const AuditAttachmentsTab: React.FC<AuditAttachmentsTabProps> = ({
 
     return (
         <div className="card !p-0 shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-4 border-b flex flex-wrap justify-between items-center gap-3 bg-gray-50/50 rounded-t-lg">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
-                    {isReportTab ? (
-                        <FileText size={20} className="text-primary" />
-                    ) : (
-                        <Paperclip size={20} className="text-primary" />
-                    )}
-                    {title || 'Çalışma Kâğıtları'}
-                </h3>
-                <Button size="sm" onClick={onAddAttachment} className="gap-2" variant="primary">
-                    <Plus size={16} /> {isReportTab ? 'Yeni Rapor Eki Ekle' : 'Yeni Çalışma Kâğıdı Ekle'}
-                </Button>
-            </div>
+            <SectionHeader 
+                title={title || 'Çalışma Kâğıtları'}
+                icon={isReportTab ? FileText : Paperclip}
+                actionButton={
+                    <Button size="sm" onClick={onAddAttachment} className="gap-2" variant="primary">
+                        <Plus size={16} /> {isReportTab ? 'Yeni Rapor Eki Ekle' : 'Yeni Çalışma Kâğıdı Ekle'}
+                    </Button>
+                }
+            />
             
             <DataTable
                 columns={columns}

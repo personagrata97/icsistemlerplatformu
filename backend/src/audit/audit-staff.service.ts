@@ -99,7 +99,8 @@ export class AuditStaffService {
         }
     }
 
-    async getCpeStats(year: number) {
+    async getCpeStats(year: number, user?: any) {
+        const isAdmin = this.isAdmin(user);
         try {
             const staffList = await this.prisma.user.findMany({
                 where: {
@@ -133,6 +134,9 @@ export class AuditStaffService {
                 if (currentYearHours > prevYearHours) trend = 'up';
                 else if (currentYearHours < prevYearHours) trend = 'down';
 
+                const isSelf = user?.id === staff.id;
+                const canViewDetails = isAdmin || isSelf;
+
                 return {
                     id: staff.id,
                     name: staff.displayName || staff.username,
@@ -140,7 +144,7 @@ export class AuditStaffService {
                     totalHours: currentYearHours,
                     previousYearHours: prevYearHours,
                     trend: trend,
-                    trainings: currentYearTrainings
+                    trainings: canViewDetails ? currentYearTrainings : []
                 };
             });
         } catch (error) {
@@ -261,7 +265,9 @@ export class AuditStaffService {
                     jobDescription: data.jobDescription,
                     photoUrl: data.photoUrl,
                     skills: data.skills,
-                    certifications: data.certifications ? (typeof data.certifications === 'string' ? data.certifications : JSON.stringify(data.certifications)) : '[]'
+                    certifications: data.certifications ? (typeof data.certifications === 'string' ? data.certifications : JSON.stringify(data.certifications)) : '[]',
+                    departureDate: data.status === 'Pasif' ? (data.departureDate ? new Date(data.departureDate).toISOString() : new Date().toISOString()) : null,
+                    separationReason: data.status === 'Pasif' ? (data.passiveReason || 'Belirtilmedi') : null
                 },
             });
 
@@ -411,7 +417,10 @@ export class AuditStaffService {
         }
     }
 
-    async getStaffProfile(id: string) {
+    async getStaffProfile(id: string, user?: any) {
+        const isSelf = user?.id === id;
+        const canManage = this.isAdmin(user);
+        const hasFullAccess = isSelf || canManage;
         const staff = await this.prisma.user.findUnique({
             where: { id },
             include: {
@@ -422,7 +431,8 @@ export class AuditStaffService {
                 trainings: {
                     orderBy: { startDate: 'desc' },
                     include: { batch: true }
-                }
+                },
+                leaves: { orderBy: { startDate: 'desc' } }
             }
         });
         if (!staff) throw new NotFoundException('Personel bulunamadı');
@@ -495,7 +505,10 @@ export class AuditStaffService {
             certifications: staff.certifications || '',
             jobDescription: staff.jobDescription || '',
             role: roleName,
-            trainings: trainings
+            trainings: hasFullAccess ? trainings : [],
+            experiences: hasFullAccess ? staff.experiences : [],
+            education: hasFullAccess ? staff.education : [],
+            leaves: hasFullAccess ? staff.leaves : []
         };
     }
 
@@ -854,5 +867,89 @@ export class AuditStaffService {
         // For now, let's return a special URL format that frontend can use via a proxy or direct static serve
         // If the backend serves static files from 'uploads', then:
         return { url: `/uploads/avatars/${filename}`, filename };
+    }
+
+    // --- LEAVE MANAGEMENT ---
+
+    async addStaffLeave(userId: string, data: any, user: any) {
+        if (!this.isAdmin(user) && user.id !== userId) {
+            throw new ForbiddenException('Yetkisiz işlem: Başka bir personelin izin bilgisini ekleyemezsiniz.');
+        }
+
+        const leave = await this.prisma.userLeave.create({
+            data: {
+                userId,
+                type: data.type,
+                startDate: new Date(data.startDate),
+                endDate: new Date(data.endDate),
+                status: data.status || 'Planlandı',
+                description: data.description,
+                proxyUserId: data.proxyUserId || null
+            }
+        });
+
+        await this.auditLogService.createLog({
+            user: user?.displayName || user?.username || 'System',
+            action: 'PERSONEL_IZNI_EKLENDI',
+            details: `Personele yeni izin eklendi: "${leave.type}"`,
+            targetType: 'Staff',
+            targetId: userId,
+            changeData: JSON.stringify(data)
+        });
+
+        return leave;
+    }
+
+    async updateStaffLeave(id: string, data: any, user: any) {
+        const leave = await this.prisma.userLeave.findUnique({ where: { id } });
+        if (!leave) throw new NotFoundException('İzin bulunamadı');
+
+        if (!this.isAdmin(user) && user.id !== leave.userId) {
+            throw new ForbiddenException('Yetkisiz işlem.');
+        }
+
+        const updated = await this.prisma.userLeave.update({
+            where: { id },
+            data: {
+                type: data.type,
+                startDate: data.startDate ? new Date(data.startDate) : undefined,
+                endDate: data.endDate ? new Date(data.endDate) : undefined,
+                status: data.status,
+                description: data.description,
+                proxyUserId: data.proxyUserId
+            }
+        });
+
+        await this.auditLogService.createLog({
+            user: user?.displayName || user?.username || 'System',
+            action: 'PERSONEL_IZNI_GUNCELLESTI',
+            details: `Personel izin kaydı güncellendi: "${updated.type}"`,
+            targetType: 'Staff',
+            targetId: leave.userId,
+            changeData: JSON.stringify(data)
+        });
+
+        return updated;
+    }
+
+    async deleteStaffLeave(id: string, user: any) {
+        const leave = await this.prisma.userLeave.findUnique({ where: { id } });
+        if (!leave) throw new NotFoundException('İzin bulunamadı');
+
+        if (!this.isAdmin(user) && user.id !== leave.userId) {
+            throw new ForbiddenException('Eğitim silme işlemi için yetkiniz bulunmamaktadır.');
+        }
+
+        const deleted = await this.prisma.userLeave.delete({ where: { id } });
+
+        await this.auditLogService.createLog({
+            user: user?.displayName || user?.username || 'System',
+            action: 'PERSONEL_IZNI_SILINDI',
+            details: `Personel izin kaydı silindi: "${leave.type}"`,
+            targetType: 'Staff',
+            targetId: leave.userId
+        });
+
+        return deleted;
     }
 }
