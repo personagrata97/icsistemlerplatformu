@@ -3,8 +3,8 @@ import { PrismaService } from '../common/prisma.service';
 import { RiskCalculationResult, ScenarioParameters } from './risk-engine.types';
 
 /**
- * Teslimat Baskısı Calculator
- * Hesaplama: Önümüzdeki 30 gün içinde yapılması gereken teslimat tutarı / Mevcut nakit
+ * Teslimat Baskısı (Delivery Pressure) Calculator
+ * Hesaplama (BDDK/FKB Faz 3): Önümüzdeki 12 Ay Teslimat Taahhüdü / Mevcut Fon Havuzu Büyüklüğü
  */
 @Injectable()
 export class DeliveryPressureCalculator {
@@ -12,59 +12,76 @@ export class DeliveryPressureCalculator {
 
     async calculate(params?: ScenarioParameters): Promise<RiskCalculationResult> {
         const bugun = new Date();
-        const onGunSonra = new Date();
-        onGunSonra.setDate(bugun.getDate() + 30);
+        const onIkiAySonra = new Date();
+        onIkiAySonra.setMonth(bugun.getMonth() + 12);
 
-        // 30 gün içindeki planlanan teslimatlar
-        const sozlesmeler = await this.prisma.sozlesme.findMany({
+        // 1. Önümüzdeki 12 Ay Teslimat Taahhüdü (12-Month Delivery Pipeline)
+        const teslimatlar = await this.prisma.sozlesme.findMany({
             where: {
                 teslim_tarihi_planlanan: {
                     gte: bugun,
-                    lte: onGunSonra,
+                    lte: onIkiAySonra,
                 },
                 durum: 'AKTIF',
             },
         });
 
-        let teslimatTutari = sozlesmeler.reduce(
+        let teslimatTaahhudu12Ay = teslimatlar.reduce(
             (sum, s) => sum + Number(s.toplam_tutar),
             0,
         );
 
-        // Senaryo uygula
+        // Senaryo uygula (Teslimat öne çekilmesi veya maliyet artışı şoku)
         if (params && params.teslimat_artis > 0) {
-            teslimatTutari = teslimatTutari * (1 + params.teslimat_artis);
+            teslimatTaahhudu12Ay = teslimatTaahhudu12Ay * (1 + params.teslimat_artis);
         }
 
-        // Mevcut nakit
+        // 2. Mevcut Fon Havuzu Büyüklüğü (Tüm Aktif Sözleşmelerin İçerideki Birikimi)
+        // MVP yaklaşımı: Nakit pozisyonu (Nakit + Likit) + Gelecek 12 Ay Taksit Beklentisi
         const pozisyon = await this.prisma.likiditePozisyonu.findFirst({
             orderBy: { tarih: 'desc' },
         });
 
-        let mevcutNakit = pozisyon ? Number(pozisyon.nakit) : 0;
+        let mevcutNakit = pozisyon ? Number(pozisyon.nakit) + Number(pozisyon.likit_varlik) : 0;
 
-        if (params && params.likidite_dusus !== 0) {
-            mevcutNakit = mevcutNakit * (1 - params.likidite_dusus);
+        // Tüm aktif sözleşmelerin aylık taksitlerinin 12 aylık toplam projeksiyonu (Basitleştirilmiş)
+        const aktifSozlesmeler = await this.prisma.sozlesme.findMany({
+            where: { durum: 'AKTIF' }
+        });
+        
+        let gelecek12AyTaksitHacmi = aktifSozlesmeler.reduce(
+            (sum, s) => sum + (Number(s.taksit_tutari) * 12),
+            0
+        );
+
+        // İptal Senaryosu Nakit Girişini Düşürür
+        if (params && params.iptal_artis > 0) {
+            gelecek12AyTaksitHacmi = gelecek12AyTaksitHacmi * (1 - params.iptal_artis);
         }
 
-        const teslimatBaski = mevcutNakit > 0 ? teslimatTutari / mevcutNakit : 0;
+        const fonHavuzuBuyuklugu = mevcutNakit + gelecek12AyTaksitHacmi;
 
-        // Risk seviyesi
+        const teslimatBaskisi = fonHavuzuBuyuklugu > 0 ? (teslimatTaahhudu12Ay / fonHavuzuBuyuklugu) : 0;
+        const teslimatBaskisiYuzde = teslimatBaskisi * 100;
+
+        // Risk seviyesi (Sektör standardı: Teslimat baskısının %80'i aşması tehlikelidir)
         let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
-        if (teslimatBaski > 1.5) {
+        if (teslimatBaskisiYuzde > 80) {
             riskSeviyesi = 'RED';
-        } else if (teslimatBaski > 1.0) {
+        } else if (teslimatBaskisiYuzde > 60) {
             riskSeviyesi = 'YELLOW';
         }
 
         return {
             kpi_kodu: 'TESLIMAT_BASKI',
-            deger: teslimatBaski,
+            deger: teslimatBaskisiYuzde, // Yüzde olarak gösteriyoruz
             risk_seviyesi: riskSeviyesi,
             detay: {
-                teslimat_tutari: teslimatTutari,
-                mevcut_nakit: mevcutNakit,
-                sozlesme_sayisi: sozlesmeler.length,
+                teslimat_taahhudu_12ay: teslimatTaahhudu12Ay,
+                fon_havuzu_buyuklugu: fonHavuzuBuyuklugu,
+                mevcut_nakit_ve_likit: mevcutNakit,
+                beklenen_taksit_girisi_12ay: gelecek12AyTaksitHacmi,
+                teslim_bekleyen_sozlesme: teslimatlar.length,
             },
         };
     }

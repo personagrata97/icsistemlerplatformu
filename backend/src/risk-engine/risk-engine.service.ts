@@ -54,6 +54,10 @@ export class RiskEngineService {
             this.logger.debug('Konsantrasyon (vade) hesaplanıyor...');
             results.push(await this.concentrationCalculator.calculateByMaturity());
 
+            // Konsantrasyon - Tüzel Kişi Sınırı (BDDK %5)
+            this.logger.debug('Konsantrasyon (tüzel kişi) hesaplanıyor...');
+            results.push(await this.concentrationCalculator.calculateByCustomerType());
+
             // DPD Dağılım
             this.logger.debug('DPD dağılım hesaplanıyor...');
             results.push(await this.dpdCalculator.calculate(scenarioParams));
@@ -91,6 +95,8 @@ export class RiskEngineService {
                 return this.concentrationCalculator.calculateByRegion();
             case 'KONSANTRASYON_VADE':
                 return this.concentrationCalculator.calculateByMaturity();
+            case 'KONSANTRASYON_TUZEL':
+                return this.concentrationCalculator.calculateByCustomerType();
             case 'DPD_DAGILIM':
                 return this.dpdCalculator.calculate(scenarioParams);
             case 'TESLIMAT_YUKUMLULUGU':

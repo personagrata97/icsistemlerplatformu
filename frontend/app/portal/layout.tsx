@@ -2,7 +2,6 @@
 
 import { ToastProvider } from '@/components/Toast';
 import PortalLayoutComponent from '@/components/portal/PortalLayout';
-import AuditronChat from '@/components/AuditronChat';
 import { AuditTitleProvider } from '@/context/AuditTitleContext';
 
 export default function PortalLayout({
@@ -15,7 +14,6 @@ export default function PortalLayout({
             <AuditTitleProvider>
                 <PortalLayoutComponent>
                     {children}
-                    <AuditronChat />
                 </PortalLayoutComponent>
             </AuditTitleProvider>
         </ToastProvider>

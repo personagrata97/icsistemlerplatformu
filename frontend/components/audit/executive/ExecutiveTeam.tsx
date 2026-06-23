@@ -345,7 +345,6 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                                 status="Kapalı"
                                 rightContent={
                                     <div className="text-right flex flex-col items-end">
-                                        <span className="text-xs text-slate-400 font-medium">Bitiş Tarihi</span>
                                         <span className="text-sm font-bold text-slate-700">{new Date(l.eDate).toLocaleDateString('tr-TR')}</span>
                                     </div>
                                 }
@@ -442,7 +441,7 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                             const assignments = selectedStaffForTimeline.activeAssignmentsList || [];
                             let hasConflict = false;
                             
-                            // Tarih çakışmasını kabaca kontrol edelim
+                            // Tarih çakışmasını kabaca kontrol edelim (Statüleri 'Devam Ediyor' saydığımız için)
                             for (let i = 0; i < assignments.length; i++) {
                                 for (let j = i + 1; j < assignments.length; j++) {
                                     const a = assignments[i];
@@ -505,11 +504,8 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                                                                         {sDate} - {eDate}
                                                                     </Badge>
                                                                 ) : (
-                                                                    <span className="text-xs text-gray-400 italic">Planlanmadı</span>
+                                                                    <Badge variant="outline" size="sm" className="text-slate-400">Planlanmadı</Badge>
                                                                 )}
-                                                                
-                                                                {/* StatusBadge'i ActionMenu'nün önüne aldık ki 3 nokta EN SAĞDA kalsın */}
-                                                                <StatusBadge value="Devam Ediyor" />
                                                                 
                                                                 <ActionMenu 
                                                                     items={[
@@ -562,17 +558,12 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                         <strong>"{reassignAuditData?.auditTitle}"</strong> görevi için yeni bir sorumlu seçin. Sadece uygun kapasiteye sahip personel listelenmektedir.
                     </p>
                     <CustomSelect
-                        label={reassignAuditData?.role === 'Gözetmen' ? "Görevi Devralacak Gözetmen" : "Görevi Devralacak Personel(ler)"}
-                        value={selectedNewStaffIds}
+                        label={reassignAuditData?.role === 'Gözetmen' ? "Görevi Devralacak Gözetmen" : "Görevi Devralacak Personel (1'e 1 Değişim)"}
+                        value={selectedNewStaffIds[0] || ""}
                         onChange={(val) => {
-                            // Eğer gözetmense sadece 1 kişi seçebilir, değilse array olarak alır
-                            if (reassignAuditData?.role === 'Gözetmen') {
-                                setSelectedNewStaffIds(Array.isArray(val) ? val.slice(-1) : [val as string]);
-                            } else {
-                                setSelectedNewStaffIds(Array.isArray(val) ? val : [val as string]);
-                            }
+                            setSelectedNewStaffIds([val as string]);
                         }}
-                        isMulti={reassignAuditData?.role !== 'Gözetmen'}
+                        isMulti={false}
                         disabled={isProcessing}
                         placeholder="Lütfen seçiniz..."
                         options={staffs

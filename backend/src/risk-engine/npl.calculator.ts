@@ -4,7 +4,7 @@ import { RiskCalculationResult, ScenarioParameters } from './risk-engine.types';
 
 /**
  * NPL (Non-Performing Loan) Calculator
- * Hesaplama: Takipteki sözleşme sayısı / Toplam sözleşme sayısı
+ * BDDK Hesaplama: 90+ Gün Gecikmeli Kredi Hacmi / Toplam Kredi Hacmi
  */
 @Injectable()
 export class NplCalculator {
@@ -21,46 +21,48 @@ export class NplCalculator {
             },
         });
 
-        const toplamSozlesme = sozlesmeler.length;
-        let nplSozlesmeSayisi = 0;
+        let toplamHacim = 0;
+        let nplHacim = 0;
 
         // Her sözleşmenin max gecikmesini kontrol et
         sozlesmeler.forEach(s => {
             const maxGecikme = s.odeme_hareketleri.reduce((max, h) => Math.max(max, h.gecikme_gun), 0);
-            if (maxGecikme > 90) {
-                nplSozlesmeSayisi++;
+            const tutar = Number(s.toplam_tutar);
+            
+            toplamHacim += tutar;
+
+            if (maxGecikme > 90) { // 3. 4. ve 5. Grup
+                nplHacim += tutar;
             }
         });
 
         // Senaryo uygula
-        if (params && params.gecikme_artis > 0) {
-            // Olumsuz senaryoda NPL sayısını artır
-            nplSozlesmeSayisi = Math.round(nplSozlesmeSayisi * (1 + params.gecikme_artis));
-        } else if (params && params.gecikme_artis < 0) {
-            nplSozlesmeSayisi = Math.round(nplSozlesmeSayisi * (1 + params.gecikme_artis));
+        if (params && params.gecikme_artis !== 0) {
+            // Olumsuz/Olumlu senaryoda NPL hacmini artır/azalt
+            nplHacim += toplamHacim * params.gecikme_artis;
+            if (nplHacim < 0) nplHacim = 0;
+            if (nplHacim > toplamHacim) nplHacim = toplamHacim;
         }
 
-        // NPL sayısı toplamı geçemez
-        if (nplSozlesmeSayisi > toplamSozlesme) nplSozlesmeSayisi = toplamSozlesme;
-
-        const nplOran = toplamSozlesme > 0 ? nplSozlesmeSayisi / toplamSozlesme : 0;
+        const nplOran = toplamHacim > 0 ? nplHacim / toplamHacim : 0;
+        const nplYuzde = nplOran * 100;
 
         // Risk seviyesi belirleme
         let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
-        if (nplOran > 0.05) { // %5 üzeri kritik (Mevzuat NPL limiti genelde düşüktür)
+        if (nplYuzde > 5) { // %5 üzeri kritik (Mevzuat NPL limiti genelde düşüktür)
             riskSeviyesi = 'RED';
-        } else if (nplOran > 0.03) {
+        } else if (nplYuzde > 3) {
             riskSeviyesi = 'YELLOW';
         }
 
         return {
             kpi_kodu: 'NPL',
-            deger: nplOran * 100, // Yüzde olarak gösterim
+            deger: nplYuzde,
             risk_seviyesi: riskSeviyesi,
             detay: {
-                toplam_sozlesme: toplamSozlesme,
-                npl_sozlesme: nplSozlesmeSayisi,
-                aciklama: '90+ gün gecikmeli sözleşme oranı'
+                toplam_hacim: toplamHacim,
+                npl_hacim: nplHacim,
+                aciklama: 'Hacim Bazlı 90+ gün gecikmeli kredi oranı (TFRS 9 Grup 3-4-5)'
             },
         };
     }

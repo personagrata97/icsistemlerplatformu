@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { RiskCalculationResult, ScenarioParameters } from './risk-engine.types';
-
-/**
- * Likidite Oranı (LCR - Liquidity Coverage Ratio) Calculator
- * Hesaplama: (Nakit + Likit Varlıklar) / (Kısa Vadeli Yükümlülükler + 30 Gün Teslimat Yükümlülüğü)
- */
 import { DeliveryLiabilityCalculator } from './delivery-liability.calculator';
 
+/**
+ * LYO - Likidite Yeterlilik Oranı (BDDK 1 Ocak 2026 Tebliği)
+ * Formül: Nakit Girişleri / Nakit Çıkışları
+ */
 @Injectable()
 export class LiquidityCalculator {
     constructor(
@@ -16,7 +15,7 @@ export class LiquidityCalculator {
     ) { }
 
     async calculate(params?: ScenarioParameters): Promise<RiskCalculationResult> {
-        // En son likidite pozisyonunu al
+        // En son pozisyonu al (Normalde bu günlük cron job ile beslenir)
         const pozisyon = await this.prisma.likiditePozisyonu.findFirst({
             orderBy: { tarih: 'desc' },
         });
@@ -30,48 +29,54 @@ export class LiquidityCalculator {
             };
         }
 
-        let nakit = Number(pozisyon.nakit);
-        let likitVarlik = Number(pozisyon.likit_varlik);
-        let kisaVadeliYukumluluk = Number(pozisyon.kisa_vadeli_yukumluluk);
+        // Nakit Giriş Kalemleri (BDDK Tebliği)
+        let nakitGiris = Number(pozisyon.nakit) + Number(pozisyon.likit_varlik);
+        
+        // Nakit Çıkış Kalemleri (Borçlar)
+        let kisaVadeliCikis = Number(pozisyon.kisa_vadeli_yukumluluk);
+        
+        // 30 Günlük Teslimat Çıkış Yükümlülüğü
+        let teslimatCikis = await this.deliveryLiabilityCalculator.calculateTotalLiability(params);
 
-        // Dinamik Teslimat Yükümlülüğü Hesaplama
-        // (Eski seed verisi yerine canlı sözleşme verisinden hesaplanır)
-        let teslimatYukumlulugu = await this.deliveryLiabilityCalculator.calculateTotalLiability(params);
-
-        // Senaryo uygula - Sadece likidite ve kısa vadeli yük. için (teslimat yukarıda handle edildi)
+        // Şok Senaryoları Uygulama
         if (params) {
             if (params.likidite_dusus !== 0) {
-                nakit = nakit * (1 - params.likidite_dusus);
-                likitVarlik = likitVarlik * (1 - params.likidite_dusus);
+                nakitGiris = nakitGiris * (1 - params.likidite_dusus);
             }
-
-            // İptal (Cayma) riski senaryosu: iptal_artis
             if (params.iptal_artis > 0) {
-                nakit = nakit * (1 - params.iptal_artis);
-                likitVarlik = likitVarlik * (1 - params.iptal_artis);
+                nakitGiris = nakitGiris * (1 - params.iptal_artis);
             }
         }
-        const pay = nakit + likitVarlik;
-        const payda = kisaVadeliYukumluluk + teslimatYukumlulugu;
-        const lcr = payda > 0 ? pay / payda : 0;
 
-        // Risk seviyesi belirleme (LCR > 1.0 ideal)
+        const toplamCikis = kisaVadeliCikis + teslimatCikis;
+        const lyo = toplamCikis > 0 ? (nakitGiris / toplamCikis) : 0;
+        const lyoYuzde = lyo * 100;
+
+        // BDDK Eşikleri Belirleme (1 Ocak 2026 Tebliği)
         let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
-        if (lcr < 0.8) {
+        let bddkUyariMesaji = '✅ LYO Sağlıklı';
+
+        if (lyoYuzde < 100) {
             riskSeviyesi = 'RED';
-        } else if (lcr < 1.0) {
+            bddkUyariMesaji = '🚨 KRİTİK İHLAL: Oran %100 altına düştü. 2 hafta içinde giderilmeli.';
+        } else if (lyoYuzde < 120) {
+            riskSeviyesi = 'RED'; // Veya UI için koyu sarı
+            bddkUyariMesaji = '🔴 ACİL BİLDİRİM: %120 altına inildi. İvedi olarak BDDK savunma yazısı hazırlanmalı.';
+        } else if (lyoYuzde < 200) {
             riskSeviyesi = 'YELLOW';
+            bddkUyariMesaji = '⚠️ YAKIN İZLEME: %200 altında. 6 hafta sürerse BDDK bildirimi zorunludur.';
         }
 
         return {
-            kpi_kodu: 'LCR',
-            deger: lcr,
+            kpi_kodu: 'LCR', // Legacy kod adı LCR kalabilir ama metrik LYO
+            deger: lyoYuzde,
             risk_seviyesi: riskSeviyesi,
             detay: {
-                nakit,
-                likit_varlik: likitVarlik,
-                kisa_vadeli_yukumluluk: kisaVadeliYukumluluk,
-                teslimat_yukumlulugu: teslimatYukumlulugu,
+                nakit_giris: nakitGiris,
+                nakit_cikis_borclar: kisaVadeliCikis,
+                nakit_cikis_teslimat: teslimatCikis,
+                toplam_cikis: toplamCikis,
+                bddk_mesaji: bddkUyariMesaji
             },
         };
     }

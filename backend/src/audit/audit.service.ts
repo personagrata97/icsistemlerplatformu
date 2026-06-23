@@ -2814,7 +2814,39 @@ export class AuditService {
                     activeAssignmentsList.push({ id: audit.id, auditId: audit.id, title: audit.title, role: 'Müfettiş', startDate: sDate, endDate: eDate });
                 }
             });
-            return { ...staff, activeAssignmentsCount: activeCount, activeAssignmentsList };
+            
+            // KVKK Data Leakage Prevention (Sanitize Leaves & Declarations)
+            const safeLeaves = staff.leaves ? staff.leaves.map((l: any) => ({
+                id: l.id,
+                type: l.type,
+                status: l.status,
+                startDate: l.startDate,
+                endDate: l.endDate
+                // Omit managerNote, rejectReason, description for privacy
+            })) : [];
+            
+            const safeDeclarations = staff.declarations ? staff.declarations.map((d: any) => ({
+                id: d.id,
+                status: d.status,
+                createdAt: d.createdAt,
+                audit: { title: d.audit?.title }
+            })) : [];
+
+            return { 
+                id: staff.id,
+                firstName: staff.firstName,
+                lastName: staff.lastName,
+                displayName: staff.displayName,
+                title: staff.title,
+                email: staff.email,
+                activeAssignmentsCount: activeCount, 
+                activeAssignmentsList,
+                leaves: safeLeaves,
+                declarations: safeDeclarations,
+                education: staff.education,
+                certificates: staff.certificates,
+                experiences: staff.experiences
+            };
         });
 
         // 7.5 Recent Logs

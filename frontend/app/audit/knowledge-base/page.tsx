@@ -17,7 +17,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import { useEffect, useRef } from 'react';
 import ConfirmModal from '@/components/ConfirmModal';
 
-type DocumentType = 'TEFTIS_KURULU' | 'DIGER_BIRIMLER' | 'MEVZUAT' | 'TEMPLATES' | 'AUDITRON';
+type DocumentType = 'TEFTIS_KURULU' | 'DIGER_BIRIMLER' | 'MEVZUAT' | 'TEMPLATES';
 
 // Doküman arayüz yapısı
 interface Document {
@@ -36,7 +36,6 @@ export default function KnowledgeBasePage() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<string>('TEFTIS_KURULU');
     const [searchTerm, setSearchTerm] = useState('');
-    const [aiResults, setAiResults] = useState<string[]>([]);
     const [filterUploader, setFilterUploader] = useState<string[]>([]);
     const [filterYear, setFilterYear] = useState<string[]>([]);
     const [confirmDeleteDoc, setConfirmDeleteDoc] = useState<any | null>(null);
@@ -47,7 +46,6 @@ export default function KnowledgeBasePage() {
         { id: 'DIGER_BIRIMLER', label: 'Diğer Birimler', icon: Building2 },
         { id: 'MEVZUAT', label: 'Mevzuat', icon: Scale },
         { id: 'TEMPLATES', label: 'Denetim Şablonları', icon: ClipboardList },
-        { id: 'AUDITRON', label: 'Auditron (AI)', icon: Bot },
     ];
 
     useEffect(() => {
@@ -65,7 +63,6 @@ export default function KnowledgeBasePage() {
             // Kategoriye göre yükle
             const data = await auditApi.getDocuments(activeTab);
             setDocuments(Array.isArray(data) ? data : []);
-            setAiResults([]); // Sekme değiştiğinde AI sonucunu sıfırla
         } catch (error: any) {
             console.error('Doküman yükleme hatası:', error);
             showToast('Dokümanlar yüklenirken hata oluştu: ' + error.message, 'error');
@@ -76,14 +73,6 @@ export default function KnowledgeBasePage() {
 
     const handleSearch = async (val: string) => {
         setSearchTerm(val);
-        if (val.length > 2 && activeTab === 'AUDITRON') {
-            try {
-                const results = await auditApi.aiSearchDocuments(val);
-                setAiResults(results);
-            } catch (err) {
-                console.error('AI arama hatası:', err);
-            }
-        }
     };
 
     const loadStaff = async () => {
@@ -198,26 +187,9 @@ export default function KnowledgeBasePage() {
                 />
             </div>
 
-            {/* AI Search Highlights for Auditron Tab */}
-            {activeTab === 'AUDITRON' && aiResults.length > 0 && (
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-xl animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="flex items-center gap-2 mb-3 text-blue-700 font-semibold">
-                        <Bot size={20} />
-                        <span>Auditron AI Zekası: İlgili Belge Kesitleri</span>
-                    </div>
-                    <div className="space-y-3">
-                        {aiResults.map((res, index) => (
-                            <div key={index} className="bg-white p-3 rounded-lg border border-blue-100 text-sm text-gray-700 shadow-sm transition-all hover:shadow-md">
-                                {res}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
             {/* Standardized Toolbar */}
             <PageToolbar
-                searchPlaceholder={activeTab === 'AUDITRON' ? "AI ile belgeler içinde ara..." : "Belge ara..."}
+                searchPlaceholder="Belge ara..."
                 searchValue={searchTerm}
                 onSearchChange={handleSearch}
                 onRefresh={() => loadDocuments(false)}

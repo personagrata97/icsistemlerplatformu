@@ -4,24 +4,40 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 
 interface DpdPieChartProps {
     data: {
-        guncel: number;
-        dpd_1_30: number;
-        dpd_31_90: number;
-        dpd_90_plus: number;
+        toplam_tutar: number;
+        toplam_sozlesme: number;
+        genel_karsilik: number;
+        ozel_karsilik: number;
+        toplam_karsilik: number;
+        gruplar: {
+            grup1: { count: number; tutar: number; karsilikOran: number; ad: string };
+            grup2: { count: number; tutar: number; karsilikOran: number; ad: string };
+            grup3: { count: number; tutar: number; karsilikOran: number; ad: string };
+            grup4: { count: number; tutar: number; karsilikOran: number; ad: string };
+            grup5: { count: number; tutar: number; karsilikOran: number; ad: string };
+        };
     };
 }
 
 export default function DpdPieChart({ data }: DpdPieChartProps) {
+    if (!data?.gruplar) return null;
+
+    const g = data.gruplar;
     const chartData = [
-        { name: 'Güncel', value: data.guncel, color: '#10b981' }, // Green
-        { name: '1-30 Gün', value: data.dpd_1_30, color: '#facc15' }, // Yellow
-        { name: '31-90 Gün', value: data.dpd_31_90, color: '#f97316' }, // Orange
-        { name: '90+ Gün', value: data.dpd_90_plus, color: '#ef4444' }, // Red
+        { name: '1. Grup (0-30)', value: g.grup1.tutar, color: '#10b981' },
+        { name: '2. Grup (31-90)', value: g.grup2.tutar, color: '#facc15' },
+        { name: '3. Grup (91-180)', value: g.grup3.tutar, color: '#f97316' },
+        { name: '4. Grup (181-365)', value: g.grup4.tutar, color: '#ea580c' },
+        { name: '5. Grup (365+)', value: g.grup5.tutar, color: '#dc2626' },
     ].filter(item => item.value > 0);
 
+    const formatMoney = (value: number) => {
+        return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(value);
+    };
+
     return (
-        <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Gecikme Dağılımı (Sözleşme Adedi)</h3>
+        <div className="card space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">Gecikme Dağılımı ve Karşılıklar (TFRS 9)</h3>
 
             <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -40,12 +56,23 @@ export default function DpdPieChart({ data }: DpdPieChartProps) {
                             ))}
                         </Pie>
                         <Tooltip
-                            formatter={(value: number) => [value + ' Adet', 'Sözleşme Sayısı']}
+                            formatter={(value: number) => [formatMoney(value), 'Hacim']}
                             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                         />
                         <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                 </ResponsiveContainer>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-sm text-gray-500">Genel Karşılık (Grup 1-2)</div>
+                    <div className="text-lg font-semibold text-gray-900">{formatMoney(data.genel_karsilik)}</div>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-sm text-gray-500">Özel Karşılık (Grup 3-4-5)</div>
+                    <div className="text-lg font-semibold text-red-600">{formatMoney(data.ozel_karsilik)}</div>
+                </div>
             </div>
         </div>
     );

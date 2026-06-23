@@ -109,4 +109,52 @@ export class ConcentrationCalculator {
             },
         };
     }
+
+    async calculateByCustomerType(): Promise<RiskCalculationResult> {
+        // Müşteri tipi (Tüzel vs Gerçek) bazında sözleşme dağılımı - BDDK Yasal Sınırı %5
+        const sozlesmeler = await this.prisma.sozlesme.findMany({
+            where: { durum: 'AKTIF' },
+            include: { musteri: true },
+        });
+
+        let toplamTutar = 0;
+        let tuzelTutar = 0;
+
+        sozlesmeler.forEach((s) => {
+            const tutar = Number(s.toplam_tutar);
+            toplamTutar += tutar;
+            
+            // Segment 'TÜZEL', 'TUZEL' veya 'KURUMSAL' ise tüzel kişi sayılır
+            const segment = s.musteri.segment.toUpperCase();
+            if (segment.includes('TÜZEL') || segment.includes('TUZEL') || segment.includes('KURUMSAL')) {
+                tuzelTutar += tutar;
+            }
+        });
+
+        const tuzelKonsantrasyon = toplamTutar > 0 ? (tuzelTutar / toplamTutar) : 0;
+        const tuzelYuzde = tuzelKonsantrasyon * 100;
+
+        // BDDK 2025 Mayıs Yönetmeliği: Tüzel kişi toplam sözleşme tutarı %5'i aşamaz.
+        let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
+        let mesaj = '✅ Yasal sınır içinde';
+
+        if (tuzelYuzde > 5) {
+            riskSeviyesi = 'RED';
+            mesaj = '🚨 YASAL İHLAL: Tüzel kişi oranı BDDK %5 sınırını aştı!';
+        } else if (tuzelYuzde > 4) {
+            riskSeviyesi = 'YELLOW';
+            mesaj = '⚠️ ERKEN UYARI: Tüzel kişi oranı %5 yasal sınırına çok yakın.';
+        }
+
+        return {
+            kpi_kodu: 'KONSANTRASYON_TUZEL',
+            deger: tuzelYuzde,
+            risk_seviyesi: riskSeviyesi,
+            detay: {
+                toplam_tutar: toplamTutar,
+                tuzel_tutar: tuzelTutar,
+                bddk_mesaji: mesaj
+            },
+        };
+    }
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import AuditronChat from './AuditronChat';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -12,7 +11,6 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     return (
         <main className="min-h-screen w-full">
             {children}
-            {!isLoginPage && !isEthicsSubmitPage && !isResumePage && <AuditronChat />}
         </main>
     );
 }

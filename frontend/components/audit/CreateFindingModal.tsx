@@ -6,7 +6,6 @@ import Modal from '@/components/ui/Modal';
 import Switch from '@/components/ui/Switch';
 import { auditApi, Audit, Finding, Process, Risk, Control, CreateFindingDto } from '@/lib/audit-api';
 import { adminApi } from '@/lib/admin-api';
-import AuditronSuggestionPanel from './AuditronSuggestionPanel';
 import CustomSelect from '@/components/ui/CustomSelect';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import Button from '@/components/ui/Button';
@@ -334,44 +333,7 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
         loadControls();
     }, [form.riskId]);
 
-    // Smart Similarity Detection (Auditron AI) checks if title/category matches past findings
-    useEffect(() => {
-        if (!form.title && form.categories.length === 0) {
-            setSimilarFindings([]);
-            return;
-        }
-
-        const searchTimeout = setTimeout(async () => {
-            try {
-                // Eğer başlık en az 5 karakterse veya en az 1 kategori seçildiyse AI kontrolü yap
-                if (form.title.length > 4 || form.categories.length > 0) {
-                    const selectedAudit = audits.find(a => String(a.id) === String(form.auditId));
-                    const unitId = selectedAudit?.unitId;
-
-                    const response = await auditApi.checkRecurringFindings({
-                        unitId: unitId,
-                        category: form.categories.length > 0 ? form.categories[0] : undefined,
-                        title: form.title
-                    });
-
-                    if (response.recurring && response.findings) {
-                        let matches = response.findings;
-                        // Mevcut düzenlenmekte olan bulguyu atla (eğer varsa)
-                        if (editFindingId) {
-                            matches = matches.filter((f: any) => String(f.id) !== String(editFindingId));
-                        }
-                        setSimilarFindings(matches.slice(0, 3));
-                    } else {
-                        setSimilarFindings([]);
-                    }
-                }
-            } catch (err) {
-                console.error("Auditron AI recurring check failed:", err);
-            }
-        }, 800); // 800ms debounce
-
-        return () => clearTimeout(searchTimeout);
-    }, [form.title, form.categories, form.auditId, audits, editFindingId]);
+    // Removed Smart Similarity Detection as requested
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, target: 'inspector' | 'unit') => {
         if (e.target.files) {
@@ -476,9 +438,6 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                 relatedFindingId: form.relatedFindingId || undefined,
                 tags: form.tags.length > 0 ? form.tags : undefined,
                 workingPaperRef: form.workingPaperRef || undefined,
-                // Auditron AI Recurring Data
-                isRecurring: form.isRepeatFinding || false,
-                recurringFindingId: form.relatedFindingId || undefined,
                 // RCM Integration
                 processId: form.processId || undefined,
                 riskId: form.riskId || undefined,
@@ -573,51 +532,6 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
             }
         >
             <form id="createFindingForm" onSubmit={handleSubmit} className="space-y-6">
-                {/* Smart Similarity Detection (Auditron AI) Banner */}
-                {similarFindings.length > 0 && (
-                    <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-2xl p-4 animate-in slide-in-from-top-2 duration-300 shadow-sm">
-                        <div className="flex items-start gap-4">
-                            <div className="p-2.5 bg-indigo-600 rounded-xl shrink-0 shadow-md shadow-indigo-200 flex items-center justify-center">
-                                <Activity size={22} className="text-white animate-pulse" />
-                            </div>
-                            <div className="flex-1">
-                                <h4 className="font-bold text-indigo-900 text-[13px] mb-1 flex items-center gap-2">
-                                    <span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider">Auditron AI</span>
-                                    Tekrarlayan Bulgu Tespiti
-                                </h4>
-                                <p className="text-[12px] text-indigo-800/80 mb-3 font-medium">Girdiğiniz bilgilere göre geçmiş dönemlere ait benzer konular saptadık. Bu bulgunun tekerrür eden bir bulgu olarak işaretlenmesini öneririz.</p>
-                                <div className="space-y-2">
-                                    {similarFindings.map(sf => (
-                                        <div key={sf.id} className="flex items-center justify-between bg-white/90 border border-indigo-100 rounded-xl px-3 py-2 gap-4 shadow-sm hover:border-indigo-300 hover:shadow-md transition-all">
-                                            <div className="flex items-center gap-2 min-w-0">
-                                                <Link2 size={14} className="text-indigo-400 shrink-0" />
-                                                <span className="text-[11px] font-bold text-indigo-700 shrink-0 bg-indigo-50 px-1.5 py-0.5 rounded">[{sf.code}]</span>
-                                                <span className="text-xs text-gray-700 truncate font-medium">{sf.title}</span>
-                                            </div>
-                                            <Button
-                                                variant="primary"
-                                                size="sm"
-                                                onClick={() => setForm({ ...form, relatedFindingId: String(sf.id), isRepeatFinding: true })}
-                                                className="text-[10px] h-7 px-3 rounded-lg transition-all shrink-0 uppercase tracking-wide gap-1.5"
-                                            >
-                                                Tekerrür Ekle
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <button
-                                title="Kapat"
-                                onClick={() => setSimilarFindings([])}
-                                className="bg-indigo-100 hover:bg-indigo-200 p-1.5 rounded-full text-indigo-600 transition-colors"
-                                type="button"
-                            >
-                                <X size={16} />
-                            </button>
-                        </div>
-                    </div>
-                )}
-
                 {/* Section 1: Genel Bilgiler */}
                 <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
                     <div className="flex items-center gap-2 border-b pb-4 mb-2">
@@ -1012,12 +926,6 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                         <h3 className="font-bold text-gray-700">Bulgu Detayları</h3>
                     </div>
                     <div className="space-y-4">
-                        {/* AI Suggestion Panel */}
-                        <AuditronSuggestionPanel
-                            findingData={form}
-                            onApplySuggestion={(field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }))}
-                            className="mb-4 shadow-sm"
-                        />
                         <div>
                             <label className="form-label">Kriter - Dayanak</label>
                             <textarea

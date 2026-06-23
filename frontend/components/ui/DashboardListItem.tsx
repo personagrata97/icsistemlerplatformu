@@ -37,7 +37,7 @@ export default function DashboardListItem({
                     </div>
                 ) : null}
                 <div className="flex flex-col min-w-0 flex-1 border-l border-gray-100 pl-4 py-0.5">
-                    <span className="text-sm text-gray-700 font-medium line-clamp-1 group-hover:text-emerald-600 transition-colors">
+                    <span className="text-sm text-gray-700 font-medium truncate block w-full group-hover:text-emerald-600 transition-colors" title={typeof title === 'string' ? title : undefined}>
                         {title}
                     </span>
                     {subtitle && (
