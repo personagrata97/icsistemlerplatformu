@@ -7,6 +7,7 @@ export interface FormTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaEl
     error?: string;
     helperText?: string;
     readOnlyView?: boolean;
+    fullWidth?: boolean;
 }
 
 const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(

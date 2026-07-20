@@ -80,13 +80,13 @@ export default function CalendarPage() {
                 // Mock multiple audits for the admin user to show the edge case
                 const isMultiple = row.name.includes('Yöneticisi') || row.name.includes('Başmüfettiş');
                 
-                const audits = [
-                    { name: 'Genel Müdürlük Süreç Denetimi (2026/04)', variant: 'primary' as const }
+                const audits: { name: string; variant: 'success' | 'danger' | 'warning' | 'info' | 'gray' | 'primary' | 'outline' }[] = [
+                    { name: 'Genel Müdürlük Süreç Denetimi (2026/04)', variant: 'primary' }
                 ];
                 
                 if (isMultiple) {
-                    audits.push({ name: 'Bilgi Sistemleri Sızma Testi (2026/05)', variant: 'secondary' as const });
-                    audits.push({ name: 'Mevzuat Uyum Denetimi (2026/06)', variant: 'info' as const });
+                    audits.push({ name: 'Bilgi Sistemleri Sızma Testi (2026/05)', variant: 'gray' });
+                    audits.push({ name: 'Mevzuat Uyum Denetimi (2026/06)', variant: 'info' });
                 }
                 
                 const maxDisplay = 2;
@@ -107,7 +107,7 @@ export default function CalendarPage() {
                                     ))}
                                 </div>
                             }>
-                                <Badge variant="secondary" className="text-[10px] cursor-help px-1.5 py-0.5" size="sm">
+                                <Badge variant="outline" className="text-[10px] cursor-help px-1.5 py-0.5" size="sm">
                                     +{audits.length - 1} Görev Daha
                                 </Badge>
                             </Tooltip>

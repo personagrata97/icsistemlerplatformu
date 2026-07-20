@@ -39,6 +39,17 @@ const mockPrismaService = {
     }
 };
 
+import { AuditLogService } from '../audit/audit-log.service';
+import { LdapService } from './ldap.service';
+
+const mockAuditLogService = {
+    createLog: jest.fn().mockResolvedValue({})
+};
+
+const mockLdapService = {
+    authenticate: jest.fn()
+};
+
 describe('AuthService', () => {
     let service: AuthService;
 
@@ -48,7 +59,9 @@ describe('AuthService', () => {
                 AuthService,
                 { provide: UserService, useValue: mockUserService },
                 { provide: JwtService, useValue: mockJwtService },
-                { provide: PrismaService, useValue: mockPrismaService }
+                { provide: PrismaService, useValue: mockPrismaService },
+                { provide: AuditLogService, useValue: mockAuditLogService },
+                { provide: LdapService, useValue: mockLdapService }
             ],
         }).compile();
 
@@ -133,7 +146,7 @@ describe('AuthService', () => {
             mockUserService.findByUsername.mockResolvedValue(inactiveUser);
 
             await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
-            await expect(service.login(loginDto)).rejects.toThrow('Bu hesap deaktif edilmiş.');
+            await expect(service.login(loginDto)).rejects.toThrow('Bu hesap pasife alınmıştır');
         });
 
         it('Maksimum oturum sınırına ulaşıldığında en eski oturum silinmeli ve login işlemi başarılı olmalı', async () => {

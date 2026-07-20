@@ -79,8 +79,10 @@ export function useExecutiveCalculations(stats: any) {
 
         return {
             skillAverages,
+            sortedSkills,
             weakestSkill,
             strongestSkill,
+            minScore,
             weakestSkillsList,
             pendingLeaves,
             activeLeaves,

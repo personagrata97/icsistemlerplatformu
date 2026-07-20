@@ -285,8 +285,8 @@ export class AuditService {
             }
 
             if (conflictIds.length > 0) {
-                const users = await this.prisma.user.findMany({ where: { id: { in: conflictIds } }, select: { displayName: true, firstName: true } });
-                const names = users.map(u => u.displayName || u.firstName).join(', ');
+                const users = await this.prisma.user.findMany({ where: { id: { in: conflictIds } }, select: { displayName: true } });
+                const names = users.map(u => u.displayName).join(', ');
                 throw new ConflictException(
                     `Seçilen personel (${names}), belirtilen tarihlerde "${audit.title}" görevine atanmış durumdadır. İşleme devam etmek için onay gereklidir.`
                 );
@@ -794,6 +794,33 @@ export class AuditService {
     async uploadWorkpaper(auditId: string, file: any, category: string, user: any) {
         if (!file) throw new Error('Dosya yüklenmedi');
 
+        // SECURITY Hardening: File type validation (Blacklist dangerous extensions & Validate Allowed Extensions)
+        const allowedExtensions = ['pdf', 'docx', 'doc', 'xlsx', 'xls', 'png', 'jpg', 'jpeg', 'txt', 'zip', 'csv'];
+        const dangerousExtensions = ['exe', 'bat', 'cmd', 'sh', 'php', 'js', 'vbs', 'ps1', 'jar', 'scr', 'dll'];
+
+        const safeFilename = Buffer.from(file.originalname, 'latin1').toString('utf8');
+        const ext = safeFilename.split('.').pop()?.toLowerCase() || '';
+
+        if (dangerousExtensions.includes(ext) || !allowedExtensions.includes(ext)) {
+            throw new ForbiddenException(`Güvenlik Uyarısı: '${ext}' uzantılı dosyaların sisteme yüklenmesi yasaktır.`);
+        }
+
+        // DEEP SECURITY Hardening: Magic Byte Binary Inspection (Polyglot / Renamed Executable Protection)
+        if (file.buffer && file.buffer.length >= 4) {
+            const buf = file.buffer;
+            // Check for Windows Portable Executable / DLL (MZ header)
+            const isMZ = buf[0] === 0x4D && buf[1] === 0x5A; // 'MZ'
+            // Check for Linux Executable (ELF header)
+            const isELF = buf[0] === 0x7F && buf[1] === 0x45 && buf[2] === 0x4C && buf[3] === 0x46; // '\x7fELF'
+            // Check for Shell script starting with #!
+            const isShebang = buf[0] === 0x23 && buf[1] === 0x21; // '#!'
+
+            if (isMZ || isELF || isShebang) {
+                this.logger.error(`SECURITY ALERT: Executable payload magic bytes detected in uploaded file '${safeFilename}' by user ${user?.username}`);
+                throw new ForbiddenException('Güvenlik İhlali Engellendi: Dosya uzantısı değiştirilmiş çalıştırılabilir binary (MZ/ELF/Script) payload tespit edildi!');
+            }
+        }
+
         const audit = await this.prisma.audit.findUnique({ where: { id: auditId } });
         if (!audit) throw new Error('Denetim bulunamadı');
 
@@ -802,7 +829,6 @@ export class AuditService {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
 
-        const safeFilename = Buffer.from(file.originalname, 'latin1').toString('utf8');
         const filePath = path.join(uploadDir, safeFilename);
 
         fs.writeFileSync(filePath, file.buffer);
@@ -2777,7 +2803,7 @@ export class AuditService {
         // 7.1 Calculate Active Workload for each staff
         const allActiveAudits = await this.prisma.audit.findMany({ 
             where: { ...whereAudit, status: 'Devam Ediyor' }, 
-            select: { id: true, title: true, team: true, supervisor: true, startDate: true, endDate: true, supervisorUser: { select: { id: true, displayName: true } } } 
+            select: { id: true, title: true, team: true, supervisor: true, startDate: true, endDate: true, plannedStartDate: true, plannedEndDate: true, supervisorUser: { select: { id: true, displayName: true } } } 
         });
 
         const staffs = staffsData.map(staff => {

@@ -144,3 +144,23 @@ export function ErrorState({
         />
     );
 }
+
+export function AccessDeniedState({
+    title = 'Erişim Yetkisi Yok',
+    description = 'Bu alana erişim yetkiniz bulunmamaktadır. Lütfen sistem yöneticinizle iletişime geçin.',
+    onBack
+}: {
+    title?: string;
+    description?: string;
+    onBack?: () => void;
+}) {
+    return (
+        <EmptyState
+            icon={AlertCircle}
+            title={title}
+            description={description}
+            variant="error"
+            action={onBack ? { label: 'Geri Dön', onClick: onBack } : undefined}
+        />
+    );
+}

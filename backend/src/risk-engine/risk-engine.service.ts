@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { NplCalculator } from './npl.calculator';
 import { LiquidityCalculator } from './liquidity.calculator';
@@ -7,10 +7,12 @@ import { DeliveryLiabilityCalculator } from './delivery-liability.calculator';
 import { ConcentrationCalculator } from './concentration.calculator';
 import { DpdCalculator } from './dpd.calculator';
 import { CancellationCalculator } from './cancellation.calculator';
+import { FinancingLimitCalculator } from './financing-limit.calculator';
+import { EquityRatioCalculator } from './equity-ratio.calculator';
 import { RiskCalculationResult, ScenarioParameters } from './risk-engine.types';
 
 @Injectable()
-export class RiskEngineService {
+export class RiskEngineService implements OnModuleInit {
     constructor(
         private prisma: PrismaService,
         private nplCalculator: NplCalculator,
@@ -19,10 +21,77 @@ export class RiskEngineService {
         private concentrationCalculator: ConcentrationCalculator,
         private dpdCalculator: DpdCalculator,
         private deliveryLiabilityCalculator: DeliveryLiabilityCalculator,
-        private cancellationCalculator: CancellationCalculator
+        private cancellationCalculator: CancellationCalculator,
+        private financingLimitCalculator: FinancingLimitCalculator,
+        private equityRatioCalculator: EquityRatioCalculator
     ) { }
 
     private readonly logger = new Logger(RiskEngineService.name);
+
+    async onModuleInit() {
+        this.logger.log('Sistem başlangıcında Risk KPI tanımları ve Limitleri doğrulanıyor...');
+        try {
+            const kpis = [
+                { kpi_kodu: 'NPL', aciklama: 'Takipteki Sözleşme Oranı', birim: 'YUZDE' },
+                { kpi_kodu: 'LCR', aciklama: 'Likidite Oranı', birim: 'YUZDE' }, // aligned to percentage representation
+                { kpi_kodu: 'TESLIMAT_BASKI', aciklama: 'Teslimat Baskısı', birim: 'ORAN' },
+                { kpi_kodu: 'KONSANTRASYON_BOLGE', aciklama: 'Bölge Konsantrasyonu', birim: 'YUZDE' },
+                { kpi_kodu: 'KONSANTRASYON_VADE', aciklama: 'Vade Konsantrasyonu', birim: 'YUZDE' },
+                { kpi_kodu: 'KONSANTRASYON_TUZEL', aciklama: 'Tüzel Kişi Konsantrasyonu', birim: 'YUZDE' },
+                { kpi_kodu: 'DPD_DAGILIM', aciklama: 'Gecikme Dağılımı (90+ Gün Oranı)', birim: 'YUZDE' },
+                { kpi_kodu: 'TESLIMAT_YUKUMLULUGU', aciklama: 'Teslimat Yükümlülüğü (30 Gün)', birim: 'TUTAR' },
+                { kpi_kodu: 'IPTAL_ORANI', aciklama: 'İptal Oranı', birim: 'YUZDE' },
+                { kpi_kodu: 'FINANSMAN_LIMITI', aciklama: 'Toplam Finansman Limiti', birim: 'YUZDE' },
+                { kpi_kodu: 'OZKAYNAK_YETERLILIK', aciklama: 'Özkaynak Yeterlilik Oranı', birim: 'YUZDE' },
+                { kpi_kodu: 'KONSANTRASYON_RISK_GRUBU', aciklama: 'Risk Grubu Yoğunlaşması', birim: 'YUZDE' }
+            ];
+
+            for (const kpi of kpis) {
+                await this.prisma.riskKpi.upsert({
+                    where: { kpi_kodu: kpi.kpi_kodu },
+                    update: { aciklama: kpi.aciklama, birim: kpi.birim },
+                    create: kpi
+                });
+            }
+
+            // Remove existing limits to ensure clean sync and prevent duplicates
+            await this.prisma.riskLimit.deleteMany({});
+
+            const defaultLimits = [
+                { kpi_kodu: 'NPL', esik_deger: 3.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'NPL', esik_deger: 5.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'LCR', esik_deger: 110.00, karsilastirma: 'LT', seviye: 'YELLOW' },
+                { kpi_kodu: 'LCR', esik_deger: 100.00, karsilastirma: 'LT', seviye: 'RED' },
+                { kpi_kodu: 'TESLIMAT_BASKI', esik_deger: 1.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'TESLIMAT_BASKI', esik_deger: 1.50, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'KONSANTRASYON_BOLGE', esik_deger: 25.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'KONSANTRASYON_BOLGE', esik_deger: 30.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'KONSANTRASYON_VADE', esik_deger: 35.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'KONSANTRASYON_VADE', esik_deger: 40.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'KONSANTRASYON_TUZEL', esik_deger: 4.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'KONSANTRASYON_TUZEL', esik_deger: 5.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'DPD_DAGILIM', esik_deger: 10.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'DPD_DAGILIM', esik_deger: 20.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'TESLIMAT_YUKUMLULUGU', esik_deger: 5000000.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'TESLIMAT_YUKUMLULUGU', esik_deger: 7500000.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'IPTAL_ORANI', esik_deger: 8.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'IPTAL_ORANI', esik_deger: 10.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'FINANSMAN_LIMITI', esik_deger: 180.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'FINANSMAN_LIMITI', esik_deger: 200.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'OZKAYNAK_YETERLILIK', esik_deger: 4.00, karsilastirma: 'LT', seviye: 'YELLOW' },
+                { kpi_kodu: 'OZKAYNAK_YETERLILIK', esik_deger: 3.00, karsilastirma: 'LT', seviye: 'RED' },
+                { kpi_kodu: 'KONSANTRASYON_RISK_GRUBU', esik_deger: 20.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'KONSANTRASYON_RISK_GRUBU', esik_deger: 25.00, karsilastirma: 'GT', seviye: 'RED' }
+            ];
+
+            for (const limit of defaultLimits) {
+                await this.prisma.riskLimit.create({ data: limit });
+            }
+            this.logger.log('Risk KPI tanımları ve Limitleri başarıyla temizlendi ve yeniden yüklendi.');
+        } catch (error) {
+            this.logger.error('Risk KPI tanımları ve Limitleri doğrulanırken hata:', error);
+        }
+    }
 
     /**
      * Tüm KPI'ları hesapla
@@ -70,6 +139,18 @@ export class RiskEngineService {
             this.logger.debug('İptal oranı hesaplanıyor...');
             results.push(await this.cancellationCalculator.calculate(scenarioParams));
 
+            // Toplam Finansman Limiti (Yönetmelik %200 sınırı)
+            this.logger.debug('Toplam finansman limiti hesaplanıyor...');
+            results.push(await this.financingLimitCalculator.calculate());
+
+            // Özkaynak Yeterlilik Oranı (Yönetmelik asgari %3)
+            this.logger.debug('Özkaynak yeterlilik oranı hesaplanıyor...');
+            results.push(await this.equityRatioCalculator.calculate());
+
+            // Risk Grubu Konsantrasyonu (Yönetmelik Aralık 2023)
+            this.logger.debug('Risk grubu konsantrasyonu hesaplanıyor...');
+            results.push(await this.concentrationCalculator.calculateByRiskGroup());
+
             return results;
         } catch (error) {
             this.logger.error('KPI hesaplama hatası:', error);
@@ -103,6 +184,12 @@ export class RiskEngineService {
                 return this.deliveryLiabilityCalculator.calculate(scenarioParams);
             case 'IPTAL_ORANI':
                 return this.cancellationCalculator.calculate(scenarioParams);
+            case 'FINANSMAN_LIMITI':
+                return this.financingLimitCalculator.calculate();
+            case 'OZKAYNAK_YETERLILIK':
+                return this.equityRatioCalculator.calculate();
+            case 'KONSANTRASYON_RISK_GRUBU':
+                return this.concentrationCalculator.calculateByRiskGroup();
             default:
                 return null;
         }

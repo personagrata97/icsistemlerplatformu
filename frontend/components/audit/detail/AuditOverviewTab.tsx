@@ -9,6 +9,9 @@ import Button from '@/components/ui/Button';
 import ActionLink from '@/components/ui/ActionLink';
 import AuditGanttChart from '../AuditGanttChart';
 
+import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
+
 interface AuditOverviewTabProps {
     auditData: any;
     findings: any[];
@@ -21,6 +24,13 @@ const AuditOverviewTab: React.FC<AuditOverviewTabProps> = ({
     progress
 }) => {
     const router = useRouter();
+    const { hasRole } = useAuth();
+    const isInspector = hasRole('AUDIT_INSPECTOR');
+    const isSupervisor = hasRole('AUDIT_SUPERVISOR');
+    const isManager = hasRole('AUDIT_ADMIN') || hasRole('ADMIN');
+    const isAuditor = isInspector || isSupervisor || isManager;
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
+    const canSeeQuality = !isUnit || isAuditor;
     // Timesheet Özeti
     const [timesheetSummary, setTimesheetSummary] = useState<any>(null);
 
@@ -192,30 +202,32 @@ const AuditOverviewTab: React.FC<AuditOverviewTabProps> = ({
             )}
 
             {/* Kalite Güvence ve İyileştirme Programı */}
-            <div className="card shadow-sm bg-gradient-to-br from-indigo-50/50 to-purple-50/30 border-indigo-100">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-indigo-100 rounded-xl text-indigo-600">
-                            <ShieldCheck size={22} />
+            {canSeeQuality && (
+                <div className="card shadow-sm bg-gradient-to-br from-indigo-50/50 to-purple-50/30 border-indigo-100">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 bg-indigo-100 rounded-xl text-indigo-600">
+                                <ShieldCheck size={22} />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-bold text-indigo-900">Kalite Güvence Değerlendirmesi</h3>
+                                <p className="text-xs text-indigo-600/80">Bu denetim görevinin kalite metrikleri durumu</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-sm font-bold text-indigo-900">Kalite Güvence Değerlendirmesi</h3>
-                            <p className="text-xs text-indigo-600/80">Bu denetim görevinin kalite metrikleri durumu</p>
+                        <div className="flex items-center gap-4">
+                            <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold">
+                                {auditData.qualityScore ? `%${auditData.qualityScore}` : 'Değerlendirilmedi'}
+                            </span>
+                            <ActionLink 
+                                onClick={() => router.push(`/audit/quality?auditId=${auditData.id}`)}
+                                variant="primary"
+                            >
+                                Değerlendirmeye Git
+                            </ActionLink>
                         </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold">
-                            {auditData.qualityScore ? `%${auditData.qualityScore}` : 'Değerlendirilmedi'}
-                        </span>
-                        <ActionLink 
-                            onClick={() => router.push(`/audit/quality?auditId=${auditData.id}`)}
-                            variant="primary"
-                        >
-                            Değerlendirmeye Git
-                        </ActionLink>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Gantt Chart (Takvim) */}
             <AuditGanttChart auditData={auditData} />

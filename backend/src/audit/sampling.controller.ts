@@ -71,6 +71,16 @@ export class SamplingController {
         return this.samplingService.generateAdvancedSample(config, req.user);
     }
 
+    // Direct Database Contract Sampling (Live DB Integration)
+    @Post('from-database')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async generateSampleFromDatabase(
+        @Body() params: { auditId: string; method?: string; sampleSize?: number; statusFilter?: string },
+        @Request() req: any
+    ) {
+        return this.samplingService.generateSampleFromDatabase(params, req.user);
+    }
+
     // Advanced Sampling Generator with File Upload
     @Post('advanced-generate-with-file')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })

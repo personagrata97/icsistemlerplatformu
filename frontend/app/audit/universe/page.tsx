@@ -355,10 +355,22 @@ const getRiskCardClass = (riskLevel: string) => {
     }
 };
 
+import { AccessDenied } from '@/components/audit/AuditLogComponents';
+
 export default function AuditUniversePage() {
     const router = useRouter();
     const { showToast } = useToast();
     const { hasRole } = useAuth();
+    const isManager = checkRole(hasRole, ROLES.UNIVERSE_MANAGER);
+    const isInspector = hasRole('AUDIT_INSPECTOR');
+    const isSupervisor = hasRole('AUDIT_SUPERVISOR');
+    const isAuditor = isManager || isInspector || isSupervisor;
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
+
+    if (isUnit && !isAuditor) {
+        return <AccessDenied />;
+    }
+
     const canManage = checkRole(hasRole, ROLES.UNIVERSE_MANAGER);
 
     const [loading, setLoading] = useState(true);
@@ -1835,6 +1847,7 @@ export default function AuditUniversePage() {
                                             {uploadedFiles.length > 0 && (
                                                 <div className="mt-4 border border-gray-100 rounded-lg overflow-hidden">
                                                     <DataTable
+                                                        rowKey="id"
                                                         data={uploadedFiles}
                                                         columns={[
                                                             {

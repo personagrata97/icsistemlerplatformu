@@ -51,7 +51,7 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="tr">
+        <html lang="tr" suppressHydrationWarning>
             <body className={`${poppins.variable} font-sans antialiased text-main-text bg-gray-50`}>
                 <AuthProvider>
                     <AuditTitleProvider>

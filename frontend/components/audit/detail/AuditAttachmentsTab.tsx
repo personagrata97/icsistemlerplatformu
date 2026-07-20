@@ -9,6 +9,9 @@ import Modal from '@/components/ui/Modal';
 import TruncatedText from '@/components/ui/TruncatedText';
 import SectionHeader from '@/components/ui/SectionHeader';
 
+import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
+
 interface Attachment {
     id: string;
     name: string;
@@ -40,6 +43,14 @@ const AuditAttachmentsTab: React.FC<AuditAttachmentsTabProps> = ({
     emptyTitle,
     emptyDescription
 }) => {
+    const { hasRole } = useAuth();
+    const isInspector = hasRole('AUDIT_INSPECTOR');
+    const isSupervisor = hasRole('AUDIT_SUPERVISOR');
+    const isManager = checkRole(hasRole, ROLES.BASIC_MANAGER);
+    const isAuditor = isInspector || isSupervisor || isManager;
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
+    const canEditOrDelete = !isUnit || isAuditor;
+
     const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(null);
 
     const columns: Column<Attachment>[] = [
@@ -105,7 +116,6 @@ const AuditAttachmentsTab: React.FC<AuditAttachmentsTabProps> = ({
             render: (item) => {
                 let displaySize = item.size;
                 if (!displaySize || displaySize === 'Bilinmiyor') {
-                    // Generate a realistic mock size based on file extension
                     const ext = item.name.split('.').pop()?.toLowerCase();
                     if (ext === 'pdf') displaySize = '2.4 MB';
                     else if (ext === 'xlsx' || ext === 'xls') displaySize = '845 KB';
@@ -122,17 +132,20 @@ const AuditAttachmentsTab: React.FC<AuditAttachmentsTabProps> = ({
             header: 'İşlemler',
             align: 'center',
             width: '140px',
-            render: (item) => (
-                <div onClick={(e) => e.stopPropagation()}>
-                    <ActionMenu
-                        items={[
-                            { label: 'Detayı İncele', icon: Eye, onClick: () => setSelectedAttachment(item) },
-                            { label: 'İndir', icon: Download, onClick: () => onDownloadAttachment(item) },
-                            { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => onDeleteAttachment(item) }
-                        ]}
-                    />
-                </div>
-            )
+            render: (item) => {
+                const actionItems: any[] = [
+                    { label: 'Detayı İncele', icon: Eye, onClick: () => setSelectedAttachment(item) },
+                    { label: 'İndir', icon: Download, onClick: () => onDownloadAttachment(item) }
+                ];
+                if (canEditOrDelete) {
+                    actionItems.push({ label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => onDeleteAttachment(item) });
+                }
+                return (
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <ActionMenu items={actionItems} />
+                    </div>
+                );
+            }
         }
     ];
 
@@ -141,10 +154,12 @@ const AuditAttachmentsTab: React.FC<AuditAttachmentsTabProps> = ({
             <SectionHeader 
                 title={title || 'Çalışma Kâğıtları'}
                 icon={isReportTab ? FileText : Paperclip}
-                actionButton={
-                    <Button size="sm" onClick={onAddAttachment} className="gap-2" variant="primary">
-                        <Plus size={16} /> {isReportTab ? 'Yeni Rapor Eki Ekle' : 'Yeni Çalışma Kâğıdı Ekle'}
-                    </Button>
+                rightContent={
+                    canEditOrDelete ? (
+                        <Button size="sm" onClick={onAddAttachment} className="gap-2" variant="primary">
+                            <Plus size={16} /> {isReportTab ? 'Yeni Rapor Eki Ekle' : 'Yeni Çalışma Kâğıdı Ekle'}
+                        </Button>
+                    ) : undefined
                 }
             />
             

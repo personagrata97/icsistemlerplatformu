@@ -151,7 +151,9 @@ function AuditsPageContent() {
     };
 
     // Yetki kontrolü
-    const { hasRole } = useAuth();
+    const { hasRole, user } = useAuth();
+    const isAuditor = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_INSPECTOR') || hasRole('SYSTEM_ADMIN');
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
     const canDelete = checkRole(hasRole, ROLES.AUDIT_DELETE);
 
     // Denetim silme - tıklama işleyicisi
@@ -206,7 +208,15 @@ function AuditsPageContent() {
 
         const matchesInspector = filterInspector.length === 0 || auditAuditors.some(a => filterInspector.includes(a));
 
-        return matchesSearch && matchesType && matchesStatus && matchesInspector;
+        // Birim Filtrelemesi: Birim kullanıcısı ise sadece kendi birimine ait denetimleri görsün
+        const matchesUnit = (isUnit && !isAuditor) ? (() => {
+            if (!user?.department) return true;
+            const unitName = audit.unit?.name || audit.unitName;
+            if (!unitName) return true;
+            return unitName.toLocaleLowerCase('tr-TR').trim() === user.department.toLocaleLowerCase('tr-TR').trim();
+        })() : true;
+
+        return matchesSearch && matchesType && matchesStatus && matchesInspector && matchesUnit;
     });
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -283,7 +293,7 @@ function AuditsPageContent() {
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 onRefresh={() => loadAudits(false)}
-                showAddButton={true}
+                showAddButton={isAuditor}
                 onAddClick={() => {
                     setEditingId(null);
                     setIsCreateModalOpen(true);

@@ -75,10 +75,10 @@ export default function AuditSidebar() {
     const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
 
     // Role Checks
-    const isManager = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('Sistem Yöneticisi') || hasRole('Teftiş Kurulu Müdürü') || hasRole('Admin') || hasRole('Yönetici');
-    const isInspector = hasRole('AUDIT_INSPECTOR') || hasRole('Müfettiş') || hasRole('Başmüfettiş') || hasRole('Kıdemli Müfettiş') || hasRole('Müfettiş Yardımcısı') || hasRole('Yetkili Müfettiş Yardımcısı');
+    const isManager = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('SYSADMIN') || hasRole('AUDIT_ADMIN') || hasRole('Sistem Yöneticisi') || hasRole('SISTEM_YONETICISI') || hasRole('Teftiş Kurulu Müdürü') || hasRole('TEFTIS_KURULU_MUDURU') || hasRole('Admin') || hasRole('Yönetici');
+    const isInspector = hasRole('AUDIT_INSPECTOR') || hasRole('Müfettiş') || hasRole('MUFETTIS') || hasRole('Başmüfettiş') || hasRole('BASMUFETTIS') || hasRole('Kıdemli Müfettiş') || hasRole('KIDEMLI_MUFETTIS') || hasRole('Müfettiş Yardımcısı') || hasRole('Yetkili Müfettiş Yardımcısı');
     // Core Audit Staff (Inspectors + Managers + Supervisors)
-    const isAuditor = isManager || isInspector || hasRole('AUDIT_SUPERVISOR');
+    const isAuditor = isManager || isInspector || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_MANAGER');
 
     // Unit / Auditee (Can see findings assigned to them)
     // If not an auditor and not a standard employee, assume Unit/Viewer role
@@ -119,19 +119,19 @@ export default function AuditSidebar() {
             </div>
 
             <div className="sidebar-content flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-gray-300">
-                <ul className="nav-links space-y-3 px-2 py-3">
-                    {/* 1. YÖNETİM VE ANALİZ */}
-                    {isAuditor && (
+                <ul className="nav-links space-y-2 px-2 py-2">
+                    {/* 1. YÖNETİM VE ANALİZ / PORTAL */}
+                    {(isAuditor || isUnit) && (
                         <li>
-                            <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">YÖNETİM & ANALİZ</div>
+                            <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">{isUnit && !isAuditor ? 'BİRİM PORTALI' : 'YÖNETİM & ANALİZ'}</div>
                             <ul className="space-y-1">
                                 <li className="nav-item">
-                                    <Link href="/audit" className={`nav-link ${pathname === '/audit' ? 'active' : ''}`}>
+                                    <Link href={isUnit && !isAuditor ? '/audit/unit' : '/audit'} className={`nav-link ${(pathname === '/audit/unit' || (pathname === '/audit' && !isUnit)) ? 'active' : ''}`}>
                                         <LayoutDashboard size={18} />
-                                        <span>Ana Panel</span>
+                                        <span>{isUnit && !isAuditor ? 'Özet Görünüm' : 'Ana Panel'}</span>
                                     </Link>
                                 </li>
-                            {(isManager || hasRole('EXECUTIVE')) && (
+                            {isAuditor && (isManager || hasRole('EXECUTIVE')) && (
                                 <li className="nav-item">
                                     <Link href="/audit/executive" className={`nav-link ${isActive('/audit/executive') ? 'active' : ''}`}>
                                         <Target size={18} />
@@ -139,12 +139,14 @@ export default function AuditSidebar() {
                                     </Link>
                                 </li>
                             )}
-                            <li className="nav-item">
-                                <Link href="/audit/staff" className={`nav-link ${isActive('/audit/staff') && !isActive('/audit/staff/cpe') ? 'active' : ''}`}>
-                                    <Users size={18} />
-                                    <span>Denetim Ekibi</span>
-                                </Link>
-                            </li>
+                            {isAuditor && (
+                                <li className="nav-item">
+                                    <Link href="/audit/staff" className={`nav-link ${isActive('/audit/staff') && !isActive('/audit/staff/cpe') ? 'active' : ''}`}>
+                                        <Users size={18} />
+                                        <span>Denetim Ekibi</span>
+                                    </Link>
+                                </li>
+                            )}
                         </ul>
                     </li>
                 )}
@@ -197,13 +199,19 @@ export default function AuditSidebar() {
                     </li>
                 )}
 
-                {/* AUDITEE (İLGİLİ BİRİM) SADECE BULGULARI GÖRÜR */}
+                {/* AUDITEE (İLGİLİ BİRİM) EKRANLARI */}
                 {(!isAuditor && isUnit) && (
-                    <li>
+                    <li className="pt-1.5 border-t border-gray-100">
                         <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">Denetim İşlemleri</div>
                         <ul className="space-y-1">
                             <li className="nav-item">
-                                <Link href="/audit/findings" className={`nav-link ${isActive('/audit/findings') ? 'active' : ''}`}>
+                                <Link href="/audit/unit/audits" className={`nav-link ${isActive('/audit/unit/audits') ? 'active' : ''}`}>
+                                    <ClipboardCheck size={18} />
+                                    <span>Birim Denetimleri</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/audit/unit/findings" className={`nav-link ${isActive('/audit/unit/findings') || isActive('/audit/conciliation') || isActive('/audit/follow-up') ? 'active' : ''}`}>
                                     <AlertCircle size={18} />
                                     <span>Bulgular (Aksiyonlarım)</span>
                                 </Link>
@@ -240,36 +248,34 @@ export default function AuditSidebar() {
                     </li>
                 )}
 
-                {/* 5. ETİK VE UYUM */}
-                {!isUnit && (
-                    <li className="pt-1.5 border-t border-gray-100">
-                        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">Etik & Uyum</div>
-                        <ul className="space-y-1">
-                            <li className="nav-item">
-                                <Link href="/audit/ethics/submit" className={`nav-link ${isActive('/audit/ethics/submit') ? 'active' : ''}`}>
-                                    <Send size={18} />
-                                    <span>Bildirim Yap</span>
-                                </Link>
-                            </li>
-                            {isAuditor && (
-                                <>
-                                    <li className="nav-item">
-                                        <Link href="/audit/ethics" className={`nav-link ${isActive('/audit/ethics') && !isActive('/audit/ethics/submit') && !isActive('/audit/ethics/reports') ? 'active' : ''}`}>
-                                            <Scale size={18} />
-                                            <span>Gelen Bildirimler</span>
-                                        </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                        <Link href="/audit/ethics/reports" className={`nav-link ${isActive('/audit/ethics/reports') ? 'active' : ''}`}>
-                                            <FileBarChart size={18} />
-                                            <span>Etik Raporları</span>
-                                        </Link>
-                                    </li>
-                                </>
-                            )}
-                        </ul>
-                    </li>
-                )}
+                {/* 5. ETİK VE İHBAR PORTALI */}
+                <li className="pt-1.5 border-t border-gray-100">
+                    <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">Etik & İhbar Portalı</div>
+                    <ul className="space-y-1">
+                        <li className="nav-item">
+                            <Link href="/audit/ethics/submit" className={`nav-link ${isActive('/audit/ethics/submit') ? 'active' : ''}`}>
+                                <Send size={18} />
+                                <span>Bildirim Yap</span>
+                            </Link>
+                        </li>
+                        {(isAuditor || isManager) && (
+                            <>
+                                <li className="nav-item">
+                                    <Link href="/audit/ethics" className={`nav-link ${isActive('/audit/ethics') && !isActive('/audit/ethics/submit') && !isActive('/audit/ethics/reports') ? 'active' : ''}`}>
+                                        <Scale size={18} />
+                                        <span>Gelen Bildirimler</span>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link href="/audit/ethics/reports" className={`nav-link ${isActive('/audit/ethics/reports') ? 'active' : ''}`}>
+                                        <FileBarChart size={18} />
+                                        <span>Etik Raporları</span>
+                                    </Link>
+                                </li>
+                            </>
+                        )}
+                    </ul>
+                </li>
             </ul>
             </div>
         </aside>

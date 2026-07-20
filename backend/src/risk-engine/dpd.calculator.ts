@@ -52,25 +52,27 @@ export class DpdCalculator {
 
         // Senaryo uygulaması (Gecikme artış şoku - DPD geçişkenlik (Roll-rate) matrisi basitleştirilmiş hali)
         if (params && params.gecikme_artis !== 0) {
-            const sokOran = params.gecikme_artis;
+            // Cap shock rate between 0 and 1
+            const sokOran = Math.max(0, Math.min(1, params.gecikme_artis));
+            
             // 1'den 2'ye geçiş
             const gecis1to2 = groups.grup1.tutar * sokOran;
-            groups.grup1.tutar -= gecis1to2;
+            groups.grup1.tutar = Math.max(0, groups.grup1.tutar - gecis1to2);
             groups.grup2.tutar += gecis1to2;
             
             // 2'den 3'e geçiş
             const gecis2to3 = groups.grup2.tutar * sokOran;
-            groups.grup2.tutar -= gecis2to3;
+            groups.grup2.tutar = Math.max(0, groups.grup2.tutar - gecis2to3);
             groups.grup3.tutar += gecis2to3;
 
             // 3'ten 4'e geçiş
             const gecis3to4 = groups.grup3.tutar * sokOran;
-            groups.grup3.tutar -= gecis3to4;
+            groups.grup3.tutar = Math.max(0, groups.grup3.tutar - gecis3to4);
             groups.grup4.tutar += gecis3to4;
 
             // 4'ten 5'e geçiş
             const gecis4to5 = groups.grup4.tutar * sokOran;
-            groups.grup4.tutar -= gecis4to5;
+            groups.grup4.tutar = Math.max(0, groups.grup4.tutar - gecis4to5);
             groups.grup5.tutar += gecis4to5;
         }
 
@@ -108,7 +110,8 @@ export class DpdCalculator {
                 genel_karsilik: genelKarsilik,
                 ozel_karsilik: ozelKarsilik,
                 toplam_karsilik: toplamKarsilik,
-                gruplar: groups
+                gruplar: groups,
+                mevzuat_dayanak: 'FKF/TFŞ Muhasebe Uygulamaları Yönetmeliği — Karşılık Oranları: Grup 3 asgari %20, Grup 4 asgari %50, Grup 5 %100. TFRS 9 Stage 1-2-3 sınıflandırması.'
             },
         };
     }

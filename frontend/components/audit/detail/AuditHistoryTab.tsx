@@ -48,7 +48,54 @@ const AuditHistoryTab: React.FC<AuditHistoryTabProps> = ({
         return action.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
     };
 
+    const translateLogKey = (key: string) => {
+        const map: Record<string, string> = {
+            'title': 'Başlık',
+            'code': 'Denetim No',
+            'type': 'Denetim Türü',
+            'status': 'Durum',
+            'period': 'Dönem',
+            'riskLevel': 'Risk Seviyesi',
+            'plannedStartDate': 'Planlanan Başlangıç',
+            'plannedEndDate': 'Planlanan Bitiş',
+            'supervisor': 'Gözetim Sorumlusu',
+            'auditors': 'Müfettişler',
+            'department': 'Birim/Departman',
+            'scope': 'Kapsam',
+            'objective': 'Amaç',
+            'methodology': 'Metodoloji',
+            'criteria': 'Kriterler',
+            'description': 'Açıklama',
+            'name': 'Adı',
+            'owner': 'Sahibi',
+            'category': 'Kategori',
+            'level': 'Seviye',
+            'frequency': 'Frekans',
+            'source': 'Kaynak',
+            'method': 'Yöntem'
+        };
+        return map[key] || key;
+    };
 
+    const formatTargetType = (targetType: string) => {
+        const map: Record<string, string> = {
+            'AUDIT': 'Denetim',
+            'FINDING': 'Bulgu',
+            'ATTACHMENT': 'Ek',
+            'PROCESS': 'Süreç',
+            'RISK': 'Risk',
+            'CONTROL': 'Kontrol'
+        };
+        return map[targetType.toUpperCase()] || targetType;
+    };
+
+    const renderSmartText = (text: string) => {
+        return text;
+    };
+
+    const formatLogDetails = (details: string) => {
+        return details;
+    };
 
     const renderChangesList = (parsedChanges: any) => {
         if (!parsedChanges || Object.keys(parsedChanges).length === 0) return null;

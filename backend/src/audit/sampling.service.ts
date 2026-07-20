@@ -847,4 +847,40 @@ n = ${sampleSize}`;
         return sample;
     }
 
+    // Direct Database Contract Sampling (Live DB Integration)
+    async generateSampleFromDatabase(params: { auditId: string; method?: string; sampleSize?: number; statusFilter?: string }, user?: any) {
+        const { auditId, method = 'Rastgele', sampleSize = 20, statusFilter = 'AKTIF' } = params;
+
+        const sozlesmeler = await this.prisma.sozlesme.findMany({
+            where: statusFilter !== 'HEPSI' ? { durum: statusFilter } : {},
+            select: {
+                sozlesme_id: true,
+                musteri_id: true,
+                toplam_tutar: true,
+                durum: true,
+                baslangic_tarihi: true,
+            }
+        });
+
+        if (sozlesmeler.length === 0) {
+            throw new NotFoundException('Örneklem çekilecek veritabanı sözleşme kaydı bulunamadı.');
+        }
+
+        const populationData = sozlesmeler.map(s => ({
+            'Sözleşme No': s.sozlesme_id,
+            'Müşteri ID': s.musteri_id,
+            'Toplam Tutar': Number(s.toplam_tutar),
+            'Durum': s.durum,
+            'Tarih': s.baslangic_tarihi ? s.baslangic_tarihi.toISOString().split('T')[0] : ''
+        }));
+
+        return this.generateAdvancedSample({
+            auditId,
+            title: `Veritabanı Canlı Örneklemi (${statusFilter})`,
+            method,
+            sampleSize,
+            populationData,
+            rules: []
+        }, user);
+    }
 }

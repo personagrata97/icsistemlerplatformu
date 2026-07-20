@@ -21,7 +21,7 @@ export class ConcentrationCalculator {
         let toplamTutar = 0;
 
         sozlesmeler.forEach((s) => {
-            const bolge = s.musteri.bolge;
+            const bolge = s.musteri?.bolge || 'Bilinmeyen';
             const tutar = Number(s.toplam_tutar);
             bolgeMap.set(bolge, (bolgeMap.get(bolge) || 0) + tutar);
             toplamTutar += tutar;
@@ -39,17 +39,19 @@ export class ConcentrationCalculator {
             }
         });
 
+        const maxKonsantrasyonYuzde = maxKonsantrasyon * 100;
+
         // Risk seviyesi
         let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
-        if (maxKonsantrasyon > 0.40) {
+        if (maxKonsantrasyonYuzde > 40) {
             riskSeviyesi = 'RED';
-        } else if (maxKonsantrasyon > 0.30) {
+        } else if (maxKonsantrasyonYuzde > 30) {
             riskSeviyesi = 'YELLOW';
         }
 
         return {
             kpi_kodu: 'KONSANTRASYON_BOLGE',
-            deger: maxKonsantrasyon,
+            deger: maxKonsantrasyonYuzde,
             risk_seviyesi: riskSeviyesi,
             detay: {
                 max_bolge: maxBolge,
@@ -91,17 +93,19 @@ export class ConcentrationCalculator {
             }
         });
 
+        const maxKonsantrasyonYuzde = maxKonsantrasyon * 100;
+
         // Risk seviyesi
         let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
-        if (maxKonsantrasyon > 0.50) {
+        if (maxKonsantrasyonYuzde > 50) {
             riskSeviyesi = 'RED';
-        } else if (maxKonsantrasyon > 0.40) {
+        } else if (maxKonsantrasyonYuzde > 40) {
             riskSeviyesi = 'YELLOW';
         }
 
         return {
             kpi_kodu: 'KONSANTRASYON_VADE',
-            deger: maxKonsantrasyon,
+            deger: maxKonsantrasyonYuzde,
             risk_seviyesi: riskSeviyesi,
             detay: {
                 max_vade_grup: maxVadeGrup,
@@ -125,7 +129,7 @@ export class ConcentrationCalculator {
             toplamTutar += tutar;
             
             // Segment 'TÜZEL', 'TUZEL' veya 'KURUMSAL' ise tüzel kişi sayılır
-            const segment = s.musteri.segment.toUpperCase();
+            const segment = (s.musteri?.segment || 'BİREYSEL').toUpperCase();
             if (segment.includes('TÜZEL') || segment.includes('TUZEL') || segment.includes('KURUMSAL')) {
                 tuzelTutar += tutar;
             }
@@ -154,6 +158,90 @@ export class ConcentrationCalculator {
                 toplam_tutar: toplamTutar,
                 tuzel_tutar: tuzelTutar,
                 bddk_mesaji: mesaj
+            },
+        };
+    }
+
+    /**
+     * Risk Grubu Konsantrasyon Analizi
+     * 
+     * Mevzuat Dayanağı: TFŞ Kuruluş ve Faaliyet Yönetmeliği
+     * Aralık 2023 değişikliği ile risk grubu tanımı netleştirilmiştir.
+     * 
+     * Risk Grubu: Bir gerçek kişi ile eşi, çocukları ve bunların kontrol ettiği
+     * ortaklıkların oluşturduğu ekonomik birliktir.
+     * 
+     * MVP Yaklaşımı: Müşteri tablosunda henüz ayrı bir risk_grubu alanı olmadığından,
+     * aynı soyadını taşıyan müşteriler "aile/risk grubu" olarak gruplandırılır.
+     * Bu, gerçek bir risk grubu tespitinin basitleştirilmiş halidir.
+     */
+    async calculateByRiskGroup(): Promise<RiskCalculationResult> {
+        const sozlesmeler = await this.prisma.sozlesme.findMany({
+            where: { durum: 'AKTIF' },
+            include: { musteri: true },
+        });
+
+        let toplamTutar = 0;
+        const riskGrubuMap = new Map<string, number>();
+
+        sozlesmeler.forEach((s) => {
+            const tutar = Number(s.toplam_tutar);
+            toplamTutar += tutar;
+
+            // Soyadına göre grupla (basitleştirilmiş risk grubu tespiti)
+            const adSoyad = s.musteri?.ad_soyad || 'Bilinmeyen';
+            const parts = adSoyad.trim().split(/\s+/);
+            const soyad = parts.length > 1 ? parts[parts.length - 1].toUpperCase() : adSoyad.toUpperCase();
+
+            riskGrubuMap.set(soyad, (riskGrubuMap.get(soyad) || 0) + tutar);
+        });
+
+        // En yoğun risk grubunu bul
+        let maxGrupTutar = 0;
+        let maxGrupAd = '';
+
+        riskGrubuMap.forEach((tutar, grup) => {
+            if (tutar > maxGrupTutar) {
+                maxGrupTutar = tutar;
+                maxGrupAd = grup;
+            }
+        });
+
+        const maxGrupOran = toplamTutar > 0 ? (maxGrupTutar / toplamTutar) * 100 : 0;
+
+        // Risk seviyesi — tek bir risk grubunun portföydeki payı %10'u aşmamalı
+        let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
+        let mesaj = '✅ Risk grubu konsantrasyonu sağlıklı.';
+
+        if (maxGrupOran > 10) {
+            riskSeviyesi = 'RED';
+            mesaj = `🚨 UYARI: "${maxGrupAd}" risk grubu portföyün %${maxGrupOran.toFixed(1)}'ini oluşturuyor. Konsantrasyon riski yüksek.`;
+        } else if (maxGrupOran > 7) {
+            riskSeviyesi = 'YELLOW';
+            mesaj = `⚠️ YAKIN İZLEME: "${maxGrupAd}" risk grubu portföyün %${maxGrupOran.toFixed(1)}'ine ulaştı.`;
+        }
+
+        // İlk 5 risk grubunu listele
+        const sortedGroups = Array.from(riskGrubuMap.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([grup, tutar]) => ({
+                risk_grubu: grup,
+                tutar,
+                oran_yuzde: toplamTutar > 0 ? ((tutar / toplamTutar) * 100).toFixed(2) : '0'
+            }));
+
+        return {
+            kpi_kodu: 'KONSANTRASYON_RISK_GRUBU',
+            deger: maxGrupOran,
+            risk_seviyesi: riskSeviyesi,
+            detay: {
+                en_yogun_grup: maxGrupAd,
+                en_yogun_grup_tutar: maxGrupTutar,
+                toplam_risk_grubu_sayisi: riskGrubuMap.size,
+                ilk_5_grup: sortedGroups,
+                bddk_mesaji: mesaj,
+                mevzuat_dayanak: 'TFŞ Kuruluş ve Faaliyet Yönetmeliği — Risk grubu limitleri (Aralık 2023 değişikliği). İlişkili kişi ve ortaklıkların toplam finansman yoğunlaşması izlenir.'
             },
         };
     }

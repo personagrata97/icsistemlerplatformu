@@ -48,6 +48,7 @@ import Modal from '@/components/ui/Modal';
 
 function FindingsPageContent() {
     const { user, hasPermission, hasRole } = useAuth();
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
     const router = useRouter();
     const pathname = usePathname();
     const { showToast } = useToast();
@@ -92,6 +93,18 @@ function FindingsPageContent() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
+
+    useEffect(() => {
+        if (isUnit) {
+            if (pathname === '/audit/findings') {
+                router.replace('/audit/unit/findings?tab=all');
+            } else if (pathname === '/audit/conciliation') {
+                router.replace('/audit/unit/findings?tab=teblig');
+            } else if (pathname === '/audit/follow-up') {
+                router.replace('/audit/unit/findings?tab=aksiyon');
+            }
+        }
+    }, [isUnit, pathname, router]);
 
     useEffect(() => {
         loadData();
@@ -212,11 +225,15 @@ function FindingsPageContent() {
 
     const handleConfirmDelete = async () => {
         if (!deleteConfirm.id) return;
+        if (isUnit) {
+            showToast('Birim kullanıcılarının bulgu silme yetkisi bulunmamaktadır.', 'error');
+            setDeleteConfirm({ isOpen: false, id: null });
+            return;
+        }
         try {
             const response = await auditApi.deleteFinding(String(deleteConfirm.id));
             if (response.success) {
                 showToast(response.message || 'İşlem başarıyla tamamlandı.', 'success');
-                // Yeni durumu yansıtmak için verileri yenile
                 await loadData();
                 refreshTrashCount();
             } else {
@@ -334,8 +351,6 @@ function FindingsPageContent() {
 
 
     // Filtreleme mantığı
-    const isUnit = checkRole(hasRole, ROLES.UNIT);
-
     const filteredFindings = findings.filter(f => {
         const matchesTerm = (f.title?.toLocaleLowerCase('tr-TR') || '').includes(searchTerm.toLocaleLowerCase('tr-TR')) ||
             (f.code?.toLocaleLowerCase('tr-TR') || '').includes(searchTerm.toLocaleLowerCase('tr-TR'));
@@ -346,37 +361,35 @@ function FindingsPageContent() {
         const year = f.dueDate ? new Date(f.dueDate).getFullYear().toString() : '2025';
         const matchesYear = filterYear.length === 0 || filterYear.includes(year);
 
-        // Birim doğrulaması: Yalnızca birimin sürecine (Tebliğ ve Mutabakat) ait ve birimlerine ait bulguları göster
+        // Birim doğrulaması: Yalnızca birimin sorumluluğundaki bulguları göster
         const relevantToUnit = isUnit ? (() => {
-            // 1. Status Check
-            const allowedStatuses = ['Tebliğ Edildi', 'Birim Yanıtladı', 'Takip Ediliyor', 'Doğrulama Bekliyor', 'Revizyon Gerekli', 'Tamamlandı'];
-            if (!allowedStatuses.includes(f.status)) return false;
-
-            // 2. Department Check
-            if (!user?.department) return false; // Birim kullanıcılarının bulguları görmesi için departmanı olmalı
-
-            // Birim adını çözümle (bulgu.audit eksik olabilir, denetimler listesinden yedek arama yap)
             let unitName = f.audit?.unit?.name;
             if (!unitName && audits.length > 0) {
                 const relatedAudit = audits.find(a => a.id === f.auditId || String(a.id) === String(f.auditId));
                 unitName = relatedAudit?.unit?.name;
             }
 
-            if (!unitName) return false;
+            if (!user?.department || !unitName) return true;
 
-            return unitName.toLocaleLowerCase('tr-TR').trim() === user.department.toLocaleLowerCase('tr-TR').trim();
+            const uDep = user.department.toLocaleLowerCase('tr-TR').trim();
+            const uName = unitName.toLocaleLowerCase('tr-TR').trim();
+            return uName.includes(uDep) || uDep.includes(uName);
         })() : true;
 
         // Sekme (Tab) Tabanlı Veri Filtreleme
+        const currentTabParam = searchParams.get('tab');
         const relevantToTab = (() => {
-            // Sadece birim kullanıcısı değilse veya birim kullanıcısı iken mutabakat sekmesindeyse
-            if (pathname === '/audit/conciliation') {
-                return ['Tebliğ Edildi', 'Birim Yanıtladı', 'Cevaplandı', 'Risk Kabul Edildi', 'Mutabık Değil'].includes(f.status);
+            if (currentTabParam === 'all') return true;
+            if (currentTabParam === 'teblig' || pathname === '/audit/conciliation') {
+                return ['Tebliğ Edildi', 'Birim Yanıtladı', 'Cevaplandı', 'Risk Kabul Edildi', 'Mutabık Değil', 'Revizyon Gerekli'].includes(f.status);
             }
-            if (pathname === '/audit/follow-up') {
+            if (currentTabParam === 'aksiyon' || pathname === '/audit/follow-up') {
                 return ['Takip Ediliyor', 'Doğrulama Bekliyor', 'Revizyon Gerekli', 'Tamamlandı', 'Kapalı', 'Kapalı (Mutabık Değil)'].includes(f.status);
             }
-            return true; // '/audit/findings' için hepsini göster
+            if (pathname === '/audit/unit/findings' && !currentTabParam) {
+                return true;
+            }
+            return true;
         })();
 
         return matchesTerm && matchesRisk && matchesStatus && matchesAudit && matchesInspector && matchesYear && relevantToUnit && relevantToTab;
@@ -636,13 +649,14 @@ function FindingsPageContent() {
     };
 
     const getStatusOptions = () => {
-        if (pathname === '/audit/conciliation') {
+        if (pathname === '/audit/conciliation' || pathname === '/audit/unit/findings') {
             return [
                 { value: "Tebliğ Edildi", label: "Tebliğ Edildi" },
                 { value: "Birim Yanıtladı", label: "Birim Yanıtladı" },
                 { value: "Cevaplandı", label: "Cevaplandı" },
                 { value: "Risk Kabul Edildi", label: "Risk Kabul Edildi" },
-                { value: "Mutabık Değil", label: "Mutabık Değil" }
+                { value: "Mutabık Değil", label: "Mutabık Değil" },
+                { value: "Revizyon Gerekli", label: "Revizyon Gerekli" }
             ];
         }
         if (pathname === '/audit/follow-up') {
@@ -655,7 +669,8 @@ function FindingsPageContent() {
                 { value: "Kapalı (Mutabık Değil)", label: "Kapalı (Mutabık Değil)" }
             ];
         }
-        return [
+        
+        const allOptions = [
             { value: "Taslak", label: "Taslak" },
             { value: "Onay Bekliyor", label: "Onay Bekliyor" },
             { value: "Onaylandı", label: "Onaylandı" },
@@ -667,6 +682,12 @@ function FindingsPageContent() {
             { value: "Tamamlandı", label: "Tamamlandı" },
             { value: "Kapalı", label: "Kapalı" }
         ];
+
+        if (isUnit) {
+            return allOptions.filter(opt => !['Taslak', 'Onay Bekliyor', 'Onaylandı'].includes(opt.value));
+        }
+
+        return allOptions;
     };
 
     if (!user) return null;
@@ -678,17 +699,16 @@ function FindingsPageContent() {
                     noSearch={true}
                     leftActions={
                         <SegmentedTabs
-                            tabs={[
+                            tabs={isUnit ? [
+                                { id: '/audit/unit/findings?tab=all', label: 'Tüm Bulgular', icon: List },
+                                { id: '/audit/unit/findings?tab=teblig', label: 'Tebliğ ve Mutabakat', icon: FileSignature },
+                                { id: '/audit/unit/findings?tab=aksiyon', label: 'Aksiyon Takip', icon: Clock }
+                            ] : [
                                 { id: '/audit/findings', label: 'Tüm Bulgular', icon: List },
                                 { id: '/audit/conciliation', label: 'Tebliğ ve Mutabakat', icon: FileSignature },
                                 { id: '/audit/follow-up', label: 'Aksiyon Takip', icon: Clock }
-                            ].filter(tab => {
-                                if (hasRole('AUDIT_UNIT')) {
-                                    return tab.id === '/audit/conciliation';
-                                }
-                                return true;
-                            })}
-                            activeTab={pathname}
+                            ]}
+                            activeTab={isUnit ? (`/audit/unit/findings?tab=${searchParams.get('tab') || 'all'}`) : (pathname === '/audit/conciliation' ? '/audit/conciliation' : pathname)}
                             onChange={(id) => router.push(id)}
                         />
                     }
@@ -696,8 +716,9 @@ function FindingsPageContent() {
             </div>
             {/* Page Header */}
             <PageHeader 
-                title={pathname === '/audit/conciliation' ? 'Tebliğ ve Mutabakat' : pathname === '/audit/follow-up' ? 'Aksiyon Takip' : 'Bulgular & Aksiyonlar'} 
+                title={pathname === '/audit/unit/findings' ? 'Bulgular & Aksiyon Takibi' : pathname === '/audit/conciliation' ? 'Tebliğ ve Mutabakat' : pathname === '/audit/follow-up' ? 'Aksiyon Takip' : 'Bulgular & Aksiyonlar'} 
                 subtitle={
+                    pathname === '/audit/unit/findings' ? 'Biriminizle ilgili tebliğ edilen bulguların mutabakat ve aksiyon süreçleri' :
                     pathname === '/audit/conciliation' ? 'Tebliğ edilen bulguların birimlerle mutabakat süreçleri ve yanıtların değerlendirilmesi' : 
                     pathname === '/audit/follow-up' ? 'Mutabık kalınan bulguların aksiyon planları ve kanıt yükleme süreçlerinin takibi' : 
                     'Tespitlerden mutabakat ve aksiyon takibine kadar tüm bulgu süreçlerinin yönetimi'
@@ -786,13 +807,13 @@ function FindingsPageContent() {
                 findings={paginatedFindings}
                 loading={loading}
                 isUnit={isUnit}
-                isManager={checkRole(hasRole, ROLES.FINDING_MANAGER)}
+                isManager={isUnit ? false : checkRole(hasRole, ROLES.FINDING_MANAGER)}
                 onView={handleView}
-                onEdit={handleEditFinding}
-                onDelete={handleDeleteClick}
-                onStatusUpdate={handleStatusUpdate}
-                onNotify={handleNotifyClick}
-                onReviewRequest={(finding) => { setActionFinding(finding); setShowReviewModal(true); }}
+                onEdit={isUnit ? undefined as any : handleEditFinding}
+                onDelete={isUnit ? undefined as any : handleDeleteClick}
+                onStatusUpdate={isUnit ? undefined as any : handleStatusUpdate}
+                onNotify={isUnit ? undefined as any : handleNotifyClick}
+                onReviewRequest={isUnit ? undefined as any : ((finding) => { setActionFinding(finding); setShowReviewModal(true); })}
                 searchTerm={searchTerm}
                 onClearFilters={() => {
                     setSearchTerm('');
@@ -828,14 +849,14 @@ function FindingsPageContent() {
                 isOpen={isDetailModalOpen}
                 onClose={() => setIsDetailModalOpen(false)}
                 finding={selectedFinding}
-                onStatusUpdate={handleStatusUpdate}
-                onNotify={handleNotifyClick}
+                onStatusUpdate={isUnit ? undefined : handleStatusUpdate}
+                onNotify={isUnit ? undefined : handleNotifyClick}
                 onAcceptRisk={handleAcceptRiskClick}
                 onExtensionRequest={handleExtensionClick}
-                onReviewRequest={(finding) => { setActionFinding(finding); setShowReviewModal(true); }}
-                onEdit={handleEditFinding}
-                onDelete={handleDeleteClick}
-                isManager={checkRole(hasRole, ROLES.FINDING_MANAGER)}
+                onReviewRequest={isUnit ? undefined : ((finding) => { setActionFinding(finding); setShowReviewModal(true); })}
+                onEdit={isUnit ? undefined : handleEditFinding}
+                onDelete={isUnit ? undefined : handleDeleteClick}
+                isManager={isUnit ? false : checkRole(hasRole, ROLES.FINDING_MANAGER)}
                 user={user}
                 onRefresh={loadData}
             />

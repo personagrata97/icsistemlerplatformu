@@ -53,7 +53,7 @@ export default function ControlPickerModal({ isOpen, onClose, onAddControls }: C
             isOpen={isOpen}
             onClose={onClose}
             title="Merkezi Kütüphaneden Kontrol Ekle"
-            size="4xl"
+            size="2xl"
             footer={
                 <div className="flex items-center justify-between w-full">
                     <Button variant="secondary" onClick={() => { onClose(); router.push('/audit/controls'); }} leftIcon={<Plus size={16} />}>
@@ -77,7 +77,7 @@ export default function ControlPickerModal({ isOpen, onClose, onAddControls }: C
                 <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200">
                     <SearchInput 
                         value={searchTerm} 
-                        onChange={setSearchTerm} 
+                        onChange={e => setSearchTerm(e.target.value)} 
                         placeholder="Kütüphanede kontrol ara (isim, kod, kategori)..." 
                     />
                 </div>

@@ -82,9 +82,24 @@ interface ReportHistory {
     fileSize?: string;
 }
 
+import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
+import { AccessDenied } from '@/components/audit/AuditLogComponents';
+
 export default function OfficialReportingPage() {
     const router = useRouter();
     const { showToast } = useToast();
+    const { hasRole } = useAuth();
+    const isInspector = hasRole('AUDIT_INSPECTOR');
+    const isSupervisor = hasRole('AUDIT_SUPERVISOR');
+    const isManager = checkRole(hasRole, ROLES.BASIC_MANAGER) || hasRole('ADMIN');
+    const isAuditor = isInspector || isSupervisor || isManager;
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
+
+    if (isUnit && !isAuditor) {
+        return <AccessDenied />;
+    }
+
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<any>(null);
     const [selectedPeriod, setSelectedPeriod] = useState(new Date().getFullYear().toString());

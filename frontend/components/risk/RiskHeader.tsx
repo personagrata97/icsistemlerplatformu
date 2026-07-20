@@ -46,9 +46,9 @@ export default function RiskHeader({
 
             <div className="flex items-center gap-4">
                 <div className="hidden sm:flex flex-col items-end mr-2">
-                    <span className="text-sm font-semibold text-gray-900">{user?.name || 'Kullanıcı'}</span>
+                    <span className="text-sm font-semibold text-gray-900">{user?.displayName || 'Kullanıcı'}</span>
                     <span className="text-xs text-indigo-600 font-medium bg-indigo-50 px-2 py-0.5 rounded-full mt-0.5">
-                        {user?.role?.replace(/_/g, ' ') || 'YETKİSİZ'}
+                        {user?.roles?.[0]?.replace(/_/g, ' ') || 'YETKİSİZ'}
                     </span>
                 </div>
                 

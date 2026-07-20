@@ -509,7 +509,7 @@ export class FindingService {
                 
                 <!-- Header -->
                 <div style="background: linear-gradient(135deg, #004a99 0%, #001d3d 100%); padding: 30px; text-align: center; border-bottom: 3px solid #c9a84c;">
-                    <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 0.5px;">EMLAK KATILIM</h1>
+                    <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 0.5px;">TASARRUF FİNANSMAN A.Ş.</h1>
                     <p style="color: #c9a84c; margin: 5px 0 0 0; font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">Teftiş Kurulu Başkanlığı</p>
                 </div>
                 
@@ -568,7 +568,7 @@ export class FindingService {
                 
                 <!-- Footer -->
                 <div style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #edf2f7; font-size: 11px; color: #718096;">
-                    <strong>Emlak Katılım Bankası A.Ş.</strong><br>
+                    <strong>Tasarruf Finansman A.Ş.</strong><br>
                     İç Sistemler Platformu • Denetim Yönetim Sistemi (AMS)<br>
                     <span style="color: #a0aec0; font-size: 10px; display: inline-block; margin-top: 5px;">Bu e-posta sistem tarafından otomatik olarak üretilmiştir. Yanıtlamayınız.</span>
                 </div>
@@ -808,6 +808,9 @@ export class FindingService {
         });
 
         if (password === 'mockPasswordBypass') {
+            if (process.env.NODE_ENV === 'production') {
+                throw new ForbiddenException('Üretim ortamında mock şifre geçişi kullanılamaz. Gerçek Active Directory / SSO doğrulaması gereklidir.');
+            }
             this.logger.warn(`SECURITY WARNING: Fast-Track authentication mock bypass used for user: ${username}`);
             try {
                 await this.auditLogService.createLog({

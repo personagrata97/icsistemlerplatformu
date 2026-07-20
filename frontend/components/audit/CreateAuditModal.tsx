@@ -629,7 +629,11 @@ export default function CreateAuditModal({ isOpen, onClose, onSuccess, staffList
                                         };
 
                                         const ranked = staffList
-                                            .filter(s => (s.title || s.role || '').toLowerCase().includes('müfettiş') || (s.title || s.role || '').toLowerCase().includes('uzman'))
+                                            .filter(s => {
+                                                const roleStr = Array.isArray(s.role) ? s.role.join(' ') : (s.role || '');
+                                                const combined = `${s.title || ''} ${roleStr}`.toLowerCase();
+                                                return combined.includes('müfettiş') || combined.includes('uzman');
+                                            })
                                             .filter(s => !formData.auditors.includes(s.id) && formData.supervisor !== s.id)
                                             .map(s => ({
                                                 id: s.id,

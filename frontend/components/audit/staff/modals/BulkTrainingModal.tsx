@@ -15,6 +15,7 @@ interface BulkTrainingForm {
     startDate: string;
     endDate: string;
     hours?: number | '';
+    status?: string;
     participantIds: string[];
 }
 
@@ -22,8 +23,8 @@ interface BulkTrainingModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSave: (e: React.FormEvent) => void;
-    bulkTrainingForm: BulkTrainingForm;
-    setBulkTrainingForm: (form: BulkTrainingForm) => void;
+    bulkTrainingForm: any;
+    setBulkTrainingForm: (form: any) => void;
     staffList: AuditStaff[];
     loading: boolean;
 }

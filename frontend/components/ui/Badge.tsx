@@ -1,7 +1,7 @@
 import React from 'react';
 import { clsx } from 'clsx';
 
-export type BadgeVariant = 'success' | 'danger' | 'warning' | 'info' | 'gray' | 'primary' | 'outline';
+export type BadgeVariant = 'success' | 'danger' | 'warning' | 'info' | 'gray' | 'primary' | 'outline' | 'secondary';
 export type BadgeSize = 'sm' | 'md' | 'lg';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -26,7 +26,8 @@ export default function Badge({ variant = 'gray', size = 'md', className, childr
         info: 'bg-blue-50 text-blue-700 border-blue-200',
         gray: 'bg-slate-50 text-slate-700 border-slate-200',
         primary: 'bg-primary/10 text-primary border-primary/20',
-        outline: 'bg-transparent text-slate-600 border-slate-300'
+        outline: 'bg-transparent text-slate-600 border-slate-300',
+        secondary: 'bg-slate-100 text-slate-600 border-slate-200'
     };
 
     return (

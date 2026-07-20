@@ -437,6 +437,7 @@ export interface AuditStaff {
     temporaryEndDate?: string;
     temporaryAssignmentDetails?: string;
     otherPassiveReasonDetails?: string;
+    leaves?: any[];
 }
 
 export const getWorkpaperUrl = (auditId: string, filename: string) => {
@@ -1424,8 +1425,9 @@ export const auditApi = {
     },
 
     // REPORTS
-    getExecutiveStats: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/executive/stats`, { headers: getHeaders() });
+    getExecutiveStats: async (year?: number | string) => {
+        const params = year ? `?year=${year}` : '';
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/executive/stats${params}`, { headers: getHeaders() });
         return handleResponse(res);
     },
 

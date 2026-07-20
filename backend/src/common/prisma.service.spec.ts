@@ -19,15 +19,15 @@ describe('PrismaService', () => {
   describe('onModuleInit', () => {
     it('should call $connect', async () => {
       const connectSpy = jest.spyOn(service, '$connect').mockResolvedValue(undefined);
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      const loggerSpy = jest.spyOn((service as any).logger, 'log').mockImplementation();
       
       await service.onModuleInit();
       
       expect(connectSpy).toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Prisma veritabanı bağlantısı kuruldu'));
+      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Veritabanı bağlantısı kuruldu'));
       
       connectSpy.mockRestore();
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 

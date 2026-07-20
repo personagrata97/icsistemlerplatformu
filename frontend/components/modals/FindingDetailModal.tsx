@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Clock, AlertCircle, CheckCircle, User, Tag, FileText, Check, Shield, Activity, Calendar, History, Search, Send, PlayCircle, XCircle, FileSearch, Edit2, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Clock, AlertCircle, CheckCircle, User, Tag, FileText, Check, Shield, Activity, Calendar, History, Search, Send, PlayCircle, XCircle, FileSearch, Edit2, Trash2, X, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Finding, auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
@@ -118,6 +118,8 @@ export default function FindingDetailModal({
         }
     };
 
+    const canEditOrDelete = !isUnitRole && (isManager || isCreator || isAssignedUser);
+
     return (
         <Modal
             isOpen={isOpen}
@@ -127,51 +129,51 @@ export default function FindingDetailModal({
             footer={
                 <div className="flex justify-between w-full">
                     <div className="flex gap-2">
-                        {onEdit && <Button variant="secondary" onClick={() => onEdit(finding)}>Düzenle</Button>}
-                        {canAcceptRisk && <Button variant="danger" onClick={() => onAcceptRisk(finding)}>Risk Kabulü</Button>}
+                        {canEditOrDelete && onEdit && <Button variant="secondary" onClick={() => onEdit(finding)}>Düzenle</Button>}
+                        {!isUnitRole && canAcceptRisk && <Button variant="danger" onClick={() => onAcceptRisk(finding)}>Risk Kabulü</Button>}
                         {canRequestExtension && <Button variant="secondary" onClick={() => onExtensionRequest(finding)}>Süre Uzat</Button>}
-                        {onDelete && <Button variant="danger" onClick={() => onDelete(finding)}>Sil</Button>}
+                        {canEditOrDelete && onDelete && <Button variant="danger" onClick={() => onDelete(finding)}>Sil</Button>}
                     </div>
 
                     <div className="flex justify-end gap-2">
                         <Button variant="secondary" onClick={onClose}>Kapat</Button>
                         
-                        {/* Workflow Buttons */}
-                        {onStatusUpdate && (finding.status === 'Taslak' || finding.status === 'Revizyon Gerekli') && (
+                        {/* Auditor Workflow Buttons */}
+                        {!isUnitRole && onStatusUpdate && (finding.status === 'Taslak' || finding.status === 'Revizyon Gerekli') && (
                             <Button variant="primary" onClick={() => onStatusUpdate(finding, 'Gözetim Bekliyor')}>Gözetime Gönder</Button>
                         )}
 
-                        {onStatusUpdate && finding.status === 'Gözetim Bekliyor' && isManager && !isConflict && (
+                        {!isUnitRole && onStatusUpdate && finding.status === 'Gözetim Bekliyor' && isManager && !isConflict && (
                             <>
                                 {onReviewRequest && <Button variant="danger" onClick={() => onReviewRequest(finding)}>Revize Et</Button>}
                                 <Button variant="primary" onClick={() => onStatusUpdate(finding, 'Onaylandı')}>Gözetimi Tamamla</Button>
                             </>
                         )}
 
-                        {onNotify && finding.status === 'Onaylandı' && (
+                        {!isUnitRole && onNotify && finding.status === 'Onaylandı' && (
                             <Button variant="primary" onClick={() => onNotify(finding)}>Tebliğ Et</Button>
                         )}
 
-                        {onStatusUpdate && finding.status === 'Birim Yanıtladı' && finding.isAgreed === true && hasActiveFollowUps() && (
+                        {!isUnitRole && onStatusUpdate && finding.status === 'Birim Yanıtladı' && finding.isAgreed === true && hasActiveFollowUps() && (
                             <Button variant="primary" onClick={() => onStatusUpdate(finding, 'Takip Ediliyor')}>Takibe Al</Button>
                         )}
 
-                        {onStatusUpdate && finding.status === 'Birim Yanıtladı' && finding.isAgreed === true && !hasActiveFollowUps() && (
+                        {!isUnitRole && onStatusUpdate && finding.status === 'Birim Yanıtladı' && finding.isAgreed === true && !hasActiveFollowUps() && (
                             <Button variant="primary" onClick={() => onStatusUpdate(finding, 'Tamamlandı')}>Doğrula ve Kapat</Button>
                         )}
 
-                        {onStatusUpdate && finding.status === 'Birim Yanıtladı' && finding.isAgreed === false && (
+                        {!isUnitRole && onStatusUpdate && finding.status === 'Birim Yanıtladı' && finding.isAgreed === false && (
                             <>
                                 <Button variant="secondary" onClick={() => onStatusUpdate(finding, 'Takip Ediliyor')}>Israr Et (Takibe Al)</Button>
                                 <Button variant="secondary" onClick={() => onStatusUpdate(finding, 'Tamamlandı')}>İptal/Kapat</Button>
                             </>
                         )}
 
-                        {onStatusUpdate && finding.status === 'Takip Ediliyor' && (
+                        {!isUnitRole && onStatusUpdate && finding.status === 'Takip Ediliyor' && (
                             <Button variant="primary" onClick={() => onStatusUpdate(finding, 'Doğrulama Bekliyor')}>Kanıt Geldi (Doğrulamaya Al)</Button>
                         )}
 
-                        {onStatusUpdate && finding.status === 'Doğrulama Bekliyor' && (
+                        {!isUnitRole && onStatusUpdate && finding.status === 'Doğrulama Bekliyor' && (
                             <>
                                 <Button variant="danger" onClick={() => onStatusUpdate(finding, 'Takip Ediliyor')}>Reddet</Button>
                                 <Button variant="primary" onClick={() => onStatusUpdate(finding, 'Tamamlandı')}>Onayla ve Kapat</Button>

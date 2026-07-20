@@ -578,8 +578,13 @@ export const DISCIPLINARY_ACTIONS = [
     { value: 'Kınama', label: 'Kınama' },
     { value: 'Ağır Kınama', label: 'Ağır Kınama' },
     { value: 'Ücret Kesintisi', label: 'Ücret Kesintisi' },
-    { value: 'Görevden Uzaklaştırma', label: 'Görevden Uzaklaştırma' },
-    { value: 'İşten Çıkarma (Haklı Fesih)', label: 'İşten Çıkarma (Haklı Fesih)' },
+    { value: 'Görevden Uzaklaştırma', label: 'Geçici Görevden Uzaklaştırma' },
+    { value: 'Unvan Değiştirme', label: 'Unvan İndirimi (Yer Değiştirme)' },
+    { value: 'İşten Çıkarma (Haklı Fesih)', label: 'İşten Çıkarma (Haklı Fesih, 4857/25)' },
+    { value: 'İhraç (Disiplin Kurulu)', label: 'İhraç — Disiplin Kurulu Kararıyla' },
+    { value: 'Mali Sorumluluk Tespiti', label: 'Mali Sorumluluk Tespiti (Zararın İadesi)' },
+    { value: 'BDDK Bildirimi', label: 'BDDK / MASAK’ya Zorunlu Bildirim' },
+    { value: 'Savcılığa Suç Duyurusu', label: 'Savcılığa Suç Duyurusu' },
     { value: 'Diğer', label: 'Diğer' }
 ];
 

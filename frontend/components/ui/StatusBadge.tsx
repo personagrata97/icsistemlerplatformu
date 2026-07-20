@@ -17,7 +17,8 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
 }) => {
     if (!value) return <span className="text-gray-300">-</span>;
 
-    const normalizedValue = value.trim();
+    const strValue = typeof value === 'string' ? value : String(value);
+    const normalizedValue = strValue.trim();
     let badgeClass = 'bg-gray-100 text-gray-700';
 
     // Robust Fix for Turkish Character Encoding Issues
@@ -46,6 +47,8 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
             case 'Onay Bekliyor': badgeClass = 'bg-yellow-100 text-yellow-800 border-yellow-200'; break;
             case 'Onaylandı': badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-100'; break;
             case 'Gönderildi': case 'Takip Ediliyor': badgeClass = 'bg-blue-100 text-blue-800 border-blue-200'; break;
+            case 'Aktif': case 'AKTIF': case 'Aktif Sözleşme': badgeClass = 'bg-blue-50 text-blue-700 border-blue-100'; break;
+            case 'Takipte': case 'TAKIPTE': case 'Takip / NPL': case 'Takip': badgeClass = 'bg-red-100 text-red-800 border-red-200'; break;
             // Ethics Statuses
             case 'Yeni': case 'Beklemede': badgeClass = 'bg-gray-100 text-gray-700 border-gray-200'; break;
             case 'İnceleniyor': badgeClass = 'bg-amber-100 text-amber-800 border-amber-200'; break;

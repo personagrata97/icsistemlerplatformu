@@ -41,12 +41,24 @@ interface AuditPlanItem {
 const PLAN_TYPES = ['Yıllık Plan', 'Revizyon-1', 'Revizyon-2', 'Revizyon-3'] as const;
 const STATUS_OPTIONS = ['Taslak', 'Onay Bekliyor', 'Onaylandı', 'İptal'] as const;
 
+import { AccessDenied } from '@/components/audit/AuditLogComponents';
+
 export default function AuditPlanPage() {
     const pathname = usePathname();
     const router = useRouter();
     const { showToast } = useToast();
     const { hasRole } = useAuth();
-    const canManage = checkRole(hasRole, ROLES.TRASH_MANAGER) || hasRole('SYSTEM_ADMIN') || hasRole('Admin') || hasRole('Yönetici');
+    const isManager = checkRole(hasRole, ROLES.TRASH_MANAGER) || hasRole('SYSTEM_ADMIN') || hasRole('Admin') || hasRole('Yönetici');
+    const isInspector = hasRole('AUDIT_INSPECTOR');
+    const isSupervisor = hasRole('AUDIT_SUPERVISOR');
+    const isAuditor = isManager || isInspector || isSupervisor;
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
+
+    if (isUnit && !isAuditor) {
+        return <AccessDenied />;
+    }
+
+    const canManage = isManager;
 
     const [loading, setLoading] = useState(true);
     const [plans, setPlans] = useState<AuditPlanItem[]>([]);

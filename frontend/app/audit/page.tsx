@@ -186,8 +186,12 @@ export default function AuditDashboard() {
     }, [selectedYear]);
 
     useEffect(() => {
-        if (!loading && isRestrictedUser && !isUnit) {
-            router.push('/audit/ethics/submit');
+        if (!loading && isRestrictedUser) {
+            if (isUnit) {
+                router.replace('/audit/unit');
+            } else {
+                router.replace('/audit/ethics/submit');
+            }
         }
     }, [loading, isRestrictedUser, isUnit, router]);
 
@@ -265,10 +269,10 @@ export default function AuditDashboard() {
                         {unitAudits.slice(0, 5).map(a => (
                             <DashboardListItem
                                 key={a.id}
-                                icon={<EntityIcon type="AUDIT" variant="square" size={16} />}
+                                icon={<EntityIcon type="AUDIT" variant="solid" size={16} />}
                                 title={a.title}
                                 subtitle={<span className="text-xs text-gray-500">{a.year || extractYear(a.startDate) || '2026'}</span>}
-                                rightContent={<StatusBadge status={a.status} />}
+                                rightContent={<StatusBadge value={a.status} />}
                             />
                         ))}
                     </DashboardWidget>
@@ -542,7 +546,7 @@ export default function AuditDashboard() {
                     <p className="text-sm text-gray-500 mb-2 font-medium">Seçilen Risk Seviyesi:</p>
                     <div className="flex gap-2 items-center">
                         <Badge variant="danger" size="md">Doğal Risk: {heatmapModal.inherent}</Badge>
-                        <Badge variant="secondary" size="md">Kontrol Etkinliği: {heatmapModal.control}</Badge>
+                        <Badge variant="gray" size="md">Kontrol Etkinliği: {heatmapModal.control}</Badge>
                     </div>
                 </div>
                 

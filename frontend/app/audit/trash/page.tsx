@@ -24,6 +24,7 @@ import ActionMenu, { ActionMenuItem } from '@/components/ui/ActionMenu';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import PageHeader from '@/components/audit/PageHeader';
 import StatCard from '@/components/ui/StatCard';
+import { AccessDenied } from '@/components/audit/AuditLogComponents';
 
 interface DeletedItems {
     audits: any[];
@@ -312,15 +313,7 @@ export default function TrashPage() {
     };
 
     if (!isAdmin) {
-        return (
-            <div className="flex flex-col items-center justify-center h-96 text-center p-8 bg-gray-50 rounded-lg border border-gray-200">
-                <ShieldX size={64} className="text-red-500 mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Erişim Engellendi</h2>
-                <p className="text-gray-600 max-w-md">
-                    Silinen kayıtlar ekranına sadece <strong>Sistem Yöneticisi</strong> yetkisine sahip kullanıcılar erişebilir.
-                </p>
-            </div>
-        );
+        return <AccessDenied />;
     }
 
     if (loading) {
@@ -603,7 +596,7 @@ export default function TrashPage() {
                                     <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Durum:</span><span className="text-gray-900">{selectedItem.status || '-'}</span></li>
                                     {selectedItem.riskLevel && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Risk:</span><span className="font-bold text-gray-900">{selectedItem.riskLevel}</span></li>}
                                     {selectedItem.risk && !selectedItem.riskLevel && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Risk:</span><span className="font-bold text-gray-900">{selectedItem.risk}</span></li>}
-                                    {(selectedItem.audit?.title || selectedItem.auditTitle) && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Denetim:</span><OverflowTooltip content={selectedItem.audit?.title || selectedItem.auditTitle} className="max-w-[200px] text-right text-gray-900">{selectedItem.audit?.title || selectedItem.auditTitle}</OverflowTooltip></li>}
+                                    {(selectedItem.audit?.title || selectedItem.auditTitle) && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Denetim:</span><span className="max-w-[200px] truncate text-right text-gray-900" title={selectedItem.audit?.title || selectedItem.auditTitle}>{selectedItem.audit?.title || selectedItem.auditTitle}</span></li>}
                                     {selectedItem.period && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Dönem:</span><span className="text-gray-900">{selectedItem.period}</span></li>}
                                     {selectedItem.category && <li className="flex justify-between text-sm items-center"><span className="text-gray-600 font-medium">Kategori:</span><span className="text-gray-900">{selectedItem.category}</span></li>}
                                 </ul>

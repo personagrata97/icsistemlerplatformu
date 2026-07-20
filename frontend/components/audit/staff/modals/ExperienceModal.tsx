@@ -154,16 +154,11 @@ export default function ExperienceModal({
                         </div>
                     </FormField>
                 </div>
-                <FormField 
-                    label={
-                        <div className="flex items-center gap-2 mb-1.5">
-                            <span className="text-sm font-semibold text-slate-700">Kariyer Detayları (Ünvan & Yıllar)</span>
-                            <Tooltip content="Şirket içi ünvan değişikliklerini ve tarihlerini buraya yazabilirsiniz.">
-                                <AlertCircle size={14} className="text-gray-400 cursor-help" />
-                            </Tooltip>
-                        </div>
-                    }
-                >
+                <FormField label="Kariyer Detayları (Ünvan & Yıllar)">
+                    <div className="flex items-center gap-1.5 mb-1.5 text-xs text-slate-500 font-medium bg-slate-50 p-2 rounded border border-slate-100">
+                        <AlertCircle size={14} className="text-indigo-500 shrink-0" />
+                        Şirket içi ünvan değişikliklerini ve tarihlerini buraya yazabilirsiniz.
+                    </div>
                     <FormTextarea 
                         className="min-h-[60px]" 
                         value={experienceForm.careerPaths} 

@@ -19,7 +19,7 @@ import PageHeader from '@/components/audit/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import Tooltip from '@/components/ui/Tooltip';
 import EmptyState from '@/components/ui/EmptyState';
-import Timeline, { TimelineEvent } from '@/components/ui/Timeline';
+import Timeline, { TimelineEvent, TimelineActionType } from '@/components/ui/Timeline';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES, checkRole } from '@/lib/auth-constants';
 import StaffTabs from '@/components/audit/staff/StaffTabs';

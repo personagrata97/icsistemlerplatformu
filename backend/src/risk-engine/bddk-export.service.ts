@@ -6,7 +6,15 @@ import { PrismaService } from '../common/prisma.service';
  */
 @Injectable()
 export class BddkExportService {
-    constructor(private prisma: PrismaService) { }
+    private readonly kurumKodu: string;
+    private readonly lyoRaporKodu: string;
+    private readonly nplRaporKodu: string;
+
+    constructor(private prisma: PrismaService) {
+        this.kurumKodu = process.env.BDDK_KURUM_KODU || 'TS-001';
+        this.lyoRaporKodu = process.env.BDDK_LYO_RAPOR_KODU || 'BDDK_HFT_LYO_01';
+        this.nplRaporKodu = process.env.BDDK_NPL_RAPOR_KODU || 'BDDK_AYL_NPL_02';
+    }
 
     /**
      * Haftalık LYO (Likidite Yeterlilik Oranı) BVTS Cetveli
@@ -27,9 +35,6 @@ export class BddkExportService {
             },
             orderBy: { tarih: 'asc' }
         });
-
-        // BVTS formatı genellikle XML veya standardize edilmiş CSV'dir. 
-        // Burada MVP olarak JSON formatında yapılandırıyoruz, frontend CSV'ye çevirebilir.
         
         let toplamDeger = 0;
         const detaySatirlari = ozetler.map(o => {
@@ -44,14 +49,31 @@ export class BddkExportService {
 
         const haftalikOrtalama = ozetler.length > 0 ? (toplamDeger / ozetler.length) : 0;
 
+        // Raporun doğrulanabilirliği için kaynak sözleşmeleri çekiyoruz
+        const sozlesmeler = await this.prisma.sozlesme.findMany({
+            include: { musteri: true, odeme_hareketleri: { select: { gecikme_gun: true } } },
+            orderBy: { sozlesme_id: 'asc' }
+        });
+
         return {
-            kurum_kodu: 'TS-001',
-            rapor_kodu: 'BDDK_HFT_LYO_01',
+            kurum_kodu: this.kurumKodu,
+            rapor_kodu: this.lyoRaporKodu,
             rapor_donemi: `${birHaftaOnce.toISOString().split('T')[0]} / ${bugun.toISOString().split('T')[0]}`,
             haftalik_ortalama_lyo: haftalikOrtalama.toFixed(2),
             yasal_sinir: '100.00',
             uyum_durumu: haftalikOrtalama >= 100 ? 'UYUMLU' : 'İHLAL',
-            gunluk_detaylar: detaySatirlari
+            gunluk_detaylar: detaySatirlari,
+            kaynak_veriler: sozlesmeler.map(s => ({
+                sozlesme_no: s.sozlesme_id,
+                ad_soyad: s.musteri?.ad_soyad || '—',
+                segment: s.musteri?.segment || '—',
+                bolge: s.musteri?.bolge || '—',
+                sube: s.musteri?.sube || '—',
+                tutar: Number(s.toplam_tutar),
+                vade: s.vade,
+                gecikme_gunu: s.odeme_hareketleri.reduce((max, h) => Math.max(max, h.gecikme_gun), 0),
+                durum: s.durum
+            }))
         };
     }
 
@@ -65,13 +87,30 @@ export class BddkExportService {
             orderBy: { tarih: 'desc' }
         });
 
+        // Raporun doğrulanabilirliği için kaynak sözleşmeleri çekiyoruz
+        const sozlesmeler = await this.prisma.sozlesme.findMany({
+            include: { musteri: true, odeme_hareketleri: { select: { gecikme_gun: true } } },
+            orderBy: { sozlesme_id: 'asc' }
+        });
+
         return {
-            kurum_kodu: 'TS-001',
-            rapor_kodu: 'BDDK_AYL_NPL_02',
+            kurum_kodu: this.kurumKodu,
+            rapor_kodu: this.nplRaporKodu,
             donem: new Date().toISOString().substring(0, 7), // YYYY-MM
             npl_orani: sonOzet ? Number(sonOzet.deger).toFixed(2) : '0.00',
             yasal_sinir: '5.00', // Sektörel takip sınırı
-            durum: (sonOzet && Number(sonOzet.deger) > 5) ? 'İHLAL' : 'UYUMLU'
+            durum: (sonOzet && Number(sonOzet.deger) > 5) ? 'İHLAL' : 'UYUMLU',
+            kaynak_veriler: sozlesmeler.map(s => ({
+                sozlesme_no: s.sozlesme_id,
+                ad_soyad: s.musteri?.ad_soyad || '—',
+                segment: s.musteri?.segment || '—',
+                bolge: s.musteri?.bolge || '—',
+                sube: s.musteri?.sube || '—',
+                tutar: Number(s.toplam_tutar),
+                vade: s.vade,
+                gecikme_gunu: s.odeme_hareketleri.reduce((max, h) => Math.max(max, h.gecikme_gun), 0),
+                durum: s.durum
+            }))
         };
     }
 }

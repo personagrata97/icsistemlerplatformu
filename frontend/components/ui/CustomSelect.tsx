@@ -254,10 +254,7 @@ export default function CustomSelect({
             )}
 
             {readOnlyView ? (
-                <div className={clsx(
-                    'w-full rounded-xl border border-transparent bg-slate-50/50 px-3.5 py-2.5 text-sm font-semibold text-slate-900',
-                    className
-                )}>
+                <div className={`w-full rounded-xl border border-transparent bg-slate-50/50 px-3.5 py-2.5 text-sm font-semibold text-slate-900 ${className || ''}`}>
                     {!value || (Array.isArray(value) && value.length === 0) ? (
                         <span className="text-slate-400">-</span>
                     ) : isMulti ? (

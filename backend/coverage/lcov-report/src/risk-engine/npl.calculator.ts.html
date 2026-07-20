@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">18.51% </span>
+                <span class="strong">16.66% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/27</span>
+                <span class='fraction'>5/30</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">13.04% </span>
+                <span class="strong">12% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/23</span>
+                <span class='fraction'>3/25</span>
             </div>
         
             
@@ -130,7 +130,9 @@
 <a name='L65'></a><a href='#L65'>65</a>
 <a name='L66'></a><a href='#L66'>66</a>
 <a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,21 +162,23 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -203,7 +207,7 @@ import { RiskCalculationResult, ScenarioParameters } from './risk-engine.types';
 &nbsp;
 /**
  * NPL (Non-Performing Loan) Calculator
- * Hesaplama: Takipteki sözleşme sayısı / Toplam sözleşme sayısı
+ * BDDK Hesaplama: 90+ Gün Gecikmeli Kredi Hacmi / Toplam Kredi Hacmi
  */
 @Injectable()
 export class NplCalculator {
@@ -220,46 +224,48 @@ export class NplCalculator {
             },
         });
 &nbsp;
-        const toplamSozlesme = <span class="cstat-no" title="statement not covered" >sozlesmeler.length;</span>
-        let nplSozlesmeSayisi = <span class="cstat-no" title="statement not covered" >0;</span>
+        let toplamHacim = <span class="cstat-no" title="statement not covered" >0;</span>
+        let nplHacim = <span class="cstat-no" title="statement not covered" >0;</span>
 &nbsp;
         // Her sözleşmenin max gecikmesini kontrol et
 <span class="cstat-no" title="statement not covered" >        sozlesmeler.forEach(<span class="fstat-no" title="function not covered" >s </span>=&gt; {</span>
             const maxGecikme = <span class="cstat-no" title="statement not covered" >s.odeme_hareketleri.reduce(<span class="fstat-no" title="function not covered" >(m</span>ax, h) =&gt; <span class="cstat-no" title="statement not covered" >Math.max(max, h.gecikme_gun),</span> 0);</span>
-<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (maxGecikme &gt; 90) {</span>
-<span class="cstat-no" title="statement not covered" >                nplSozlesmeSayisi++;</span>
+            const tutar = <span class="cstat-no" title="statement not covered" >Number(s.toplam_tutar);</span>
+            
+<span class="cstat-no" title="statement not covered" >            toplamHacim += tutar;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (maxGecikme &gt; 90) { // 3. 4. ve 5. Grup</span>
+<span class="cstat-no" title="statement not covered" >                nplHacim += tutar;</span>
             }
         });
 &nbsp;
         // Senaryo uygula
-<span class="cstat-no" title="statement not covered" >        if (params &amp;&amp; params.gecikme_artis &gt; 0) {</span>
-            // Olumsuz senaryoda NPL sayısını artır
-<span class="cstat-no" title="statement not covered" >            nplSozlesmeSayisi = Math.round(nplSozlesmeSayisi * (1 + params.gecikme_artis));</span>
-        } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (params &amp;&amp; params.gecikme_artis &lt; 0) {</span>
-<span class="cstat-no" title="statement not covered" >            nplSozlesmeSayisi = Math.round(nplSozlesmeSayisi * (1 + params.gecikme_artis));</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (params &amp;&amp; params.gecikme_artis !== 0) {</span>
+            // Olumsuz/Olumlu senaryoda NPL hacmini artır/azalt
+<span class="cstat-no" title="statement not covered" >            nplHacim += toplamHacim * params.gecikme_artis;</span>
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (nplHacim &lt; 0) <span class="cstat-no" title="statement not covered" >nplHacim = 0;</span></span>
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (nplHacim &gt; toplamHacim) <span class="cstat-no" title="statement not covered" >nplHacim = toplamHacim;</span></span>
         }
 &nbsp;
-        // NPL sayısı toplamı geçemez
-<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (nplSozlesmeSayisi &gt; toplamSozlesme) <span class="cstat-no" title="statement not covered" >nplSozlesmeSayisi = toplamSozlesme;</span></span>
-&nbsp;
-        const nplOran = <span class="cstat-no" title="statement not covered" >toplamSozlesme &gt; 0 ? nplSozlesmeSayisi / toplamSozlesme : 0;</span>
+        const nplOran = <span class="cstat-no" title="statement not covered" >toplamHacim &gt; 0 ? nplHacim / toplamHacim : 0;</span>
+        const nplYuzde = <span class="cstat-no" title="statement not covered" >nplOran * 100;</span>
 &nbsp;
         // Risk seviyesi belirleme
         let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = <span class="cstat-no" title="statement not covered" >'GREEN';</span>
-<span class="cstat-no" title="statement not covered" >        if (nplOran &gt; 0.05) { // %5 üzeri kritik (Mevzuat NPL limiti genelde düşüktür)</span>
+<span class="cstat-no" title="statement not covered" >        if (nplYuzde &gt; 5) { // %5 üzeri kritik (Mevzuat NPL limiti genelde düşüktür)</span>
 <span class="cstat-no" title="statement not covered" >            riskSeviyesi = 'RED';</span>
-        } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (nplOran &gt; 0.03) {</span>
+        } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (nplYuzde &gt; 3) {</span>
 <span class="cstat-no" title="statement not covered" >            riskSeviyesi = 'YELLOW';</span>
         }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        return {</span>
             kpi_kodu: 'NPL',
-            deger: nplOran * 100, // Yüzde olarak gösterim
+            deger: nplYuzde,
             risk_seviyesi: riskSeviyesi,
             detay: {
-                toplam_sozlesme: toplamSozlesme,
-                npl_sozlesme: nplSozlesmeSayisi,
-                aciklama: '90+ gün gecikmeli sözleşme oranı'
+                toplam_hacim: toplamHacim,
+                npl_hacim: nplHacim,
+                aciklama: 'Hacim Bazlı 90+ gün gecikmeli kredi oranı (TFRS 9 Grup 3-4-5)'
             },
         };
     }
@@ -271,7 +277,7 @@ export class NplCalculator {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-10T13:11:08.973Z
+                at 2026-07-20T12:07:43.271Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

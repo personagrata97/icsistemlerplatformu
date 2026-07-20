@@ -1037,13 +1037,14 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
     const isDeleted = auditData.status === 'Silindi' || auditData.status === 'Silinme Onayı Bekliyor';
 
     // Role, Confidentiality & Independence Logic (IIA 1100 & Audit Confidentiality)
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
     const isSupervisor = checkRole(hasRole, ROLES.AUDIT_SUPERVISOR);
     const isTeamMember = isSupervisor || team.some((t: any) => t.id === user?.id || t.userId === user?.id || t.name === user?.displayName);
     const hasIndependence = !!myDeclaration;
 
     // Is the user restricted from viewing sensitive tabs?
-    const restrictConfidentiality = !isTeamMember;
-    const restrictIndependence = !hasIndependence && isTeamMember && !isSupervisor; // Only active team members must declare independence to perform fieldwork
+    const restrictConfidentiality = !isTeamMember && !isUnit;
+    const restrictIndependence = !isUnit && !hasIndependence && isTeamMember && !isSupervisor; // Only active team members must declare independence to perform fieldwork
 
     const isSensitiveTabBlocked = restrictConfidentiality || restrictIndependence;
     const blockedReason = restrictConfidentiality 
@@ -1117,15 +1118,17 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
 
                             {/* Right Side: Independence & Quick Stats */}
                             <div className="lg:col-span-4 flex flex-col gap-6">
-                                <IndependenceQuickPanel
-                                    auditId={id}
-                                    userId={user?.id || ''}
-                                    onDeclared={() => {
-                                        checkIndependence();
-                                        loadData();
-                                    }}
-                                    isDeclared={!!myDeclaration}
-                                />
+                                {!isUnit && (
+                                    <IndependenceQuickPanel
+                                        auditId={id}
+                                        userId={user?.id || ''}
+                                        onDeclared={() => {
+                                            checkIndependence();
+                                            loadData();
+                                        }}
+                                        isDeclared={!!myDeclaration}
+                                    />
+                                )}
 
                                 <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
                                     <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">

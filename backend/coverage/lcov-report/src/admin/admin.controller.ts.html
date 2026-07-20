@@ -116,7 +116,12 @@
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
 <a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -136,12 +141,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -151,6 +150,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -166,10 +175,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Controller, Get, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request } from '@nestjs/common';</span>
 <span class="cstat-no" title="statement not covered" >import { AdminService } from './admin.service';</span>
 <span class="cstat-no" title="statement not covered" >import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';</span>
 <span class="cstat-no" title="statement not covered" >import { PermissionsGuard } from '../auth/guards/permissions.guard';</span>
@@ -188,17 +198,21 @@ export <span class="cstat-no" title="statement not covered" >class <span class="
 &nbsp;
     @Post('roles')
     @RequirePermissions({ module: 'ADMIN', action: 'EDIT' })
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >    createRole(</span>@Body() data: { code: string; name: string; description?: string }) {</span>
-<span class="cstat-no" title="statement not covered" >        return this.adminService.createRole(data);</span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >    createRole(</span></span>
+        @Body() data: { code: string; name: string; description?: string },
+        @Request() req: any
+    ) {
+<span class="cstat-no" title="statement not covered" >        return this.adminService.createRole(data, req.user);</span>
     }
 &nbsp;
     @Patch('roles/:id/permissions')
     @RequirePermissions({ module: 'ADMIN', action: 'EDIT' })
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >    updateRolePermissions(</span></span>
         @Param('id') id: string,
-        @Body() body: { permissions: { permissionId: string; scope: string }[] }
+        @Body() body: { permissions: { permissionId: string; scope: string }[] },
+        @Request() req: any
     ) {
-<span class="cstat-no" title="statement not covered" >        return this.adminService.updateRolePermissions(id, body.permissions);</span>
+<span class="cstat-no" title="statement not covered" >        return this.adminService.updateRolePermissions(id, body.permissions, req.user);</span>
     }
 &nbsp;
     @Get('permissions')
@@ -217,9 +231,10 @@ export <span class="cstat-no" title="statement not covered" >class <span class="
     @RequirePermissions({ module: 'ADMIN', action: 'EDIT' })
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >    updateUserRoles(</span></span>
         @Param('id') id: string,
-        @Body() body: { roleIds: string[] }
+        @Body() body: { roleIds: string[] },
+        @Request() req: any
     ) {
-<span class="cstat-no" title="statement not covered" >        return this.adminService.updateUserRoles(id, body.roleIds);</span>
+<span class="cstat-no" title="statement not covered" >        return this.adminService.updateUserRoles(id, body.roleIds, req.user);</span>
     }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -229,7 +244,7 @@ export <span class="cstat-no" title="statement not covered" >class <span class="
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-10T13:11:08.973Z
+                at 2026-07-20T12:07:43.271Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

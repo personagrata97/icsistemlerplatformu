@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import CodeBadge from '@/components/ui/CodeBadge';
 import StatusBadge from '@/components/ui/StatusBadge';
+import OverflowTooltip from '@/components/ui/OverflowTooltip';
 
 export interface DashboardListItemProps {
     href?: string;
@@ -28,22 +29,22 @@ export default function DashboardListItem({
         <div className={`flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg hover:border-emerald-300 hover:shadow-sm transition-all group ${className}`}>
             <div className="flex items-center gap-4 min-w-0 flex-1">
                 {code ? (
-                    <div className="w-[110px] shrink-0">
-                        <CodeBadge code={code} />
+                    <div className="w-[110px] shrink-0 overflow-hidden">
+                        <CodeBadge code={code} className="w-full text-center truncate" />
                     </div>
                 ) : icon ? (
-                    <div className="w-[110px] shrink-0 flex items-center justify-start pl-1">
+                    <div className="w-[110px] shrink-0 flex items-center justify-center">
                         {icon}
                     </div>
                 ) : null}
                 <div className="flex flex-col min-w-0 flex-1 border-l border-gray-100 pl-4 py-0.5">
-                    <span className="text-sm text-gray-700 font-medium truncate block w-full group-hover:text-emerald-600 transition-colors" title={typeof title === 'string' ? title : undefined}>
+                    <OverflowTooltip content={title} className="text-sm text-gray-700 font-medium group-hover:text-emerald-600 transition-colors">
                         {title}
-                    </span>
+                    </OverflowTooltip>
                     {subtitle && (
-                        <span className="text-xs text-gray-400 mt-0.5 truncate">
+                        <OverflowTooltip content={subtitle} className="text-xs text-gray-400 mt-0.5">
                             {subtitle}
-                        </span>
+                        </OverflowTooltip>
                     )}
                 </div>
             </div>

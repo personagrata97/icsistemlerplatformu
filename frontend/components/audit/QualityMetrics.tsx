@@ -207,7 +207,7 @@ export default function QualityMetrics() {
                                         </div>
                                     </div>
                                     <div className="shrink-0">
-                                        <StatusBadge status={metric.status} />
+                                        <StatusBadge value={metric.status} />
                                     </div>
                                 </div>
                             ))}
@@ -242,7 +242,7 @@ export default function QualityMetrics() {
                                 {assessments.slice(0, 4).map((assessment: any) => (
                                     <DashboardListItem
                                         key={assessment.id}
-                                        icon={<StatusBadge status={assessment.type === 'İç' ? 'Bilgi' : 'Uyarı'} text={assessment.type} />}
+                                        icon={<StatusBadge value={assessment.type} />}
                                         title={assessment.assessor}
                                         rightContent={
                                             <span className="text-xs text-gray-500 font-medium">{formatDate(assessment.date)}</span>

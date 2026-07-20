@@ -12,6 +12,8 @@ import Modal from '@/components/ui/Modal';
 import { formatDate } from '@/lib/audit-utils';
 import ActionMenu from '@/components/ui/ActionMenu';
 
+import PageToolbar from '@/components/ui/PageToolbar';
+
 export default function RiskLogsPage() {
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
@@ -22,10 +24,16 @@ export default function RiskLogsPage() {
         loadLogs();
     }, []);
 
-    const loadLogs = () => {
+    const loadLogs = async () => {
         setLoading(true);
-        setLogs(RiskLogger.getLogs());
-        setLoading(false);
+        try {
+            const data = await RiskLogger.getLogs();
+            setLogs(data);
+        } catch {
+            setLogs(RiskLogger.getLocalLogs());
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleExport = () => {
@@ -62,36 +70,15 @@ export default function RiskLogsPage() {
     );
 
     return (
-        <div className="max-w-7xl mx-auto py-2 space-y-8">
-            <div className="flex flex-wrap items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">İşlem Geçmişi</h1>
-                    <p className="text-slate-500 font-medium">Sistem üzerindeki tüm risk aktiviteleri ve denetim izleri.</p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Loglarda ara..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="h-11 pl-10 pr-4 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all w-64 shadow-sm"
-                        />
-                    </div>
-                    
-                    <Button
-                        variant="secondary"
-                        onClick={handleExport}
-                        leftIcon={<Download size={18} />}
-                        className="!rounded-xl h-11"
-                    >
-                        Excel'e Aktar
-                    </Button>
-                    
-                    <RefreshButton onClick={loadLogs} />
-                </div>
-            </div>
+        <div className="space-y-6">
+            <PageToolbar
+                searchPlaceholder="Loglarda ara..."
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
+                onRefresh={loadLogs}
+                showExportButton={true}
+                onExportClick={handleExport}
+            />
 
             <DataTable
                 columns={[

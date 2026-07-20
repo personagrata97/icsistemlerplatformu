@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nes
 import { OrganizationService } from './organization.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@Controller('api/organization')
+@Controller('organization')
 @UseGuards(JwtAuthGuard)
 export class OrganizationController {
     constructor(private readonly organizationService: OrganizationService) { }

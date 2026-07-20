@@ -1,8 +1,31 @@
 import React from 'react';
-import { ShieldCheck, User, Clock, Database, Activity, FileText, X } from 'lucide-react';
+import { ShieldAlert, User, Clock, Database, Activity, FileText, X, Lock, ArrowLeft, Info, CheckCircle } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
-import { AuditLog } from '@/app/audit/logs/page';
-import { formatDateTime, renderSmartText, formatLogDetails } from '@/lib/audit-utils';
+import Link from 'next/link';
+import Button from '@/components/ui/Button';
+import { formatDateTime } from '@/lib/audit-utils';
+
+export interface AuditLog {
+    id: string;
+    action: string;
+    type: string;
+    date: string;
+    user: string;
+    entity?: string;
+    entityId?: string;
+    ipAddress?: string;
+    details?: string;
+    changeData?: any;
+}
+
+export function formatLogDetails(details: string): string {
+    if (!details) return '-';
+    return details;
+}
+
+export function renderSmartText(text: string): React.ReactNode {
+    return text;
+}
 
 // Internal Audit Standard Colors
 export const TYPE_COLORS: Record<string, string> = {
@@ -15,7 +38,7 @@ export const TYPE_COLORS: Record<string, string> = {
 };
 
 export const TYPE_ICONS: Record<string, React.ReactNode> = {
-    create: <CheckCircleIcon size={14} />,
+    create: <CheckCircle size={14} />,
     update: <FileText size={14} />,
     delete: <X size={14} />,
     status: <Activity size={14} />,
@@ -23,11 +46,10 @@ export const TYPE_ICONS: Record<string, React.ReactNode> = {
     system: <Database size={14} />
 };
 
-// Helper function for Icons (since we can't import CheckCircleIcon easily if not exported)
-// Actually we can import them from lucide-react.
-function CheckCircleIcon({ size }: { size: number }) { return <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg> }
+import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
 
-export function StatCard({ title, value, icon, color, bg }: any) {
+export function StatCard({ title, value, icon, color, bg, onClick, className }: any) {
     const renderIcon = () => {
         if (!icon) return null;
         if (React.isValidElement(icon)) return icon;
@@ -36,7 +58,7 @@ export function StatCard({ title, value, icon, color, bg }: any) {
     };
 
     return (
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
+        <div onClick={onClick} className={`bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4 ${className || ''}`}>
             <div className={`p-3 rounded-lg ${bg}`}>
                 {renderIcon()}
             </div>
@@ -49,15 +71,42 @@ export function StatCard({ title, value, icon, color, bg }: any) {
 }
 
 export function AccessDenied() {
+    const { hasRole } = useAuth();
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
+    const returnUrl = isUnit ? '/audit/unit' : '/audit';
+    const returnLabel = isUnit ? "Birim Portalı'na Dön" : "Ana Panele Dön";
+
     return (
-        <div className="flex flex-col items-center justify-center h-96 text-center p-8 bg-gray-50 rounded-lg border border-gray-200 dashed">
-            <div className="p-4 bg-red-100 rounded-full mb-4">
-                <ShieldCheck size={40} className="text-red-600" />
+        <div className="fixed inset-0 z-[100] bg-slate-50 flex items-center justify-center p-4">
+            <div className="max-w-md w-full p-8 bg-white rounded-3xl border border-slate-200/90 shadow-2xl text-center space-y-5 animate-in fade-in zoom-in-95 duration-200">
+                {/* Top Pill */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-wider">
+                    <Lock size={12} className="text-amber-600" />
+                    <span>Erişim Kısıtlı • 403</span>
+                </div>
+
+                {/* Icon */}
+                <div className="w-16 h-16 mx-auto flex items-center justify-center rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-600 shadow-inner">
+                    <ShieldAlert size={36} />
+                </div>
+
+                {/* Title & Description */}
+                <div className="space-y-2">
+                    <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Erişim Yetkisi Kısıtlandı</h2>
+                    <p className="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto font-medium">
+                        Bu sayfaya erişim yetki matrisi kuralları gereğince kısıtlanmıştır. Erişim talepleriniz için lütfen Yetki Yöneticiniz ile iletişime geçiniz.
+                    </p>
+                </div>
+
+                {/* Action */}
+                <div className="pt-2">
+                    <Link href={returnUrl}>
+                        <Button variant="primary" size="md" leftIcon={<ArrowLeft size={16} />} className="shadow-md font-bold px-6">
+                            {returnLabel}
+                        </Button>
+                    </Link>
+                </div>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Erişim Yetkisi Yok</h2>
-            <p className="text-gray-600 max-w-md">
-                Bu alana sadece <strong>Yönetici</strong> ve <strong>Denetim Yöneticisi</strong> seviyesindeki kullanıcılar erişebilir.
-            </p>
         </div>
     );
 }

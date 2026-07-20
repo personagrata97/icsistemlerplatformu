@@ -23,6 +23,7 @@ import ExecutiveOverview from '@/components/audit/executive/ExecutiveOverview';
 import ExecutiveTeam from '@/components/audit/executive/ExecutiveTeam';
 import EmptyState from '@/components/ui/EmptyState';
 import { useExecutiveCalculations } from '@/hooks/useExecutiveCalculations';
+import { AccessDenied } from '@/components/audit/AuditLogComponents';
 
 export default function ExecutiveDashboard() {
     const router = useRouter();
@@ -98,8 +99,10 @@ export default function ExecutiveDashboard() {
     };
 
     const {
+        sortedSkills,
         weakestSkill,
         strongestSkill,
+        minScore,
         weakestSkillsList,
         pendingLeaves,
         activeLeaves,
@@ -108,16 +111,7 @@ export default function ExecutiveDashboard() {
     } = useExecutiveCalculations(stats);
 
     if (!isExecutive) {
-        return (
-            <div className="flex flex-col items-center justify-center h-[calc(100vh-100px)] w-full gap-4">
-                <EmptyState 
-                    variant="minimal" 
-                    icon={AlertTriangle} 
-                    title="Yetkisiz Erişim" 
-                    description="Bu sayfayı (Yönetici Paneli) görüntüleme yetkiniz bulunmamaktadır." 
-                />
-            </div>
-        );
+        return <AccessDenied />;
     }
 
     if (loading) {

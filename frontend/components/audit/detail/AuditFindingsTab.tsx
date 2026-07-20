@@ -34,7 +34,7 @@ const AuditFindingsTab: React.FC<AuditFindingsTabProps> = ({
             <SectionHeader 
                 title="Bulgular" 
                 icon={AlertCircle} 
-                actionButton={
+                rightContent={
                     <Button size="sm" onClick={onAddFinding} className="gap-2">
                         <Plus size={16} /> Yeni Bulgu Ekle
                     </Button>

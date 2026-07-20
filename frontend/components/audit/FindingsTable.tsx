@@ -155,7 +155,12 @@ const FindingsTable: React.FC<FindingsTableProps> = ({
         return {
             ...item,
             computedDueDate: date,
-            assignedUser: userStr || undefined
+            assignedUser: userStr ? { 
+                id: '1', 
+                firstName: userStr, 
+                lastName: '', 
+                email: 'test@example.com' 
+            } : undefined
         };
     });
 

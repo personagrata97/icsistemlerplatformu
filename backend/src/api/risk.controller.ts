@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Query, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ScenarioEngineService } from '../scenario-engine/scenario-engine.service';
 import { AlertService } from '../alert-system/alert.service';
 import * as xlsx from 'xlsx';
 import { PrismaService } from '../common/prisma.service';
 import { BddkExportService } from '../risk-engine/bddk-export.service';
+import { DataIngestionService } from '../risk-engine/data-ingestion.service';
+
 @Controller('risk')
 export class RiskController {
     constructor(
@@ -12,6 +14,7 @@ export class RiskController {
         private alertService: AlertService,
         private prisma: PrismaService,
         private bddkService: BddkExportService,
+        private dataIngestionService: DataIngestionService,
     ) { }
 
     /**
@@ -89,9 +92,21 @@ export class RiskController {
 
             const basariliKayit = await this.dataIngestionService.processAndLoadData(mappedData);
 
+            // Hesaplamaları otomatik olarak tetikleyelim ki arayüzde veriler güncellensin
+            try {
+                await this.scenarioEngine.runAllScenarios();
+            } catch (calcError) {
+                // Hata olsa dahi kayıtların yüklendiğini bildirmeliyiz
+                return {
+                    basari: true,
+                    mesaj: `${basariliKayit} adet kayıt yüklendi fakat hesaplamalar tetiklenirken hata oluştu: ${calcError.message}`,
+                    report: report
+                };
+            }
+
             return {
                 basari: true,
-                mesaj: `${basariliKayit} adet kayıt başarıyla Risk Motoruna yüklendi. Hesaplamalar başlatılıyor.`,
+                mesaj: `${basariliKayit} adet kayıt başarıyla Risk Motoruna yüklendi ve tüm risk göstergeleri yeniden hesaplandı.`,
                 report: report
             };
 
@@ -120,5 +135,31 @@ export class RiskController {
     @Get('bddk-export/npl')
     async getBddkNplExport() {
         return this.bddkService.generateMonthlyNplReport();
+    }
+
+    /**
+     * GET /risk/limits
+     * Risk limit listesini döner
+     */
+    @Get('limits')
+    async getLimits() {
+        return this.prisma.riskLimit.findMany({
+            include: { kpi: true },
+            orderBy: { kpi_kodu: 'asc' }
+        });
+    }
+
+    /**
+     * POST /risk/limits
+     * Belirli limit eşik değerlerini günceller
+     */
+    @Post('limits')
+    async updateLimit(@Body() body: { id: string; esik_deger: number }) {
+        const { id, esik_deger } = body;
+        return this.prisma.riskLimit.update({
+            where: { id },
+            data: { esik_deger },
+            include: { kpi: true }
+        });
     }
 }

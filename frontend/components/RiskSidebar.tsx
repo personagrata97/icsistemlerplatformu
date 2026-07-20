@@ -140,7 +140,7 @@ export default function RiskSidebar() {
                     <span>Sözleşmeler</span>
                 </Link>
 
-                {/* İşlem Geçmişi */}
+                {/* Denetim İzi */}
                 <Link
                     href="/risk/logs"
                     className={clsx(
@@ -151,7 +151,7 @@ export default function RiskSidebar() {
                     )}
                 >
                     <ClipboardCheck size={20} />
-                    <span>İşlem Geçmişi</span>
+                    <span>Denetim İzi</span>
                 </Link>
             </nav>
             {/* FOOTER REMOVED as per feedback */}

@@ -113,9 +113,24 @@ const TABS = [
     { id: 'actions', label: 'İyileştirme Planları', icon: ListChecks },
 ];
 
+import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
+import { AccessDenied } from '@/components/audit/AuditLogComponents';
+
 // ======================== COMPONENT ========================
 
 export default function QualityAssurancePage() {
+    const { hasRole } = useAuth();
+    const isManager = checkRole(hasRole, ROLES.BASIC_MANAGER);
+    const isInspector = hasRole('AUDIT_INSPECTOR');
+    const isSupervisor = hasRole('AUDIT_SUPERVISOR');
+    const isAuditor = isManager || isInspector || isSupervisor;
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
+
+    if (isUnit && !isAuditor) {
+        return <AccessDenied />;
+    }
+
     const { showToast } = useToast();
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');

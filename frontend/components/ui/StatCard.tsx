@@ -83,7 +83,7 @@ export default function StatCard({
     const breakdownContent = processedBreakdowns ? (
         <div className="flex flex-col gap-1.5 min-w-[160px] p-1">
             <div className="text-[11px] uppercase font-extrabold tracking-widest text-slate-600 mb-1.5 border-b border-slate-200/80 pb-1.5">DAĞILIM ÖZETİ</div>
-            {processedBreakdowns.map((b, i) => (
+            {processedBreakdowns.map((b: any, i) => (
                 <div key={i} className={`flex items-center justify-between gap-6 ${b.isOther ? 'mt-1 pt-1.5 border-t border-gray-100/60' : ''}`}>
                     <span className={`${b.isOther ? 'text-gray-400 italic' : 'text-gray-500'} font-medium text-[13px] line-clamp-1`}>{b.label}</span>
                     <span className="font-bold text-gray-800 text-[13px] tabular-nums">{b.value}</span>

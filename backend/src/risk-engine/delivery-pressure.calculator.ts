@@ -61,7 +61,7 @@ export class DeliveryPressureCalculator {
 
         const fonHavuzuBuyuklugu = mevcutNakit + gelecek12AyTaksitHacmi;
 
-        const teslimatBaskisi = fonHavuzuBuyuklugu > 0 ? (teslimatTaahhudu12Ay / fonHavuzuBuyuklugu) : 0;
+        const teslimatBaskisi = fonHavuzuBuyuklugu > 0 ? (teslimatTaahhudu12Ay / fonHavuzuBuyuklugu) : (teslimatTaahhudu12Ay > 0 ? 9.99 : 0);
         const teslimatBaskisiYuzde = teslimatBaskisi * 100;
 
         // Risk seviyesi (Sektör standardı: Teslimat baskısının %80'i aşması tehlikelidir)

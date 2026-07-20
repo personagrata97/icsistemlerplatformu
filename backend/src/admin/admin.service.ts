@@ -45,6 +45,40 @@ export class AdminService {
         return role;
     }
 
+    async getRoleById(id: string) {
+        return this.prisma.role.findUnique({
+            where: { id },
+            include: {
+                permissions: {
+                    include: {
+                        permission: true
+                    }
+                }
+            }
+        });
+    }
+
+    async deleteRole(id: string, user?: any) {
+        const role = await this.prisma.role.findUnique({ where: { id } });
+        if (!role) throw new Error('Rol bulunamadı');
+        if (role.isSystem) throw new Error('Sistem rolleri silinemez');
+
+        await this.prisma.rolePermission.deleteMany({ where: { roleId: id } });
+        await this.prisma.userRole.deleteMany({ where: { roleId: id } });
+        const result = await this.prisma.role.delete({ where: { id } });
+
+        const performerName = user?.displayName || user?.username || 'Sistem Yöneticisi';
+        await this.auditLogService.createLog({
+            user: performerName,
+            action: 'ROL_SILINDI',
+            details: `"${role.name}" (${role.code}) rolü silindi.`,
+            targetType: 'Role',
+            targetId: id
+        });
+
+        return result;
+    }
+
     async updateRolePermissions(roleId: string, permissions: { permissionId: string; scope: string }[], user?: any) {
         const role = await this.prisma.role.findUnique({ where: { id: roleId } });
         

@@ -6,18 +6,13 @@ import { useAuth } from '@/context/AuthContext';
 import Tooltip from '@/components/ui/Tooltip';
 
 export default function Home() {
-    const { user, logout } = useAuth();
-    const roles = user?.roles || [];
+    const { user, logout, hasRole } = useAuth();
 
-    // Daha kesin rol kontrolü için (Örn: COMPLIANCE_ADMIN'in ADMIN olarak algılanmasını önlemek için)
-    const hasRole = (roleCodes: string[]) =>
-        roles.some(role => roleCodes.includes(role));
-
-    const isAdmin = hasRole(['ADMIN', 'SYSTEM_ADMIN']);
-    const canSeeRisk = hasRole(['RISK_ADMIN', 'RISK_VIEWER', 'ADMIN', 'SYSTEM_ADMIN', 'COMPLIANCE_ADMIN']);
-    const canSeeAudit = hasRole(['AUDIT_ADMIN', 'AUDIT_INSPECTOR', 'AUDIT_UNIT', 'ADMIN', 'SYSTEM_ADMIN']);
-    const isUnitOnly = hasRole(['AUDIT_UNIT', 'AUDIT_VIEWER']) && !hasRole(['ADMIN', 'SYSTEM_ADMIN', 'AUDIT_ADMIN', 'AUDIT_INSPECTOR', 'AUDIT_SUPERVISOR']);
-    const canSeeSanction = hasRole(['SANCTION_ADMIN', 'COMPLIANCE_ADMIN', 'ADMIN', 'SYSTEM_ADMIN']);
+    const isAdmin = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN');
+    const canSeeRisk = hasRole('RISK_ADMIN') || hasRole('RISK_VIEWER') || hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('COMPLIANCE_ADMIN');
+    const canSeeAudit = hasRole('AUDIT_ADMIN') || hasRole('AUDIT_INSPECTOR') || hasRole('AUDIT_UNIT') || hasRole('ADMIN') || hasRole('SYSTEM_ADMIN');
+    const isUnitOnly = (hasRole('AUDIT_UNIT') || hasRole('AUDIT_VIEWER')) && !(hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_INSPECTOR') || hasRole('AUDIT_SUPERVISOR'));
+    const canSeeSanction = hasRole('SANCTION_ADMIN') || hasRole('COMPLIANCE_ADMIN') || hasRole('ADMIN') || hasRole('SYSTEM_ADMIN');
 
     const handleLogout = () => {
         logout();

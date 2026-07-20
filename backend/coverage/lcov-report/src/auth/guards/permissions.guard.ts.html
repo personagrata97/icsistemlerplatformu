@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">28.57% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/24</span>
+                <span class='fraction'>8/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>0/21</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">27.27% </span>
+                <span class="strong">23.07% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/22</span>
+                <span class='fraction'>6/26</span>
             </div>
         
             
@@ -114,7 +114,16 @@
 <a name='L49'></a><a href='#L49'>49</a>
 <a name='L50'></a><a href='#L50'>50</a>
 <a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -144,10 +153,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -194,11 +212,20 @@ export class PermissionsGuard implements CanActivate {
 <span class="cstat-no" title="statement not covered" >            return true;</span>
         }
 &nbsp;
-        const { user } = <span class="cstat-no" title="statement not covered" >context.switchToHttp().getRequest();</span>
+        const request = <span class="cstat-no" title="statement not covered" >context.switchToHttp().getRequest();</span>
+        const { user } = <span class="cstat-no" title="statement not covered" >request;</span>
+        
+        // GOD MODE: Eğer kullanıcı AUDIT_ADMIN, ADMIN veya SYSTEM_ADMIN ise her şeye izin ver
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (user &amp;&amp; user.roles &amp;&amp; (user.roles.includes('AUDIT_ADMIN') || user.roles.includes('ADMIN') || user.roles.includes('SYSTEM_ADMIN'))) {</span>
+<span class="cstat-no" title="statement not covered" >            return true;</span>
+        }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!user || !user.permissions) {</span>
 <span class="cstat-no" title="statement not covered" >            throw new ForbiddenException('Bu işlem için yetkiniz bulunmamaktadır.');</span>
         }
+&nbsp;
+        // IP Adresini Audit Log için user nesnesine ekle
+<span class="cstat-no" title="statement not covered" >        user.ipAddress = request.ip || request.connection?.remoteAddress || 'Bilinmiyor';</span>
 &nbsp;
         const hasPermission = <span class="cstat-no" title="statement not covered" >requiredPermissions.some(<span class="fstat-no" title="function not covered" >required </span>=&gt;</span>
 <span class="cstat-no" title="statement not covered" >            user.permissions.some(<span class="fstat-no" title="function not covered" >(u</span>serPerm: { module: string; action: string }) =&gt;</span>
@@ -223,7 +250,7 @@ export class PermissionsGuard implements CanActivate {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-10T13:11:08.973Z
+                at 2026-07-20T12:07:43.271Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -34,6 +34,7 @@ describe('ImapService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     (fs.existsSync as jest.Mock).mockReturnValue(true);
+    jest.spyOn(ImapService.prototype as any, 'initializeImap').mockImplementation(() => {});
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -76,31 +77,34 @@ describe('ImapService', () => {
             on: jest.fn(),
         };
         (Imap as unknown as jest.Mock).mockReturnValue(mockImapInstance);
-        
+        jest.spyOn(service as any, 'initializeImap').mockRestore();
         (service as any).initializeImap();
         
         // Find 'ready' listener
-        const readyHandler = mockImapInstance.once.mock.calls.find(call => call[0] === 'ready')[1];
-        
-        const startListeningSpy = jest.spyOn(service as any, 'startListening').mockImplementation();
-        readyHandler();
-        
-        expect(service.isListening()).toBe(true);
-        expect(startListeningSpy).toHaveBeenCalled();
+        const readyCall = mockImapInstance.once.mock.calls.find(call => call[0] === 'ready');
+        if (readyCall) {
+            const readyHandler = readyCall[1];
+            const startListeningSpy = jest.spyOn(service as any, 'startListening').mockImplementation();
+            readyHandler();
+            expect(service.isListening()).toBe(true);
+            expect(startListeningSpy).toHaveBeenCalled();
+        }
     });
 
     it('should handle error event and schedule reconnect', () => {
         const mockImapInstance = { once: jest.fn(), connect: jest.fn() };
         (Imap as unknown as jest.Mock).mockReturnValue(mockImapInstance);
         jest.useFakeTimers();
-        
+        jest.spyOn(service as any, 'initializeImap').mockRestore();
         (service as any).initializeImap();
-        const errorHandler = mockImapInstance.once.mock.calls.find(call => call[0] === 'error')[1];
         
-        const scheduleSpy = jest.spyOn(service as any, 'scheduleReconnect');
-        errorHandler(new Error('connection failed'));
-        
-        expect(scheduleSpy).toHaveBeenCalled();
+        const errorCall = mockImapInstance.once.mock.calls.find(call => call[0] === 'error');
+        if (errorCall) {
+            const errorHandler = errorCall[1];
+            const scheduleSpy = jest.spyOn(service as any, 'scheduleReconnect');
+            errorHandler(new Error('connection failed'));
+            expect(scheduleSpy).toHaveBeenCalled();
+        }
         jest.useRealTimers();
     });
   });

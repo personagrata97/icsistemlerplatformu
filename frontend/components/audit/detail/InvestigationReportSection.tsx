@@ -203,7 +203,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
             ".signature-block { text-align: center; width: 45%; }",
             ".signature-line { margin-top: 50px; border-top: 1px solid #cbd5e1; padding-top: 8px; font-size: 13px; font-weight: 600; }",
             '</style></head><body>',
-            '<div class="header"><h1>T.C. EMLAK KATILIM BANKASI A.Ş.</h1><h2 style="font-size: 15px; margin-top: 10px; color: #1e3a8a;">SORUŞTURMA VE İNCELEME RAPORU</h2></div>',
+            '<div class="header"><h1>TASARRUF FİNANSMAN A.Ş.</h1><h2 style="font-size: 15px; margin-top: 10px; color: #1e3a8a;">SORUŞTURMA VE İNCELEME RAPORU</h2></div>',
             '<table class="meta-table"><tr><td class="label">Rapor No</td><td>' + (auditData.code || 'D-01') + '</td><td class="label">Tarih</td><td>' + new Date().toLocaleDateString('tr-TR') + '</td></tr>',
             '<tr><td class="label">Olay Türü</td><td>' + (fraudType || 'Belirtilmedi') + '</td><td class="label">Zarar Tutarı</td><td>' + impactTxt + '</td></tr>',
             '<tr><td class="label">Disiplin Durumu</td><td colspan="3"><strong>' + disciplinaryDecision + '</strong></td></tr></table>',
@@ -226,9 +226,8 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
         <div className="card !p-0 shadow-sm border border-gray-100 overflow-hidden bg-white">
             <SectionHeader
                 icon={ShieldAlert}
-                iconClassName="text-rose-600"
                 title="İnceleme & Soruşturma Raporlama Merkezi"
-                actionButton={
+                rightContent={
                     <div className="flex items-center gap-3">
                         {lastSaved && (
                             <span className="text-[11px] text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100 flex items-center gap-1">

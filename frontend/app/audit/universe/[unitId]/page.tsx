@@ -616,9 +616,7 @@ export default function UnitRcmPage() {
                                                                 </span>
                                                                 <StatusBadge value={risk.level || 'Belirsiz'} type="risk" size="sm" />
                                                                 {risk.category && (
-                                                                    <CodeBadge>
-                                                                        {risk.category}
-                                                                    </CodeBadge>
+                                                                    <CodeBadge code={risk.category} />
                                                                 )}
                                                             </div>
                                                             {canManage && (

@@ -219,7 +219,7 @@ export default function Timeline({ events, emptyStateMessage = "Geçmiş kaydı 
             // If we have at least one detailed log, we can safely discard the redundant "Sistem" ones visually
             if (detailedLogs.length > 0) {
                 // Furthermore, if we have duplicate titles in detailedLogs, keep only the first one
-                const uniqueLogs = [];
+                const uniqueLogs: TimelineEvent[] = [];
                 const seenTitles = new Set();
                 detailedLogs.forEach(log => {
                     // Extract a simplified title string to catch similar logs

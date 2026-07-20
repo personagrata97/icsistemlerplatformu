@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Delete, Param, UseGuards, Request } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
@@ -22,6 +22,15 @@ export class AdminController {
         @Request() req: any
     ) {
         return this.adminService.createRole(data, req.user);
+    }
+
+    @Delete('roles/:id')
+    @RequirePermissions({ module: 'ADMIN', action: 'EDIT' })
+    deleteRole(
+        @Param('id') id: string,
+        @Request() req: any
+    ) {
+        return this.adminService.deleteRole(id, req.user);
     }
 
     @Patch('roles/:id/permissions')

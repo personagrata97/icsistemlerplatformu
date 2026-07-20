@@ -4,6 +4,8 @@ import { apiClient } from '@/lib/api-client';
 import LoadingState from '@/components/ui/LoadingState';
 import Button from '@/components/ui/Button';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+
 export default function ExecutiveRiskCockpit() {
     const [riskData, setRiskData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ export default function ExecutiveRiskCockpit() {
 
     const handleExportBddk = async (type: 'lyo' | 'npl') => {
         try {
-            const response = await fetch(`http://localhost:3011/api/risk/bddk-export/${type}`);
+            const response = await fetch(`${API_BASE}/risk/bddk-export/${type}`);
             const data = await response.json();
             
             // JSON verisini ekranda alert ile veya console ile gösterelim MVP için
@@ -40,7 +42,7 @@ export default function ExecutiveRiskCockpit() {
 
     const handleMasakScan = async () => {
         try {
-            const response = await fetch('http://localhost:3011/api/sanction/masak/scan');
+            const response = await fetch(`${API_BASE}/sanction/masak/scan`);
             const data = await response.json();
             alert(`MASAK ŞİB Taraması Tamamlandı.\nTespit Edilen Şüpheli İşlem: ${data.tespit_edilen_supheli_islem_sayisi}`);
         } catch (error) {
@@ -58,9 +60,24 @@ export default function ExecutiveRiskCockpit() {
                     <p className="text-sm text-gray-500">Otonom Traffic Light Raporu ve Uyum Bildirimleri</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="secondary" onClick={() => handleExportBddk('lyo')} icon={Download}>BVTS LYO</Button>
-                    <Button variant="secondary" onClick={() => handleExportBddk('npl')} icon={Download}>BVTS NPL</Button>
-                    <Button variant="danger" onClick={handleMasakScan} icon={ShieldCheck}>MASAK ŞİB Tara</Button>
+                    <Button variant="secondary" onClick={() => handleExportBddk('lyo')}>
+                        <span className="flex items-center gap-2">
+                            <Download size={16} />
+                            BVTS LYO
+                        </span>
+                    </Button>
+                    <Button variant="secondary" onClick={() => handleExportBddk('npl')}>
+                        <span className="flex items-center gap-2">
+                            <Download size={16} />
+                            BVTS NPL
+                        </span>
+                    </Button>
+                    <Button variant="danger" onClick={handleMasakScan}>
+                        <span className="flex items-center gap-2">
+                            <ShieldCheck size={16} />
+                            MASAK ŞİB Tara
+                        </span>
+                    </Button>
                 </div>
             </div>
 

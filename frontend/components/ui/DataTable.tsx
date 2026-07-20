@@ -18,7 +18,7 @@ export interface Column<T> {
     header: string;
     width?: string;
     align?: 'left' | 'center' | 'right';
-    type?: 'text' | 'date' | 'datetime' | 'currency' | 'status' | 'risk' | 'code' | 'user' | 'number' | 'percentage' | 'email' | 'phone' | 'filesize';
+    type?: 'text' | 'date' | 'datetime' | 'currency' | 'status' | 'risk' | 'code' | 'user' | 'number' | 'percentage' | 'email' | 'phone' | 'filesize' | (string & {});
     render?: (item: T, index: number) => React.ReactNode;
     sortable?: boolean;
     infoTooltip?: string;

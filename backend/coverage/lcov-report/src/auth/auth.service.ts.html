@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.14% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>74/89</span>
+                <span class='fraction'>76/95</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.5% </span>
+                <span class="strong">80.76% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>21/24</span>
+                <span class='fraction'>21/26</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.72% </span>
+                <span class="strong">80.43% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>72/86</span>
+                <span class='fraction'>74/92</span>
             </div>
         
             
@@ -360,11 +360,23 @@
 <a name='L295'></a><a href='#L295'>295</a>
 <a name='L296'></a><a href='#L296'>296</a>
 <a name='L297'></a><a href='#L297'>297</a>
-<a name='L298'></a><a href='#L298'>298</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -404,6 +416,7 @@
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
@@ -440,10 +453,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -654,6 +675,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -663,6 +685,7 @@ import { LoginDto } from './dto/login.dto';
 import { UserService, UserWithRoles } from './user.service';
 import { jwtConstants } from './jwt.constants';
 import { PrismaService } from '../common/prisma.service';
+import { LdapService } from './ldap.service';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 &nbsp;
@@ -704,6 +727,7 @@ export class AuthService {
         private userService: UserService,
         private jwtService: JwtService,
         private prisma: PrismaService,
+        private ldapService: LdapService,
     ) { }
 &nbsp;
     async login(loginDto: LoginDto): Promise&lt;AuthResponse&gt; {
@@ -714,7 +738,7 @@ export class AuthService {
         }
 &nbsp;
         if (!user.isActive) {
-            throw new UnauthorizedException('Bu hesap deaktif edilmiş.');
+            throw new UnauthorizedException('Bu hesap pasife alınmıştır. Lütfen sistem yöneticisiyle iletişime geçin.');
         }
 &nbsp;
         // ============================================
@@ -737,12 +761,20 @@ export class AuthService {
 &nbsp;
             const isPasswordValid = await bcrypt.compare(loginDto.password, user.passwordHash);
             if (!isPasswordValid) {
-                // Başarısız giriş sayacını artır
                 await this.handleFailedLogin(user);
                 throw new UnauthorizedException('Kullanıcı adı veya şifre hatalı.');
             }
+        } else <span class="missing-if-branch" title="else path not taken" >E</span>{
+            // AD kullanıcısı: LDAP bind ile şirket bilgisayar şifresi doğrulaması
+            const isLdapValid = <span class="cstat-no" title="statement not covered" >await this.ldapService.authenticate(</span>
+                loginDto.username,
+                loginDto.password,
+            );
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (!isLdapValid) {</span>
+<span class="cstat-no" title="statement not covered" >                await this.handleFailedLogin(user);</span>
+<span class="cstat-no" title="statement not covered" >                throw new UnauthorizedException('Kullanıcı adı veya şifre hatalı.');</span>
+            }
         }
-        // AD kullanıcısı için burada AD doğrulaması yapılacak (Phase 4)
 &nbsp;
         // Başarılı giriş: Sayacı sıfırla
         await this.resetFailedAttempts(user.id);
@@ -756,13 +788,13 @@ export class AuthService {
                 data: {
                     user: user.displayName || user.username,
                     action: 'Sisteme Giriş',
-                    details: `${user.username} kullanıcı adıyla sisteme başarılı giriş yapıldı.`,
+                    details: `${user.username} kullanıcı adıyla sisteme başarılı giriş (veya MFA adımı) başladı.`,
                     targetType: 'Auth',
                     targetId: user.id
                 }
             });
         } catch (logError) {
-<span class="cstat-no" title="statement not covered" >            console.error('AuditLog insert error:', logError);</span>
+<span class="cstat-no" title="statement not covered" >            this.logger.error('AuditLog insert error:', logError);</span>
         }
 &nbsp;
         // Token'ları oluştur
@@ -904,7 +936,7 @@ export class AuthService {
         // Kullanıcıyı bul
         const user = await this.userService.findById(refreshToken.userId);
         <span class="missing-if-branch" title="if path not taken" >I</span>if (!user || !user.isActive) {
-<span class="cstat-no" title="statement not covered" >            throw new UnauthorizedException('Kullanıcı bulunamadı veya deaktif edilmiş.');</span>
+<span class="cstat-no" title="statement not covered" >            throw new UnauthorizedException('Kullanıcı bulunamadı veya hesabı pasife alınmış.');</span>
         }
 &nbsp;
         // Eski refresh token'ı sil
@@ -941,7 +973,7 @@ export class AuthService {
                     }
                 });
             } catch (logError) {
-<span class="cstat-no" title="statement not covered" >                console.error('AuditLog insert error:', logError);</span>
+<span class="cstat-no" title="statement not covered" >                this.logger.error('AuditLog insert error:', logError);</span>
             }
         }
     }
@@ -953,6 +985,7 @@ export class AuthService {
 <span class="cstat-no" title="statement not covered" >            return null;</span>
         }
     }
+&nbsp;
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -961,7 +994,7 @@ export class AuthService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-10T13:11:08.973Z
+                at 2026-07-20T12:07:43.271Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

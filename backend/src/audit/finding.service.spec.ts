@@ -129,7 +129,7 @@ describe('FindingService', () => {
             mockPrisma.auditFollowUp.count.mockResolvedValue(1);
 
             await expect(service.updateFinding('f1', { status: 'Tamamlandı' }, mockUser))
-                .rejects.toThrow('Açık aksiyonlar (1) varken bulgu kapatılamaz');
+                .rejects.toThrow('açık aksiyonu var');
         });
 
         it('should block self-approval (Segregation of Duties)', async () => {
@@ -144,8 +144,9 @@ describe('FindingService', () => {
             mockPrisma.finding.update.mockResolvedValue({ id: 'f1', status: 'Risk Kabul Edildi' });
             (fs.existsSync as jest.Mock).mockReturnValue(false);
 
+            const adminUser = { ...mockUser, roles: ['ADMIN'] };
             const file = { originalname: 'risk.pdf', buffer: Buffer.from('data') };
-            await service.acceptRisk('f1', 'Gerekçe', file, mockUser);
+            await service.acceptRisk('f1', 'Gerekçe', file, adminUser);
 
             expect(fs.writeFileSync).toHaveBeenCalled();
             expect(mockPrisma.finding.update).toHaveBeenCalledWith(expect.objectContaining({

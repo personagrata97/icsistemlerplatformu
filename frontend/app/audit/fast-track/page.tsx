@@ -232,7 +232,7 @@ function FastTrackPageContent() {
         return (
             <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 p-6">
                 <RotateCw className="w-12 h-12 text-[#c9a84c] animate-spin mb-4" />
-                <p className="text-sm font-semibold tracking-wider text-slate-400">EMLAK KATILIM HIZLI MUTABAKAT PORTALI</p>
+                <p className="text-sm font-semibold tracking-wider text-slate-400">TASARRUF FİNANSMAN A.Ş. HIZLI MUTABAKAT PORTALİ</p>
                 <p className="text-xs text-slate-500 mt-2">Güvenli veriler yükleniyor, lütfen bekleyin...</p>
             </div>
         );
@@ -259,7 +259,7 @@ function FastTrackPageContent() {
             {/* Elegant Header */}
             <div className="w-full max-w-4xl text-center mb-8">
                 <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-1">
-                    EMLAK KATILIM <span className="text-[#c9a84c]">TFS</span>
+                    TASARRUF FİNANSMAN <span className="text-[#c9a84c]">A.Ş.</span>
                 </h1>
                 <p className="text-xs uppercase tracking-widest text-[#c9a84c] font-semibold">Teftiş Kurulu Müdürlüğü • Dijital Mutabakat Sistemi (AMS)</p>
             </div>
@@ -572,7 +572,7 @@ function FastTrackPageContent() {
                                     <div className="shrink-0 flex items-center justify-center">
                                         <div className="w-32 h-32 rounded-full border-4 border-dashed border-[#c9a84c] flex flex-col items-center justify-center bg-white shadow-lg p-2 text-center animate-spin-slow">
                                             <ShieldCheck className="w-8 h-8 text-emerald-600 mb-1" />
-                                            <span className="text-[8px] font-extrabold text-[#004a99] uppercase tracking-wider">EMLAK KATILIM</span>
+                                            <span className="text-[8px] font-extrabold text-[#004a99] uppercase tracking-wider">TASARRUF FİNANSMAN</span>
                                             <span className="text-[9px] font-extrabold text-emerald-600 uppercase tracking-widest">{isAgreed ? 'MUTABIK' : 'RED'}</span>
                                             <span className="text-[6px] font-bold text-slate-400 mt-1">AMS INTEGRITY</span>
                                         </div>

@@ -30,8 +30,8 @@ export class PermissionsGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const { user } = request;
         
-        // GOD MODE: Eğer kullanıcı AUDIT_ADMIN ise her şeye izin ver
-        if (user && user.roles && user.roles.includes('AUDIT_ADMIN')) {
+        // GOD MODE: Eğer kullanıcı AUDIT_ADMIN, ADMIN veya SYSTEM_ADMIN ise her şeye izin ver
+        if (user && user.roles && (user.roles.includes('AUDIT_ADMIN') || user.roles.includes('ADMIN') || user.roles.includes('SYSTEM_ADMIN'))) {
             return true;
         }
 

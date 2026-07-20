@@ -228,7 +228,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Yetki kontrol fonksiyonları
     const hasPermission = useCallback((module: string, action: string): boolean => {
-        if (!user || !user.permissions) return false;
+        if (!user) return false;
+
+        // GOD MODE: Admins bypass permission checks
+        const normalizedRoles = (user.roles || []).map(r => r.toUpperCase());
+        if (normalizedRoles.includes('ADMIN') || normalizedRoles.includes('SYSTEM_ADMIN')) {
+            return true;
+        }
+
+        if (!user.permissions) return false;
 
         return user.permissions.some(p =>
             (p.module === module || p.module === 'ALL') &&
@@ -240,6 +248,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!user || !user.roles) return false;
         
         const normalizedRoles = user.roles.map(r => r.toUpperCase());
+        
+        // GOD MODE: Admins have all roles
+        if (normalizedRoles.includes('ADMIN') || normalizedRoles.includes('SYSTEM_ADMIN')) {
+            return true;
+        }
+
         const targetRole = role.toUpperCase();
         
         // DevMode Role Mapping
@@ -252,8 +266,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (normalizedRoles.includes('MUFETTIS') || normalizedRoles.includes('MÜFETTİŞ')) {
             normalizedRoles.push('AUDITOR');
         }
-        if (normalizedRoles.includes('ADMIN')) {
-            normalizedRoles.push('SYSTEM_ADMIN', 'AUDIT_ADMIN');
+        if (normalizedRoles.includes('ADMIN') || normalizedRoles.includes('SYSTEM_ADMIN') || normalizedRoles.includes('AUDIT_ADMIN')) {
+            if (!normalizedRoles.includes('ADMIN')) normalizedRoles.push('ADMIN');
+            if (!normalizedRoles.includes('SYSTEM_ADMIN')) normalizedRoles.push('SYSTEM_ADMIN');
+            if (!normalizedRoles.includes('AUDIT_ADMIN')) normalizedRoles.push('AUDIT_ADMIN');
         }
         if (normalizedRoles.includes('CAE')) {
             normalizedRoles.push('MANAGER', 'AUDIT_MANAGER', 'ADMIN');

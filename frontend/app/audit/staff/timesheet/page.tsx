@@ -85,8 +85,7 @@ export default function TimesheetPage() {
             render: (row: any) => (
                 <div className="flex justify-center">
                     <StatusBadge 
-                        status={row.status === 'Onaylandı' ? 'Tamamlandı' : 'Bekliyor'} 
-                        text={row.status} 
+                        value={row.status === 'Onaylandı' ? 'Tamamlandı' : 'Bekliyor'} 
                     />
                 </div>
             )
@@ -155,7 +154,7 @@ export default function TimesheetPage() {
                 <StatCard 
                     title="İdari / Diğer" 
                     value="220 Saat" 
-                    entityType="ISSUE" 
+                    entityType="WORKPAPER" 
                     subtext="Eğitim, toplantı ve idari" 
                     onClick={() => setStatusFilter('pending')}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${statusFilter === 'pending' ? 'ring-2 ring-amber-500 scale-[1.02] bg-amber-50/10' : ''}`}

@@ -22,7 +22,8 @@ export type EntityType =
     | 'SKILL_IT'
     | 'SKILL_FINANCE'
     | 'SKILL_DATA'
-    | 'SKILL_REPORT';
+    | 'SKILL_REPORT'
+    | 'AUDIT_FINDING';
 
 export type EntityColor = 'primary' | 'emerald' | 'indigo' | 'orange' | 'purple' | 'blue' | 'red' | 'slate' | 'cyan';
 
@@ -49,7 +50,8 @@ export const ENTITY_CONFIG: Record<EntityType, EntityConfig> = {
     SKILL_IT: { icon: Cpu, color: 'cyan', label: 'Bilgi Sistemleri' },
     SKILL_FINANCE: { icon: BarChart3, color: 'emerald', label: 'Finansal Denetim' },
     SKILL_DATA: { icon: Database, color: 'orange', label: 'Veri Analitiği' },
-    SKILL_REPORT: { icon: Globe, color: 'purple', label: 'Raporlama' }
+    SKILL_REPORT: { icon: Globe, color: 'purple', label: 'Raporlama' },
+    AUDIT_FINDING: { icon: FolderOpen, color: 'orange', label: 'Denetim Bulgusu' }
 };
 
 export const getColorClasses = (color: EntityColor) => {

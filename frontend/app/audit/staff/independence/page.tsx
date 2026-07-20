@@ -69,8 +69,7 @@ export default function IndependencePage() {
             render: (row: any) => (
                 <div className="flex justify-center">
                     <StatusBadge 
-                        status={row.hasSigned ? 'Tamamlandı' : 'Bekliyor'} 
-                        text={row.hasSigned ? 'İmzalandı' : 'Eksik'} 
+                        value={row.hasSigned ? 'Tamamlandı' : 'Bekliyor'} 
                     />
                 </div>
             )
@@ -145,7 +144,7 @@ export default function IndependencePage() {
                 <StatCard 
                     title="İmzalanan Beyanlar" 
                     value={staffList.length.toString()} 
-                    entityType="DOCUMENT" 
+                    entityType="WORKPAPER" 
                     subtext="2026 Yılı Dönemi" 
                     onClick={() => setStatusFilter('signed')}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${statusFilter === 'signed' ? 'ring-2 ring-emerald-500 scale-[1.02] bg-emerald-50/10' : ''}`}
@@ -153,7 +152,7 @@ export default function IndependencePage() {
                 <StatCard 
                     title="Çıkar Çatışması Bildirimi" 
                     value="0" 
-                    entityType="ISSUE" 
+                    entityType="RISK" 
                     subtext="İncelenmesi gerekenler" 
                     onClick={() => setStatusFilter('conflict')}
                     className={`transition-all hover:scale-[1.02] cursor-pointer ${statusFilter === 'conflict' ? 'ring-2 ring-rose-500 scale-[1.02] bg-rose-50/10' : ''}`}

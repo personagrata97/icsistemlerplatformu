@@ -93,9 +93,21 @@ const getNestedDepartmentOptions = () => {
     return options;
 };
 
+import { AccessDenied } from '@/components/audit/AuditLogComponents';
+
 export default function AuditStaffPage() {
     const router = useRouter();
     const { hasRole, user } = useAuth();
+    const isManager = checkRole(hasRole, ROLES.STAFF_MANAGER);
+    const isInspector = hasRole('AUDIT_INSPECTOR');
+    const isSupervisor = hasRole('AUDIT_SUPERVISOR');
+    const isAuditor = isManager || isInspector || isSupervisor;
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
+
+    if (isUnit && !isAuditor) {
+        return <AccessDenied />;
+    }
+
     const canManage = hasRole ? checkRole(hasRole, ROLES.STAFF_MANAGER) : false;
     const { showToast } = useToast();
     const [staffList, setStaffList] = useState<AuditStaff[]>([]);
@@ -159,7 +171,9 @@ export default function AuditStaffPage() {
     const [filters, setFilters] = useState({
         title: [] as string[],
         status: [] as string[],
-        hireYear: [] as string[]
+        hireYear: [] as string[],
+        certifications: [] as string[],
+        skills: [] as string[]
     });
 
     // Silme onay durumları
@@ -1086,21 +1100,23 @@ export default function AuditStaffPage() {
         const staffHireYear = staff.hireDate ? new Date(staff.hireDate).getFullYear().toString() : '';
         const matchesHireYear = filters.hireYear.length === 0 || filters.hireYear.includes(staffHireYear);
 
-        const staffCerts = Array.isArray(staff.certifications) 
-            ? staff.certifications.map(c => typeof c === 'object' ? c.value || c.label : c) 
-            : (typeof staff.certifications === 'string' && staff.certifications.trim() !== ''
-                ? (staff.certifications.startsWith('[') 
-                    ? (() => { try { return JSON.parse(staff.certifications).map((c:any) => typeof c === 'object' ? c.value || c.label : c); } catch { return []; } })()
-                    : staff.certifications.split(',').map(c => c.trim()))
+        const certifications = staff.certifications as any;
+        const staffCerts = Array.isArray(certifications) 
+            ? certifications.map((c: any) => typeof c === 'object' ? c.value || c.label : c) 
+            : (typeof certifications === 'string' && certifications.trim() !== ''
+                ? (certifications.startsWith('[') 
+                    ? (() => { try { return JSON.parse(certifications).map((c:any) => typeof c === 'object' ? c.value || c.label : c); } catch { return []; } })()
+                    : certifications.split(',').map(c => c.trim()))
                 : []);
         const matchesCerts = !filters.certifications || filters.certifications.length === 0 || filters.certifications.some(c => staffCerts.includes(c));
 
-        const staffSkills = Array.isArray(staff.skills) 
-            ? staff.skills.map(c => typeof c === 'object' ? c.value || c.label : c) 
-            : (typeof staff.skills === 'string' && staff.skills.trim() !== ''
-                ? (staff.skills.startsWith('[') 
-                    ? (() => { try { return JSON.parse(staff.skills).map((c:any) => typeof c === 'object' ? c.value || c.label : c); } catch { return []; } })()
-                    : staff.skills.split(',').map(c => c.trim()))
+        const skills = staff.skills as any;
+        const staffSkills = Array.isArray(skills) 
+            ? skills.map((c: any) => typeof c === 'object' ? c.value || c.label : c) 
+            : (typeof skills === 'string' && skills.trim() !== ''
+                ? (skills.startsWith('[') 
+                    ? (() => { try { return JSON.parse(skills).map((c:any) => typeof c === 'object' ? c.value || c.label : c); } catch { return []; } })()
+                    : skills.split(',').map(c => c.trim()))
                 : []);
         const matchesSkills = !filters.skills || filters.skills.length === 0 || filters.skills.some(s => staffSkills.includes(s));
 
@@ -1169,7 +1185,7 @@ export default function AuditStaffPage() {
                             Yetkinlikler
                         </Button>
                         {canManage && (
-                            <Button variant="secondary" onClick={() => { setBulkTrainingForm({ name: '', provider: '', startDate: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], participantIds: [] }); setIsBulkTrainingModalOpen(true); }} className="border-primary/20 text-primary hover:bg-primary/5" leftIcon={<ShieldCheck size={18} />}>
+                            <Button variant="secondary" onClick={() => { setBulkTrainingForm({ name: '', provider: '', hours: undefined, startDate: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], status: 'Tamamlandı', participantIds: [] as string[] }); setIsBulkTrainingModalOpen(true); }} className="border-primary/20 text-primary hover:bg-primary/5" leftIcon={<ShieldCheck size={18} />}>
                                 Toplu Eğitim
                             </Button>
                         )}
@@ -1269,7 +1285,7 @@ export default function AuditStaffPage() {
                 searchTerm={searchTerm}
                 onClearFilters={() => {
                     setSearchTerm('');
-                    setFilters({ title: [], status: [], hireYear: [] });
+                    setFilters({ title: [], status: [], hireYear: [], certifications: [], skills: [] });
                 }}
             />
 
@@ -1677,7 +1693,7 @@ export default function AuditStaffPage() {
                                                 <div className="text-xs font-bold text-primary uppercase tracking-wider">Mevcut Ünvan</div>
                                                 <div className="text-xl font-bold text-gray-900 mt-1">{editingStaff.title}</div>
                                             </div>
-                                            <StatusBadge status="Aktif" />
+                                            <StatusBadge value="Aktif" />
                                         </div>
                                         <div className="text-sm text-gray-600 flex items-center gap-4 mt-3">
                                             <span className="flex items-center gap-1.5">
@@ -1725,7 +1741,7 @@ export default function AuditStaffPage() {
                                                     <ArrowRight size={12} className="text-gray-300" />
                                                     <span className="text-gray-600 font-bold">{promo.title}</span>
                                                     <div className="ml-auto">
-                                                        <StatusBadge status={promo.type || 'Terfi'} />
+                                                        <StatusBadge value={promo.type || 'Terfi'} />
                                                     </div>
                                                 </div>
                                                 <div className="flex justify-between items-end">
@@ -1805,7 +1821,7 @@ export default function AuditStaffPage() {
                                                     <h4 className="font-semibold text-gray-800">{leave.type}</h4>
                                                     <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
                                                         <span className="flex items-center gap-1"><Calendar size={14} /> {formatDate(leave.startDate)} - {formatDate(leave.endDate)}</span>
-                                                        <StatusBadge status={leave.status} />
+                                                        <StatusBadge value={leave.status} />
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
@@ -1815,14 +1831,14 @@ export default function AuditStaffPage() {
                                                                 ...(leave.status === 'Planlandı' ? [
                                                                     {
                                                                         label: 'Onayla',
-                                                                        icon: () => <span className="text-emerald-600 font-bold">✓</span>,
+                                                                        icon: CheckCircle,
                                                                         onClick: () => setApproveLeaveId(leave.id),
                                                                     }
                                                                 ] : []),
                                                                 ...(leave.status !== 'İptal Edildi' ? [
                                                                     {
                                                                         label: 'İptal Et',
-                                                                        icon: () => <span className="text-rose-600 font-bold">✕</span>,
+                                                                        icon: X,
                                                                         onClick: () => setRejectLeaveId(leave.id),
                                                                     }
                                                                 ] : []),
@@ -2239,7 +2255,7 @@ export default function AuditStaffPage() {
                                                         key: 'status',
                                                         header: 'Durum', 
                                                         render: (item: any) => (
-                                                            <StatusBadge status={item.status === 'Onaylandı' ? 'Tamamlandı' : item.status === 'Sorun Var' ? 'Uyarı' : 'Bekliyor'} text={item.status === 'Onaylandı' ? 'Uyumlu' : item.status === 'Sorun Var' ? 'İstisna Mevcut' : 'Bekliyor'} />
+                                                            <StatusBadge value={item.status === 'Onaylandı' ? 'Uyumlu' : item.status === 'Sorun Var' ? 'İstisna Mevcut' : 'Bekliyor'} />
                                                         )
                                                     },
                                                     { 
@@ -2248,9 +2264,9 @@ export default function AuditStaffPage() {
                                                         render: (item: any) => {
                                                             const hasIssues = item.hasConflict || item.hasFinancialLink || item.hasFamilyLink || item.hasPreviousRole || item.hasOtherIssue;
                                                             return hasIssues ? (
-                                                                <StatusBadge status="Kritik" text="İlişki Beyan Edilmiş" />
+                                                                <StatusBadge value="İnceleniyor" />
                                                             ) : (
-                                                                <StatusBadge status="İyi" text="Yok (Tam Bağımsız)" />
+                                                                <StatusBadge value="Tamamlandı" />
                                                             );
                                                         }
                                                     },

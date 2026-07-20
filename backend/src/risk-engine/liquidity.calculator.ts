@@ -49,22 +49,22 @@ export class LiquidityCalculator {
         }
 
         const toplamCikis = kisaVadeliCikis + teslimatCikis;
-        const lyo = toplamCikis > 0 ? (nakitGiris / toplamCikis) : 0;
+        const lyo = toplamCikis > 0 ? (nakitGiris / toplamCikis) : (nakitGiris > 0 ? 9.99 : 1.0);
         const lyoYuzde = lyo * 100;
 
         // BDDK Eşikleri Belirleme (1 Ocak 2026 Tebliği)
         let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
-        let bddkUyariMesaji = '✅ LYO Sağlıklı';
+        let bddkUyariMesaji = '✅ LYO Sağlıklı (Mevzuat Uyumlu)';
 
         if (lyoYuzde < 100) {
             riskSeviyesi = 'RED';
-            bddkUyariMesaji = '🚨 KRİTİK İHLAL: Oran %100 altına düştü. 2 hafta içinde giderilmeli.';
+            bddkUyariMesaji = '🚨 KRİTİK İHLAL: Oran %100 asgari sınırının altına düştü. 2 hafta içinde giderilmelidir. (Yılda en fazla 6 kez ihlal edilebilir)';
         } else if (lyoYuzde < 120) {
-            riskSeviyesi = 'RED'; // Veya UI için koyu sarı
-            bddkUyariMesaji = '🔴 ACİL BİLDİRİM: %120 altına inildi. İvedi olarak BDDK savunma yazısı hazırlanmalı.';
+            riskSeviyesi = 'YELLOW';
+            bddkUyariMesaji = '🔴 BDDK BİLDİRİM EŞİĞİ: Oran %120 sınırının altında. Alınacak önlemlerle birlikte ivedilikle BDDK\'ya bildirilmelidir.';
         } else if (lyoYuzde < 200) {
             riskSeviyesi = 'YELLOW';
-            bddkUyariMesaji = '⚠️ YAKIN İZLEME: %200 altında. 6 hafta sürerse BDDK bildirimi zorunludur.';
+            bddkUyariMesaji = '⚠️ ERKEN UYARI EŞİĞİ: Oran %200\'ün altında. 6 hafta üst üste bu seviyede kalırsa gerekçeler BDDK\'ya bildirilmelidir.';
         }
 
         return {

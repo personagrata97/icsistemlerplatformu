@@ -58,12 +58,13 @@ describe('HttpExceptionFilter', () => {
     const exception = new Error('Generic error');
     const status = HttpStatus.INTERNAL_SERVER_ERROR;
 
+    const loggerSpy = jest.spyOn((filter as any).logger, 'error').mockImplementation();
     filter.catch(exception, mockArgumentsHost);
 
     expect(mockResponse.status).toHaveBeenCalledWith(status);
-    expect(fs.appendFileSync).toHaveBeenCalledWith(
-      'error-log.txt',
-      expect.stringContaining('Generic error')
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Generic error'),
+      expect.anything()
     );
   });
 

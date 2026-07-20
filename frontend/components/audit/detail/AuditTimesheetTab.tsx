@@ -12,6 +12,8 @@ import { auditApi } from '@/lib/audit-api';
 import ConfirmModal from '@/components/ConfirmModal';
 import FormInput from "@/components/ui/FormInput";
 
+import { checkRole, ROLES } from '@/lib/auth-constants';
+
 interface AuditTimesheetTabProps {
     auditId: string;
 }
@@ -27,6 +29,11 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
     const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
     const isManager = hasRole('ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('SYSTEM_ADMIN');
+    const isInspector = hasRole('AUDIT_INSPECTOR');
+    const isSupervisor = hasRole('AUDIT_SUPERVISOR');
+    const isAuditor = isInspector || isSupervisor || isManager;
+    const isUnit = checkRole(hasRole, ROLES.UNIT);
+    const canManageTimesheet = !isUnit || isAuditor;
 
     useEffect(() => {
         loadTimesheets();
@@ -162,7 +169,7 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
             sortable: true,
             width: '160px',
             render: (row: any) => {
-                const isEditable = isManager || row.userId === user?.id || row.isNew;
+                const isEditable = canManageTimesheet && (isManager || row.userId === user?.id || row.isNew);
                 return isEditable ? (
                     <FormInput type="date"  
                         value={row.date} 
@@ -178,7 +185,7 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
             header: 'Açıklama / Görev',
             sortable: true,
             render: (row: any) => {
-                const isEditable = isManager || row.userId === user?.id || row.isNew;
+                const isEditable = canManageTimesheet && (isManager || row.userId === user?.id || row.isNew);
                 return isEditable ? (
                     <input type="text" className="form-input" 
                         placeholder="Görev veya harcanan efor detayı"
@@ -197,7 +204,7 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
             width: '120px',
             align: 'center' as const,
             render: (row: any) => {
-                const isEditable = isManager || row.userId === user?.id || row.isNew;
+                const isEditable = canManageTimesheet && (isManager || row.userId === user?.id || row.isNew);
                 return isEditable ? (
                     <input type="number" min="0" step="0.5" className="form-input text-center" 
                         value={row.hours} 
@@ -214,7 +221,7 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
             width: '80px',
             align: 'center' as const,
             render: (row: any) => {
-                const isEditable = isManager || row.userId === user?.id || row.isNew;
+                const isEditable = canManageTimesheet && (isManager || row.userId === user?.id || row.isNew);
                 return isEditable ? (
                     <ActionMenu variant="ghost" items={[
                         { label: 'Satırı Sil', icon: Trash2, onClick: () => handleDeleteEntry(row.id), variant: 'danger' }
@@ -251,14 +258,16 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
                     <Clock size={20} className="text-primary" /> Efor Çizelgesi
                 </h3>
-                <div className="flex gap-2">
-                    <Button size="sm" onClick={handleAddEntry} leftIcon={<Plus size={16} />}>
-                        Yeni Efor Ekle
-                    </Button>
-                    <Button size="sm" variant="primary" onClick={handleSave} isLoading={saving} leftIcon={<Save size={16} />}>
-                        Değişiklikleri Kaydet
-                    </Button>
-                </div>
+                {canManageTimesheet && (
+                    <div className="flex gap-2">
+                        <Button size="sm" onClick={handleAddEntry} leftIcon={<Plus size={16} />}>
+                            Yeni Efor Ekle
+                        </Button>
+                        <Button size="sm" variant="primary" onClick={handleSave} isLoading={saving} leftIcon={<Save size={16} />}>
+                            Değişiklikleri Kaydet
+                        </Button>
+                    </div>
+                )}
             </div>
 
             {personSummaryArray.length > 0 && (

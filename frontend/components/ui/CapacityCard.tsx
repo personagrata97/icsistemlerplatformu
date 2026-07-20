@@ -54,7 +54,7 @@ export default function CapacityCard({
             <div className="max-h-[160px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
                 {activeAssignments.map((al, i) => (
                     <div key={i} className="flex flex-col mb-1.5 last:mb-0">
-                        <span className="truncate max-w-[200px]" title={al.title}>{al.title}</span>
+                        <span className="truncate max-w-[200px]">{al.title}</span>
                         <span className="text-[10px] text-emerald-300">{al.role}</span>
                     </div>
                 ))}

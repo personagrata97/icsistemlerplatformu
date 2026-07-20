@@ -1,4 +1,5 @@
 import React from 'react';
+import OverflowTooltip from '@/components/ui/OverflowTooltip';
 
 interface CodeBadgeProps {
     code: string | undefined | null;
@@ -26,16 +27,23 @@ const CodeBadge: React.FC<CodeBadgeProps> = ({
 
     // Color/Style variants
     const variantStyles = {
-        primary: "text-emerald-700 bg-emerald-50 border border-emerald-100", // Updated to match user request
-        secondary: "bg-gray-100 text-gray-700 border border-gray-200", // Neutral
+        primary: "text-emerald-700 bg-emerald-50 border border-emerald-100",
+        secondary: "bg-gray-100 text-gray-700 border border-gray-200",
         outline: "bg-transparent text-primary border border-primary/20",
         ghost: "bg-transparent text-gray-500 hover:text-gray-900"
     }[variant];
 
+    const isLongCode = code.length > 12;
+    const dynamicSizeStyles = isLongCode ? "text-[10px] tracking-tight px-1.5 py-0.5" : sizeStyles;
+
     return (
-        <span className={`${baseStyles} ${sizeStyles} ${variantStyles} ${className}`}>
-            {code}
-        </span>
+        <OverflowTooltip content={code} className="w-full">
+            <span 
+                className={`${baseStyles} ${dynamicSizeStyles} ${variantStyles} ${className} w-full text-center max-w-full overflow-hidden block`}
+            >
+                <span className="truncate block max-w-full">{code}</span>
+            </span>
+        </OverflowTooltip>
     );
 };
 

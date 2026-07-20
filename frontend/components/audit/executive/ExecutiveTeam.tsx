@@ -13,7 +13,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Alert from '@/components/ui/Alert';
 import { Calendar, CheckSquare, Clock, UserCheck, Users, XCircle, Target, Activity, CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
-import auditApi from '@/lib/audit-api';
+import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
 
 type ExecutiveTeamProps = {
@@ -466,10 +466,10 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                                 <>
                                     {hasConflict && (
                                         <Alert 
-                                            variant="danger" 
+                                            variant="error" 
                                             title="Tarih Çakışması" 
                                             description="İlgili personelin atandığı denetimlerin bazılarında tarih çakışması bulunmaktadır."
-                                            icon={AlertTriangle}
+                                            icon={<AlertTriangle size={20} />}
                                         />
                                     )}
                                     

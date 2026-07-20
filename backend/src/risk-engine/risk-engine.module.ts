@@ -8,6 +8,8 @@ import { ConcentrationCalculator } from './concentration.calculator';
 import { DpdCalculator } from './dpd.calculator';
 import { DeliveryLiabilityCalculator } from './delivery-liability.calculator';
 import { CancellationCalculator } from './cancellation.calculator';
+import { FinancingLimitCalculator } from './financing-limit.calculator';
+import { EquityRatioCalculator } from './equity-ratio.calculator';
 import { BddkExportService } from './bddk-export.service';
 import { DataIngestionService } from './data-ingestion.service';
 
@@ -22,6 +24,8 @@ import { DataIngestionService } from './data-ingestion.service';
         DpdCalculator,
         DeliveryLiabilityCalculator,
         CancellationCalculator,
+        FinancingLimitCalculator,
+        EquityRatioCalculator,
         BddkExportService,
         DataIngestionService,
     ],

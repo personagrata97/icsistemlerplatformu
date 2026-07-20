@@ -12,6 +12,8 @@ import { formatDate } from '@/lib/audit-utils';
 import ConfirmModal from '@/components/ConfirmModal';
 import ActionMenu from '@/components/ui/ActionMenu';
 
+import PageToolbar from '@/components/ui/PageToolbar';
+
 export default function AlertsPage() {
     const [alerts, setAlerts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -54,41 +56,36 @@ export default function AlertsPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto py-2 space-y-8">
-            <div className="flex flex-wrap items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Risk Uyarıları</h1>
-                    <p className="text-slate-500 font-medium">Limit aşımları ve kritik eşik takibi</p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+        <div className="space-y-6">
+            <PageToolbar
+                noSearch={true}
+                onRefresh={loadAlerts}
+                filters={
+                    <div className="flex gap-1 bg-gray-100 p-1 rounded-lg border border-gray-200">
                         <Button
                             variant={filter === 'OPEN' ? 'primary' : 'ghost'}
                             onClick={() => setFilter('OPEN')}
-                            className={`!h-9 !px-5 text-xs font-black uppercase tracking-widest !rounded-lg transition-all ${filter === 'OPEN' ? 'shadow-md shadow-primary/20' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`!h-8 !px-4 text-xs font-semibold rounded-md transition-all ${filter === 'OPEN' ? 'shadow-sm text-white' : 'text-gray-600 hover:text-gray-900'}`}
                         >
                             Açık
                         </Button>
                         <Button
                             variant={filter === 'CLOSED' ? 'primary' : 'ghost'}
                             onClick={() => setFilter('CLOSED')}
-                            className={`!h-9 !px-5 text-xs font-black uppercase tracking-widest !rounded-lg transition-all ${filter === 'CLOSED' ? 'shadow-md shadow-primary/20' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`!h-8 !px-4 text-xs font-semibold rounded-md transition-all ${filter === 'CLOSED' ? 'shadow-sm text-white' : 'text-gray-600 hover:text-gray-900'}`}
                         >
                             Kapalı
                         </Button>
                         <Button
                             variant={filter === 'ALL' ? 'primary' : 'ghost'}
                             onClick={() => setFilter('ALL')}
-                            className={`!h-9 !px-5 text-xs font-black uppercase tracking-widest !rounded-lg transition-all ${filter === 'ALL' ? 'shadow-md shadow-primary/20' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`!h-8 !px-4 text-xs font-semibold rounded-md transition-all ${filter === 'ALL' ? 'shadow-sm text-white' : 'text-gray-600 hover:text-gray-900'}`}
                         >
                             Tümü
                         </Button>
                     </div>
-                    
-                    <RefreshButton onClick={loadAlerts} />
-                </div>
-            </div>
+                }
+            />
 
             <DataTable
                 columns={[
