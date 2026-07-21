@@ -86,8 +86,15 @@ export class SamplingController {
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
     @UseInterceptors(FileInterceptor('file', {
         limits: {
-            fieldSize: 500 * 1024 * 1024, // 500MB (JSON veri paketleri için kafa payı)
-            fileSize: 500 * 1024 * 1024   // 500MB (Dosya yüklemeleri için)
+            fieldSize: 50 * 1024 * 1024,
+            fileSize: 50 * 1024 * 1024
+        },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(csv|xlsx|xls|json|pdf|txt|zip|docx|doc)$/i;
+            if (!file.originalname.match(allowed)) {
+                return callback(new HttpException('Geçersiz dosya formatı. Sadece CSV, Excel, JSON, PDF ve Word dosyalarına izin verilir.', HttpStatus.BAD_REQUEST), false);
+            }
+            callback(null, true);
         }
     }))
     async generateAdvancedWithFile(

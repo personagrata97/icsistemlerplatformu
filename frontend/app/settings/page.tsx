@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Shield, Users, Save, Plus, ChevronRight, Trash2 } from 'lucide-react';
+import { Shield, Users, Save, Plus, ChevronRight, Trash2, RotateCcw, Clock, AlertTriangle } from 'lucide-react';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import { clsx } from 'clsx';
 import Switch from '@/components/ui/Switch';
@@ -15,6 +15,7 @@ import { organizationApi } from '@/lib/organization-api';
 import PageHeader from '@/components/audit/PageHeader';
 import SharedAuditLayout from '@/components/audit/AuditLayout';
 import Modal from '@/components/ui/Modal';
+import ConfirmModal from '@/components/ConfirmModal';
 import CustomSelect from '@/components/ui/CustomSelect';
 import PageToolbar from '@/components/ui/PageToolbar';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
@@ -43,7 +44,20 @@ interface Role {
     name: string;
     description?: string;
     isSystem?: boolean;
+    isDeleted?: boolean;
     permissions: RolePermission[];
+}
+
+interface DeletedRole {
+    id: string;
+    code: string;
+    name: string;
+    description?: string;
+    isSystem?: boolean;
+    isDeleted?: boolean;
+    deletedAt?: string;
+    deletedBy?: string;
+    permissions?: RolePermission[];
 }
 
 interface UserRole {
@@ -67,15 +81,26 @@ export default function SettingsPage() {
     const { user } = useAuth();
     const { showToast } = useToast();
 
-    const [activeTab, setActiveTab] = useState<'roles' | 'users'>('roles');
+    const [activeTab, setActiveTab] = useState<'roles' | 'users' | 'trash'>('roles');
     const [roles, setRoles] = useState<Role[]>([]);
+    const [deletedRoles, setDeletedRoles] = useState<DeletedRole[]>([]);
     const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
     const [users, setUsers] = useState<UserRecord[]>([]);
     const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    
+    // Modal states
     const [showNewRoleModal, setShowNewRoleModal] = useState(false);
     const [newRoleData, setNewRoleData] = useState({ name: '', description: '' });
+
+    // ConfirmModal states for Role Deletion and Restoration
+    const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
+    const [deleteReason, setDeleteReason] = useState('');
+    const [deleting, setDeleting] = useState(false);
+
+    const [roleToRestore, setRoleToRestore] = useState<DeletedRole | null>(null);
+    const [restoring, setRestoring] = useState(false);
 
     // Filtering
     const [searchTerm, setSearchTerm] = useState('');
@@ -89,7 +114,6 @@ export default function SettingsPage() {
         try {
             setLoading(true);
             
-            // Extract all unit names securely
             const flattenUnits = (units: any[]): string[] => {
                 let list: string[] = [];
                 for (const u of units) {
@@ -101,16 +125,18 @@ export default function SettingsPage() {
                 return list;
             };
 
-            const [rolesData, permsData, usersData, orgData] = await Promise.all([
+            const [rolesData, permsData, usersData, orgData, deletedRolesData] = await Promise.all([
                 adminApi.getRoles(),
                 adminApi.getPermissions(),
                 adminApi.getUsers(),
-                organizationApi.getTree().catch(() => []) // Fallback in case API is not active
+                organizationApi.getTree().catch(() => []),
+                adminApi.getDeletedRoles().catch(() => [])
             ]);
             
             setRoles(rolesData);
             setAllPermissions(permsData);
             setUsers(usersData);
+            setDeletedRoles(deletedRolesData);
             
             const allUnits = flattenUnits(orgData);
             setOrganizationUnits(Array.from(new Set(allUnits)).sort());
@@ -161,7 +187,6 @@ export default function SettingsPage() {
             await Promise.all(roles.map(role =>
                 adminApi.updateRolePermissions(role.id, role.permissions.map(p => ({ permissionId: p.permissionId, scope: p.scope })))
             ));
-            // M10: Yetki değişiklik logu
             await adminApi.createAuditLog({
                 action: 'Yetki Matrisi Güncellendi',
                 details: `${roles.length} rol için yetki matrisi güncellendi.`,
@@ -190,7 +215,7 @@ export default function SettingsPage() {
             setSelectedRoleId(newRole.id);
             setShowNewRoleModal(false);
             setNewRoleData({ name: '', description: '' });
-            // M10: Rol oluşturma logu
+            
             await adminApi.createAuditLog({
                 action: 'Rol Oluşturuldu',
                 details: `"${newRoleData.name}" rolü oluşturuldu.`,
@@ -205,28 +230,68 @@ export default function SettingsPage() {
         }
     };
 
-    // M5: Rol Silme (Sistem rolleri korumalı)
-    const handleDeleteRole = async (roleId: string) => {
-        const role = roles.find(r => r.id === roleId);
-        if (!role) return;
+    // --- Soft Delete Role with ConfirmModal ---
+    const openDeleteConfirmModal = (role: Role) => {
         if (role.isSystem) {
             showToast('Sistem rolleri silinemez', 'error');
             return;
         }
+        setRoleToDelete(role);
+        setDeleteReason('');
+    };
+
+    const handleConfirmDeleteRole = async () => {
+        if (!roleToDelete) return;
         try {
-            await adminApi.deleteRole(roleId);
-            setRoles(prev => prev.filter(r => r.id !== roleId));
-            if (selectedRoleId === roleId) setSelectedRoleId(roles[0]?.id || null);
-            // M10: Rol silme logu
-            await adminApi.createAuditLog({
-                action: 'Rol Silindi',
-                details: `"${role.name}" rolü silindi.`,
-                targetType: 'Rol',
-                targetId: roleId
-            });
-            showToast('Rol başarıyla silindi', 'success');
+            setDeleting(true);
+            await adminApi.deleteRole(roleToDelete.id, deleteReason);
+            
+            // Remove from active roles list
+            const remaining = roles.filter(r => r.id !== roleToDelete.id);
+            setRoles(remaining);
+            if (selectedRoleId === roleToDelete.id) {
+                setSelectedRoleId(remaining[0]?.id || null);
+            }
+
+            // Fetch refreshed deleted roles list
+            const updatedDeleted = await adminApi.getDeletedRoles().catch(() => []);
+            setDeletedRoles(updatedDeleted);
+
+            showToast(`"${roleToDelete.name}" rolü Geri Dönüşüm Kutusuna taşındı.`, 'success');
+            setRoleToDelete(null);
+            setDeleteReason('');
         } catch {
             showToast('Rol silinirken bir hata oluştu', 'error');
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    // --- Restore Role with ConfirmModal ---
+    const openRestoreConfirmModal = (role: DeletedRole) => {
+        setRoleToRestore(role);
+    };
+
+    const handleConfirmRestoreRole = async () => {
+        if (!roleToRestore) return;
+        try {
+            setRestoring(true);
+            await adminApi.restoreRole(roleToRestore.id);
+            
+            // Remove from deleted list
+            setDeletedRoles(prev => prev.filter(r => r.id !== roleToRestore.id));
+            
+            // Fetch updated active roles list
+            const updatedRoles = await adminApi.getRoles();
+            setRoles(updatedRoles);
+            setSelectedRoleId(roleToRestore.id);
+
+            showToast(`"${roleToRestore.name}" rolü başarıyla geri yüklendi ve aktif hale getirildi.`, 'success');
+            setRoleToRestore(null);
+        } catch {
+            showToast('Rol geri yüklenirken bir hata oluştu', 'error');
+        } finally {
+            setRestoring(false);
         }
     };
 
@@ -242,7 +307,6 @@ export default function SettingsPage() {
                     ? { ...u, roles: roleIds.map(rid => ({ role: roles.find(r => r.id === rid)! })).filter(r => r.role) as UserRole[] }
                     : u
             ));
-            // M10: Kullanıcı rol atama logu
             const targetUser = users.find(u => u.id === userId);
             await adminApi.createAuditLog({
                 action: 'Kullanıcı Rolleri Güncellendi',
@@ -301,6 +365,7 @@ export default function SettingsPage() {
     const term = lc(searchTerm);
 
     const filteredRoles = roles.filter(r => lc(r.name).includes(term));
+    const filteredDeletedRoles = deletedRoles.filter(r => lc(r.name).includes(term) || lc(r.code).includes(term));
     const filteredUsers = users.filter(u => {
         const matchSearch = lc(u.displayName).includes(term) || lc(u.email).includes(term) || lc(u.username).includes(term);
         const matchDept = selectedDepartments.length === 0 || selectedDepartments.includes(u.department || '');
@@ -319,36 +384,35 @@ export default function SettingsPage() {
     const selectedRole = roles.find(r => r.id === selectedRoleId);
     const modules = Array.from(new Set(allPermissions.map(p => p.module))).sort();
     
-    // Use true organizational units as the source of truth for the dropdown, 
-    // but also include any existing user departments that might not be in the org tree yet to prevent orphaned filters
     const userDepartments = users.map(u => u.department).filter(Boolean) as string[];
     const departments = Array.from(new Set([...organizationUnits, ...userDepartments])).sort();
 
     return (
         <SharedAuditLayout hideSidebar={true}>
             <div className="space-y-6 max-w-[1600px] mx-auto pb-10">
-                <PageHeader title="Erişim Yönetimi" subtitle="Sistem rolleri, yetki matrisi ve kullanıcı atamaları" />
+                <PageHeader title="Erişim Yönetimi" subtitle="Sistem rolleri, yetki matrisi, geri dönüşüm kutusu ve kullanıcı atamaları" />
 
                 {/* Tabs */}
                 <SegmentedTabs
                     tabs={[
                         { id: 'roles', label: 'Yetki Matrisi', icon: Shield },
                         { id: 'users', label: 'Kullanıcı Rol Atamaları', icon: Users },
+                        { id: 'trash', label: `Silinen Roller (${deletedRoles.length})`, icon: Trash2 },
                     ]}
                     activeTab={activeTab}
-                    onChange={(id) => setActiveTab(id as 'roles' | 'users')}
+                    onChange={(id) => setActiveTab(id as 'roles' | 'users' | 'trash')}
                 />
 
                 {/* Toolbar */}
                 <PageToolbar
-                    searchPlaceholder={activeTab === 'roles' ? "Rol veya yetki ara..." : "Kullanıcı ara..."}
+                    searchPlaceholder={activeTab === 'roles' ? "Rol veya yetki ara..." : activeTab === 'trash' ? "Silinen rol ara..." : "Kullanıcı ara..."}
                     searchValue={searchTerm}
                     onSearchChange={setSearchTerm}
                     onRefresh={() => fetchData()}
                     showAddButton={activeTab === 'roles'}
                     addButtonText="Yeni Rol"
                     onAddClick={() => setShowNewRoleModal(true)}
-                    showExportButton={true}
+                    showExportButton={activeTab !== 'trash'}
                     onExportClick={activeTab === 'roles' ? handleExport : handleExportUsers}
                     filters={
                         activeTab === 'roles' ? (
@@ -365,7 +429,7 @@ export default function SettingsPage() {
                                     placeholder="Modül seçiniz..."
                                 />
                             </FilterDropdown>
-                        ) : (
+                        ) : activeTab === 'users' ? (
                             <FilterDropdown
                                 activeCount={selectedDepartments.length}
                                 onClear={() => setSelectedDepartments([])}
@@ -379,7 +443,7 @@ export default function SettingsPage() {
                                     placeholder="Departman seçiniz..."
                                 />
                             </FilterDropdown>
-                        )
+                        ) : undefined
                     }
                     rightActions={activeTab === 'roles' ? (
                         <Button
@@ -442,7 +506,7 @@ export default function SettingsPage() {
                                                     <Button 
                                                         variant="ghost" 
                                                         size="sm" 
-                                                        onClick={() => handleDeleteRole(selectedRole.id)}
+                                                        onClick={() => openDeleteConfirmModal(selectedRole)}
                                                         className="text-red-500 hover:text-red-700 hover:bg-red-50"
                                                     >
                                                         <Trash2 size={16} className="mr-1.5" />
@@ -513,7 +577,7 @@ export default function SettingsPage() {
                                 )}
                             </div>
                         </div>
-                    ) : (
+                    ) : activeTab === 'users' ? (
                         /* === USERS TAB — Merkezi DataTable === */
                         <DataTable<UserRecord>
                             columns={[
@@ -575,6 +639,91 @@ export default function SettingsPage() {
                                 setSelectedDepartments([]);
                             }}
                         />
+                    ) : (
+                        /* === TRASH TAB — Silinen Roller (Geri Dönüşüm Kutusu) === */
+                        <DataTable<DeletedRole>
+                            columns={[
+                                {
+                                    key: 'name',
+                                    header: 'Rol Bilgisi',
+                                    align: 'left',
+                                    sortable: true,
+                                    render: (r) => (
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                                                <Shield size={16} />
+                                            </div>
+                                            <div>
+                                                <div className="font-semibold text-gray-900">{r.name}</div>
+                                                <div className="text-[11px] text-gray-400 font-mono uppercase">{r.code}</div>
+                                            </div>
+                                        </div>
+                                    )
+                                },
+                                {
+                                    key: 'description',
+                                    header: 'Açıklama',
+                                    align: 'left',
+                                    render: (r) => (
+                                        <span className="text-xs text-gray-600">{r.description || '—'}</span>
+                                    )
+                                },
+                                {
+                                    key: 'deletedAt',
+                                    header: 'Silinme Tarihi & Silen',
+                                    align: 'left',
+                                    sortable: true,
+                                    render: (r) => (
+                                        <div className="space-y-0.5">
+                                            <div className="flex items-center gap-1 text-xs text-gray-700 font-medium">
+                                                <Clock size={12} className="text-gray-400" />
+                                                {r.deletedAt ? new Date(r.deletedAt).toLocaleString('tr-TR') : '—'}
+                                            </div>
+                                            <div className="text-[11px] text-gray-400">
+                                                Silen: <span className="font-semibold text-gray-600">{r.deletedBy || 'Sistem Yöneticisi'}</span>
+                                            </div>
+                                        </div>
+                                    )
+                                },
+                                {
+                                    key: 'status',
+                                    header: 'Durum',
+                                    align: 'center',
+                                    render: () => (
+                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                                            Silindi / Pasif
+                                        </span>
+                                    )
+                                },
+                                {
+                                    key: 'actions',
+                                    header: 'İşlem',
+                                    align: 'right',
+                                    render: (r) => (
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={() => openRestoreConfirmModal(r)}
+                                            leftIcon={<RotateCcw size={14} />}
+                                            className="text-primary hover:bg-primary/10 border-primary/20 shadow-none"
+                                        >
+                                            Geri Yükle
+                                        </Button>
+                                    )
+                                }
+                            ] as Column<DeletedRole>[]}
+                            data={filteredDeletedRoles}
+                            rowKey="id"
+                            loading={loading}
+                            emptyTitle={searchTerm ? 'Silinen rol bulunamadı' : 'Geri Dönüşüm Kutusu Boş'}
+                            emptyDescription={searchTerm ? 'Arama kriterlerinizi değiştirin.' : 'Silinmiş herhangi bir rol kaydı bulunmamaktadır.'}
+                            emptyIcon={Trash2}
+                            hoverable
+                            paginated
+                            itemsPerPage={15}
+                            itemUnit="silinen rol"
+                            searchTerm={searchTerm}
+                        />
                     )}
                 </div>
 
@@ -624,6 +773,43 @@ export default function SettingsPage() {
                         </div>
                     </div>
                 </Modal>
+
+                {/* Central ConfirmModal for Role Deletion */}
+                <ConfirmModal
+                    isOpen={!!roleToDelete}
+                    onClose={() => { if (!deleting) setRoleToDelete(null); }}
+                    onConfirm={handleConfirmDeleteRole}
+                    title="Rolü Silmek İstediğinize Emin Misiniz?"
+                    message={`"${roleToDelete?.name}" (${roleToDelete?.code}) rolü sistemden pasife çekilerek Geri Dönüşüm Kutusuna kaldırılacaktır.`}
+                    confirmText="Rolü Sil"
+                    cancelText="Vazgeç"
+                    type="danger"
+                >
+                    <div className="mt-4 text-left space-y-2">
+                        <label className="form-label text-xs font-semibold text-gray-700">
+                            Silme Gerekçesi (Denetim İzi Kaydı İçin Opsiyonel)
+                        </label>
+                        <textarea
+                            value={deleteReason}
+                            onChange={(e) => setDeleteReason(e.target.value)}
+                            placeholder="Silme nedeninizi belirtebilirsiniz (örn: Birim yeniden yapılanması)..."
+                            rows={2}
+                            className="form-textarea text-xs"
+                        />
+                    </div>
+                </ConfirmModal>
+
+                {/* Central ConfirmModal for Role Restoration */}
+                <ConfirmModal
+                    isOpen={!!roleToRestore}
+                    onClose={() => { if (!restoring) setRoleToRestore(null); }}
+                    onConfirm={handleConfirmRestoreRole}
+                    title="Rolü Geri Yükle"
+                    message={`"${roleToRestore?.name}" (${roleToRestore?.code}) rolü Geri Dönüşüm Kutusundan çıkarılarak tekrar aktif yetki matrisine dahil edilecektir.`}
+                    confirmText="Geri Yükle"
+                    cancelText="Vazgeç"
+                    type="success"
+                />
             </div>
         </SharedAuditLayout>
     );

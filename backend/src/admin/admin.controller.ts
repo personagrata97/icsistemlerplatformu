@@ -24,13 +24,29 @@ export class AdminController {
         return this.adminService.createRole(data, req.user);
     }
 
+    @Get('roles/deleted')
+    @RequirePermissions({ module: 'ADMIN', action: 'VIEW' })
+    getDeletedRoles() {
+        return this.adminService.getDeletedRoles();
+    }
+
     @Delete('roles/:id')
     @RequirePermissions({ module: 'ADMIN', action: 'EDIT' })
     deleteRole(
         @Param('id') id: string,
+        @Body() body: { reason?: string },
         @Request() req: any
     ) {
-        return this.adminService.deleteRole(id, req.user);
+        return this.adminService.deleteRole(id, req.user, body?.reason);
+    }
+
+    @Post('roles/:id/restore')
+    @RequirePermissions({ module: 'ADMIN', action: 'EDIT' })
+    restoreRole(
+        @Param('id') id: string,
+        @Request() req: any
+    ) {
+        return this.adminService.restoreRole(id, req.user);
     }
 
     @Patch('roles/:id/permissions')

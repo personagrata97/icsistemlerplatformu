@@ -18,7 +18,16 @@ export class WorkpaperController {
 
     @Post(':auditId')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 50 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|xlsx|xls|png|jpg|jpeg|txt|csv|zip)$/i;
+            if (!file.originalname.match(allowed)) {
+                return callback(new Error('İzin verilmeyen çalışma kağıdı dosya formatı!'), false);
+            }
+            callback(null, true);
+        }
+    }))
     async create(@Param('auditId') auditId: string, @UploadedFile() file: any, @Body() body: any, @Request() req) {
         if (file) {
             return this.service.uploadAndCreateWorkpaper(auditId, req.user.userId, file, body.category);
@@ -34,7 +43,16 @@ export class WorkpaperController {
 
     @Put(':id/file')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 50 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|xlsx|xls|png|jpg|jpeg|txt|csv|zip)$/i;
+            if (!file.originalname.match(allowed)) {
+                return callback(new Error('İzin verilmeyen çalışma kağıdı dosya formatı!'), false);
+            }
+            callback(null, true);
+        }
+    }))
     async updateFile(@Param('id') id: string, @UploadedFile() file: any, @Request() req) {
         return this.service.updateWorkpaperFile(id, req.user.userId, file);
     }

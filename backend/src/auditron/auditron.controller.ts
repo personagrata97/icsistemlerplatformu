@@ -15,7 +15,16 @@ export class AuditronController {
     }
 
     @Post('upload-document')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 50 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|txt|md|csv|xlsx)$/i;
+            if (!file.originalname.match(allowed)) {
+                return callback(new HttpException('Auditron AI yalnızca PDF, Word, Excel, CSV ve Metin dosyalarını indeksleyebilir.', HttpStatus.BAD_REQUEST), false);
+            }
+            callback(null, true);
+        }
+    }))
     async uploadDocument(@UploadedFile() file: any, @Req() req: any) {
         if (!file) {
             throw new HttpException('Dosya bulunamadi', HttpStatus.BAD_REQUEST);

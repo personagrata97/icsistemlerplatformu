@@ -192,7 +192,16 @@ export class AuditController {
 
     @Post('findings/:id/accept-risk')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 25 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|xlsx|xls|png|jpg|jpeg|txt|csv|zip)$/i;
+            if (!file.originalname.match(allowed)) {
+                return callback(new Error('Güvenlik İhlali: İzin verilmeyen dosya biçimi!'), false);
+            }
+            callback(null, true);
+        }
+    }))
     async acceptRisk(
         @Param('id') id: string,
         @Body() body: { justification: string },
@@ -269,7 +278,16 @@ export class AuditController {
 
     @Post('staff/upload-photo')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 10 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(png|jpg|jpeg|webp)$/i;
+            if (!file.originalname.match(allowed)) {
+                return callback(new Error('Yalnızca fotoğraf/görsel dosyaları (PNG, JPG, WEBP) yüklenebilir!'), false);
+            }
+            callback(null, true);
+        }
+    }))
     async uploadStaffPhoto(@UploadedFile(new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 10 * 1024 * 1024 }).build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY })) file: any) {
         return this.auditStaffService.uploadStaffPhoto(file);
     }
@@ -330,7 +348,14 @@ export class AuditController {
 
     @Post('plans/:id/document')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 25 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|xlsx|xls|png|jpg|jpeg|txt|csv|zip)$/i;
+            if (!file.originalname.match(allowed)) return callback(new Error('İzin verilmeyen dosya biçimi!'), false);
+            callback(null, true);
+        }
+    }))
     async uploadPlanDocument(@Param('id') id: string, @UploadedFile(new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 10 * 1024 * 1024 }).build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY })) file: any, @Request() req: any) {
         return this.auditService.uploadPlanDocument(id, file, req.user);
     }
@@ -408,7 +433,14 @@ export class AuditController {
     // WORKPAPERS (File Upload)
     @Post('audits/:id/workpapers')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 25 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|xlsx|xls|png|jpg|jpeg|txt|csv|zip)$/i;
+            if (!file.originalname.match(allowed)) return callback(new Error('İzin verilmeyen dosya biçimi!'), false);
+            callback(null, true);
+        }
+    }))
     async uploadWorkpaper(
         @Param('id') id: string,
         @UploadedFile(new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 10 * 1024 * 1024 }).build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY })) file: any,
@@ -435,7 +467,14 @@ export class AuditController {
     // FINDING EVIDENCE (File Upload)
     @Post('findings/:id/evidence')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 25 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|xlsx|xls|png|jpg|jpeg|txt|csv|zip)$/i;
+            if (!file.originalname.match(allowed)) return callback(new Error('İzin verilmeyen dosya biçimi!'), false);
+            callback(null, true);
+        }
+    }))
     async uploadFindingEvidence(@Param('id') id: string, @UploadedFile(new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 10 * 1024 * 1024 }).build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY })) file: any, @Request() req: any) {
         return this.auditService.uploadFindingEvidence(id, file, req.user);
     }
@@ -449,7 +488,14 @@ export class AuditController {
 
     @Post('findings/:id/conciliation-evidence')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 25 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|xlsx|xls|png|jpg|jpeg|txt|csv|zip)$/i;
+            if (!file.originalname.match(allowed)) return callback(new Error('İzin verilmeyen dosya biçimi!'), false);
+            callback(null, true);
+        }
+    }))
     async uploadConciliationEvidence(@Param('id') id: string, @UploadedFile(new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 10 * 1024 * 1024 }).build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY })) file: any, @Request() req: any) {
         return this.auditService.uploadConciliationEvidence(id, file, req.user);
     }

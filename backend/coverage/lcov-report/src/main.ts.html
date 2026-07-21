@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/31</span>
+                <span class='fraction'>0/29</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/31</span>
+                <span class='fraction'>0/29</span>
             </div>
         
             
@@ -147,14 +147,7 @@
 <a name='L82'></a><a href='#L82'>82</a>
 <a name='L83'></a><a href='#L83'>83</a>
 <a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a>
-<a name='L86'></a><a href='#L86'>86</a>
-<a name='L87'></a><a href='#L87'>87</a>
-<a name='L88'></a><a href='#L88'>88</a>
-<a name='L89'></a><a href='#L89'>89</a>
-<a name='L90'></a><a href='#L90'>90</a>
-<a name='L91'></a><a href='#L91'>91</a>
-<a name='L92'></a><a href='#L92'>92</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L85'></a><a href='#L85'>85</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -171,19 +164,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -191,6 +171,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -262,7 +248,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 <span class="cstat-no" title="statement not covered" >import { HttpExceptionFilter } from './common/filters/http-exception.filter';</span>
 <span class="cstat-no" title="statement not covered" >import { TransformInterceptor } from './common/interceptors/transform.interceptor';</span>
 <span class="cstat-no" title="statement not covered" >import helmet from 'helmet';</span>
-<span class="cstat-no" title="statement not covered" >import { join } from 'path';</span>
+import { join } from 'path';
 &nbsp;
 async function <span class="fstat-no" title="function not covered" >bootstrap(</span>) {
     // --- NESTJS APP INITIALIZATION ---
@@ -271,17 +257,10 @@ async function <span class="fstat-no" title="function not covered" >bootstrap(</
     });
 &nbsp;
     // --- BODY PARSER LIMITS ---
-    // Büyük örneklem popülasyonları ve dosya içerikleri için limit artırımı (500MB kafa payı)
+    // Örneklem ve dosya yüklemeleri için makul DoS korumalı limit (50MB)
     const { json, urlencoded } = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >await import('</span>express');</span>
-<span class="cstat-no" title="statement not covered" >    app.use(json({ limit: '500mb' }));</span>
-<span class="cstat-no" title="statement not covered" >    app.use(urlencoded({ extended: true, limit: '500mb' }));</span>
-&nbsp;
-&nbsp;
-    // --- STATIC FILES ---
-    // Yüklenen personel fotoğrafları vb. için statik dosya sunumu
-<span class="cstat-no" title="statement not covered" >    app.useStaticAssets(join(process.cwd(), 'uploads'), {</span>
-        prefix: '/uploads',
-    });
+<span class="cstat-no" title="statement not covered" >    app.use(json({ limit: '50mb' }));</span>
+<span class="cstat-no" title="statement not covered" >    app.use(urlencoded({ extended: true, limit: '50mb' }));</span>
 &nbsp;
     // --- GÜVENLİK BAŞLIKLARI ---
 <span class="cstat-no" title="statement not covered" >    app.use(helmet({</span>
@@ -343,7 +322,7 @@ async function <span class="fstat-no" title="function not covered" >bootstrap(</
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-20T12:07:43.271Z
+                at 2026-07-21T06:15:24.333Z
             </div>
         <script src="../prettify.js"></script>
         <script>

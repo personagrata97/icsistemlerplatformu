@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/157</span>
+                <span class='fraction'>0/167</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/71</span>
+                <span class='fraction'>0/84</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/23</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/143</span>
+                <span class='fraction'>0/153</span>
             </div>
         
             
@@ -525,7 +525,24 @@
 <a name='L460'></a><a href='#L460'>460</a>
 <a name='L461'></a><a href='#L461'>461</a>
 <a name='L462'></a><a href='#L462'>462</a>
-<a name='L463'></a><a href='#L463'>463</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -791,6 +808,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -987,7 +1021,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Injectable, Logger, NotFoundException } from '@nestjs/common';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Injectable, Logger, NotFoundException, UnauthorizedException, ForbiddenException } from '@nestjs/common';</span>
 <span class="cstat-no" title="statement not covered" >import { PrismaService } from '../common/prisma.service';</span>
 <span class="cstat-no" title="statement not covered" >import * as fs from 'fs';</span>
 <span class="cstat-no" title="statement not covered" >import * as path from 'path';</span>
@@ -1251,8 +1285,25 @@ export class <span class="cstat-no" title="statement not covered" ><span class="
     }
 &nbsp;
 <span class="fstat-no" title="function not covered" >    async </span>serveFile(id: string, mode: 'download' | 'view', user?: any) {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >            this.logger.warn(`[GÜVENLİK İHLALİ] Yetkisiz/Anonim belge erişim denemesi! Belge ID: ${id}`);</span>
+<span class="cstat-no" title="statement not covered" >            throw new UnauthorizedException('Bu belgeye erişebilmek için geçerli bir oturum açmanız gerekmektedir.');</span>
+        }
+&nbsp;
         const doc = <span class="cstat-no" title="statement not covered" >await this.prisma.aiDocument.findUnique({ where: { id } });</span>
 <span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!doc) <span class="cstat-no" title="statement not covered" >throw new NotFoundException('Belge bulunamadı');</span></span>
+&nbsp;
+        // Kategori bazlı erişim denetimi
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (doc.category === 'TEFTIS_KURULU') {</span>
+            const userRoles = <span class="cstat-no" title="statement not covered" >user.roles || [];</span>
+            const hasAuditRole = <span class="cstat-no" title="statement not covered" >Array.isArray(userRoles) &amp;&amp; userRoles.some(<span class="fstat-no" title="function not covered" >(r</span>: any) =&gt; </span>
+<span class="cstat-no" title="statement not covered" >                ['ADMIN', 'INSPECTOR', 'AUDITOR', 'TEFTIS_UZMANI', 'EXECUTIVE'].includes(typeof r === 'string' ? r : r?.role?.code || r?.code)</span>
+            );
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (!hasAuditRole &amp;&amp; user.username !== 'admin') {</span>
+<span class="cstat-no" title="statement not covered" >                this.logger.warn(`[GÜVENLİK İHLALİ] Yetersiz yetki ile Teftiş Kurulu belgesi erişim denemesi! Kullanıcı: ${user.username}, Belge: ${doc.title}`);</span>
+<span class="cstat-no" title="statement not covered" >                throw new ForbiddenException('Bu gizli teftiş belgesine erişim yetkiniz bulunmamaktadır.');</span>
+            }
+        }
 &nbsp;
         const filePath = <span class="cstat-no" title="statement not covered" >path.join(process.cwd(), 'uploads', 'documents', doc.storedFileName);</span>
         
@@ -1264,7 +1315,7 @@ export class <span class="cstat-no" title="statement not covered" ><span class="
         // Log the access action (Download/View)
 <span class="cstat-no" title="statement not covered" >        try {</span>
 <span class="cstat-no" title="statement not covered" >            await this.auditLogService.createLog({</span>
-                user: user?.displayName || user?.username || 'ANONYMOUS',
+                user: user?.displayName || user?.username || 'GÜVENLİ_KULLANICI',
                 action: mode === 'download' ? 'BELGE_İNDİRİLDİ' : 'BELGE_GÖRÜNTÜLENDİ',
                 details: `${doc.title} belgesi ${mode === 'download' ? 'indirildi' : 'görüntülendi'}. (Dosya: ${doc.fileName}, Kategori: ${doc.category})`,
                 targetType: 'Document',
@@ -1456,7 +1507,7 @@ export class <span class="cstat-no" title="statement not covered" ><span class="
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-20T12:07:43.271Z
+                at 2026-07-21T06:15:24.333Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

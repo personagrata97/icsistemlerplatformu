@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -262,8 +262,25 @@ export class DocumentsService {
     }
 
     async serveFile(id: string, mode: 'download' | 'view', user?: any) {
+        if (!user) {
+            this.logger.warn(`[GÜVENLİK İHLALİ] Yetkisiz/Anonim belge erişim denemesi! Belge ID: ${id}`);
+            throw new UnauthorizedException('Bu belgeye erişebilmek için geçerli bir oturum açmanız gerekmektedir.');
+        }
+
         const doc = await this.prisma.aiDocument.findUnique({ where: { id } });
         if (!doc) throw new NotFoundException('Belge bulunamadı');
+
+        // Kategori bazlı erişim denetimi
+        if (doc.category === 'TEFTIS_KURULU') {
+            const userRoles = user.roles || [];
+            const hasAuditRole = Array.isArray(userRoles) && userRoles.some((r: any) => 
+                ['ADMIN', 'INSPECTOR', 'AUDITOR', 'TEFTIS_UZMANI', 'EXECUTIVE'].includes(typeof r === 'string' ? r : r?.role?.code || r?.code)
+            );
+            if (!hasAuditRole && user.username !== 'admin') {
+                this.logger.warn(`[GÜVENLİK İHLALİ] Yetersiz yetki ile Teftiş Kurulu belgesi erişim denemesi! Kullanıcı: ${user.username}, Belge: ${doc.title}`);
+                throw new ForbiddenException('Bu gizli teftiş belgesine erişim yetkiniz bulunmamaktadır.');
+            }
+        }
 
         const filePath = path.join(process.cwd(), 'uploads', 'documents', doc.storedFileName);
         
@@ -275,7 +292,7 @@ export class DocumentsService {
         // Log the access action (Download/View)
         try {
             await this.auditLogService.createLog({
-                user: user?.displayName || user?.username || 'ANONYMOUS',
+                user: user?.displayName || user?.username || 'GÜVENLİ_KULLANICI',
                 action: mode === 'download' ? 'BELGE_İNDİRİLDİ' : 'BELGE_GÖRÜNTÜLENDİ',
                 details: `${doc.title} belgesi ${mode === 'download' ? 'indirildi' : 'görüntülendi'}. (Dosya: ${doc.fileName}, Kategori: ${doc.category})`,
                 targetType: 'Document',

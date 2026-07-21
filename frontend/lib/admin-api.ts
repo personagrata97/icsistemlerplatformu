@@ -57,12 +57,28 @@ export const adminApi = {
         return res.json();
     },
 
-    async deleteRole(roleId: string) {
+    async getDeletedRoles() {
+        const res = await fetch(`${API_BASE_URL}/admin/roles/deleted`, { headers: getHeaders() });
+        if (!res.ok) throw new Error('Failed to fetch deleted roles');
+        return res.json();
+    },
+
+    async deleteRole(roleId: string, reason?: string) {
         const res = await fetch(`${API_BASE_URL}/admin/roles/${roleId}`, {
             method: 'DELETE',
             headers: getHeaders(),
+            body: JSON.stringify({ reason }),
         });
         if (!res.ok) throw new Error('Rol silinemedi');
+        return res.json();
+    },
+
+    async restoreRole(roleId: string) {
+        const res = await fetch(`${API_BASE_URL}/admin/roles/${roleId}/restore`, {
+            method: 'POST',
+            headers: getHeaders(),
+        });
+        if (!res.ok) throw new Error('Rol geri yüklenemedi');
         return res.json();
     },
 

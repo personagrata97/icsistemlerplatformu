@@ -65,7 +65,16 @@ export class RiskController {
      * Akıllı Excel Yükleme ve Validasyon Endpoint'i
      */
     @Post('upload-excel')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 50 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(xlsx|xls|csv)$/i;
+            if (!file.originalname.match(allowed)) {
+                return callback(new Error('Sadece Excel (XLSX, XLS) veya CSV verileri yüklenebilir!'), false);
+            }
+            callback(null, true);
+        }
+    }))
     async uploadExcelData(@UploadedFile() file: Express.Multer.File, @Query('confirm') confirm: string) {
         if (!file) {
             return { basari: false, mesaj: 'Dosya bulunamadı' };

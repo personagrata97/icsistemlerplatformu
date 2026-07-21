@@ -47,7 +47,6 @@ export class DocumentsController {
     }
 
     @Get('download/:id')
-    @Public()
     async downloadFile(@Param('id') id: string, @Req() req: any, @Res() res: any) {
         const fileInfo = await this.documentsService.serveFile(id, 'download', req.user);
         res.set({
@@ -58,7 +57,6 @@ export class DocumentsController {
     }
 
     @Get('view/:id')
-    @Public()
     async viewFile(@Param('id') id: string, @Req() req: any, @Res() res: any) {
         const fileInfo = await this.documentsService.serveFile(id, 'view', req.user);
         res.set({
@@ -69,7 +67,16 @@ export class DocumentsController {
     }
 
     @Post('upload')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 50 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|xlsx|xls|png|jpg|jpeg|txt|csv|zip)$/i;
+            if (!file.originalname.match(allowed)) {
+                return callback(new HttpException('Güvenlik İhlali: İzin verilmeyen dosya uzantısı!', HttpStatus.BAD_REQUEST), false);
+            }
+            callback(null, true);
+        }
+    }))
     @HttpCode(HttpStatus.CREATED)
     async uploadFile(@UploadedFile('file') file: any, @Body() body: { category: string; title: string }, @Req() req: any) {
         if (!file) {
@@ -101,7 +108,16 @@ export class DocumentsController {
     }
 
     @Post(':id/update')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 50 * 1024 * 1024 },
+        fileFilter: (req: any, file: any, callback: any) => {
+            const allowed = /\.(pdf|docx|doc|xlsx|xls|png|jpg|jpeg|txt|csv|zip)$/i;
+            if (!file.originalname.match(allowed)) {
+                return callback(new HttpException('Güvenlik İhlali: İzin verilmeyen dosya uzantısı!', HttpStatus.BAD_REQUEST), false);
+            }
+            callback(null, true);
+        }
+    }))
     updateDocument(
         @Param('id') id: string,
         @UploadedFile() file: any,

@@ -4,6 +4,8 @@ import { AuditLogService } from '../audit/audit-log.service';
 
 @Injectable()
 export class AdminService {
+    private get db(): any { return this.prisma; }
+
     constructor(
         private prisma: PrismaService,
         private auditLogService: AuditLogService
@@ -11,7 +13,8 @@ export class AdminService {
 
     // ROLES
     async getAllRoles() {
-        return this.prisma.role.findMany({
+        return this.db.role.findMany({
+            where: { isDeleted: false },
             include: {
                 permissions: {
                     include: {
@@ -23,13 +26,28 @@ export class AdminService {
         });
     }
 
+    async getDeletedRoles() {
+        return this.db.role.findMany({
+            where: { isDeleted: true },
+            include: {
+                permissions: {
+                    include: {
+                        permission: true
+                    }
+                }
+            },
+            orderBy: { deletedAt: 'desc' }
+        });
+    }
+
     async createRole(data: { code: string; name: string; description?: string }, user?: any) {
-        const role = await this.prisma.role.create({
+        const role = await this.db.role.create({
             data: {
                 code: data.code.toUpperCase(),
                 name: data.name,
                 description: data.description,
-                isSystem: false
+                isSystem: false,
+                isDeleted: false
             }
         });
 
@@ -46,7 +64,7 @@ export class AdminService {
     }
 
     async getRoleById(id: string) {
-        return this.prisma.role.findUnique({
+        return this.db.role.findUnique({
             where: { id },
             include: {
                 permissions: {
@@ -58,20 +76,54 @@ export class AdminService {
         });
     }
 
-    async deleteRole(id: string, user?: any) {
-        const role = await this.prisma.role.findUnique({ where: { id } });
+    async deleteRole(id: string, user?: any, reason?: string) {
+        const role = await this.db.role.findUnique({ where: { id } });
         if (!role) throw new Error('Rol bulunamadı');
         if (role.isSystem) throw new Error('Sistem rolleri silinemez');
 
-        await this.prisma.rolePermission.deleteMany({ where: { roleId: id } });
-        await this.prisma.userRole.deleteMany({ where: { roleId: id } });
-        const result = await this.prisma.role.delete({ where: { id } });
-
         const performerName = user?.displayName || user?.username || 'Sistem Yöneticisi';
+
+        // Soft-delete role instead of hard delete (prevents data corruption and enables auditability & recovery)
+        const result = await this.db.role.update({
+            where: { id },
+            data: {
+                isDeleted: true,
+                deletedAt: new Date(),
+                deletedBy: performerName
+            }
+        });
+
         await this.auditLogService.createLog({
             user: performerName,
             action: 'ROL_SILINDI',
-            details: `"${role.name}" (${role.code}) rolü silindi.`,
+            details: `"${role.name}" (${role.code}) rolü silindi (Geri Dönüşüm Kutusuna Taşındı). ${reason ? `Gerekçe: ${reason}` : ''}`,
+            targetType: 'Role',
+            targetId: id
+        });
+
+        return result;
+    }
+
+    async restoreRole(id: string, user?: any) {
+        const role = await this.db.role.findUnique({ where: { id } });
+        if (!role) throw new Error('Rol bulunamadı');
+        if (!role.isDeleted) throw new Error('Bu rol zaten aktif durumda');
+
+        const performerName = user?.displayName || user?.username || 'Sistem Yöneticisi';
+
+        const result = await this.db.role.update({
+            where: { id },
+            data: {
+                isDeleted: false,
+                deletedAt: null,
+                deletedBy: null
+            }
+        });
+
+        await this.auditLogService.createLog({
+            user: performerName,
+            action: 'ROL_GERI_YUKLENDI',
+            details: `"${role.name}" (${role.code}) rolü Geri Dönüşüm Kutusundan başarıyla geri yüklendi ve aktif hale getirildi.`,
             targetType: 'Role',
             targetId: id
         });

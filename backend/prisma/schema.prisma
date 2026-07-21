@@ -780,6 +780,9 @@ model Role {
   name        String
   description String?
   isSystem    Boolean          @default(false)
+  isDeleted   Boolean          @default(false)
+  deletedAt   DateTime?
+  deletedBy   String?
   createdAt   DateTime         @default(now())
   permissions RolePermission[]
   users       UserRole[]
