@@ -35,6 +35,8 @@ const COLORS = {
     bgAccent: '#f0f4ff',       // Aksan arka plan
 };
 
+import { PdfReportService } from './pdf-report.service';
+
 @Injectable()
 export class ReportGeneratorService {
     private readonly assetsDir = path.join(process.cwd(), 'uploads', 'assets');
@@ -44,7 +46,8 @@ export class ReportGeneratorService {
 
     constructor(
         private prisma: PrismaService,
-        private auditLogService: AuditLogService
+        private auditLogService: AuditLogService,
+        private pdfReportService: PdfReportService
     ) { }
 
     private readonly logger = new Logger(ReportGeneratorService.name);
@@ -89,10 +92,8 @@ export class ReportGeneratorService {
             const filename = `RAPOR_${type}_${period}_${Date.now()}.pdf`;
             const filePath = path.join(uploadDir, filename);
 
-            const doc = new PDFDocument({
+            const doc = this.pdfReportService.createDocument({
                 margin: 60,
-                size: 'A4',
-                bufferPages: true,
                 info: {
                     Title: `${this.getReportTitle(type)} - ${period}`,
                     Author: user?.displayName || ORG.departmentName,

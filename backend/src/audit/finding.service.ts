@@ -7,6 +7,7 @@ import { EmailService } from '../email/email.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import { PdfReportService } from './pdf-report.service';
 const PDFDocument = require('pdfkit');
 
 @Injectable()
@@ -18,7 +19,8 @@ export class FindingService {
         private auditronService: AuditronService,
         private auditLogService: AuditLogService,
         private auditRiskService: AuditRiskService,
-        private emailService: EmailService
+        private emailService: EmailService,
+        private pdfReportService: PdfReportService
     ) { }
 
     private isAdmin(user: any): boolean {
@@ -1008,9 +1010,7 @@ export class FindingService {
         
         const filePath = path.join(uploadDir, filename);
         
-        const doc = new PDFDocument({
-            size: 'A4',
-            margin: 50,
+        const doc = this.pdfReportService.createDocument({
             info: {
                 Title: `Mutabakat Zaptı - ${finding.code}`,
                 Author: 'Emlak Katılım Teftiş Kurulu',

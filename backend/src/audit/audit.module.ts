@@ -16,6 +16,7 @@ import { SamplingService } from './sampling.service';
 import { MultiYearPlanController } from './multi-year-plan.controller';
 import { MultiYearPlanService } from './multi-year-plan.service';
 import { ReportGeneratorService } from './report-generator.service';
+import { PdfReportService } from './pdf-report.service';
 import { WorkpaperTemplateService } from './workpaper-template.service';
 import { WorkpaperTemplateController } from './workpaper-template.controller';
 
@@ -37,6 +38,7 @@ import { CommunicationService } from './communication.service';
 import { NotificationModule } from '../common/notification/notification.module';
 import { KvkkController } from './kvkk.controller';
 import { KvkkService } from './kvkk.service';
+
 @Module({
     imports: [EmailModule, AuditronModule, RiskEngineModule, NotificationModule],
     controllers: [
@@ -61,6 +63,7 @@ import { KvkkService } from './kvkk.service';
         SamplingService,
         MultiYearPlanService,
         ReportGeneratorService,
+        PdfReportService,
         WorkpaperTemplateService,
         EthicsService,
         CronService,
@@ -75,6 +78,6 @@ import { KvkkService } from './kvkk.service';
         AuditStaffService,
         KvkkService,
     ],
-    exports: [AuditService, FindingService, AuditTrashService, AuditLogService, AuditRiskService],
+    exports: [AuditService, FindingService, AuditTrashService, AuditLogService, AuditRiskService, PdfReportService],
 })
 export class AuditModule { }
