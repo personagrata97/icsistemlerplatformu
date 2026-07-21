@@ -35,6 +35,8 @@ import { EscalationService } from './escalation.service';
 import { CommunicationController } from './communication.controller';
 import { CommunicationService } from './communication.service';
 import { NotificationModule } from '../common/notification/notification.module';
+import { KvkkController } from './kvkk.controller';
+import { KvkkService } from './kvkk.service';
 @Module({
     imports: [EmailModule, AuditronModule, RiskEngineModule, NotificationModule],
     controllers: [
@@ -48,6 +50,7 @@ import { NotificationModule } from '../common/notification/notification.module';
         WorkpaperTemplateController,
         EthicsController,
         CommunicationController,
+        KvkkController,
     ],
     providers: [
         AuditService,
@@ -70,6 +73,7 @@ import { NotificationModule } from '../common/notification/notification.module';
         PrismaService,
         CommunicationService,
         AuditStaffService,
+        KvkkService,
     ],
     exports: [AuditService, FindingService, AuditTrashService, AuditLogService, AuditRiskService],
 })

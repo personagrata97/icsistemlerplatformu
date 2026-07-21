@@ -1,44 +1,74 @@
 version: '3.8'
 
 services:
+  # ===========================================
+  # PostgreSQL Veritabanı
+  # ===========================================
   postgres:
-    image: postgres:15
+    image: postgres:16-alpine
+    container_name: icsistemler_db
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: risk_platform
+      POSTGRES_USER: icsistemler
+      POSTGRES_PASSWORD: icsistemler_secure_2026
+      POSTGRES_DB: icsistemler_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U user -d risk_platform" ]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U icsistemler -d icsistemler_db"]
+      interval: 10s
       timeout: 5s
       retries: 5
 
+  # ===========================================
+  # NestJS Backend API
+  # ===========================================
   backend:
-    build: ./backend
-    ports:
-      - "3001:3001"
-    environment:
-      DATABASE_URL: "postgresql://user:password@postgres:5432/risk_platform?schema=public"
-      JWT_SECRET: "gizli-anahtar-super-secret"
-      PORT: 3001
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: icsistemler_backend
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
-    restart: always
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:3001"
+      DATABASE_URL: "postgresql://icsistemler:icsistemler_secure_2026@postgres:5432/icsistemler_db?schema=public"
+      JWT_SECRET: "${JWT_SECRET:-icsistemler-jwt-secret-production-degistir}"
+      JWT_ACCESS_EXPIRATION: "15m"
+      JWT_REFRESH_EXPIRATION: "7d"
+      NODE_ENV: production
+      PORT: 3001
+      CORS_ORIGIN: "http://localhost:3010,http://localhost:3000"
+    ports:
+      - "3001:3001"
+    volumes:
+      - uploads_data:/app/uploads
+      - private_uploads_data:/app/private_uploads
+
+  # ===========================================
+  # Next.js Frontend
+  # ===========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: icsistemler_frontend
+    restart: unless-stopped
     depends_on:
       - backend
-    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: "http://backend:3001/api/v1"
+      NODE_ENV: production
+    ports:
+      - "3010:3000"
 
 volumes:
   postgres_data:
+    driver: local
+  uploads_data:
+    driver: local
+  private_uploads_data:
+    driver: local

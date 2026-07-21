@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { SanctionService } from './sanction.service';
 import { MasakService } from './masak.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
 
 @Controller('sanction')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class SanctionController {
     constructor(
         private readonly sanctionService: SanctionService,

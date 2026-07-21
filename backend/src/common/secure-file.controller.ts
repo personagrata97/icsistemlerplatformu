@@ -134,5 +134,44 @@ export class SecureFileController {
 
         return this.serveFile('independence', filename, res);
     }
+
+    // --- Personel Fotoğrafları (Staff Photos) ---
+    @Get('photos/:filename')
+    async getPhotoFile(
+        @Param('filename') filename: string,
+        @Res({ passthrough: true }) res: Response,
+        @Request() req: any
+    ): Promise<StreamableFile> {
+        const user = req.user;
+        if (!user) throw new ForbiddenException('Kimlik doğrulanamadı.');
+
+        return this.serveFile('photos', filename, res);
+    }
+
+    // --- Üretilen Raporlar (Generated Reports) ---
+    @Get('reports/:filename')
+    async getReportFile(
+        @Param('filename') filename: string,
+        @Res({ passthrough: true }) res: Response,
+        @Request() req: any
+    ): Promise<StreamableFile> {
+        const user = req.user;
+        if (!user) throw new ForbiddenException('Kimlik doğrulanamadı.');
+
+        return this.serveFile('reports', filename, res);
+    }
+
+    // --- Statik Varlıklar (Logo, Fontlar vb.) ---
+    @Get('assets/:filename')
+    async getAssetFile(
+        @Param('filename') filename: string,
+        @Res({ passthrough: true }) res: Response,
+        @Request() req: any
+    ): Promise<StreamableFile> {
+        const user = req.user;
+        if (!user) throw new ForbiddenException('Kimlik doğrulanamadı.');
+
+        return this.serveFile('assets', filename, res);
+    }
     // -------------------------------------------------------------
 }

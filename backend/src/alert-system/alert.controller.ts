@@ -1,7 +1,10 @@
-import { Controller, Get, Post, Param, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, UseGuards } from '@nestjs/common';
 import { AlertService } from './alert.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
 
 @Controller('alerts')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class AlertController {
     constructor(private alertService: AlertService) { }
 

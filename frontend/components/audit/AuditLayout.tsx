@@ -87,8 +87,8 @@ function AuditLayoutContent({ children, title: initialTitle = "Genel Bakış", h
                 />
             )}
 
-            {/* Dev Helper - Enabled for testing */}
-            <DevRoleSwitcher />
+            {/* Dev Helper - Enabled only in development environment */}
+            {process.env.NODE_ENV === 'development' && <DevRoleSwitcher />}
         </div>
     );
 }

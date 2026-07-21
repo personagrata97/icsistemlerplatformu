@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
+import { Controller, Get, Post, Query, UploadedFile, UseInterceptors, Body, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ScenarioEngineService } from '../scenario-engine/scenario-engine.service';
 import { AlertService } from '../alert-system/alert.service';
@@ -6,8 +6,11 @@ import * as xlsx from 'xlsx';
 import { PrismaService } from '../common/prisma.service';
 import { BddkExportService } from '../risk-engine/bddk-export.service';
 import { DataIngestionService } from '../risk-engine/data-ingestion.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
 
 @Controller('risk')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class RiskController {
     constructor(
         private scenarioEngine: ScenarioEngineService,

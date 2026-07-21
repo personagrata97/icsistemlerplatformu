@@ -1,10 +1,10 @@
 import { Module, MiddlewareConsumer, RequestMethod, Logger } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { DataMaskingInterceptor } from './common/data-masking.interceptor';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from './auth/guards/permissions.guard';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { PrismaService } from './common/prisma.service'; // Keeping original import
 import { CommonModule } from './common/common.module';
@@ -34,10 +34,6 @@ import { HealthController } from './health.controller';
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-        ServeStaticModule.forRoot({
-            rootPath: join(process.cwd(), 'uploads'),
-            serveRoot: '/uploads',
-        }),
         // Dakikada 60 istek limiti (brute force koruması)
         ThrottlerModule.forRoot([{
             ttl: 60000,
@@ -62,6 +58,14 @@ import { HealthController } from './health.controller';
         {
             provide: APP_INTERCEPTOR,
             useClass: DataMaskingInterceptor,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: JwtAuthGuard,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: PermissionsGuard,
         },
     ],
     exports: [],

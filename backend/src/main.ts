@@ -24,17 +24,10 @@ async function bootstrap() {
     });
 
     // --- BODY PARSER LIMITS ---
-    // Büyük örneklem popülasyonları ve dosya içerikleri için limit artırımı (500MB kafa payı)
+    // Örneklem ve dosya yüklemeleri için makul DoS korumalı limit (50MB)
     const { json, urlencoded } = await import('express');
-    app.use(json({ limit: '500mb' }));
-    app.use(urlencoded({ extended: true, limit: '500mb' }));
-
-
-    // --- STATIC FILES ---
-    // Yüklenen personel fotoğrafları vb. için statik dosya sunumu
-    app.useStaticAssets(join(process.cwd(), 'uploads'), {
-        prefix: '/uploads',
-    });
+    app.use(json({ limit: '50mb' }));
+    app.use(urlencoded({ extended: true, limit: '50mb' }));
 
     // --- GÜVENLİK BAŞLIKLARI ---
     app.use(helmet({

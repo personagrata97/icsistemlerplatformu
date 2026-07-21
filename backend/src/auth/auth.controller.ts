@@ -4,12 +4,14 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { Public } from './decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) { }
 
     // Login: Dakikada maksimum 5 deneme (brute-force koruması)
+    @Public()
     @HttpCode(HttpStatus.OK)
     @UseGuards(ThrottlerGuard)
     @Throttle({ default: { limit: 5, ttl: 60000 } })
@@ -19,6 +21,7 @@ export class AuthController {
     }
 
     // Refresh: Dakikada maksimum 10 istek
+    @Public()
     @HttpCode(HttpStatus.OK)
     @UseGuards(ThrottlerGuard)
     @Throttle({ default: { limit: 10, ttl: 60000 } })

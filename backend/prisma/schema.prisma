@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Musteri {
@@ -1488,3 +1488,51 @@ model UserLeave {
     @@map("user_leave")
 }
 
+// ============================================================
+// KVKK UYUM MODÜLLERİ (Kişisel Verilerin Korunması Kanunu)
+// ============================================================
+
+// Veri Saklama ve Otomatik İmha Politikaları
+model DataRetentionPolicy {
+    id                String    @id @default(cuid())
+    dataCategory      String    // Kişisel Veri, Özel Nitelikli Kişisel Veri, Denetim Verisi, Log Verisi
+    dataDescription   String    // Veri açıklaması (ör: Personel TC Kimlik No)
+    legalBasis        String    // Hukuki işleme şartı (ör: 6698 s.K. m.5/2-ç)
+    retentionPeriod   Int       // Saklama süresi (ay cinsinden)
+    destructionMethod String    // İmha yöntemi: Silme, Anonim Hale Getirme, Fiziksel İmha
+    responsibleUnit   String    // Sorumlu birim
+    status            String    @default("Aktif") // Aktif, Süresi Dolmuş, İmha Edildi
+    lastReviewDate    DateTime?
+    nextReviewDate    DateTime?
+    notes             String?
+    created_at        DateTime  @default(now())
+    updated_at        DateTime  @updatedAt
+
+    @@map("data_retention_policy")
+}
+
+// Veri Sahibi Başvuru Takip Sistemi (KVKK Madde 11)
+model DataSubjectRequest {
+    id                String    @id @default(cuid())
+    requestCode       String    @unique // Otomatik üretilen takip kodu
+    applicantName     String
+    applicantIdentity String?   // TC No (maskelenerek saklanır)
+    applicantContact  String    // E-posta veya telefon
+    requestType       String    // Bilgi Edinme, Düzeltme, Silme, İtiraz, Aktarım Bilgisi
+    requestDetails    String    // Başvuru detayı
+    receivedDate      DateTime  @default(now())
+    dueDate           DateTime  // Yasal süre: 30 gün
+    responseDate      DateTime? // Yanıt tarihi
+    status            String    @default("Alındı") // Alındı, İnceleniyor, Yanıtlandı, Reddedildi, Kısmen Yanıtlandı
+    response          String?   // Verilen yanıt
+    assignedTo        String?   // Sorumlu kişi ID
+    assignedToName    String?
+    legalBasis        String?   // Yasal dayanak
+    notes             String?   // İç notlar
+    created_at        DateTime  @default(now())
+    updated_at        DateTime  @updatedAt
+
+    @@index([status])
+    @@index([requestCode])
+    @@map("data_subject_request")
+}
