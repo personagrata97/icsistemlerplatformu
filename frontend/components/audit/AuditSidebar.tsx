@@ -37,6 +37,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useAuditTitle } from '@/context/AuditTitleContext';
+import { isAuditManagerRole, isAuditInspectorRole, isAuditUnitRole } from '@/lib/permissions-map';
 
 // Path to Title/Subtitle mapping
 const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
@@ -74,19 +75,11 @@ export default function AuditSidebar() {
 
     const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
 
-    // Role Checks
-    const isManager = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('SYSADMIN') || hasRole('AUDIT_ADMIN') || hasRole('Sistem Yöneticisi') || hasRole('SISTEM_YONETICISI') || hasRole('Teftiş Kurulu Müdürü') || hasRole('TEFTIS_KURULU_MUDURU') || hasRole('Admin') || hasRole('Yönetici');
-    const isInspector = hasRole('AUDIT_INSPECTOR') || hasRole('Müfettiş') || hasRole('MUFETTIS') || hasRole('Başmüfettiş') || hasRole('BASMUFETTIS') || hasRole('Kıdemli Müfettiş') || hasRole('KIDEMLI_MUFETTIS') || hasRole('Müfettiş Yardımcısı') || hasRole('Yetkili Müfettiş Yardımcısı');
-    // Core Audit Staff (Inspectors + Managers + Supervisors)
+    // Centralized RBAC Role Checks
+    const isManager = isAuditManagerRole(hasRole);
+    const isInspector = isAuditInspectorRole(hasRole);
     const isAuditor = isManager || isInspector || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_MANAGER');
-
-    // Unit / Auditee (Can see findings assigned to them)
-    // If not an auditor and not a standard employee, assume Unit/Viewer role
-    // Or check explicit AUDIT_UNIT role
-    const isUnit = hasRole('AUDIT_UNIT') || hasRole('AUDIT_VIEWER');
-
-    // Standard Employee: Has NO audit roles and is NOT a unit viewer
-    // If user has NO roles, or only STANDARD_EMPLOYEE, treating as Standard Employee
+    const isUnit = isAuditUnitRole(hasRole);
     const isStandardEmployee = !isAuditor && !isUnit && !hasRole('SYSTEM_ADMIN');
 
     useEffect(() => {

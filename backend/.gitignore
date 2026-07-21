@@ -1,7 +1,13 @@
 .env
 node_modules/
 dist/
-.DS_Store
+uploads/
+private_uploads/
+prisma/*.db
+prisma/dev.db
+coverage/
 *.log
+*error*.txt
+.DS_Store
 .vscode/
 .idea/

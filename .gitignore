@@ -1,20 +1,48 @@
-# Teknik klasörler (GitHub'a atılmaz, çok büyüktür)
+# Dependency and build output directories
 node_modules/
 .next/
 dist/
 build/
 .vscode/
 
-# Az önce aldığımız devasa yedek klasörü (Bunu internete atmaya gerek yok)
+# Backup directories
 1hazirangitoncesiyedek/
 
-# Çevresel değişkenler (ileride şifre koyarsan diye şimdiden önlem)
+# Sensitive Uploads & Private Documents (KVKK & Confidentiality)
+uploads/
+private_uploads/
+backend/uploads/
+backend/private_uploads/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+backend/prisma/dev.db
+
+# Test coverage output
+coverage/
+backend/coverage/
+coverage-summary.json
+coverage-final.json
+
+# Environment variables & secrets
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# İşletim sistemi kalıntıları
+# Debug, build logs & temp files
+*.log
+*error*.txt
+tsc_output*.txt
+build_log.txt
+compile_errors.txt
+syntax_err.json
+tmp_*.txt
+evidence_search.txt
+
+# OS system files
 .DS_Store
 Thumbs.db

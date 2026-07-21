@@ -126,11 +126,43 @@ export const ROLE_CAPABILITIES: Record<string, {
 export function hasCapability(userRoles: string[], capability: keyof typeof ROLE_CAPABILITIES['ADMIN']): boolean {
     if (!userRoles || userRoles.length === 0) return false;
 
-    // Check if any user role possesses capability
     return userRoles.some((role) => {
         const caps = ROLE_CAPABILITIES[role];
         return caps ? caps[capability] : false;
     });
+}
+
+/**
+ * Centralized Role Helpers for UI Components
+ */
+export function isAuditManagerRole(hasRole: (role: string) => boolean): boolean {
+    return hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('SYSADMIN') ||
+        hasRole('AUDIT_ADMIN') || hasRole('Sistem Yöneticisi') ||
+        hasRole('SISTEM_YONETICISI') || hasRole('Teftiş Kurulu Müdürü') ||
+        hasRole('TEFTIS_KURULU_MUDURU') || hasRole('Admin') || hasRole('Yönetici');
+}
+
+export function isAuditInspectorRole(hasRole: (role: string) => boolean): boolean {
+    return hasRole('AUDIT_INSPECTOR') || hasRole('Müfettiş') || hasRole('MUFETTIS') ||
+        hasRole('Başmüfettiş') || hasRole('BASMUFETTIS') || hasRole('Kıdemli Müfettiş') ||
+        hasRole('KIDEMLI_MUFETTIS') || hasRole('Müfettiş Yardımcısı') ||
+        hasRole('Yetkili Müfettiş Yardımcısı');
+}
+
+export function isAuditUnitRole(hasRole: (role: string) => boolean): boolean {
+    return hasRole('AUDIT_UNIT') || hasRole('AUDIT_VIEWER');
+}
+
+export function isRiskAdminRole(hasRole: (role: string) => boolean): boolean {
+    return hasRole('ADMIN') || hasRole('SYSTEM_ADMIN');
+}
+
+export function isRiskStaffRole(hasRole: (role: string) => boolean): boolean {
+    return isRiskAdminRole(hasRole) || hasRole('RISK_MANAGER') || hasRole('RISK_ANALYST');
+}
+
+export function isExecutiveRole(hasRole: (role: string) => boolean): boolean {
+    return isRiskAdminRole(hasRole) || hasRole('EXECUTIVE');
 }
 
 /**
