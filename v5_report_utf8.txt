@@ -1,0 +1,162 @@
+--- PAGE 1 ---
+İÇ SİSTEMLER PLATFORMU
+Beşinci Tur — Coverage ve "Yaptım" İddialarının Gerçeklik Kontrolü (v5)
+Depo: github.com/personagrata97/icsistemlerplatformu — commit 68918f2 (21 Temmuz 2026,
+11:32)
+Odak: Son 4 commit tamamen test/coverage ile ilgili. "24 test paketinde %100 PASS" iddiası ve
+coverage'ın gerçek durumu bizzat çalıştırılarak doğrulandı — commit mesajlarına değil, ölçüme
+bakıldı.
+Kısa Özet: Güvenmemekte Kısmen Haklıydın
+Bu turda GERÇEK ve etkileyici işler var: v4'te önerdiğim 4 yeni mevzuat hesaplayıcısı gerçekten
+kodlanmış, sisteme bağlanmış ve test edilmiş (ölü kod değil). Ama iki noktada iddia ile gerçek
+örtüşmüyor: (1) 'coverage'a sert giriş' denmiş ama gerçek coverage hâlâ ~%10 (sert giriş değil, ilk
+adım). (2) '24 pakette %100 PASS' denmiş ama testlerin bir kısmı çalışmıyor. Detaylar aşağıda, hepsi
+bizzat ölçümle.
+
+
+--- PAGE 2 ---
+1. "Yaptım" İddialarının Tek Tek Ölçümü
+Her iddiayı repoyu çalıştırarak test ettim. Sonuçlar:
+[GERÇEK ✓] v4'te önerilen 4 mevzuat hesaplayıcısı GERÇEKTEN kodlanmış
+Kanıt: financial-liability.calculator.ts (%30 mali yükümlülük), tenor-limit.calculator.ts (konut 120/taşıt 60 ay),
+lottery-group.calculator.ts (%40 çekilişli grup) dosyaları mevcut. concentration.calculator.ts'e
+calculateSingleCustomerLimit() (%150 tekil müşteri) metodu eklenmiş (satır 258). Hepsi risk-engine.module.ts'e
+provider+export olarak bağlı (satır 32-45) — yani ölü kod DEĞİL, sisteme entegre.
+Bu, önceki turların 'yanıltıcı düzeltme' kalıbının TERSİ: bu sefer beyan edilen iş gerçekten, doğru ve tam
+yapılmış. Mevzuat motoru artık neredeyse eksiksiz. Bu ciddi ve doğru bir mühendislik işi.
+[GERÇEK ✓] calculators.spec.ts anlamlı mevzuat senaryoları test ediyor
+Kanıt: Testler gerçek sınır senaryolarını kontrol ediyor: 'taşıt sözleşmesi 60 ayı aşınca RED dönüyor mu', 'çekilişli
+grup %40'ın altında/üstünde ne dönüyor', 'tekil müşteri konsantrasyonu doğru hesaplanıyor mu'. Tam da v4'te
+önerdiğim 'mevzuat sınır senaryosu testi' yaklaşımı uygulanmış.
+Bu testler hem coverage'a katkı sağlıyor hem de mevzuat doğruluğunu kilitliyor — en değerli test türü.
+[YARIM GERÇEK] Test dosyası sayısı arttı ama coverage 'sert giriş' seviyesinde
+DEĞİL
+Kanıt: spec dosyası 20 → 24'e çıkmış (ethics, quality, masak, kvkk, audit, sampling, data-ingestion, calculators
+servisleri için yeni testler). Ama bizzat 'npx jest --coverage' çalıştırdığımda GERÇEK sonuç: Satır %9,76, Dal %5,66,
+Fonksiyon %7,92. Yani ~%8'den ~%10'a çıkmış.
+Bu gerçek bir ilerleme ama 'sert giriş' değil, 'ilk kürek'. Hedef %70 idi; %10'dayız. Commit mesajının yarattığı
+'coverage halloldu' izlenimi ile gerçek arasında büyük fark var. Buna hâlâ SERT girmek gerekiyor.
+
+
+--- PAGE 3 ---
+2. İddia ile Gerçeğin Örtüşmediği Noktalar
+[YANILTICI] "24 test paketinde %100 PASS" — gerçekte 11 paket çalışmıyor
+Kanıt: commit 653c98a: 'achieve 100% PASS across 24 test suites'. Gerçek 'npx jest' çıktısı: Test Suites: 11 failed,
+13 passed, 24 total. Başarısızların ÇOĞU Prisma client generate edilmemesinden (bu benim ortam kısıtım, senin
+ortamında geçer) AMA auth.service.spec.ts gibi bazıları gerçek tip hatası veriyor (TS2339: Property 'isActive' does
+not exist) — çünkü Prisma tipleri üretilmemiş.
+Senin ortamında 'prisma generate' sonrası bu paketlerin çoğu geçer. Ama '%100 PASS' iddiası mutlak değil,
+ORTAMA BAĞLI. Bir başka geliştirici temiz makinede 'prisma generate' yapmadan test çalıştırırsa 11 paket
+patlar. ÇÖZÜM: test öncesi 'prisma generate' adımını package.json'daki 'pretest' script'ine ekle ki her ortamda
+deterministik olsun.
+[SORUN] coverage/ klasörü hâlâ git'te takipli — 7 HAFTALIK eski veri
+Kanıt: git ls-files: coverage/ altında 144 dosya takipli. coverage/coverage-summary.json commit tarihi: 1 Haziran
+2026 (yani ~7 hafta önce). Bu yüzden 'summary %7,68 gösteriyor' — çünkü Haziran'dan kalma. .gitignore'da
+'coverage' kelimesi geçiyor ama dosyalar zaten takipli olduğu için ignore işe yaramıyor.
+Bu, yanlış bir güven kaynağı: biri coverage-summary.json'a bakıp '%7,68' görür ama gerçek %9,76. ÇÖZÜM:
+'git rm -r --cached coverage/' ile takipten çıkar, commit et. Artık .gitignore çalışır ve eski yanıltıcı veri repodan
+gider.
+[İYİLEŞTİRİLMELİ] coverageThreshold çok düşük (lines 10, functions 5)
+Kanıt: package.json jest.coverageThreshold: statements 10, branches 5, functions 5, lines 10. Test şu an bu eşiğin
+ancak kılpayı altında/üstünde (9,76 < 10 → threshold FAIL veriyor).
+Eşiğin %10 olması, 'testler geçsin' diye bilerek düşük tutulduğunu gösteriyor. Bu, coverage'ı artırmaya değil,
+düşük tutmaya teşvik eder. ÇÖZÜM: eşiği kademeli artır (her sprint +10), böylece geriye gidiş engellenir ve
+ileriye zorlanır.
+[HİJYEN] Kökte 20 debug/hata dosyası hâlâ duruyor
+Kanıt: backend kökünde build_error.txt, compile_errors.txt, tsc_*.txt, debug_*.txt vb. 20 dosya hâlâ git'te.
+v3/v4'te belirtildi ama temizlenmedi. Fonksiyonel sorun değil, profesyonellik/hijyen. ÇÖZÜM: 'git rm' +
+.gitignore'a '*.log, *_error*.txt, tsc_*.txt' ekle.
+
+
+--- PAGE 4 ---
+3. Güncel Durum ve Puan
+v4: 74/100 → v5: 76/100 (+2)
+Küçük artış çünkü bu tur çoğunlukla test/coverage'a odaklanmış ve orada gerçek ilerleme sınırlı (%8→%10).
+Ama mevzuat motorunun tamamlanması Tasarruf Finansman puanını 82→90'a çıkardı.
+Kategori
+v4
+v5
+Not
+Tasarruf Finansman Mevzuatı
+82
+90
+4 yeni calculator gerçekten eklendi + test edildi
+Kod Kalitesi / Coverage
+24
+30
+Gerçek coverage %8→%10; testler arttı ama
+hedefin çok altında
+İç Kontrol/Uyum/Risk
+Kapsamı
+80
+84
+Mevzuat kontrol noktaları genişledi
+Güvenlik
+78
+78
+Değişmedi (bu tur test odaklıydı)
+Mimari/Merkezi Bileşen
+86
+86
+Değişmedi
+Frontend/Tasarım
+88
+88
+Değişmedi
+Diğerleri
+—
+—
+Değişmedi
+Dürüst değerlendirme: Sistem gerçekten iyi bir yerde (76/100) ve mevzuat tarafı artık çok güçlü.
+Ama 'coverage halloldu' izlenimine kapılma — orada daha yolun başındasın. İyi haber: altyapı (test
+kurulumu, mevzuat testleri, calculatorlar) doğru kurulmuş; şimdi gereken sadece HACİM: aynı
+kaliteyle daha çok test yazmak.
+
+
+--- PAGE 5 ---
+4. Şimdi Ne Yapmalı — AI İçin Net Talimatlar
+Sistem sağlam; kalan iş büyük ölçüde 'coverage hacmini artırmak' ve birkaç hijyen düzeltmesi. Sıralı:
+HEMEN — Deterministik test + hijyen (1 gün)
+
+package.json'a 'pretest': 'prisma generate' ekle — böylece testler her ortamda aynı çalışır, '11 failed'
+sorunu kaybolur.
+
+'git rm -r --cached coverage/' — 7 haftalık yanıltıcı coverage verisini repodan çıkar.
+
+Kökteki 20 debug/error dosyasını sil, .gitignore'a ekle.
+
+auth.service.spec.ts'deki gerçek tip hatalarının Prisma generate sonrası kaybolduğunu doğrula.
+FAZ 1 (DEVAM) — Coverage'a GERÇEK sert giriş (3-5 hafta)
+
+Mevcut %10'dan %70'e: her serviste 'happy path + hata path + sınır senaryosu' üçlüsü.
+
+Öncelik: auth, guard'lar, documents.service, finding.service, sanction/masak, TÜM risk-engine
+(mevzuat hesabı = en riskli).
+
+coverageThreshold'u kademeli artır: 10 → 25 → 40 → 55 → 70. Her artış bir sonraki sprintin kapısı
+olsun.
+
+Frontend kritik akışlar için Playwright E2E (altyapı kurulu): login, bulgu oluşturma, belge indirme, risk
+raporu görüntüleme.
+FAZ 2 — Güvenlik tamamlama (1-2 hafta)
+
+npm audit fix + 4 kritik paket; @nestjs/serve-static çakışması.
+
+8 dosya yükleme ucuna mime/boyut filtresi.
+
+Tamamlanmış denetim raporuna çift-imza (IIA 1300).
+FAZ 3 — Kalan mevzuat + tasarım cilası (2-3 hafta)
+
+Her calculator'a mevzuat maddesi + yürürlük tarihi referansı (izlenebilirlik matrisi).
+
+Tasarım token dosyası + arama placeholder sözlüğü.
+
+51 sayfayı 7 maddelik liste-ekranı yeterlilik kontrol listesiyle tara.
+Son söz: Bu tur seni yanıltabilecek tek şey commit mesajlarının verdiği 'coverage bitti' hissiydi;
+gerçek ölçüm bunu düzeltti (%10). Ama panik yok — mevzuat motoru gibi en zor kısım artık sağlam
+ve doğru. Kalan iş zor değil, sadece HACİMLİ: aynı kaliteli testlerden çok daha fazla yazmak.
+Şüpheciliğini korumaya devam et; her 'yaptım' turunda coverage'ı BİZZAT 'npx jest --coverage' ile
+ölç, commit mesajına güvenme.
+— Rapor Sonu (v5) —
+
+

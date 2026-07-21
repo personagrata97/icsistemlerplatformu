@@ -8,6 +8,13 @@ prisma/dev.db
 coverage/
 *.log
 *error*.txt
+build_*.txt
+debug_*.txt
+tsc_*.txt
+tsc-*.txt
+prisma_*.txt
+prisma-*.txt
+compile_*.txt
 .DS_Store
 .vscode/
 .idea/
