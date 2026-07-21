@@ -36,7 +36,7 @@
         "@nestjs/passport": "^10.0.3",
         "@nestjs/platform-express": "^10.0.0",
         "@nestjs/schedule": "^6.1.0",
-        "@nestjs/serve-static": "^5.0.4",
+        "@nestjs/serve-static": "^4.0.2",
         "@nestjs/throttler": "^6.5.0",
         "@prisma/client": "^5.22.0",
         "@types/pdfkit": "^0.17.4",
@@ -108,6 +108,14 @@
             "**/*.(t|j)s"
         ],
         "coverageDirectory": "../coverage",
+        "coverageThreshold": {
+            "global": {
+                "statements": 10,
+                "branches": 5,
+                "functions": 5,
+                "lines": 10
+            }
+        },
         "testEnvironment": "node"
     },
     "prisma": {

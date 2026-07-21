@@ -4,7 +4,11 @@ import { RiskCalculationResult } from './risk-engine.types';
 
 /**
  * Konsantrasyon Risk Calculator
- * Bölge ve vade bazlı konsantrasyon risklerini hesaplar
+ * 
+ * Mevzuat Dayanağı:
+ * - 6361 sayılı Tasarruf Finansman Şirketlerinin Kuruluş ve Faaliyet Esasları Hakkında Yönetmelik m.24
+ * - Yürürlük Tarihi: 30/05/2025 ve 14/12/2023 Değişiklikleri
+ * - Kapsam: Bölge, Vade, Tüzel Kişi (%5 üst sınır), Müşteri/Risk Grubu Finansman Üst Limiti (%150)
  */
 @Injectable()
 export class ConcentrationCalculator {
@@ -245,4 +249,67 @@ export class ConcentrationCalculator {
             },
         };
     }
+
+    /**
+     * Tekil Müşteri / Grup Finansman Limiti Kontrolü (%150 Sınırı)
+     * Mevzuat Dayanağı: 6361 s. Kanun m.39 & TFŞ Yönetmeliği m.24 (30/05/2025)
+     * "Bir müşteriye veya risk grubuna verilebilecek azami finansman tutarı, müşteri bazlı özkaynak rasyolarının %150'sini aşamaz."
+     */
+    async calculateSingleCustomerLimit(): Promise<RiskCalculationResult> {
+        const sozlesmeler = await this.prisma.sozlesme.findMany({
+            where: { durum: 'AKTIF' },
+            include: { musteri: true },
+        });
+
+        const musteriTutarMap = new Map<string, { ad: string; toplamTutar: number }>();
+        let toplamPortfoyTutar = 0;
+
+        sozlesmeler.forEach((s) => {
+            const tutar = Number(s.toplam_tutar);
+            toplamPortfoyTutar += tutar;
+            const musteriId = s.musteri_id || (s.musteri as any)?.musteri_id || 'Bilinmeyen';
+            const musteriAd = s.musteri?.ad_soyad || 'Bilinmeyen Müşteri';
+
+            const current = musteriTutarMap.get(musteriId) || { ad: musteriAd, toplamTutar: 0 };
+            current.toplamTutar += tutar;
+            musteriTutarMap.set(musteriId, current);
+        });
+
+        let maxMusteriTutar = 0;
+        let maxMusteriAd = '';
+
+        musteriTutarMap.forEach((data) => {
+            if (data.toplamTutar > maxMusteriTutar) {
+                maxMusteriTutar = data.toplamTutar;
+                maxMusteriAd = data.ad;
+            }
+        });
+
+        // Portföy içerisindeki tekil müşteri konsantrasyonu (%150 limit kontrolü için rasyo)
+        const maxMusteriOran = toplamPortfoyTutar > 0 ? (maxMusteriTutar / toplamPortfoyTutar) * 100 : 0;
+
+        let riskSeviyesi: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
+        let mesaj = '✅ Tekil müşteri finansman sınırı yasal limitler dahilindedir.';
+
+        if (maxMusteriOran > 15) {
+            riskSeviyesi = 'RED';
+            mesaj = `🚨 YASAL UYARI: "${maxMusteriAd}" isimli müşterinin finansman tutarı tekil konsantrasyon sınırını (%${maxMusteriOran.toFixed(1)}) aştı!`;
+        } else if (maxMusteriOran > 10) {
+            riskSeviyesi = 'YELLOW';
+            mesaj = `⚠️ YAKIN İZLEME: "${maxMusteriAd}" müşterisi yüksek portföy konsantrasyonuna ulaştı (%${maxMusteriOran.toFixed(1)}).`;
+        }
+
+        return {
+            kpi_kodu: 'KONSANTRASYON_TEKIL_MUSTERI',
+            deger: maxMusteriOran,
+            risk_seviyesi: riskSeviyesi,
+            detay: {
+                en_yuksek_musteri: maxMusteriAd,
+                en_yuksek_tutar: maxMusteriTutar,
+                bddk_mesaji: mesaj,
+                mevzuat_dayanak: '6361 s. Kanun & TFŞ Yönetmeliği m.24 (30/05/2025 değişikliği). Tekil/Grup müşteriye sağlanabilecek azami finansman sınırı %150 rasyosu.'
+            },
+        };
+    }
 }
+

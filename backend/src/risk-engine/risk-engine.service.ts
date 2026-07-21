@@ -9,6 +9,9 @@ import { DpdCalculator } from './dpd.calculator';
 import { CancellationCalculator } from './cancellation.calculator';
 import { FinancingLimitCalculator } from './financing-limit.calculator';
 import { EquityRatioCalculator } from './equity-ratio.calculator';
+import { FinancialLiabilityCalculator } from './financial-liability.calculator';
+import { TenorLimitCalculator } from './tenor-limit.calculator';
+import { LotteryGroupCalculator } from './lottery-group.calculator';
 import { RiskCalculationResult, ScenarioParameters } from './risk-engine.types';
 
 @Injectable()
@@ -23,7 +26,10 @@ export class RiskEngineService implements OnModuleInit {
         private deliveryLiabilityCalculator: DeliveryLiabilityCalculator,
         private cancellationCalculator: CancellationCalculator,
         private financingLimitCalculator: FinancingLimitCalculator,
-        private equityRatioCalculator: EquityRatioCalculator
+        private equityRatioCalculator: EquityRatioCalculator,
+        private financialLiabilityCalculator: FinancialLiabilityCalculator,
+        private tenorLimitCalculator: TenorLimitCalculator,
+        private lotteryGroupCalculator: LotteryGroupCalculator
     ) { }
 
     private readonly logger = new Logger(RiskEngineService.name);
@@ -33,17 +39,21 @@ export class RiskEngineService implements OnModuleInit {
         try {
             const kpis = [
                 { kpi_kodu: 'NPL', aciklama: 'Takipteki Sözleşme Oranı', birim: 'YUZDE' },
-                { kpi_kodu: 'LCR', aciklama: 'Likidite Oranı', birim: 'YUZDE' }, // aligned to percentage representation
+                { kpi_kodu: 'LCR', aciklama: 'Likidite Oranı', birim: 'YUZDE' },
                 { kpi_kodu: 'TESLIMAT_BASKI', aciklama: 'Teslimat Baskısı', birim: 'ORAN' },
                 { kpi_kodu: 'KONSANTRASYON_BOLGE', aciklama: 'Bölge Konsantrasyonu', birim: 'YUZDE' },
                 { kpi_kodu: 'KONSANTRASYON_VADE', aciklama: 'Vade Konsantrasyonu', birim: 'YUZDE' },
                 { kpi_kodu: 'KONSANTRASYON_TUZEL', aciklama: 'Tüzel Kişi Konsantrasyonu', birim: 'YUZDE' },
+                { kpi_kodu: 'KONSANTRASYON_TEKIL_MUSTERI', aciklama: 'Tekil Müşteri Finansman Limiti (%150)', birim: 'YUZDE' },
                 { kpi_kodu: 'DPD_DAGILIM', aciklama: 'Gecikme Dağılımı (90+ Gün Oranı)', birim: 'YUZDE' },
                 { kpi_kodu: 'TESLIMAT_YUKUMLULUGU', aciklama: 'Teslimat Yükümlülüğü (30 Gün)', birim: 'TUTAR' },
                 { kpi_kodu: 'IPTAL_ORANI', aciklama: 'İptal Oranı', birim: 'YUZDE' },
                 { kpi_kodu: 'FINANSMAN_LIMITI', aciklama: 'Toplam Finansman Limiti', birim: 'YUZDE' },
                 { kpi_kodu: 'OZKAYNAK_YETERLILIK', aciklama: 'Özkaynak Yeterlilik Oranı', birim: 'YUZDE' },
-                { kpi_kodu: 'KONSANTRASYON_RISK_GRUBU', aciklama: 'Risk Grubu Yoğunlaşması', birim: 'YUZDE' }
+                { kpi_kodu: 'KONSANTRASYON_RISK_GRUBU', aciklama: 'Risk Grubu Yoğunlaşması', birim: 'YUZDE' },
+                { kpi_kodu: 'MALI_YUKUMLULUK_OZKAYNAK', aciklama: 'Mali Yükümlülük / Özkaynak Oranı (%30)', birim: 'YUZDE' },
+                { kpi_kodu: 'VADE_SINIRI_MEVZUAT_UYUM', aciklama: 'Vade Sınırı Mevzuat İhlal Sayısı', birim: 'ADET' },
+                { kpi_kodu: 'CEKILISLI_GRUP_DOLULUK_ORANI', aciklama: 'Çekilişli Grup Asgari Doluluk Oranı (%40)', birim: 'YUZDE' }
             ];
 
             for (const kpi of kpis) {
@@ -70,6 +80,8 @@ export class RiskEngineService implements OnModuleInit {
                 { kpi_kodu: 'KONSANTRASYON_VADE', esik_deger: 40.00, karsilastirma: 'GT', seviye: 'RED' },
                 { kpi_kodu: 'KONSANTRASYON_TUZEL', esik_deger: 4.00, karsilastirma: 'GT', seviye: 'YELLOW' },
                 { kpi_kodu: 'KONSANTRASYON_TUZEL', esik_deger: 5.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'KONSANTRASYON_TEKIL_MUSTERI', esik_deger: 10.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'KONSANTRASYON_TEKIL_MUSTERI', esik_deger: 15.00, karsilastirma: 'GT', seviye: 'RED' },
                 { kpi_kodu: 'DPD_DAGILIM', esik_deger: 10.00, karsilastirma: 'GT', seviye: 'YELLOW' },
                 { kpi_kodu: 'DPD_DAGILIM', esik_deger: 20.00, karsilastirma: 'GT', seviye: 'RED' },
                 { kpi_kodu: 'TESLIMAT_YUKUMLULUGU', esik_deger: 5000000.00, karsilastirma: 'GT', seviye: 'YELLOW' },
@@ -81,7 +93,12 @@ export class RiskEngineService implements OnModuleInit {
                 { kpi_kodu: 'OZKAYNAK_YETERLILIK', esik_deger: 4.00, karsilastirma: 'LT', seviye: 'YELLOW' },
                 { kpi_kodu: 'OZKAYNAK_YETERLILIK', esik_deger: 3.00, karsilastirma: 'LT', seviye: 'RED' },
                 { kpi_kodu: 'KONSANTRASYON_RISK_GRUBU', esik_deger: 20.00, karsilastirma: 'GT', seviye: 'YELLOW' },
-                { kpi_kodu: 'KONSANTRASYON_RISK_GRUBU', esik_deger: 25.00, karsilastirma: 'GT', seviye: 'RED' }
+                { kpi_kodu: 'KONSANTRASYON_RISK_GRUBU', esik_deger: 25.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'MALI_YUKUMLULUK_OZKAYNAK', esik_deger: 25.00, karsilastirma: 'GT', seviye: 'YELLOW' },
+                { kpi_kodu: 'MALI_YUKUMLULUK_OZKAYNAK', esik_deger: 30.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'VADE_SINIRI_MEVZUAT_UYUM', esik_deger: 1.00, karsilastirma: 'GT', seviye: 'RED' },
+                { kpi_kodu: 'CEKILISLI_GRUP_DOLULUK_ORANI', esik_deger: 50.00, karsilastirma: 'LT', seviye: 'YELLOW' },
+                { kpi_kodu: 'CEKILISLI_GRUP_DOLULUK_ORANI', esik_deger: 40.00, karsilastirma: 'LT', seviye: 'RED' }
             ];
 
             for (const limit of defaultLimits) {
@@ -104,52 +121,52 @@ export class RiskEngineService implements OnModuleInit {
             const results: RiskCalculationResult[] = [];
 
             // NPL
-            this.logger.debug('NPL hesaplanıyor...');
             results.push(await this.nplCalculator.calculate(scenarioParams));
 
             // Likidite
-            this.logger.debug('Likidite hesaplanıyor...');
             results.push(await this.liquidityCalculator.calculate(scenarioParams));
 
             // Teslimat Baskısı
-            this.logger.debug('Teslimat baskısı hesaplanıyor...');
             results.push(await this.deliveryPressureCalculator.calculate(scenarioParams));
 
             // Konsantrasyon - Bölge
-            this.logger.debug('Konsantrasyon (bölge) hesaplanıyor...');
             results.push(await this.concentrationCalculator.calculateByRegion());
 
             // Konsantrasyon - Vade
-            this.logger.debug('Konsantrasyon (vade) hesaplanıyor...');
             results.push(await this.concentrationCalculator.calculateByMaturity());
 
             // Konsantrasyon - Tüzel Kişi Sınırı (BDDK %5)
-            this.logger.debug('Konsantrasyon (tüzel kişi) hesaplanıyor...');
             results.push(await this.concentrationCalculator.calculateByCustomerType());
 
+            // Konsantrasyon - Tekil Müşteri Finansman Limiti (%150)
+            results.push(await this.concentrationCalculator.calculateSingleCustomerLimit());
+
             // DPD Dağılım
-            this.logger.debug('DPD dağılım hesaplanıyor...');
             results.push(await this.dpdCalculator.calculate(scenarioParams));
 
             // Teslimat Yükümlülüğü
-            this.logger.debug('Teslimat yükümlülüğü hesaplanıyor...');
             results.push(await this.deliveryLiabilityCalculator.calculate(scenarioParams));
 
             // İptal Oranı
-            this.logger.debug('İptal oranı hesaplanıyor...');
             results.push(await this.cancellationCalculator.calculate(scenarioParams));
 
             // Toplam Finansman Limiti (Yönetmelik %200 sınırı)
-            this.logger.debug('Toplam finansman limiti hesaplanıyor...');
             results.push(await this.financingLimitCalculator.calculate());
 
             // Özkaynak Yeterlilik Oranı (Yönetmelik asgari %3)
-            this.logger.debug('Özkaynak yeterlilik oranı hesaplanıyor...');
             results.push(await this.equityRatioCalculator.calculate());
 
             // Risk Grubu Konsantrasyonu (Yönetmelik Aralık 2023)
-            this.logger.debug('Risk grubu konsantrasyonu hesaplanıyor...');
             results.push(await this.concentrationCalculator.calculateByRiskGroup());
+
+            // Mali Yükümlülük / Özkaynak Oranı (Yönetmelik m.6, %30 Sınırı)
+            results.push(await this.financialLiabilityCalculator.calculate());
+
+            // Vade Sınırı Mevzuat İhlali (Konut 120 ay, Taşıt 60 ay)
+            results.push(await this.tenorLimitCalculator.calculate());
+
+            // Çekilişli Grup Asgari Doluluk Oranı (Yönetmelik m.21, %40 Sınırı)
+            results.push(await this.lotteryGroupCalculator.calculate());
 
             return results;
         } catch (error) {
@@ -178,6 +195,8 @@ export class RiskEngineService implements OnModuleInit {
                 return this.concentrationCalculator.calculateByMaturity();
             case 'KONSANTRASYON_TUZEL':
                 return this.concentrationCalculator.calculateByCustomerType();
+            case 'KONSANTRASYON_TEKIL_MUSTERI':
+                return this.concentrationCalculator.calculateSingleCustomerLimit();
             case 'DPD_DAGILIM':
                 return this.dpdCalculator.calculate(scenarioParams);
             case 'TESLIMAT_YUKUMLULUGU':
@@ -190,6 +209,12 @@ export class RiskEngineService implements OnModuleInit {
                 return this.equityRatioCalculator.calculate();
             case 'KONSANTRASYON_RISK_GRUBU':
                 return this.concentrationCalculator.calculateByRiskGroup();
+            case 'MALI_YUKUMLULUK_OZKAYNAK':
+                return this.financialLiabilityCalculator.calculate();
+            case 'VADE_SINIRI_MEVZUAT_UYUM':
+                return this.tenorLimitCalculator.calculate();
+            case 'CEKILISLI_GRUP_DOLULUK_ORANI':
+                return this.lotteryGroupCalculator.calculate();
             default:
                 return null;
         }

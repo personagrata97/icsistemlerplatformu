@@ -10,6 +10,9 @@ import { DeliveryLiabilityCalculator } from './delivery-liability.calculator';
 import { CancellationCalculator } from './cancellation.calculator';
 import { FinancingLimitCalculator } from './financing-limit.calculator';
 import { EquityRatioCalculator } from './equity-ratio.calculator';
+import { FinancialLiabilityCalculator } from './financial-liability.calculator';
+import { TenorLimitCalculator } from './tenor-limit.calculator';
+import { LotteryGroupCalculator } from './lottery-group.calculator';
 import { BddkExportService } from './bddk-export.service';
 import { DataIngestionService } from './data-ingestion.service';
 
@@ -26,9 +29,20 @@ import { DataIngestionService } from './data-ingestion.service';
         CancellationCalculator,
         FinancingLimitCalculator,
         EquityRatioCalculator,
+        FinancialLiabilityCalculator,
+        TenorLimitCalculator,
+        LotteryGroupCalculator,
         BddkExportService,
         DataIngestionService,
     ],
-    exports: [RiskEngineService, DeliveryLiabilityCalculator, BddkExportService, DataIngestionService],
+    exports: [
+        RiskEngineService,
+        DeliveryLiabilityCalculator,
+        BddkExportService,
+        DataIngestionService,
+        FinancialLiabilityCalculator,
+        TenorLimitCalculator,
+        LotteryGroupCalculator,
+    ],
 })
 export class RiskEngineModule { }
