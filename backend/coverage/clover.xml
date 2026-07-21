@@ -1,42 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1784622154872" clover="3.2.0">
-  <project timestamp="1784622154872" name="All files">
-    <metrics statements="7385" coveredstatements="1217" conditionals="4611" coveredconditionals="608" methods="1287" coveredmethods="174" elements="13283" coveredelements="1999" complexity="0" loc="7385" ncloc="7385" packages="22" files="114" classes="114"/>
+<coverage generated="1784622442642" clover="3.2.0">
+  <project timestamp="1784622442642" name="All files">
+    <metrics statements="7049" coveredstatements="1210" conditionals="4585" coveredconditionals="608" methods="1274" coveredmethods="174" elements="12908" coveredelements="1992" complexity="0" loc="7049" ncloc="7049" packages="20" files="90" classes="90"/>
     <package name="src">
-      <metrics statements="71" coveredstatements="0" conditionals="15" coveredconditionals="0" methods="13" coveredmethods="0"/>
-      <file name="app.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\app.module.ts">
-        <metrics statements="30" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="26" count="0" type="stmt"/>
-        <line num="73" count="0" type="stmt"/>
-        <line num="74" count="0" type="stmt"/>
-        <line num="77" count="0" type="stmt"/>
-        <line num="79" count="0" type="stmt"/>
-        <line num="80" count="0" type="stmt"/>
-      </file>
+      <metrics statements="12" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="2" coveredmethods="0"/>
       <file name="health.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\health.controller.ts">
         <metrics statements="12" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -52,41 +19,9 @@
         <line num="18" count="0" type="stmt"/>
         <line num="21" count="0" type="stmt"/>
       </file>
-      <file name="main.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\main.ts">
-        <metrics statements="29" coveredstatements="0" conditionals="7" coveredconditionals="0" methods="8" coveredmethods="0"/>
-        <line num="2" count="0" type="cond" truecount="0" falsecount="1"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="33" count="0" type="stmt"/>
-        <line num="41" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="55" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="56" count="0" type="stmt"/>
-        <line num="59" count="0" type="stmt"/>
-        <line num="66" count="0" type="stmt"/>
-        <line num="70" count="0" type="stmt"/>
-        <line num="71" count="0" type="stmt"/>
-        <line num="74" count="0" type="stmt"/>
-        <line num="77" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="78" count="0" type="stmt"/>
-        <line num="80" count="0" type="stmt"/>
-        <line num="81" count="0" type="stmt"/>
-        <line num="84" count="0" type="stmt"/>
-      </file>
     </package>
     <package name="src.admin">
-      <metrics statements="77" coveredstatements="0" conditionals="30" coveredconditionals="0" methods="25" coveredmethods="0"/>
+      <metrics statements="71" coveredstatements="0" conditionals="30" coveredconditionals="0" methods="25" coveredmethods="0"/>
       <file name="admin.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\admin\admin.controller.ts">
         <metrics statements="25" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="10" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -114,15 +49,6 @@
         <line num="71" count="0" type="stmt"/>
         <line num="76" count="0" type="stmt"/>
         <line num="81" count="0" type="stmt"/>
-      </file>
-      <file name="admin.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\admin\admin.module.ts">
-        <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
       </file>
       <file name="admin.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\admin\admin.service.ts">
         <metrics statements="46" coveredstatements="0" conditionals="30" coveredconditionals="0" methods="15" coveredmethods="0"/>
@@ -175,15 +101,7 @@
       </file>
     </package>
     <package name="src.alert-system">
-      <metrics statements="57" coveredstatements="0" conditionals="16" coveredconditionals="0" methods="9" coveredmethods="0"/>
-      <file name="alert-system.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\alert-system\alert-system.module.ts">
-        <metrics statements="5" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-      </file>
+      <metrics statements="52" coveredstatements="0" conditionals="16" coveredconditionals="0" methods="9" coveredmethods="0"/>
       <file name="alert.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\alert-system\alert.controller.ts">
         <metrics statements="12" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -244,19 +162,7 @@
       </file>
     </package>
     <package name="src.api">
-      <metrics statements="98" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="17" coveredmethods="0"/>
-      <file name="api.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\api\api.module.ts">
-        <metrics statements="9" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-      </file>
+      <metrics statements="89" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="17" coveredmethods="0"/>
       <file name="contract.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\api\contract.controller.ts">
         <metrics statements="13" coveredstatements="0" conditionals="1" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -357,7 +263,7 @@
       </file>
     </package>
     <package name="src.audit">
-      <metrics statements="4729" coveredstatements="416" conditionals="3289" coveredconditionals="196" methods="864" coveredmethods="54"/>
+      <metrics statements="4690" coveredstatements="416" conditionals="3289" coveredconditionals="196" methods="864" coveredmethods="54"/>
       <file name="audit-log.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit-log.service.ts">
         <metrics statements="73" coveredstatements="24" conditionals="70" coveredconditionals="10" methods="10" coveredmethods="5"/>
         <line num="1" count="10" type="stmt"/>
@@ -1097,48 +1003,6 @@
         <line num="820" count="0" type="stmt"/>
         <line num="823" count="0" type="stmt"/>
         <line num="824" count="0" type="stmt"/>
-      </file>
-      <file name="audit.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.module.ts">
-        <metrics statements="39" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="26" count="0" type="stmt"/>
-        <line num="27" count="0" type="stmt"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="33" count="0" type="stmt"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="35" count="0" type="stmt"/>
-        <line num="36" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="38" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="83" count="0" type="stmt"/>
       </file>
       <file name="audit.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\audit.service.ts">
         <metrics statements="1108" coveredstatements="116" conditionals="1040" coveredconditionals="65" methods="173" coveredmethods="8"/>
@@ -5190,138 +5054,8 @@
         <line num="385" count="0" type="stmt"/>
       </file>
     </package>
-    <package name="src.audit.dto">
-      <metrics statements="118" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-      <file name="audit-extension.dto.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\dto\audit-extension.dto.ts">
-        <metrics statements="10" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="26" count="0" type="stmt"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="35" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-      </file>
-      <file name="audit.dto.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\dto\audit.dto.ts">
-        <metrics statements="76" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="3" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="26" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="38" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
-        <line num="54" count="0" type="stmt"/>
-        <line num="58" count="0" type="stmt"/>
-        <line num="61" count="0" type="stmt"/>
-        <line num="64" count="0" type="stmt"/>
-        <line num="68" count="0" type="stmt"/>
-        <line num="72" count="0" type="stmt"/>
-        <line num="76" count="0" type="stmt"/>
-        <line num="80" count="0" type="stmt"/>
-        <line num="84" count="0" type="stmt"/>
-        <line num="88" count="0" type="stmt"/>
-        <line num="92" count="0" type="stmt"/>
-        <line num="98" count="0" type="stmt"/>
-        <line num="102" count="0" type="stmt"/>
-        <line num="106" count="0" type="stmt"/>
-        <line num="110" count="0" type="stmt"/>
-        <line num="114" count="0" type="stmt"/>
-        <line num="118" count="0" type="stmt"/>
-        <line num="122" count="0" type="stmt"/>
-        <line num="126" count="0" type="stmt"/>
-        <line num="131" count="0" type="stmt"/>
-        <line num="135" count="0" type="stmt"/>
-        <line num="139" count="0" type="stmt"/>
-        <line num="143" count="0" type="stmt"/>
-        <line num="146" count="0" type="stmt"/>
-        <line num="152" count="0" type="stmt"/>
-        <line num="155" count="0" type="stmt"/>
-        <line num="159" count="0" type="stmt"/>
-        <line num="163" count="0" type="stmt"/>
-        <line num="167" count="0" type="stmt"/>
-        <line num="171" count="0" type="stmt"/>
-        <line num="175" count="0" type="stmt"/>
-        <line num="179" count="0" type="stmt"/>
-        <line num="183" count="0" type="stmt"/>
-        <line num="187" count="0" type="stmt"/>
-        <line num="190" count="0" type="stmt"/>
-        <line num="194" count="0" type="stmt"/>
-        <line num="198" count="0" type="stmt"/>
-        <line num="202" count="0" type="stmt"/>
-        <line num="206" count="0" type="stmt"/>
-        <line num="210" count="0" type="stmt"/>
-        <line num="214" count="0" type="stmt"/>
-        <line num="218" count="0" type="stmt"/>
-        <line num="224" count="0" type="stmt"/>
-        <line num="228" count="0" type="stmt"/>
-        <line num="232" count="0" type="stmt"/>
-        <line num="236" count="0" type="stmt"/>
-        <line num="240" count="0" type="stmt"/>
-        <line num="244" count="0" type="stmt"/>
-        <line num="248" count="0" type="stmt"/>
-        <line num="251" count="0" type="stmt"/>
-        <line num="256" count="0" type="stmt"/>
-        <line num="260" count="0" type="stmt"/>
-        <line num="264" count="0" type="stmt"/>
-        <line num="268" count="0" type="stmt"/>
-        <line num="271" count="0" type="stmt"/>
-      </file>
-      <file name="finding.dto.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\audit\dto\finding.dto.ts">
-        <metrics statements="32" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="33" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="45" count="0" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="53" count="0" type="stmt"/>
-        <line num="57" count="0" type="stmt"/>
-        <line num="61" count="0" type="stmt"/>
-        <line num="67" count="0" type="stmt"/>
-        <line num="70" count="0" type="stmt"/>
-        <line num="74" count="0" type="stmt"/>
-        <line num="78" count="0" type="stmt"/>
-        <line num="82" count="0" type="stmt"/>
-        <line num="86" count="0" type="stmt"/>
-        <line num="90" count="0" type="stmt"/>
-        <line num="94" count="0" type="stmt"/>
-        <line num="98" count="0" type="stmt"/>
-        <line num="102" count="0" type="stmt"/>
-        <line num="106" count="0" type="stmt"/>
-        <line num="110" count="0" type="stmt"/>
-        <line num="114" count="0" type="stmt"/>
-        <line num="118" count="0" type="stmt"/>
-        <line num="122" count="0" type="stmt"/>
-        <line num="126" count="0" type="stmt"/>
-      </file>
-    </package>
     <package name="src.auditron">
-      <metrics statements="310" coveredstatements="79" conditionals="213" coveredconditionals="49" methods="56" coveredmethods="10"/>
+      <metrics statements="304" coveredstatements="79" conditionals="213" coveredconditionals="49" methods="56" coveredmethods="10"/>
       <file name="auditron.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auditron\auditron.controller.ts">
         <metrics statements="57" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="10" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -5381,15 +5115,6 @@
         <line num="113" count="0" type="stmt"/>
         <line num="114" count="0" type="stmt"/>
         <line num="116" count="0" type="stmt"/>
-      </file>
-      <file name="auditron.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auditron\auditron.module.ts">
-        <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
       </file>
       <file name="auditron.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auditron\auditron.service.ts">
         <metrics statements="247" coveredstatements="79" conditionals="205" coveredconditionals="49" methods="46" coveredmethods="10"/>
@@ -5643,7 +5368,7 @@
       </file>
     </package>
     <package name="src.auth">
-      <metrics statements="221" coveredstatements="141" conditionals="73" coveredconditionals="41" methods="46" coveredmethods="28"/>
+      <metrics statements="204" coveredstatements="141" conditionals="64" coveredconditionals="41" methods="46" coveredmethods="28"/>
       <file name="auth.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auth\auth.controller.ts">
         <metrics statements="18" coveredstatements="18" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="5"/>
         <line num="1" count="1" type="stmt"/>
@@ -5664,19 +5389,6 @@
         <line num="38" count="1" type="stmt"/>
         <line num="43" count="1" type="stmt"/>
         <line num="44" count="1" type="stmt"/>
-      </file>
-      <file name="auth.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auth\auth.module.ts">
-        <metrics statements="10" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
       </file>
       <file name="auth.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auth\auth.service.ts">
         <metrics statements="92" coveredstatements="74" conditionals="26" coveredconditionals="21" methods="10" coveredmethods="8"/>
@@ -5772,16 +5484,6 @@
         <line num="301" count="0" type="stmt"/>
         <line num="302" count="0" type="stmt"/>
         <line num="304" count="0" type="stmt"/>
-      </file>
-      <file name="jwt.constants.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auth\jwt.constants.ts">
-        <metrics statements="7" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="15" count="0" type="cond" truecount="0" falsecount="1"/>
-        <line num="16" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
       </file>
       <file name="jwt.strategy.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auth\jwt.strategy.ts">
         <metrics statements="23" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="6" coveredmethods="0"/>
@@ -5903,22 +5605,6 @@
         <line num="5" count="3" type="stmt"/>
       </file>
     </package>
-    <package name="src.auth.dto">
-      <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="login.dto.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auth\dto\login.dto.ts">
-        <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="6" count="1" type="stmt"/>
-        <line num="10" count="1" type="stmt"/>
-      </file>
-      <file name="refresh-token.dto.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auth\dto\refresh-token.dto.ts">
-        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="6" count="1" type="stmt"/>
-      </file>
-    </package>
     <package name="src.auth.guards">
       <metrics statements="79" coveredstatements="38" conditionals="56" coveredconditionals="18" methods="12" coveredmethods="7"/>
       <file name="independence.guard.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\auth\guards\independence.guard.ts">
@@ -6011,16 +5697,7 @@
       </file>
     </package>
     <package name="src.common">
-      <metrics statements="155" coveredstatements="54" conditionals="118" coveredconditionals="32" methods="25" coveredmethods="10"/>
-      <file name="common.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\common.module.ts">
-        <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-      </file>
+      <metrics statements="149" coveredstatements="54" conditionals="118" coveredconditionals="32" methods="25" coveredmethods="10"/>
       <file name="data-masking.interceptor.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\data-masking.interceptor.ts">
         <metrics statements="34" coveredstatements="0" conditionals="30" coveredconditionals="0" methods="6" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -6265,7 +5942,7 @@
       </file>
     </package>
     <package name="src.common.notification">
-      <metrics statements="31" coveredstatements="3" conditionals="4" coveredconditionals="0" methods="11" coveredmethods="0"/>
+      <metrics statements="26" coveredstatements="3" conditionals="4" coveredconditionals="0" methods="11" coveredmethods="0"/>
       <file name="notification.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\notification\notification.controller.ts">
         <metrics statements="17" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -6286,14 +5963,6 @@
         <line num="30" count="0" type="stmt"/>
         <line num="31" count="0" type="stmt"/>
       </file>
-      <file name="notification.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\notification\notification.module.ts">
-        <metrics statements="5" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-      </file>
       <file name="notification.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\common\notification\notification.service.ts">
         <metrics statements="9" coveredstatements="3" conditionals="4" coveredconditionals="0" methods="6" coveredmethods="0"/>
         <line num="1" count="3" type="stmt"/>
@@ -6308,7 +5977,7 @@
       </file>
     </package>
     <package name="src.documents">
-      <metrics statements="216" coveredstatements="23" conditionals="89" coveredconditionals="12" methods="41" coveredmethods="3"/>
+      <metrics statements="207" coveredstatements="23" conditionals="89" coveredconditionals="12" methods="41" coveredmethods="3"/>
       <file name="documents.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\documents\documents.controller.ts">
         <metrics statements="54" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="17" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -6365,18 +6034,6 @@
         <line num="132" count="0" type="stmt"/>
         <line num="136" count="0" type="stmt"/>
         <line num="137" count="0" type="stmt"/>
-      </file>
-      <file name="documents.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\documents\documents.module.ts">
-        <metrics statements="9" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
       </file>
       <file name="documents.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\documents\documents.service.ts">
         <metrics statements="153" coveredstatements="23" conditionals="84" coveredconditionals="12" methods="24" coveredmethods="3"/>
@@ -6536,17 +6193,7 @@
       </file>
     </package>
     <package name="src.email">
-      <metrics statements="158" coveredstatements="93" conditionals="82" coveredconditionals="48" methods="32" coveredmethods="18"/>
-      <file name="email.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\email\email.module.ts">
-        <metrics statements="7" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
-      </file>
+      <metrics statements="151" coveredstatements="93" conditionals="74" coveredconditionals="48" methods="31" coveredmethods="18"/>
       <file name="email.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\email\email.service.ts">
         <metrics statements="60" coveredstatements="45" conditionals="34" coveredconditionals="30" methods="11" coveredmethods="10"/>
         <line num="1" count="6" type="stmt"/>
@@ -6706,7 +6353,7 @@
       </file>
     </package>
     <package name="src.liquidity-stress">
-      <metrics statements="43" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="8" coveredmethods="0"/>
+      <metrics statements="37" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="8" coveredmethods="0"/>
       <file name="liquidity-stress.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\liquidity-stress\liquidity-stress.controller.ts">
         <metrics statements="8" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -6717,15 +6364,6 @@
         <line num="9" count="0" type="stmt"/>
         <line num="12" count="0" type="stmt"/>
         <line num="13" count="0" type="stmt"/>
-      </file>
-      <file name="liquidity-stress.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\liquidity-stress\liquidity-stress.module.ts">
-        <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
       </file>
       <file name="liquidity-stress.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\liquidity-stress\liquidity-stress.service.ts">
         <metrics statements="29" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="6" coveredmethods="0"/>
@@ -6761,7 +6399,7 @@
       </file>
     </package>
     <package name="src.organization">
-      <metrics statements="62" coveredstatements="42" conditionals="37" coveredconditionals="24" methods="10" coveredmethods="5"/>
+      <metrics statements="57" coveredstatements="42" conditionals="37" coveredconditionals="24" methods="10" coveredmethods="5"/>
       <file name="organization.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\organization\organization.controller.ts">
         <metrics statements="13" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -6777,14 +6415,6 @@
         <line num="22" count="0" type="stmt"/>
         <line num="26" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
-      </file>
-      <file name="organization.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\organization\organization.module.ts">
-        <metrics statements="5" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
       </file>
       <file name="organization.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\organization\organization.service.ts">
         <metrics statements="44" coveredstatements="42" conditionals="37" coveredconditionals="24" methods="5" coveredmethods="5"/>
@@ -6835,7 +6465,7 @@
       </file>
     </package>
     <package name="src.risk-engine">
-      <metrics statements="751" coveredstatements="255" conditionals="495" coveredconditionals="157" methods="84" coveredmethods="29"/>
+      <metrics statements="731" coveredstatements="255" conditionals="495" coveredconditionals="157" methods="84" coveredmethods="29"/>
       <file name="bddk-export.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\risk-engine\bddk-export.service.ts">
         <metrics statements="25" coveredstatements="0" conditionals="32" coveredconditionals="0" methods="8" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -7505,27 +7135,6 @@
         <line num="55" count="0" type="stmt"/>
         <line num="58" count="0" type="stmt"/>
       </file>
-      <file name="risk-engine.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\risk-engine\risk-engine.module.ts">
-        <metrics statements="18" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="48" count="0" type="stmt"/>
-      </file>
       <file name="risk-engine.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\risk-engine\risk-engine.service.ts">
         <metrics statements="80" coveredstatements="55" conditionals="19" coveredconditionals="4" methods="4" coveredmethods="3"/>
         <line num="1" count="1" type="stmt"/>
@@ -7609,11 +7218,6 @@
         <line num="217" count="0" type="stmt"/>
         <line num="219" count="1" type="stmt"/>
       </file>
-      <file name="risk-engine.types.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\risk-engine\risk-engine.types.ts">
-        <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-      </file>
       <file name="tenor-limit.calculator.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\risk-engine\tenor-limit.calculator.ts">
         <metrics statements="21" coveredstatements="20" conditionals="17" coveredconditionals="14" methods="3" coveredmethods="3"/>
         <line num="1" count="2" type="stmt"/>
@@ -7640,7 +7244,7 @@
       </file>
     </package>
     <package name="src.sanction">
-      <metrics statements="69" coveredstatements="14" conditionals="5" coveredconditionals="0" methods="12" coveredmethods="2"/>
+      <metrics statements="63" coveredstatements="14" conditionals="5" coveredconditionals="0" methods="12" coveredmethods="2"/>
       <file name="masak.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\sanction\masak.service.ts">
         <metrics statements="14" coveredstatements="14" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
         <line num="1" count="1" type="stmt"/>
@@ -7674,15 +7278,6 @@
         <line num="22" count="0" type="stmt"/>
         <line num="30" count="0" type="stmt"/>
         <line num="31" count="0" type="stmt"/>
-      </file>
-      <file name="sanction.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\sanction\sanction.module.ts">
-        <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
       </file>
       <file name="sanction.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\sanction\sanction.service.ts">
         <metrics statements="35" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="6" coveredmethods="0"/>
@@ -7724,7 +7319,7 @@
       </file>
     </package>
     <package name="src.scenario-engine">
-      <metrics statements="60" coveredstatements="0" conditionals="14" coveredconditionals="0" methods="8" coveredmethods="0"/>
+      <metrics statements="54" coveredstatements="0" conditionals="14" coveredconditionals="0" methods="8" coveredmethods="0"/>
       <file name="scenario-engine.controller.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\scenario-engine\scenario-engine.controller.ts">
         <metrics statements="16" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="4" coveredmethods="0"/>
         <line num="1" count="0" type="stmt"/>
@@ -7743,15 +7338,6 @@
         <line num="38" count="0" type="stmt"/>
         <line num="42" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="43" count="0" type="stmt"/>
-      </file>
-      <file name="scenario-engine.module.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\scenario-engine\scenario-engine.module.ts">
-        <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
       </file>
       <file name="scenario-engine.service.ts" path="C:\Users\sk36\.gemini\antigravity\scratch\icsistemler-platformu\backend\src\scenario-engine\scenario-engine.service.ts">
         <metrics statements="38" coveredstatements="0" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0"/>
