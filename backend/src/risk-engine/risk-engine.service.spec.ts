@@ -8,9 +8,11 @@ import { ConcentrationCalculator } from './concentration.calculator';
 import { DpdCalculator } from './dpd.calculator';
 import { DeliveryLiabilityCalculator } from './delivery-liability.calculator';
 import { CancellationCalculator } from './cancellation.calculator';
-
 import { FinancingLimitCalculator } from './financing-limit.calculator';
 import { EquityRatioCalculator } from './equity-ratio.calculator';
+import { FinancialLiabilityCalculator } from './financial-liability.calculator';
+import { TenorLimitCalculator } from './tenor-limit.calculator';
+import { LotteryGroupCalculator } from './lottery-group.calculator';
 
 describe('RiskEngineService', () => {
   let service: RiskEngineService;
@@ -21,6 +23,7 @@ describe('RiskEngineService', () => {
     calculateByMaturity: jest.fn().mockResolvedValue({ code: 'MATURITY', value: 30 }),
     calculateByCustomerType: jest.fn().mockResolvedValue({ code: 'CUST', value: 40 }),
     calculateByRiskGroup: jest.fn().mockResolvedValue({ code: 'RISK_GRP', value: 50 }),
+    calculateSingleCustomerLimit: jest.fn().mockResolvedValue({ code: 'SINGLE_CUST', value: 60 }),
   });
 
   const mockNpl = createMockCalculator();
@@ -32,12 +35,15 @@ describe('RiskEngineService', () => {
   const mockCanc = createMockCalculator();
   const mockFin = createMockCalculator();
   const mockEq = createMockCalculator();
+  const mockFinLiab = createMockCalculator();
+  const mockTenor = createMockCalculator();
+  const mockLottery = createMockCalculator();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RiskEngineService,
-        { provide: PrismaService, useValue: {} },
+        { provide: PrismaService, useValue: { riskKpi: { upsert: jest.fn() }, riskLimit: { deleteMany: jest.fn(), create: jest.fn() } } },
         { provide: NplCalculator, useValue: mockNpl },
         { provide: LiquidityCalculator, useValue: mockLiq },
         { provide: DeliveryPressureCalculator, useValue: mockDeliveryP },
@@ -47,6 +53,9 @@ describe('RiskEngineService', () => {
         { provide: CancellationCalculator, useValue: mockCanc },
         { provide: FinancingLimitCalculator, useValue: mockFin },
         { provide: EquityRatioCalculator, useValue: mockEq },
+        { provide: FinancialLiabilityCalculator, useValue: mockFinLiab },
+        { provide: TenorLimitCalculator, useValue: mockTenor },
+        { provide: LotteryGroupCalculator, useValue: mockLottery },
       ],
     }).compile();
 
@@ -62,7 +71,7 @@ describe('RiskEngineService', () => {
     it('should call all calculators and return array of results', async () => {
       const results = await service.calculateAllKpis();
       
-      expect(results).toHaveLength(12);
+      expect(results).toHaveLength(16);
       expect(mockNpl.calculate).toHaveBeenCalled();
       expect(mockConc.calculateByRegion).toHaveBeenCalled();
       expect(mockConc.calculateByMaturity).toHaveBeenCalled();

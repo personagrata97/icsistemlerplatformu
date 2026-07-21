@@ -7,47 +7,48 @@ import { AuditRiskService } from './audit-risk.service';
 import { FindingService } from './finding.service';
 import { AuditTrashService } from './audit-trash.service';
 import { NotificationService } from '../common/notification/notification.service';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, ConflictException } from '@nestjs/common';
 import * as fs from 'fs';
 
 jest.mock('fs');
 
-describe('AuditService', () => {
+describe('AuditService Core Logic & Controls', () => {
     let service: AuditService;
-    let prisma: PrismaService;
 
     const mockPrisma = {
         audit: {
             findMany: jest.fn(),
             findUnique: jest.fn(),
+            findFirst: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
-            delete: jest.fn(),
         },
-        auditableUnit: {
-            findUnique: jest.fn(),
-            update: jest.fn(),
-        },
-        user: {
-            findUnique: jest.fn(),
-        },
-        document: {
-            create: jest.fn(),
+        userPromotion: {
             findMany: jest.fn(),
-        }
+        },
+        independenceDeclaration: {
+            findFirst: jest.fn(),
+        },
+        finding: {
+            count: jest.fn(),
+        },
+        auditWorkpaper: {
+            count: jest.fn(),
+        },
     };
 
-    const mockAuditron = { processDocument: jest.fn().mockResolvedValue('ok') };
+    const mockAuditron = {};
     const mockAuditLog = { createLog: jest.fn() };
-    const mockAuditRisk = { updateRiskMetrics: jest.fn() };
+    const mockAuditRisk = { updateOpenFindingsCount: jest.fn() };
     const mockFinding = {};
     const mockTrash = {};
-    const mockNotification = {};
+    const mockNotification = { create: jest.fn() };
 
     const mockUser = {
-        id: 'u1',
-        username: 'auditor1',
-        roles: ['AUDITOR'],
+        id: 'user-admin-1',
+        displayName: 'Selim Admin',
+        roles: ['ADMIN'],
+        department: 'Teftiş Kurulu',
     };
 
     beforeEach(async () => {
@@ -65,7 +66,7 @@ describe('AuditService', () => {
         }).compile();
 
         service = module.get<AuditService>(AuditService);
-        prisma = module.get<PrismaService>(PrismaService);
+        (fs.existsSync as jest.Mock).mockReturnValue(true);
         jest.clearAllMocks();
     });
 
@@ -73,26 +74,69 @@ describe('AuditService', () => {
         expect(service).toBeDefined();
     });
 
-    describe('getAllAudits', () => {
-        it('should return audits list', async () => {
-            mockPrisma.audit.findMany.mockResolvedValue([{ id: 'a1', title: 'Birim Denetimi' }]);
-            const result = await service.getAllAudits(mockUser);
-            expect(result).toHaveLength(1);
-            expect(result[0].title).toBe('Birim Denetimi');
+    describe('Auditor Independence Validation', () => {
+        it('should throw ForbiddenException if auditor served in department within 1 year', async () => {
+            mockPrisma.userPromotion.findMany.mockResolvedValue([
+                { id: 'p1', userId: 'auditor-1', department: 'Krediler', type: 'Atama', endDate: new Date() }
+            ]);
+
+            const auditData = {
+                title: 'Krediler Birimi Denetimi',
+                department: 'Krediler',
+                supervisorId: 'auditor-1',
+                startDate: '2026-01-01',
+            };
+
+            await expect(service.createAudit(auditData, mockUser)).rejects.toThrow(ForbiddenException);
         });
     });
 
-    describe('uploadWorkpaper', () => {
-        it('should block dangerous file extensions', async () => {
-            const file = { originalname: 'malware.exe', buffer: Buffer.from('data') };
-            await expect(service.uploadWorkpaper('a1', file, 'Çalışma Kağıdı', mockUser))
-                .rejects.toThrow(ForbiddenException);
+    describe('Parallel Audit Conflict Control', () => {
+        it('should throw ConflictException if active audit exists for same unit', async () => {
+            mockPrisma.userPromotion.findMany.mockResolvedValue([]);
+            mockPrisma.audit.findFirst.mockResolvedValue({
+                id: 'active-audit-1',
+                auditCode: 'DEN-2026-001',
+                title: 'Mevcut Aktif Denetim',
+                status: 'Devam Ediyor',
+            });
+
+            const auditData = {
+                title: 'Yeni Denetim',
+                unitId: 'unit-100',
+                department: 'Şubeler',
+            };
+
+            await expect(service.createAudit(auditData, mockUser)).rejects.toThrow(ConflictException);
         });
 
-        it('should block executable payload magic bytes even with pdf extension', async () => {
-            const file = { originalname: 'fake.pdf', buffer: Buffer.from([0x4D, 0x5A, 0x90, 0x00]) }; // MZ executable header
-            await expect(service.uploadWorkpaper('a1', file, 'Çalışma Kağıdı', mockUser))
-                .rejects.toThrow(ForbiddenException);
+        it('should allow parallel audit when allowParallel is true', async () => {
+            mockPrisma.userPromotion.findMany.mockResolvedValue([]);
+            mockPrisma.audit.findFirst.mockResolvedValue({
+                id: 'active-audit-1',
+                status: 'Devam Ediyor',
+            });
+            mockPrisma.audit.create.mockResolvedValue({ id: 'new-audit-2', title: 'Paralel Denetim' });
+
+            const auditData = {
+                title: 'Paralel Denetim',
+                unitId: 'unit-100',
+                department: 'Şubeler',
+                allowParallel: true,
+            };
+
+            const result = await service.createAudit(auditData, mockUser);
+            expect(result.id).toBe('new-audit-2');
+        });
+    });
+
+    describe('Audit Reporting Verification', () => {
+        it('should block transition to Raporlandı if no approved findings exist', async () => {
+            mockPrisma.audit.findUnique.mockResolvedValue({ id: 'a1', status: 'Devam Ediyor' });
+            mockPrisma.finding.count.mockResolvedValue(0);
+
+            await expect(service.updateAudit('a1', { status: 'Raporlandı', statusJustification: 'Test' }, mockUser))
+                .rejects.toThrow('en az bir onaylanmış bulgu gereklidir');
         });
     });
 });

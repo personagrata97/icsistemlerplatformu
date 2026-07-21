@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SecureFileController } from './secure-file.controller';
 import { PrismaService } from '../common/prisma.service';
+import { AuditLogService } from '../audit/audit-log.service';
 import { NotFoundException, ForbiddenException, StreamableFile } from '@nestjs/common';
 import * as fs from 'fs';
 import { Response } from 'express';
@@ -20,6 +21,7 @@ describe('SecureFileController', () => {
       controllers: [SecureFileController],
       providers: [
         { provide: PrismaService, useValue: {} },
+        { provide: AuditLogService, useValue: { createLog: jest.fn() } },
       ],
     }).compile();
 
