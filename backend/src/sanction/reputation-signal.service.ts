@@ -12,17 +12,19 @@ export class ReputationSignalService {
         this.logger.log(`İtibar riski ve iç sinyal değerlendirmesi yürütülüyor: ${musteriId}`);
 
         const signals: any[] = [];
-        const musteri = await this.prisma.musteri.findUnique({
+        const musteri: any = await this.prisma.musteri.findUnique({
             where: { musteri_id: musteriId },
             include: { sozlesmeler: { include: { odeme_hareketleri: true } } }
         });
 
         if (!musteri) return [];
 
+        const isTuzel = musteri.musteri_tipi === 'TUZEL' || /A\.Ş|LTD|ŞTİ|INC|CORP/i.test(musteri.ad_soyad);
+
         for (const sozlesme of musteri.sozlesmeler) {
             // KURAL 1: Ödeme Yönlendirme (Tüzel kişi sözleşmesinde ödeme gerçek kişi hesabına isteniyor)
             for (const odeme of sozlesme.odeme_hareketleri) {
-                if (musteri.musteri_tipi === 'TUZEL' && odeme.alacakliTuru === 'GERCEK_KISI') {
+                if (isTuzel && odeme.alacakliTuru === 'GERCEK_KISI') {
                     signals.push(await this.createSignal({
                         musteriId,
                         sozlesmeId: sozlesme.sozlesme_id,
@@ -137,7 +139,7 @@ export class ReputationSignalService {
         guvenilirlikSkoru: string;
         ticaretSicilKontrol?: boolean;
         resmiGazeteKontrol?: boolean;
-        tmsfKontrol?: Boolean;
+        tmsfKontrol?: boolean;
         acikKaynakKontrol?: boolean;
         kurumIciKontrol?: boolean;
         kanitDosyaUrl?: string;
@@ -156,11 +158,11 @@ export class ReputationSignalService {
                 kaynakAd: data.kaynakAd,
                 kaynakTarih: data.kaynakTarih ? new Date(data.kaynakTarih) : null,
                 guvenilirlikSkoru: data.guvenilirlikSkoru,
-                ticaretSicilKontrol: data.ticaretSicilKontrol || false,
-                resmiGazeteKontrol: data.resmiGazeteKontrol || false,
-                tmsfKontrol: data.tmsfKontrol || false,
-                acikKaynakKontrol: data.acikKaynakKontrol || false,
-                kurumIciKontrol: data.kurumIciKontrol || false,
+                ticaretSicilKontrol: !!data.ticaretSicilKontrol,
+                resmiGazeteKontrol: !!data.resmiGazeteKontrol,
+                tmsfKontrol: !!data.tmsfKontrol,
+                acikKaynakKontrol: !!data.acikKaynakKontrol,
+                kurumIciKontrol: !!data.kurumIciKontrol,
                 kanitDosyaUrl: data.kanitDosyaUrl,
                 kaynakBaglantisi: data.kaynakBaglantisi,
                 karar: data.karar,
