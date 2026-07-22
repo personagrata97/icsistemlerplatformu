@@ -110,6 +110,12 @@ model Sozlesme {
   iptal_durumu              Boolean         @default(false)
   iptal_tarihi              DateTime?
   iptal_nedeni              String?
+  fesihTalepTarihi          DateTime?
+  fesihTalepEden            String?
+  devirVarMi                Boolean         @default(false)
+  devirTarihi               DateTime?
+  devralanTckn              String?
+  devralanAdSoyad           String?
   created_at                DateTime        @default(now())
   odeme_hareketleri         OdemeHareketi[]
   musteri                   Musteri         @relation(fields: [musteri_id], references: [musteri_id])
@@ -124,8 +130,15 @@ model OdemeHareketi {
   tarih       DateTime
   tutar       Decimal
   tip         String
-  gecikme_gun Int      @default(0)
-  created_at  DateTime @default(now())
+  gecikme_gun             Int      @default(0)
+  odemeYonu               String   @default("CIKIS")
+  alacakliTuru            String   @default("MUSTERI")
+  alacakliAdSoyad         String?
+  alacakliVknTckn         String?
+  alacakliIban            String?
+  ibanSahipligiDogrulandi Boolean  @default(false)
+  yonlendirmeGerekcesi    String?
+  created_at              DateTime @default(now())
   sozlesme    Sozlesme @relation(fields: [sozlesme_id], references: [sozlesme_id])
 
   @@map("odeme_hareketi")
@@ -1667,4 +1680,51 @@ model DataSubjectRequest {
     @@index([status])
     @@index([requestCode])
     @@map("data_subject_request")
+}
+
+// ============================================================
+// İTİBAR RİSKİ VE EDD (GENİŞLETİLMİŞ DURUM TESPİTİ) MODÜLLERİ
+// ============================================================
+
+model ReputationSignal {
+  id                String   @id @default(cuid())
+  musteriId         String
+  sozlesmeId        String?
+  kuralKodu         String
+  kuralAd           String
+  riskPuani         Int
+  onemDuzeyi        String
+  tetiklenmeSebebi  String
+  durum             String   @default("ACIK")
+  created_at        DateTime @default(now())
+
+  @@map("reputation_signal")
+}
+
+model EnhancedDueDiligence {
+  id                  String    @id @default(cuid())
+  musteriId           String
+  signalId            String?
+  iddiaTuru           String
+  iddiaAsamasi        String
+  kaynakAd            String
+  kaynakTarih         DateTime?
+  guvenilirlikSkoru   String
+  ticaretSicilKontrol Boolean   @default(false)
+  resmiGazeteKontrol  Boolean   @default(false)
+  tmsfKontrol         Boolean   @default(false)
+  acikKaynakKontrol   Boolean   @default(false)
+  kurumIciKontrol     Boolean   @default(false)
+  kanitDosyaUrl       String?
+  kaynakBaglantisi    String?
+  karar               String    @default("ISLEME_DEVAM")
+  kararGerekcesi      String
+  ustOnayGerekli      Boolean   @default(false)
+  ustOnayDurumu       String?
+  inceleyenUser       String
+  onaylayanUser       String?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  @@map("enhanced_due_diligence")
 }

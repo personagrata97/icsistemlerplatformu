@@ -3,6 +3,7 @@ import { SanctionService } from './sanction.service';
 import { MasakService } from './masak.service';
 import { SanctionImportService } from './sanction-import.service';
 import { SanctionCronService } from './sanction-cron.service';
+import { ReputationSignalService } from './reputation-signal.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 
@@ -13,7 +14,8 @@ export class SanctionController {
         private readonly sanctionService: SanctionService,
         private readonly masakService: MasakService,
         private readonly importService: SanctionImportService,
-        private readonly cronService: SanctionCronService
+        private readonly cronService: SanctionCronService,
+        private readonly signalService: ReputationSignalService
     ) { }
 
     @Get('dashboard')
@@ -97,5 +99,30 @@ export class SanctionController {
     @Get('masak/scan')
     async scanMasak() {
         return this.masakService.scanForSuspiciousTransactions();
+    }
+
+    // ============================================================
+    // İTİBAR RİSKİ VE EDD (GENİŞLETİLMİŞ DURUM TESPİTİ) ENDPOINTLERİ
+    // ============================================================
+
+    @Post('reputation/evaluate/:id')
+    async evaluateReputation(@Param('id') id: string) {
+        return this.signalService.evaluateSignalsForCustomer(id);
+    }
+
+    @Get('reputation/signals')
+    async getSignals(@Query('musteriId') musteriId?: string) {
+        return this.signalService.getSignals(musteriId);
+    }
+
+    @Post('edd')
+    async createEDDRecord(@Body() body: any, @Req() req: any) {
+        const username = req.user?.displayName || req.user?.username || 'Uyum Görevlisi';
+        return this.signalService.createEDDRecord({ ...body, user: username });
+    }
+
+    @Get('edd')
+    async getEDDRecords() {
+        return this.signalService.getEDDRecords();
     }
 }
