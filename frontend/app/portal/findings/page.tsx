@@ -1,5 +1,5 @@
-import FindingsPage from '@/app/audit/findings/page';
+import { redirect } from 'next/navigation';
 
 export default function PortalFindingsPage() {
-    return <FindingsPage />;
+    redirect('/audit/unit/findings');
 }

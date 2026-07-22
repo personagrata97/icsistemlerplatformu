@@ -1,5 +1,5 @@
-import AuditDashboard from '@/app/audit/page';
+import { redirect } from 'next/navigation';
 
 export default function PortalPage() {
-    return <AuditDashboard />;
+    redirect('/audit/unit');
 }
