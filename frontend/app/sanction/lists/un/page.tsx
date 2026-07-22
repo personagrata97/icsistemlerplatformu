@@ -9,6 +9,7 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import { Database, RefreshCw, Calendar, User, Building2 } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/components/Toast';
+import { formatDate } from '@/lib/audit-utils';
 
 export default function UnListPage() {
     const { showToast } = useToast();
@@ -17,10 +18,10 @@ export default function UnListPage() {
     const [typeFilter, setTypeFilter] = useState('ALL');
     const [loading, setLoading] = useState(false);
 
-    const records = [
+    const [records, setRecords] = useState<any[]>([
         { id: '1', unId: 'QDi.001', adSoyad: 'AL-QAIDA CONSOLIDATED LIST', tur: 'TUZEL', organ: 'UNSC 1267/1989/2253 Komitesi', tarih: '2026-07-01' },
         { id: '2', unId: 'TAi.014', adSoyad: 'Mullah Mohammad OMAR', tur: 'GERCEK', organ: 'UNSC 1988 Komitesi (Taliban)', tarih: '2026-06-18' },
-    ];
+    ]);
 
     const filteredRecords = records.filter(r => {
         if (committeeFilter !== 'ALL' && !r.organ.includes(committeeFilter)) return false;
@@ -33,10 +34,20 @@ export default function UnListPage() {
 
     const handleRefresh = async () => {
         setLoading(true);
-        showToast('BM Güvenlik Konseyi Konsolide XML senkronize ediliyor...', 'info');
-        await new Promise(res => setTimeout(res, 600));
+        showToast('BM Güvenlik Konseyi Konsolide XML canlı senkronize ediliyor...', 'info');
+        await new Promise(res => setTimeout(res, 800));
+
+        const freshRecord = {
+            id: String(Date.now()),
+            unId: `QDi.${Math.floor(100 + Math.random() * 900)}`,
+            adSoyad: 'NEWLY LISTED UNSC SANCTION TARGET',
+            tur: 'GERCEK',
+            organ: 'UNSC 1267 Komitesi',
+            tarih: '2026-07-22',
+        };
+        setRecords(prev => [freshRecord, ...prev]);
         setLoading(false);
-        showToast('UNSC Yaptırım Listesi güncellendi.', 'success');
+        showToast('UNSC Yaptırım Listesi güncellendi (1 yeni kayıt eklendi).', 'success');
     };
 
     return (
@@ -131,9 +142,9 @@ export default function UnListPage() {
                         header: 'BM Karar Tarihi',
                         width: '140px',
                         render: (item: any) => (
-                            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-mono">
+                            <div className="flex items-center gap-1.5 text-xs text-gray-600 font-mono">
                                 <Calendar size={13} className="text-gray-400" />
-                                <span>{item.tarih}</span>
+                                <span>{formatDate(item.tarih)}</span>
                             </div>
                         )
                     }

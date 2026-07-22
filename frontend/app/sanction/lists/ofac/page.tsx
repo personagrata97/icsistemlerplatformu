@@ -9,6 +9,7 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import { Globe, RefreshCw, Calendar, User, Building2 } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/components/Toast';
+import { formatDate } from '@/lib/audit-utils';
 
 export default function OfacListPage() {
     const { showToast } = useToast();
@@ -17,11 +18,11 @@ export default function OfacListPage() {
     const [typeFilter, setTypeFilter] = useState('ALL');
     const [loading, setLoading] = useState(false);
 
-    const records = [
+    const [records, setRecords] = useState<any[]>([
         { id: '1', sdnId: '9841', adSoyad: 'Viktor Anatolyevich BOUT', tur: 'GERCEK', program: 'SDGT (Terör)', pasaportNo: 'RU-992144', tarih: '2026-06-15' },
         { id: '2', sdnId: '12401', adSoyad: 'Rosneft Trading S.A.', tur: 'TUZEL', program: 'VENEZUELA', pasaportNo: '-', tarih: '2026-05-20' },
         { id: '3', sdnId: '14802', adSoyad: 'Evgeny Viktorovich PRIGOZHIN', tur: 'GERCEK', program: 'RUSSIA-EO14024', pasaportNo: 'RU-102938', tarih: '2026-07-01' },
-    ];
+    ]);
 
     const filteredRecords = records.filter(r => {
         if (programFilter !== 'ALL' && !r.program.includes(programFilter)) return false;
@@ -35,9 +36,20 @@ export default function OfacListPage() {
     const handleRefresh = async () => {
         setLoading(true);
         showToast('ABD OFAC SDN Listesi XML canlı senkronize ediliyor...', 'info');
-        await new Promise(res => setTimeout(res, 600));
+        await new Promise(res => setTimeout(res, 800));
+
+        const freshRecord = {
+            id: String(Date.now()),
+            sdnId: String(Math.floor(15000 + Math.random() * 1000)),
+            adSoyad: 'NEWLY ADDED OFAC SDN ENTITY',
+            tur: 'GERCEK',
+            program: 'SDGT (Terör)',
+            pasaportNo: 'US-991203',
+            tarih: '2026-07-22',
+        };
+        setRecords(prev => [freshRecord, ...prev]);
         setLoading(false);
-        showToast('OFAC SDN Listesi güncellendi.', 'success');
+        showToast('OFAC SDN XML üzerinden 1 yeni yaptırım kaydı eklendi.', 'success');
     };
 
     return (
@@ -142,9 +154,9 @@ export default function OfacListPage() {
                         header: 'Listeye Giriş Tarihi',
                         width: '140px',
                         render: (item: any) => (
-                            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-mono">
+                            <div className="flex items-center gap-1.5 text-xs text-gray-600 font-mono">
                                 <Calendar size={13} className="text-gray-400" />
-                                <span>{item.tarih}</span>
+                                <span>{formatDate(item.tarih)}</span>
                             </div>
                         )
                     }

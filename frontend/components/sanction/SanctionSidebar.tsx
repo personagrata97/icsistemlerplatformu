@@ -145,12 +145,6 @@ export default function SanctionSidebar() {
                 </ul>
             </div>
 
-            {/* Alt Bilgi — Audit & Risk ile birebir aynı */}
-            <div className="p-3 bg-gray-50/50 border-t border-gray-100 text-center">
-                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                    MASAK & 5549/6415/7262 UYUMLU
-                </div>
-            </div>
         </aside>
     );
 }

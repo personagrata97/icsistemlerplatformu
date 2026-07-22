@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, X } from 'lucide-react';
 import { clsx } from 'clsx';
+import Tooltip from './Tooltip';
 
 interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     className?: string;
@@ -38,14 +39,17 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
                     {...props}
                 />
                 {hasValue && (
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
-                        title="Aramayı Temizle"
-                    >
-                        <X className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                        <Tooltip content="Aramayı Temizle" position="top">
+                            <button
+                                type="button"
+                                onClick={handleClear}
+                                className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                            >
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        </Tooltip>
+                    </div>
                 )}
             </div>
         );

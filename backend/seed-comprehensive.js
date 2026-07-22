@@ -52,7 +52,7 @@ async function seed() {
         email: 'gozetmen@emlakkatilim.com.tr',
         roleCode: 'AUDIT_SUPERVISOR',
         title: 'Gözetim Sorumlusu',
-        department: 'Teftiş Kurulu Merkezi'
+        department: 'Teftiş Kurulu'
       },
       {
         username: 'mufettis',

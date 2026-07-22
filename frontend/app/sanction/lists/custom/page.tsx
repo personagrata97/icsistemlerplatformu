@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import Modal from '@/components/ui/Modal';
 import { sanctionApi } from '@/lib/sanction-api';
+import { formatDate } from '@/lib/audit-utils';
 
 export default function CustomListPage() {
     const { showToast } = useToast();
@@ -71,7 +72,7 @@ export default function CustomListPage() {
             setReason('');
             loadData();
         } catch (e) {
-            // Fallback for UI responsiveness
+            // Fallback UI responsiveness
             const newRec = {
                 id: String(Date.now()),
                 musteriAd: name,
@@ -179,9 +180,9 @@ export default function CustomListPage() {
                         header: 'Tarih',
                         width: '130px',
                         render: (item: any) => (
-                            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-mono">
+                            <div className="flex items-center gap-1.5 text-xs text-gray-600 font-mono">
                                 <Calendar size={13} className="text-gray-400" />
-                                <span>{item.tarih}</span>
+                                <span>{formatDate(item.tarih)}</span>
                             </div>
                         )
                     }

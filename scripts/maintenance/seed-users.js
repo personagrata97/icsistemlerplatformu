@@ -48,7 +48,7 @@ async function seed() {
         passwordHash,
         displayName: 'Burak Kaya (Gözetim Sorumlusu)',
         email: 'gozetmen@banka.com.tr',
-        department: 'Teftiş Kurulu Merkezi',
+        department: 'Teftiş Kurulu',
         isActive: true,
         isAdUser: false
       }
