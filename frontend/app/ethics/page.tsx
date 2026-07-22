@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ETHICS_CATEGORIES, formatDate, formatDateTime } from '@/lib/audit-utils';
 import {
     Send, AlertTriangle, Shield, CheckCircle,
-    Search, MessageSquare, History, Lock, Copy, Check, ArrowLeft, Info, X,
+    Search, MessageSquare, History, Lock, UserCheck, Copy, Check, ArrowLeft, Info, X,
     ChevronDown, Paperclip
 } from 'lucide-react';
 import { useToast } from '@/components/Toast';
@@ -331,17 +331,24 @@ export default function PublicEthicsPortalPage() {
                             <h2 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">Etik Bildirim Formu</h2>
                             <p className="text-slate-500 mb-8 text-sm font-medium leading-relaxed">Lütfen aşağıdaki alanları eksiksiz doldurunuz.</p>
 
-                            <div className="bg-primary/5 p-5 rounded-2xl mb-8 flex items-center justify-between border border-primary/10">
-                                <h3 className="font-black text-gray-900 flex items-center gap-2 text-lg"><Lock size={20} className="text-primary" /> Anonim Bildirim Yapmak İstiyorum</h3>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        className="sr-only peer"
-                                        checked={isAnonymous}
-                                        onChange={(e) => toggleAnonymous(e.target.checked)}
-                                    />
-                                    <div className="w-14 h-7 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                </label>
+                            <div className="mb-8">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">1. Bildirim Tipi</label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleAnonymous(true)}
+                                        className={`py-3.5 px-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2.5 ${isAnonymous ? 'bg-red-900 text-white border-red-900 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
+                                    >
+                                        <Lock size={16} /> Anonim Bildirim (Kimlik Gizli)
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleAnonymous(false)}
+                                        className={`py-3.5 px-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2.5 ${!isAnonymous ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
+                                    >
+                                        <UserCheck size={16} /> İsimli Bildirim
+                                    </button>
+                                </div>
                             </div>
 
                             <AnonymousModal
@@ -444,11 +451,12 @@ export default function PublicEthicsPortalPage() {
                                         type="submit"
                                         disabled={isSubmitting}
                                         isLoading={isSubmitting}
-                                        className="w-full"
+                                        variant="danger"
+                                        className="w-full font-bold text-sm"
                                         size="lg"
-                                        rightIcon={!isSubmitting && <Send size={24} />}
+                                        rightIcon={!isSubmitting && <Send size={20} />}
                                     >
-                                        {isSubmitting ? 'Gönderiliyor...' : 'Bildirimi Gönder'}
+                                        {isSubmitting ? 'Gönderiliyor...' : 'Etik İhbarı Gönder'}
                                     </Button>
                                 </div>
                             </div>
