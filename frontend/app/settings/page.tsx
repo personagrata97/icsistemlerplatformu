@@ -13,7 +13,6 @@ import LoadingState from '@/components/ui/LoadingState';
 import { useAuth } from '@/context/AuthContext';
 import { organizationApi } from '@/lib/organization-api';
 import PageHeader from '@/components/audit/PageHeader';
-import SharedAuditLayout from '@/components/audit/AuditLayout';
 import Modal from '@/components/ui/Modal';
 import ConfirmModal from '@/components/ConfirmModal';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -388,20 +387,18 @@ export default function SettingsPage() {
 
     if (!canAccessSettings) {
         return (
-            <SharedAuditLayout hideSidebar={true}>
-                <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-center space-y-4">
-                        <div className="mx-auto w-20 h-20 rounded-2xl bg-red-50 flex items-center justify-center">
-                            <Shield className="h-10 w-10 text-red-300" />
-                        </div>
-                        <h2 className="text-xl font-semibold text-gray-700">Erişim Yetkiniz Bulunmuyor</h2>
-                        <p className="text-gray-500 text-sm max-w-md">
-                            Bu sayfaya erişmek için yönetici yetkisi gereklidir. 
-                            Yetki talep etmek için sistem yöneticinize başvurunuz.
-                        </p>
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center space-y-4">
+                    <div className="mx-auto w-20 h-20 rounded-2xl bg-red-50 flex items-center justify-center">
+                        <Shield className="h-10 w-10 text-red-300" />
                     </div>
+                    <h2 className="text-xl font-semibold text-gray-700">Erişim Yetkiniz Bulunmuyor</h2>
+                    <p className="text-gray-500 text-sm max-w-md">
+                        Bu sayfaya erişmek için yönetici yetkisi gereklidir. 
+                        Yetki talep etmek için sistem yöneticinize başvurunuz.
+                    </p>
                 </div>
-            </SharedAuditLayout>
+            </div>
         );
     }
 
@@ -414,8 +411,7 @@ export default function SettingsPage() {
     const departments = Array.from(new Set([...organizationUnits, ...userDepartments])).sort();
 
     return (
-        <SharedAuditLayout hideSidebar={true}>
-            <div className="space-y-6 max-w-[1600px] mx-auto pb-10">
+        <div className="space-y-6 max-w-[1600px] mx-auto pb-10">
                 <PageHeader title="Erişim Yönetimi" subtitle="Sistem rolleri, yetki matrisi, geri dönüşüm kutusu ve kullanıcı atamaları" />
 
                 {/* Tabs */}
@@ -837,6 +833,5 @@ export default function SettingsPage() {
                     type="success"
                 />
             </div>
-        </SharedAuditLayout>
     );
 }
