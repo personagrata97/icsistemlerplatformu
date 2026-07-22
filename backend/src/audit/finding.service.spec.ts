@@ -59,7 +59,7 @@ describe('FindingService', () => {
             providers: [
                 FindingService,
                 { provide: PrismaService, useValue: mockPrisma },
-                { provide: AuditronService, useValue: mockAuditron },
+                { provide: PharosService, useValue: mockAuditron },
                 { provide: AuditLogService, useValue: mockAuditLog },
                 { provide: AuditRiskService, useValue: mockAuditRisk },
                 { provide: EmailService, useValue: mockEmail },

@@ -56,7 +56,7 @@ describe('AuditService Core Logic & Controls', () => {
             providers: [
                 AuditService,
                 { provide: PrismaService, useValue: mockPrisma },
-                { provide: AuditronService, useValue: mockAuditron },
+                { provide: PharosService, useValue: mockAuditron },
                 { provide: AuditLogService, useValue: mockAuditLog },
                 { provide: AuditRiskService, useValue: mockAuditRisk },
                 { provide: FindingService, useValue: mockFinding },
