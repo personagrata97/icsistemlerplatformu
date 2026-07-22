@@ -58,7 +58,7 @@ export default function SanctionDashboardPage() {
         <div className="space-y-6">
             <PageHeader
                 title="Yaptırım Taraması ve MASAK Uyum Kokpiti"
-                subtitle="MASAK 6415/7262, Resmî Gazete, OFAC ve BM Listeleri Canlı Uyum Takibi"
+                subtitle="MASAK (5549/6415/7262), Resmî Gazete, OFAC ve BM Listeleri Canlı Uyum Takibi"
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -97,7 +97,7 @@ export default function SanctionDashboardPage() {
                             <CustomSelect
                                 options={[
                                     { value: 'ALL', label: 'Tüm Listeler' },
-                                    { value: 'MASAK', label: 'MASAK 6415/7262' },
+                                    { value: 'MASAK', label: 'MASAK (5549/6415/7262)' },
                                     { value: 'OFAC', label: 'OFAC SDN' },
                                     { value: 'BM', label: 'BM Güvenlik Konseyi' },
                                 ]}
