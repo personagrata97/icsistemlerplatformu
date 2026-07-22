@@ -331,24 +331,17 @@ export default function PublicEthicsPortalPage() {
                             <h2 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">Etik Bildirim Formu</h2>
                             <p className="text-slate-500 mb-8 text-sm font-medium leading-relaxed">Lütfen aşağıdaki alanları eksiksiz doldurunuz.</p>
 
-                            <div className="mb-8">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">1. Bildirim Tipi</label>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => toggleAnonymous(true)}
-                                        className={`py-3.5 px-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2.5 ${isAnonymous ? 'bg-red-900 text-white border-red-900 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
-                                    >
-                                        <Lock size={16} /> Anonim Bildirim (Kimlik Gizli)
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => toggleAnonymous(false)}
-                                        className={`py-3.5 px-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2.5 ${!isAnonymous ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
-                                    >
-                                        <UserCheck size={16} /> İsimli Bildirim
-                                    </button>
-                                </div>
+                            <div className="mb-8 space-y-2">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">1. Bildirim Tipi</label>
+                                <SegmentedTabs
+                                    tabs={[
+                                        { id: 'anonim', label: 'Anonim Bildirim (Kimlik Gizli)', icon: Lock },
+                                        { id: 'isimli', label: 'İsimli Bildirim', icon: UserCheck }
+                                    ]}
+                                    activeTab={isAnonymous ? 'anonim' : 'isimli'}
+                                    onChange={(id) => toggleAnonymous(id === 'anonim')}
+                                    className="w-full grid grid-cols-2 p-1.5 bg-slate-100 rounded-xl"
+                                />
                             </div>
 
                             <AnonymousModal

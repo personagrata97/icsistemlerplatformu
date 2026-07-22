@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import { Scale, CheckCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/Checkbox';
-import { IndependenceExceptionModal } from './IndependenceExceptionModal';
+import IndependenceExceptionModal from './modals/IndependenceExceptionModal';
 
 interface IndependenceQuickPanelProps {
     auditId: string;
+    userId?: string;
+    isDeclared?: boolean;
     onDeclared: () => void;
 }
 
@@ -176,3 +178,5 @@ export function IndependenceQuickPanel({ auditId, onDeclared }: IndependenceQuic
         </div>
     );
 }
+
+export default IndependenceQuickPanel;
