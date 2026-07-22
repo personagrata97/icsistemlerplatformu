@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuditronService } from './auditron.service';
+import { PharosService } from './pharos.service';
 import { PrismaService } from '../common/prisma.service';
 import { EmailService } from '../email/email.service';
 

@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException, ConflictException, Logger, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../common/prisma.service';
-import { AuditronService } from '../auditron/auditron.service';
+import { PharosService } from '../pharos/pharos.service';
 import { AuditLogService } from './audit-log.service';
 import { AuditRiskService } from './audit-risk.service';
 import { FindingService } from './finding.service';
@@ -17,7 +17,7 @@ export class AuditService {
 
     constructor(
         private prisma: PrismaService,
-        private auditronService: AuditronService,
+        private pharosService: PharosService,
         private auditLogService: AuditLogService,
         private auditRiskService: AuditRiskService,
         private findingService: FindingService,

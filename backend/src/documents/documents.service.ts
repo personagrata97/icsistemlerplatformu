@@ -16,7 +16,7 @@ export interface CreateDocumentDto {
     uploadedBy: string;
 }
 
-import { AuditronService } from '../auditron/auditron.service';
+import { PharosService } from '../pharos/pharos.service';
 
 @Injectable()
 export class DocumentsService {
@@ -24,7 +24,7 @@ export class DocumentsService {
 
     constructor(
         private readonly prisma: PrismaService,
-        private readonly auditronService: AuditronService,
+        private pharosService: PharosService,
         private readonly auditLogService: AuditLogService,
     ) { }
 

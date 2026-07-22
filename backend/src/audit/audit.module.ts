@@ -23,7 +23,7 @@ import { WorkpaperTemplateController } from './workpaper-template.controller';
 import { EthicsController } from './ethics.controller';
 import { EthicsService } from './ethics.service';
 import { EmailModule } from '../email/email.module';
-import { AuditronModule } from '../auditron/auditron.module';
+import { PharosModule } from '../pharos/pharos.module';
 import { FindingService } from './finding.service';
 import { AuditTrashService } from './audit-trash.service';
 import { AuditLogService } from './audit-log.service';
@@ -43,7 +43,7 @@ import { BilgiNotuController } from './bilgi-notu.controller';
 import { PartialReportService } from './partial-report.service';
 
 @Module({
-    imports: [EmailModule, AuditronModule, RiskEngineModule, NotificationModule],
+    imports: [EmailModule, PharosModule, RiskEngineModule, NotificationModule],
     controllers: [
         AuditController,
         TimesheetController,

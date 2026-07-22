@@ -1,6 +1,6 @@
 import { Injectable, ForbiddenException, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
-import { AuditronService } from '../auditron/auditron.service';
+import { PharosService } from '../pharos/pharos.service';
 import { AuditLogService } from './audit-log.service';
 import { AuditRiskService } from './audit-risk.service';
 import { EmailService } from '../email/email.service';
@@ -17,7 +17,7 @@ export class FindingService {
 
     constructor(
         private prisma: PrismaService,
-        private auditronService: AuditronService,
+        private pharosService: PharosService,
         private auditLogService: AuditLogService,
         private auditRiskService: AuditRiskService,
         private emailService: EmailService,

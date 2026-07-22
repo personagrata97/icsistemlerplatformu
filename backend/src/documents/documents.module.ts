@@ -5,7 +5,7 @@ import { DocumentsController } from './documents.controller';
 import { DocumentsService } from './documents.service';
 import { PrismaService } from '../common/prisma.service';
 import { AuditModule } from '../audit/audit.module';
-import { AuditronModule } from '../auditron/auditron.module';
+import { PharosModule } from '../pharos/pharos.module';
 
 @Module({
     imports: [
@@ -13,7 +13,7 @@ import { AuditronModule } from '../auditron/auditron.module';
             storage: memoryStorage(),
         }),
         AuditModule,
-        AuditronModule,
+        PharosModule,
     ],
     controllers: [DocumentsController],
     providers: [DocumentsService, PrismaService],
