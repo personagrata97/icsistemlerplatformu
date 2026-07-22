@@ -9,15 +9,91 @@ datasource db {
 }
 
 model Musteri {
-  musteri_id  String     @id @default(cuid())
+  musteri_id  String          @id @default(cuid())
   ad_soyad    String
   segment     String
   bolge       String
   sube        String
-  created_at  DateTime   @default(now())
+  tckn        String?         // Şifreli saklanır
+  dogumTarihi DateTime?
+  uyruk       String?         @default("TR")
+  pasaportNo  String?
+  vergiNo     String?
+  musteriTuru String          @default("GERCEK") // GERCEK | TUZEL
+  created_at  DateTime        @default(now())
   sozlesmeler Sozlesme[]
+  matches     SanctionMatch[]
 
   @@map("musteri")
+}
+
+model SanctionList {
+  id            String           @id @default(cuid())
+  kod           String           @unique // MASAK_6415, MASAK_7262, UN, OFAC_SDN, EU, INTERNAL
+  ad            String
+  kaynakUrl     String?
+  sonGuncelleme DateTime?
+  kayitSayisi   Int              @default(0)
+  aktif         Boolean          @default(true)
+  created_at    DateTime         @default(now())
+  entities      SanctionEntity[]
+
+  @@map("sanction_list")
+}
+
+model SanctionEntity {
+  id                 String          @id @default(cuid())
+  listId             String
+  tur                String          @default("GERCEK") // GERCEK | TUZEL
+  adSoyad            String
+  normalizedAd       String
+  takmaAdlar         String?         // JSON
+  dogumTarihi        DateTime?
+  uyruk              String?
+  kimlikNo           String?
+  pasaportNo         String?
+  adres              String?         @db.Text
+  listeyeGirisTarihi DateTime?
+  kararNo            String?
+  ham                String?         @db.Text
+  created_at         DateTime        @default(now())
+  list               SanctionList    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  matches            SanctionMatch[]
+
+  @@map("sanction_entity")
+}
+
+model SanctionScreening {
+  id                 String          @id @default(cuid())
+  tetikleyici        String          // YENI_MUSTERI | LISTE_GUNCELLEME | PERIYODIK | MANUEL
+  baslangic          DateTime        @default(now())
+  bitis              DateTime?
+  tarananKayitSayisi Int             @default(0)
+  eslesmeSayisi      Int             @default(0)
+  calistiran         String
+  matches            SanctionMatch[]
+
+  @@map("sanction_screening")
+}
+
+model SanctionMatch {
+  id          String             @id @default(cuid())
+  screeningId String?
+  musteriId   String
+  entityId    String
+  skor        Int
+  eslesmeTuru String             // TAM | BULANIK | KIMLIK
+  durum       String             @default("ACIK") // ACIK | INCELEMEDE | YANLIS_ESLESME | DOGRULANDI
+  karar       String?
+  karariVeren String?
+  kararTarihi DateTime?
+  gerekce     String?            @db.Text
+  created_at  DateTime           @default(now())
+  screening   SanctionScreening? @relation(fields: [screeningId], references: [id])
+  entity      SanctionEntity     @relation(fields: [entityId], references: [id])
+  musteri     Musteri            @relation(fields: [musteriId], references: [musteri_id], onDelete: Cascade)
+
+  @@map("sanction_match")
 }
 
 model Sozlesme {
