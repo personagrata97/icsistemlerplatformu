@@ -147,11 +147,11 @@ export class BilgiNotuService {
         doc.font('Regular').fontSize(9).fillColor(BRAND_COLORS.textSecondary);
         doc.text(data.hazirlayanUnvan, margin, yMeta);
 
-        // Gözden geçiren (varsa)
+        // Gözetim Sorumlusu (varsa)
         if (data.gozdenGecirenAd) {
             yMeta += 30;
             doc.font('Bold').fontSize(9).fillColor(BRAND_COLORS.textMuted);
-            doc.text('Gözden Geçiren:', margin, yMeta);
+            doc.text('GÖZETİM SORUMLUSU:', margin, yMeta);
             yMeta += 14;
             doc.font('Bold').fontSize(10).fillColor(BRAND_COLORS.text);
             doc.text(data.gozdenGecirenAd, margin, yMeta);

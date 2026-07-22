@@ -16,6 +16,8 @@ import { CreateAuditDto, UpdateAuditDto } from './dto/audit.dto';
 import { CreateFindingDto, UpdateFindingDto } from './dto/finding.dto';
 import { CreateAuditExtensionDto, HandleAuditExtensionDto } from './dto/audit-extension.dto';
 
+import { PartialReportService } from './partial-report.service';
+
 @Controller('audit')
 @UseGuards(JwtAuthGuard, PermissionsGuard, IndependenceGuard)
 export class AuditController {
@@ -24,7 +26,8 @@ export class AuditController {
         private readonly reportService: ReportGeneratorService,
         private readonly findingService: FindingService,
         private readonly trashService: AuditTrashService,
-        private readonly auditLogService: AuditLogService
+        private readonly auditLogService: AuditLogService,
+        private readonly partialReportService: PartialReportService
     ) { }
 
     private readonly logger = new Logger(AuditController.name);
@@ -822,5 +825,23 @@ export class AuditController {
 
         const filePath = await this.auditService.getFindingEvidencePath(id, filename);
         res.download(filePath);
+    }
+
+    @Post('reports/partial-copy')
+    @RequirePermissions({ module: 'REPORTS', action: 'CREATE' })
+    async generatePartialCopy(@Body() body: any, @Req() req: any, @Res() res: Response) {
+        const username = req.user?.displayName || req.user?.username || 'Sistem';
+        const result = await this.partialReportService.createPartialCopy({
+            reportId: body.reportId || 'IS.1.2026',
+            mode: body.mode || 'TOPLU',
+            targetUnitId: body.targetUnitId,
+            targetUnitName: body.targetUnitName,
+            sectionIds: body.sectionIds,
+            requestedBy: username,
+        });
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=Rapor_${result.turevNo.replace(/[/.]/g, '_')}.pdf`);
+        res.send(result.fileBuffer);
     }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Plus, Filter, FileText, Download, MoreVertical, Eye, Share2, Printer, Archive, Trash2, CheckCircle, Clock, AlertTriangle, FileBarChart, Shield, Activity, BarChart2 } from 'lucide-react';
+import { Search, Plus, Filter, FileText, Download, MoreVertical, Eye, Share2, Printer, Archive, Trash2, CheckCircle, Clock, AlertTriangle, FileBarChart, Shield, Activity, BarChart2, Layers } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AuditHeader from '@/components/audit/AuditHeader';
@@ -18,6 +18,7 @@ import DataTable from '@/components/ui/DataTable';
 import ActionMenu from '@/components/ui/ActionMenu';
 import Button from '@/components/ui/Button';
 import PageToolbar from '@/components/ui/PageToolbar';
+import PartialCopyModal from '@/components/audit/PartialCopyModal';
 
 interface ReportStats {
     totalAudits: number;
@@ -43,6 +44,7 @@ export default function ReportsPage() {
     const [generatedReports, setGeneratedReports] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+    const [isPartialModalOpen, setIsPartialModalOpen] = useState(false);
     const [sortColumn, setSortColumn] = useState<string>('generatedAt');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
     const itemsPerPage = 10;
@@ -207,10 +209,14 @@ export default function ReportsPage() {
                 onAddClick={() => setIsGenerateModalOpen(true)}
                 addButtonText="Yeni Rapor Oluştur"
                 rightActions={
-                    <Button variant="secondary" leftIcon={<FileBarChart size={18} />} onClick={() => {
-                        // Faaliyet raporu oluşturma
-                        setIsGenerateModalOpen(true);
-                    }}>Faaliyet Raporu</Button>
+                    <div className="flex gap-2">
+                        <Button variant="secondary" leftIcon={<Layers size={18} />} onClick={() => setIsPartialModalOpen(true)}>
+                            Kısmi Nüsha Dağıtımı
+                        </Button>
+                        <Button variant="secondary" leftIcon={<FileBarChart size={18} />} onClick={() => {
+                            setIsGenerateModalOpen(true);
+                        }}>Faaliyet Raporu</Button>
+                    </div>
                 }
             />
 
@@ -298,6 +304,11 @@ export default function ReportsPage() {
                 isOpen={isGenerateModalOpen}
                 onClose={() => setIsGenerateModalOpen(false)}
                 onGenerate={loadData}
+            />
+            {/* Partial Copy Distribution Modal */}
+            <PartialCopyModal
+                isOpen={isPartialModalOpen}
+                onClose={() => setIsPartialModalOpen(false)}
             />
         </div>
     );

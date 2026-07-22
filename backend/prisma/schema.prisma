@@ -1300,6 +1300,52 @@ model GeneratedReport {
   @@map("generated_report")
 }
 
+model ReportSection {
+  id                  String   @id @default(cuid())
+  reportId            String
+  sira                Int
+  numara              String   // örn: '3.2'
+  baslik              String
+  icerik              String   @db.Text
+  hedefBirimIds       String?  // JSON / comma separated birim id list
+  gizlilikDerecesi    String   @default("HASSAS")
+  kismiCiktidaYerAlir Boolean  @default(true)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  @@map("report_section")
+}
+
+model ReportFinding {
+  id            String    @id @default(cuid())
+  reportId      String
+  sectionId     String?
+  bulguNo       String
+  hedefBirimId  String?
+  onemDuzeyi    String    // Kritik, Yüksek, Orta, Düşük
+  tespit        String    @db.Text
+  birimCevabi   String?   @db.Text
+  oneri         String?   @db.Text
+  kapatmaTarihi DateTime?
+  created_at    DateTime  @default(now())
+
+  @@map("report_finding")
+}
+
+model ReportIssue {
+  id              String   @id @default(cuid())
+  reportId        String
+  tur             String   // TOPLU, BOLUM, BIRIM
+  hedefBirimId    String?
+  sectionIds      String?  // JSON array
+  turevNo         String   // örn: İS.1.2026/BT
+  olusturanId     String
+  olusturmaTarihi DateTime @default(now())
+  dosyaId         String?
+
+  @@map("report_issue")
+}
+
 model WorkpaperTemplate {
   id           String   @id @default(cuid())
   name         String

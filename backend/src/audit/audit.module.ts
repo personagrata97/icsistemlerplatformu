@@ -40,6 +40,7 @@ import { KvkkController } from './kvkk.controller';
 import { KvkkService } from './kvkk.service';
 import { BilgiNotuService } from './bilgi-notu.service';
 import { BilgiNotuController } from './bilgi-notu.controller';
+import { PartialReportService } from './partial-report.service';
 
 @Module({
     imports: [EmailModule, AuditronModule, RiskEngineModule, NotificationModule],
@@ -81,7 +82,8 @@ import { BilgiNotuController } from './bilgi-notu.controller';
         AuditStaffService,
         KvkkService,
         BilgiNotuService,
+        PartialReportService,
     ],
-    exports: [AuditService, FindingService, AuditTrashService, AuditLogService, AuditRiskService, PdfReportService],
+    exports: [AuditService, FindingService, AuditTrashService, AuditLogService, AuditRiskService, PdfReportService, PartialReportService],
 })
 export class AuditModule { }
