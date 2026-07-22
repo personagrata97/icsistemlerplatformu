@@ -18,6 +18,19 @@ export const organizationApi = {
         return response.json();
     },
 
+    getUnits: async () => {
+        try {
+            const response = await fetch(`${BASE_URL}/organization/tree`, {
+                headers: getHeaders()
+            });
+            if (!response.ok) return [];
+            const data = await response.json();
+            return Array.isArray(data) ? data : [];
+        } catch {
+            return [];
+        }
+    },
+
     // Create a new node/unit
     createNode: async (data: { name: string; type: string; parentId?: string; riskScore?: number; manager?: string; auditCycle?: string; isActive?: boolean }) => {
         const response = await fetch(`${BASE_URL}/organization`, {

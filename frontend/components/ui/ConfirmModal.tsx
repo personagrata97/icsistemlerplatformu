@@ -12,6 +12,12 @@ interface ConfirmModalProps {
     confirmText?: string;
     cancelText?: string;
     type?: 'danger' | 'warning' | 'info' | 'success';
+    variant?: 'danger' | 'warning' | 'info' | 'success';
+    isLoading?: boolean;
+    requireReason?: boolean;
+    reasonLabel?: string;
+    reasonPlaceholder?: string;
+    onReasonChange?: (val: string) => void;
     children?: React.ReactNode;
 }
 
@@ -23,13 +29,19 @@ export default function ConfirmModal({
     message = 'Bu işlemi gerçekleştirmek istediğinize emin misiniz?',
     confirmText = 'Onayla',
     cancelText = 'İptal',
-    type = 'danger',
+    type,
+    variant = 'danger',
+    isLoading = false,
+    requireReason = false,
+    reasonLabel = 'Gerekçe (Zorunlu)',
+    reasonPlaceholder = 'Lütfen gerekçenizi giriniz...',
+    onReasonChange,
     children
 }: ConfirmModalProps) {
-
-    const isDanger = type === 'danger';
-    const isWarning = type === 'warning';
-    const isSuccess = type === 'success';
+    const modalType = type || variant;
+    const isDanger = modalType === 'danger';
+    const isWarning = modalType === 'warning';
+    const isSuccess = modalType === 'success';
 
     const getColors = () => {
         if (isDanger) return { icon: 'bg-red-50 text-red-600', btn: 'btn-danger' };
@@ -60,27 +72,42 @@ export default function ConfirmModal({
                         type="button"
                         className="flex-1"
                         onClick={onClose}
+                        disabled={isLoading}
                     >
                         {cancelText}
                     </Button>
                     <Button
-                        variant={isDanger ? 'danger' : isWarning ? 'primary' : 'primary'}
+                        variant={isDanger ? 'danger' : 'primary'}
                         className="flex-1"
                         onClick={onConfirm}
+                        isLoading={isLoading}
                     >
                         {confirmText.toLowerCase().startsWith('evet') ? confirmText : `Evet, ${confirmText}`}
                     </Button>
                 </div>
             }
         >
-            <div className="text-center py-4">
-                <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4 ${colors.icon}`}>
+            <div className="text-center py-2">
+                <div className={`w-14 h-14 rounded-full mx-auto flex items-center justify-center mb-3 ${colors.icon}`}>
                     {getIcon()}
                 </div>
                 {message && (
                     <p className="text-gray-600 text-sm leading-relaxed mb-4">
                         {message}
                     </p>
+                )}
+                {requireReason && (
+                    <div className="text-left mb-4">
+                        <label className="form-label mb-1 block text-xs font-semibold text-gray-700">
+                            {reasonLabel}
+                        </label>
+                        <textarea
+                            className="form-input text-xs w-full"
+                            rows={3}
+                            placeholder={reasonPlaceholder}
+                            onChange={(e) => onReasonChange && onReasonChange(e.target.value)}
+                        />
+                    </div>
                 )}
                 {children}
             </div>
