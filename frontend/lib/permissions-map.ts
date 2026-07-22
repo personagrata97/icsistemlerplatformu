@@ -165,10 +165,18 @@ export function isExecutiveRole(hasRole: (role: string) => boolean): boolean {
     return isRiskAdminRole(hasRole) || hasRole('EXECUTIVE');
 }
 
+export function isSanctionAdminRole(hasRole: (role: string) => boolean): boolean {
+    return hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('COMPLIANCE_MANAGER');
+}
+
+export function isSanctionStaffRole(hasRole: (role: string) => boolean): boolean {
+    return isSanctionAdminRole(hasRole) || hasRole('SANCTION_ANALYST') || hasRole('COMPLIANCE_OFFICER');
+}
+
 /**
  * Centralized RBAC Visibility check helper for React components
  */
-export function canAccessModule(userRoles: string[], moduleName: 'AUDIT' | 'RISK' | 'SETTINGS' | 'ADMIN'): boolean {
+export function canAccessModule(userRoles: string[], moduleName: 'AUDIT' | 'RISK' | 'SANCTION' | 'SETTINGS' | 'ADMIN'): boolean {
     if (!userRoles || userRoles.length === 0) return false;
 
     const isAdmin = userRoles.some(r => ['ADMIN', 'SYSTEM_ADMIN', 'AUDIT_ADMIN'].includes(r));
@@ -183,6 +191,8 @@ export function canAccessModule(userRoles: string[], moduleName: 'AUDIT' | 'RISK
             return true;
         case 'RISK':
             return userRoles.some(r => ['ADMIN', 'SYSTEM_ADMIN', 'RISK_MANAGER', 'RISK_ANALYST', 'EXECUTIVE', 'BOARD_MEMBER'].includes(r));
+        case 'SANCTION':
+            return userRoles.some(r => ['ADMIN', 'SYSTEM_ADMIN', 'AUDIT_ADMIN', 'COMPLIANCE_MANAGER', 'SANCTION_ANALYST', 'COMPLIANCE_OFFICER'].includes(r));
         default:
             return false;
     }

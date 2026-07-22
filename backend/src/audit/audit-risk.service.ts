@@ -149,7 +149,24 @@ export class AuditRiskService {
                 else if (negativeTests > 0) testPenalty = 10; // En az bir olumsuzluk varsa ceza
             }
 
-            const finalRiskScore = Math.min(100, Math.max(0, adjustedScore + findingsPenalty + ethicsPenalty + historyPenalty + testPenalty));
+            // --- IIA 2010 ENTEGRASYONU: MEVZUAT & RİSK MOTORU ALARMLARI ---
+            // Likidite, NPL veya Finansman Limiti gibi yasal KPI ihlallerinin denetim evreni risk puanı cezası
+            const activeRiskLogs = await this.prisma.auditLog.findMany({
+                where: {
+                    action: 'RISK_ERKEN_UYARI',
+                    date: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } // Son 30 gün
+                },
+                select: { details: true }
+            });
+
+            let riskAlertPenalty = 0;
+            for (const log of activeRiskLogs) {
+                if (log.details?.includes(targetUnitId) || log.details?.includes('RED') || log.details?.includes('LİMİT İHLALİ')) {
+                    riskAlertPenalty += 15;
+                }
+            }
+
+            const finalRiskScore = Math.min(100, Math.max(0, adjustedScore + findingsPenalty + ethicsPenalty + historyPenalty + testPenalty + riskAlertPenalty));
             const controlDiscount: any = { 'Güçlü': 0.4, 'Orta': 0.7, 'Zayıf': 1.0 };
             const discount = controlDiscount[unit.controlEffectiveness || 'Orta'] || 0.7;
             const residualRiskScore = Math.min(100, Math.max(0, Math.round(finalRiskScore * discount)));

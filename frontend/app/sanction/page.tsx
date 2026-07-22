@@ -217,13 +217,26 @@ export default function SanctionDashboard() {
                             {
                                 key: 'date',
                                 header: 'Tarih',
-                                width: '160px',
+                                width: '140px',
                                 align: 'center',
                                 render: (scan: any) => (
                                     <div className="cell-date justify-center">
                                         <Clock size={14} className="text-gray-400" />
                                         {scan.date}
                                     </div>
+                                )
+                            },
+                            {
+                                key: 'action',
+                                header: 'İlişkili Aksiyon',
+                                width: '150px',
+                                align: 'center',
+                                render: (scan: any) => (
+                                    <Link href={`/audit/ethics/submit?target=${encodeURIComponent(scan.name)}&source=MASAK_SANCTION`}>
+                                        <Button size="sm" variant={scan.result === 'Eşleşme' ? 'danger' : 'secondary'} className="!text-[11px] !py-1">
+                                            İnceleme Başlat
+                                        </Button>
+                                    </Link>
                                 )
                             }
                         ]}
