@@ -13,6 +13,8 @@ import EmptyState from '@/components/ui/EmptyState';
 import Tooltip from '@/components/ui/Tooltip';
 import Link from 'next/link';
 
+import PageHeader from '@/components/audit/PageHeader';
+
 // KPI kod → Türkçe açıklama haritası
 const KPI_LABELS: Record<string, string> = {
     'NPL': 'Takipteki Alacak Oranı',
@@ -242,6 +244,10 @@ export default function RiskCockpitPage() {
 
     return (
         <div className="space-y-8">
+            <PageHeader
+                title="Risk Kokpiti"
+                subtitle="Finansman, Likidite, NPL ve Konsantrasyon Göstergeleri"
+            />
             {/* 1. DURUM ÇUBUĞU */}
             <div className={`p-6 rounded-2xl border ${isSafe ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
                 <div className="flex items-center gap-4">

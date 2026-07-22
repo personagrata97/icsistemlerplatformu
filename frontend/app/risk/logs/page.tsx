@@ -13,6 +13,7 @@ import { formatDate } from '@/lib/audit-utils';
 import ActionMenu from '@/components/ui/ActionMenu';
 
 import PageToolbar from '@/components/ui/PageToolbar';
+import PageHeader from '@/components/audit/PageHeader';
 
 export default function RiskLogsPage() {
     const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -71,6 +72,10 @@ export default function RiskLogsPage() {
 
     return (
         <div className="space-y-6">
+            <PageHeader
+                title="Risk Log ve Denetim İzi"
+                subtitle="Risk İşlemleri, Parametre Değişiklikleri ve Senaryo İletileri"
+            />
             <PageToolbar
                 searchPlaceholder="Loglarda ara..."
                 searchValue={searchTerm}

@@ -13,6 +13,7 @@ import { formatDate } from '@/lib/audit-utils';
 import ActionMenu from '@/components/ui/ActionMenu';
 
 import PageToolbar from '@/components/ui/PageToolbar';
+import PageHeader from '@/components/audit/PageHeader';
 
 export default function ContractsPage() {
     const [contracts, setContracts] = useState<any[]>([]);
@@ -67,6 +68,10 @@ export default function ContractsPage() {
 
     return (
         <div className="space-y-6">
+            <PageHeader
+                title="Sözleşme & Portföy Yönetimi"
+                subtitle="Risk Altındaki Sözleşmeler, Ödeme ve Teslimat Geçmişi"
+            />
             <PageToolbar
                 searchPlaceholder="Sözleşme veya müşteri ara..."
                 searchValue={searchTerm}

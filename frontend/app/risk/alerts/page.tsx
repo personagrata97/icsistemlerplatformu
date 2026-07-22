@@ -13,6 +13,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import ActionMenu from '@/components/ui/ActionMenu';
 
 import PageToolbar from '@/components/ui/PageToolbar';
+import PageHeader from '@/components/audit/PageHeader';
 
 export default function AlertsPage() {
     const [alerts, setAlerts] = useState<any[]>([]);
@@ -57,6 +58,10 @@ export default function AlertsPage() {
 
     return (
         <div className="space-y-6">
+            <PageHeader
+                title="Risk İkaz ve Limit İhlalleri"
+                subtitle="Otomatik Hesaplanan Erken Uyarılar ve Alarm Kayıtları"
+            />
             <PageToolbar
                 noSearch={true}
                 onRefresh={loadAlerts}

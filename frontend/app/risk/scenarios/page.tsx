@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { RiskLogger } from '@/lib/risk-logger';
 import { useToast } from '@/components/Toast';
+import PageHeader from '@/components/audit/PageHeader';
 
 // Senaryo parametreleri — backend ScenarioParameters tipiyle uyumlu
 const scenarios = [
@@ -117,6 +118,10 @@ export default function ScenariosPage() {
 
     return (
         <div className="space-y-8">
+            <PageHeader
+                title="Stres Testi ve Senaryo Analizleri"
+                subtitle="Baz, Olumsuz ve Şiddetli Stres Senaryo Simülasyonları"
+            />
 
             <div className="card border-l-4 border-primary bg-white">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">

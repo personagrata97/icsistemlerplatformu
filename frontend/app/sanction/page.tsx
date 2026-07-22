@@ -14,6 +14,7 @@ import { formatDate } from '@/lib/audit-utils';
 import Tooltip from '@/components/ui/Tooltip';
 import Button from '@/components/ui/Button';
 import RefreshButton from '@/components/ui/RefreshButton';
+import PageHeader from '@/components/audit/PageHeader';
 
 // Stat Card Component
 function StatCard({ icon: Icon, label, value, trend, color, infoTooltip, onClick, className }: {
@@ -111,13 +112,12 @@ export default function SanctionDashboard() {
     if (loading) return <LoadingState />;
 
     return (
-        <div className="max-w-7xl mx-auto py-2">
-            {/* Page Header */}
-            <div className="flex flex-wrap justify-between items-center mb-8 gap-6">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Yaptırım Tarayıcı</h1>
-                    <p className="text-slate-500 font-medium">Müşteri ve işlem tarama merkezi</p>
-                </div>
+        <div className="space-y-6">
+            <div className="flex flex-wrap justify-between items-center gap-4">
+                <PageHeader
+                    title="Yaptırım & MASAK Tarama Merkezi"
+                    subtitle="Müşteri, İşlem ve Karaliste Tarama Paneli"
+                />
                 <div className="flex items-center gap-4">
                     <div className="flex flex-col items-end mr-2">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Son Güncelleme</span>
