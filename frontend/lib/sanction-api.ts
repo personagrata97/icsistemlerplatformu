@@ -51,6 +51,16 @@ export const sanctionApi = {
         return res.json();
     },
 
+    async createCustomEntity(data: { adSoyad: string; tckn?: string; gerekce?: string }) {
+        const res = await fetch(`${API_BASE_URL}/sanction/lists/custom/entities`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error('Kayıt eklenemedi');
+        return res.json();
+    },
+
     async getHistory() {
         const res = await fetch(`${API_BASE_URL}/sanction/history`, { headers: getHeaders() });
         if (!res.ok) return [];

@@ -1,6 +1,5 @@
 'use client';
 
-import PageHeader from '@/components/audit/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
@@ -34,10 +33,6 @@ export default function EuListPage() {
 
     return (
         <div className="space-y-6">
-            <PageHeader
-                title="Avrupa Birliği Konsolide Yaptırım Listesi"
-                subtitle="EU Financial Sanctions Consolidated List"
-            />
             <PageToolbar
                 searchPlaceholder="EU ID, İsim veya Regülasyon Kodu ile ara..."
                 searchValue={searchTerm}

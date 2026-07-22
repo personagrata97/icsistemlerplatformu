@@ -2,14 +2,46 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 import {
     Shield, Search, AlertTriangle, FileText, Settings, Clock,
-    Database, Globe, ShieldAlert, ChevronRight
+    Database, Globe, ShieldAlert
 } from 'lucide-react';
-import { useState } from 'react';
+import { useSanctionTitle } from '@/context/SanctionTitleContext';
+
+const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
+    '/sanction': { title: 'Yaptırım Kokpiti', subtitle: 'MASAK, OFAC ve BM Yaptırım Taramaları Özeti' },
+    '/sanction/scan': { title: 'Müşteri & İşlem Taraması', subtitle: 'MASAK, Resmî Gazete 6415/7262 ve OFAC Canlı Sorgulaması' },
+    '/sanction/results': { title: 'Tarama Sonuçları & Karar Havuzu', subtitle: 'Yaptırım Uyarıları ve Karar Bağlama Süreçleri' },
+    '/sanction/lists': { title: 'Yaptırım Listeleri Yönetimi', subtitle: 'MASAK, OFAC, BM ve AB Yaptırım Kaynakları' },
+    '/sanction/lists/ofac': { title: 'ABD OFAC SDN Listesi', subtitle: 'Office of Foreign Assets Control Specially Designated Nationals List' },
+    '/sanction/lists/un': { title: 'BM Güvenlik Konseyi Listesi', subtitle: 'UN Security Council Consolidated Sanctions List' },
+    '/sanction/lists/eu': { title: 'AB Konsolide Yaptırım Listesi', subtitle: 'EU Financial Sanctions Consolidated List' },
+    '/sanction/lists/masak': { title: 'MASAK & Resmî Gazete Listesi', subtitle: '6415 ve 7262 Sayılı Kanun Malvarlığı Dondurma Kararları' },
+    '/sanction/lists/custom': { title: 'Kurum İçi Özel Kara Liste', subtitle: 'Teftiş ve Uyum Tarafından Tanımlanan Dahili Yasaklı Listesi' },
+    '/sanction/reports': { title: 'Yaptırım ve Uyum Raporları', subtitle: 'Denetim Kurulu ve Uyum Başkanlığı Rapor Arşivi' },
+    '/sanction/history': { title: 'Tarama Geçmişi & Audit İzi', subtitle: 'Otomatik ve Anlık Tarama Günlük Kayıtları' },
+    '/sanction/settings': { title: 'Yaptırım Ayarları', subtitle: 'Eşik Değerleri ve Otomatik Tarama Parametreleri' },
+};
 
 export default function SanctionSidebar() {
     const pathname = usePathname();
+    const { setTitle, setSubtitle } = useSanctionTitle();
+
+    useEffect(() => {
+        let pageInfo = PAGE_TITLES[pathname];
+        if (!pageInfo) {
+            const pathParts = pathname.split('/');
+            if (pathParts.length > 2) {
+                const parentPath = pathParts.slice(0, 3).join('/');
+                pageInfo = PAGE_TITLES[parentPath];
+            }
+        }
+        if (pageInfo) {
+            setTitle(pageInfo.title);
+            setSubtitle(pageInfo.subtitle || '');
+        }
+    }, [pathname, setTitle, setSubtitle]);
 
     const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
 
@@ -56,7 +88,7 @@ export default function SanctionSidebar() {
                             <li className="nav-item">
                                 <Link href="/sanction/lists/masak" className={`nav-link ${isActive('/sanction/lists/masak') ? 'active' : ''}`}>
                                     <ShieldAlert size={18} />
-                                    <span>MASAK (6415/7262)</span>
+                                    <span>MASAK (5549/6415/7262)</span>
                                 </Link>
                             </li>
                             <li className="nav-item">
@@ -116,7 +148,7 @@ export default function SanctionSidebar() {
             {/* Alt Bilgi — Audit & Risk ile birebir aynı */}
             <div className="p-3 bg-gray-50/50 border-t border-gray-100 text-center">
                 <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                    MASAK & 6415/7262 UYUMLU
+                    MASAK & 5549/6415/7262 UYUMLU
                 </div>
             </div>
         </aside>

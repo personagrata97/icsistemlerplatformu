@@ -55,6 +55,7 @@ model SanctionEntity {
   adres              String?         @db.Text
   listeyeGirisTarihi DateTime?
   kararNo            String?
+  aciklama           String?         @db.Text
   ham                String?         @db.Text
   created_at         DateTime        @default(now())
   list               SanctionList    @relation(fields: [listId], references: [id], onDelete: Cascade)

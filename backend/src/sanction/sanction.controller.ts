@@ -48,6 +48,12 @@ export class SanctionController {
         return this.sanctionService.getListEntities(kod, search);
     }
 
+    @Post('lists/custom/entities')
+    async createCustomEntity(@Body() body: any, @Req() req: any) {
+        const username = req.user?.displayName || req.user?.username || 'Sistem';
+        return this.sanctionService.createCustomEntity(body, username);
+    }
+
     @Get('history')
     async getHistory() {
         return this.sanctionService.getHistory();

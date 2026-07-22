@@ -324,6 +324,34 @@ export class SanctionService {
         }
     }
 
+    async createCustomEntity(data: { adSoyad: string; tckn?: string; gerekce?: string }, username: string = 'Sistem') {
+        let list = await this.prisma.sanctionList.findUnique({ where: { kod: 'INTERNAL_BLACK_LIST' } });
+        if (!list) {
+            await this.seedInitialLists();
+            list = await this.prisma.sanctionList.findUnique({ where: { kod: 'INTERNAL_BLACK_LIST' } });
+        }
+
+        const entity = await this.prisma.sanctionEntity.create({
+            data: {
+                listId: list!.id,
+                adSoyad: data.adSoyad,
+                normalizedAd: this.normalizeName(data.adSoyad),
+                kimlikNo: data.tckn,
+                tur: data.tckn && data.tckn.length === 11 ? 'GERCEK' : 'TUZEL',
+                aciklama: data.gerekce || 'Kurum İçi Teftiş Kararı',
+            }
+        });
+
+        await this.createLog({
+            user: username,
+            category: 'KARA_LISTE_EKLE',
+            action: 'CREATE',
+            details: `Dahili kara listeye yeni kayıt eklendi: ${data.adSoyad} (${data.tckn || '-'})`
+        });
+
+        return entity;
+    }
+
     async getListEntities(kod: string, search?: string) {
         const list = await this.prisma.sanctionList.findUnique({ where: { kod } });
         if (!list) return [];
