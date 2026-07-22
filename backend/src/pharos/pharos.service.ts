@@ -61,8 +61,8 @@ DIL KURALLARI:
 - 5N1K (Ne, Nerede, Ne zaman, Kim, Neden, Nasil) kuralina uyulup uyulmadigini kontrol et.`;
 
 @Injectable()
-export class AuditronService implements OnModuleInit {
-    private readonly logger = new Logger(AuditronService.name);
+export class PharosService implements OnModuleInit {
+    private readonly logger = new Logger(PharosService.name);
 
     private pipeline: any;
     private env: any;

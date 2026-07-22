@@ -14,7 +14,8 @@ import { AlertSystemModule } from './alert-system/alert-system.module';
 import { ApiModule } from './api/api.module';
 import { LiquidityStressModule } from './liquidity-stress/liquidity-stress.module';
 import { AuditModule } from './audit/audit.module';
-import { AuditronModule } from './auditron/auditron.module';
+import { PharosModule } from './pharos/pharos.module';
+import { ControlModule } from './control/control.module';
 import { SanctionModule } from './sanction/sanction.module';
 import { AuthModule } from './auth/auth.module';
 import { DocumentsModule } from './documents/documents.module';
@@ -45,7 +46,8 @@ import { HealthController } from './health.controller';
         ApiModule,
         LiquidityStressModule,
         AuditModule,
-        AuditronModule,
+        PharosModule,
+        ControlModule,
         SanctionModule,
         AuthModule,
         DocumentsModule,

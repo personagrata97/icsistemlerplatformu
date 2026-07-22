@@ -1,17 +1,16 @@
 import { Controller, Post, Body, Get, UseInterceptors, UploadedFile, HttpException, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AuditronService } from './auditron.service';
+import { PharosService } from './pharos.service';
 
-// A1: Tüm Auditron endpoint'leri JWT ile korunuyor — BDDK izlenebilirlik gereksinimine uyum
 @UseGuards(JwtAuthGuard)
-@Controller('auditron')
-export class AuditronController {
-    constructor(private readonly auditronService: AuditronService) { }
+@Controller('pharos')
+export class PharosController {
+    constructor(private readonly pharosService: PharosService) { }
 
     @Get('status')
     getStatus() {
-        return this.auditronService.getStatus();
+        return this.pharosService.getStatus();
     }
 
     @Post('upload-document')
@@ -20,7 +19,7 @@ export class AuditronController {
         fileFilter: (req: any, file: any, callback: any) => {
             const allowed = /\.(pdf|docx|doc|txt|md|csv|xlsx)$/i;
             if (!file.originalname.match(allowed)) {
-                return callback(new HttpException('Auditron AI yalnızca PDF, Word, Excel, CSV ve Metin dosyalarını indeksleyebilir.', HttpStatus.BAD_REQUEST), false);
+                return callback(new HttpException('Pharos AI yalnızca PDF, Word, Excel, CSV ve Metin dosyalarını indeksleyebilir.', HttpStatus.BAD_REQUEST), false);
             }
             callback(null, true);
         }
@@ -31,7 +30,7 @@ export class AuditronController {
         }
 
         try {
-            const result = await this.auditronService.processDocument(file.buffer, file.originalname, file.mimetype, req.user);
+            const result = await this.pharosService.processDocument(file.buffer, file.originalname, file.mimetype, req.user);
             return { success: true, message: result };
         } catch (error) {
             throw new HttpException({ success: false, error: error.message }, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -45,7 +44,7 @@ export class AuditronController {
         }
 
         try {
-            const result = await this.auditronService.enhanceFinding(findingData, req.user);
+            const result = await this.pharosService.enhanceFinding(findingData, req.user);
             return { success: true, original: findingData, enhanced: result };
         } catch (error) {
             return { success: false, error: error.message };
@@ -59,7 +58,7 @@ export class AuditronController {
         }
 
         try {
-            const contextMatches = await this.auditronService.getRagContext(text);
+            const contextMatches = await this.pharosService.getRagContext(text);
             return { success: true, context: contextMatches };
         } catch (error) {
             return { success: false, error: error.message };
@@ -73,21 +72,17 @@ export class AuditronController {
         }
 
         try {
-            const response = await this.auditronService.chat(body.message, body.history || [], req.user);
+            const response = await this.pharosService.chat(body.message, body.history || [], req.user);
             return { success: true, response };
         } catch (error) {
             return { success: false, error: error.message };
         }
     }
 
-    // ==========================================
-    // BİLGİ BANKASI (Kalıcı RAG Vektör Deposu)
-    // ==========================================
-
     @Get('knowledge-base/stats')
     async getKnowledgeBaseStats() {
         try {
-            const stats = await this.auditronService.getKnowledgeBaseStats();
+            const stats = await this.pharosService.getKnowledgeBaseStats();
             return { success: true, ...stats };
         } catch (error) {
             return { success: false, error: error.message };
@@ -97,7 +92,7 @@ export class AuditronController {
     @Post('knowledge-base/refresh')
     async refreshKnowledgeBase() {
         try {
-            const result = await this.auditronService.refreshVectorCache();
+            const result = await this.pharosService.refreshVectorCache();
             return { success: true, message: `Bilgi bankasi onbellegi yenilendi. ${result.count} parca yuklendi.` };
         } catch (error) {
             return { success: false, error: error.message };
@@ -110,7 +105,7 @@ export class AuditronController {
             throw new HttpException('Kaynak dosya adi gerekli', HttpStatus.BAD_REQUEST);
         }
         try {
-            const result = await this.auditronService.deleteDocumentChunks(source);
+            const result = await this.pharosService.deleteDocumentChunks(source);
             return { success: true, message: `${result.source} dosyasindan ${result.deleted} parca silindi.` };
         } catch (error) {
             return { success: false, error: error.message };
