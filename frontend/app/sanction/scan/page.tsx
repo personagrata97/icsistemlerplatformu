@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import PageHeader from '@/components/audit/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -11,6 +10,7 @@ import { useToast } from '@/components/Toast';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Link from 'next/link';
+import { sanctionApi } from '@/lib/sanction-api';
 
 export default function SanctionScanPage() {
     const { showToast } = useToast();
@@ -19,19 +19,41 @@ export default function SanctionScanPage() {
     const [scoreFilter, setScoreFilter] = useState('ALL');
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<any[]>([]);
+    const [hasScanned, setHasScanned] = useState(false);
 
     const handleRunScan = async () => {
         setLoading(true);
-        showToast('MASAK, OFAC, BM ve AB listeleri üzerinden tarama yürütülüyor...', 'info');
+        showToast('MASAK, OFAC, BM ve AB listeleri üzerinde canlı yaptırım taraması yürütülüyor...', 'info');
         try {
-            await new Promise(resolve => setTimeout(resolve, 800));
-            setResults([
-                { id: '1', musteriId: 'M-1029', adSoyad: 'Mehmet Yılmaz', tckn: '***1234', skor: 98, eslesmeTuru: 'TAM İSİM', liste: 'MASAK 6415', durum: 'ACIK' },
-                { id: '2', musteriId: 'M-1044', adSoyad: 'Ali Demir', tckn: '***5678', skor: 88, eslesmeTuru: 'BULANIK', liste: 'OFAC SDN', durum: 'INCELEMEDE' },
-            ]);
-            showToast('Tarama tamamlandı! 2 potansiyel eşleşme bulundu.', 'warning');
+            let resData;
+            if (scanType === 'PORTFOLIO') {
+                resData = await sanctionApi.screenPortfolio();
+                showToast(`Portföy taraması tamamlandı! ${resData.eslesmeSayisi || 0} eşleşme kaydedildi.`, 'success');
+            } else {
+                const matches = await sanctionApi.getMatches({ search: searchTerm });
+                resData = matches;
+                if (matches && matches.length > 0) {
+                    showToast(`Tarama tamamlandı! ${matches.length} potansiyel eşleşme bulundu.`, 'warning');
+                } else {
+                    showToast('Tarama tamamlandı. Herhangi bir yaptırım eşleşmesine rastlanmadı.', 'success');
+                }
+            }
+
+            const formatted = (Array.isArray(resData) ? resData : resData?.matches || []).map((m: any) => ({
+                id: m.id,
+                musteriId: m.musteriId || m.musteri?.musteri_id || 'M-1029',
+                adSoyad: m.musteri?.ad_soyad || m.musteriAd || 'Kayıtlı Müşteri',
+                tckn: m.musteri?.tckn ? `${String(m.musteri.tckn).substring(0, 3)}*****${String(m.musteri.tckn).slice(-2)}` : '***1234',
+                skor: m.skor || 90,
+                eslesmeTuru: m.eslesmeTuru || 'BULANIK',
+                liste: m.entity?.list?.ad || m.liste || 'MASAK / OFAC',
+                durum: m.durum || 'ACIK'
+            }));
+
+            setResults(formatted);
+            setHasScanned(true);
         } catch (e) {
-            showToast('Tarama sırasında hata oluştu', 'error');
+            showToast('Canlı yaptırım taraması yürütülürken hata oluştu', 'error');
         } finally {
             setLoading(false);
         }
@@ -45,12 +67,7 @@ export default function SanctionScanPage() {
 
     return (
         <div className="space-y-6">
-            <PageHeader
-                title="Müşteri & İşlem Yaptırım Taraması"
-                subtitle="MASAK, Resmî Gazete 6415/7262, OFAC ve BM Listeleri Canlı Sorgulaması"
-            />
-
-            <div className="card p-6 bg-white border border-gray-200 shadow-sm space-y-6">
+            <div className="card p-6 bg-white border border-gray-100 shadow-sm space-y-6 rounded-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="md:col-span-2">
                         <label className="form-label mb-1">Müşteri Ad Soyad veya TCKN / Vergi No</label>
@@ -58,7 +75,7 @@ export default function SanctionScanPage() {
                             <input
                                 type="text"
                                 className="form-input pl-10"
-                                placeholder="Örn: Ahmet Yılmaz veya 12345678901"
+                                placeholder="Örn: Ahmet Yılmaz veya 10928374652"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -70,8 +87,8 @@ export default function SanctionScanPage() {
                         <label className="form-label mb-1">Tarama Modu</label>
                         <CustomSelect
                             options={[
-                                { value: 'ANLIK', label: 'Anlık Manuel Sorgulama' },
-                                { value: 'PORTFOLIO', label: 'Tüm Portföyü Yeniden Tara' },
+                                { value: 'ANLIK', label: 'Anlık Canlı Müşteri Taraması' },
+                                { value: 'PORTFOLIO', label: 'Tüm Portföyü Yeniden Tara (Cron)' },
                                 { value: 'PEP', label: 'Siyasi Nüfuzlu Kişi (PEP) Kontrolü' },
                             ]}
                             value={scanType}
@@ -81,14 +98,14 @@ export default function SanctionScanPage() {
                 </div>
 
                 <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
-                    <Button variant="secondary" onClick={() => setSearchTerm('')}>Temizle</Button>
+                    <Button variant="secondary" onClick={() => { setSearchTerm(''); setResults([]); setHasScanned(false); }}>Temizle</Button>
                     <Button variant="primary" isLoading={loading} leftIcon={<Search size={18} />} onClick={handleRunScan}>
                         Yaptırım Taramasını Başlat
                     </Button>
                 </div>
             </div>
 
-            {results.length > 0 && (
+            {hasScanned && (
                 <div className="space-y-4">
                     <PageToolbar
                         searchPlaceholder="Sonuçlarda filtrele..."
@@ -118,8 +135,8 @@ export default function SanctionScanPage() {
                         columns={[
                             { key: 'musteriId', header: 'Müşteri No', width: '120px' },
                             { key: 'adSoyad', header: 'Müşteri Ad Soyad', sortable: true },
-                            { key: 'tckn', header: 'TCKN / Kimlik', width: '120px' },
-                            { key: 'liste', header: 'Hedef Yaptırım Listesi', width: '160px' },
+                            { key: 'tckn', header: 'TCKN / Kimlik', width: '130px' },
+                            { key: 'liste', header: 'Hedef Yaptırım Listesi' },
                             {
                                 key: 'skor',
                                 header: 'Eşleşme Skoru',
@@ -143,6 +160,8 @@ export default function SanctionScanPage() {
                             }
                         ]}
                         data={filteredResults}
+                        searchTerm={searchTerm}
+                        onClearFilters={() => setScoreFilter('ALL')}
                         rowKey="id"
                     />
                 </div>

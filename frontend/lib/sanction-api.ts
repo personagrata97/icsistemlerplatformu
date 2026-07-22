@@ -28,6 +28,24 @@ export const sanctionApi = {
         return res.json();
     },
 
+    async screenPortfolio() {
+        const res = await fetch(`${API_BASE_URL}/sanction/screening/portfolio`, {
+            method: 'POST',
+            headers: getHeaders(),
+        });
+        if (!res.ok) throw new Error('Portföy taraması başarısız');
+        return res.json();
+    },
+
+    async syncList(kod: string) {
+        const res = await fetch(`${API_BASE_URL}/sanction/sync/${kod}`, {
+            method: 'POST',
+            headers: getHeaders(),
+        });
+        if (!res.ok) throw new Error('Liste senkronizasyonu başarısız');
+        return res.json();
+    },
+
     async decideMatch(id: string, decision: 'YANLIS_ESLESME' | 'DOGRULANDI', reason?: string) {
         const res = await fetch(`${API_BASE_URL}/sanction/matches/${id}/decide`, {
             method: 'POST',

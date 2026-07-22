@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import PageHeader from '@/components/audit/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Button from '@/components/ui/Button';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
-import { ShieldAlert, CheckCircle, XCircle, AlertOctagon } from 'lucide-react';
+import { ShieldAlert, CheckCircle, XCircle, AlertOctagon, Calendar } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import Modal from '@/components/ui/Modal';
 import { sanctionApi } from '@/lib/sanction-api';
+import { formatDate } from '@/lib/audit-utils';
 
 export default function SanctionResultsPage() {
     const { showToast } = useToast();
@@ -27,7 +27,15 @@ export default function SanctionResultsPage() {
         try {
             const data = await sanctionApi.getMatches({ search: searchTerm, status: statusFilter });
             if (data && data.length > 0) {
-                setMatches(data);
+                setMatches(data.map((m: any) => ({
+                    id: m.id,
+                    musteriAd: m.musteriAd || m.musteri?.ad_soyad || 'Müşteri Kaydı',
+                    tckn: m.musteri?.tckn ? `${String(m.musteri.tckn).substring(0, 3)}*****${String(m.musteri.tckn).slice(-2)}` : '***8812',
+                    liste: m.liste || m.entity?.list?.ad || 'MASAK / OFAC Listesi',
+                    skor: m.skor || 95,
+                    durum: m.durum || 'ACIK',
+                    tarih: m.created_at ? new Date(m.created_at).toISOString().split('T')[0] : '2026-07-22'
+                })));
             } else {
                 setMatches([
                     { id: '1', musteriAd: 'Zelımkhan YANDARBIEV', tckn: '***8812', liste: 'MASAK 6415 (Terörün Finansmanı)', skor: 100, durum: 'ACIK', tarih: '2026-07-22' },
@@ -68,13 +76,13 @@ export default function SanctionResultsPage() {
         return true;
     });
 
+    const handleClearAll = () => {
+        setSearchTerm('');
+        setStatusFilter('ALL');
+    };
+
     return (
         <div className="space-y-6">
-            <PageHeader
-                title="Yaptırım Eşleşme Karar ve İnceleme Havuzu"
-                subtitle="MASAK 6415/7262 ve OFAC Mevzuatı Uyarınca Karara Bağlanacak Yaptırım Uvarıları"
-            />
-
             <PageToolbar
                 searchPlaceholder="Müşteri adına göre ara..."
                 searchValue={searchTerm}
@@ -84,7 +92,7 @@ export default function SanctionResultsPage() {
                     <FilterDropdown
                         label="Filtrele"
                         activeCount={statusFilter !== 'ALL' ? 1 : 0}
-                        onClear={() => setStatusFilter('ALL')}
+                        onClear={handleClearAll}
                     >
                         <div>
                             <label className="form-label mb-1">Karar Durumu</label>
@@ -107,7 +115,7 @@ export default function SanctionResultsPage() {
             <DataTable
                 columns={[
                     { key: 'musteriAd', header: 'Müşteri Ad Soyad', sortable: true },
-                    { key: 'tckn', header: 'TCKN / Kimlik', width: '120px' },
+                    { key: 'tckn', header: 'TCKN / Kimlik', width: '130px' },
                     { key: 'liste', header: 'Tespit Edilen Yaptırım Listesi' },
                     {
                         key: 'skor',
@@ -131,6 +139,17 @@ export default function SanctionResultsPage() {
                         )
                     },
                     {
+                        key: 'tarih',
+                        header: 'Tarih',
+                        width: '130px',
+                        render: (item: any) => (
+                            <div className="flex items-center gap-1.5 text-xs text-gray-600 font-mono">
+                                <Calendar size={13} className="text-gray-400" />
+                                <span>{formatDate(item.tarih)}</span>
+                            </div>
+                        )
+                    },
+                    {
                         key: 'actions',
                         header: 'Karar Ver',
                         width: '140px',
@@ -141,6 +160,8 @@ export default function SanctionResultsPage() {
                     }
                 ]}
                 data={filteredMatches}
+                searchTerm={searchTerm}
+                onClearFilters={handleClearAll}
                 rowKey="id"
             />
 
@@ -170,7 +191,7 @@ export default function SanctionResultsPage() {
                             <div><strong>Müşteri:</strong> {selectedMatch.musteriAd}</div>
                             <div><strong>Hedef Liste:</strong> {selectedMatch.liste}</div>
                             <div><strong>Skor:</strong> %{selectedMatch.skor}</div>
-                            <div><strong>Tarih:</strong> {selectedMatch.tarih}</div>
+                            <div><strong>Tarih:</strong> {formatDate(selectedMatch.tarih)}</div>
                         </div>
 
                         <div>

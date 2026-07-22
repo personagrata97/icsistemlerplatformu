@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Body, Query, Param, Req, UseGuards } from '@nestjs/common';
 import { SanctionService } from './sanction.service';
 import { MasakService } from './masak.service';
+import { SanctionImportService } from './sanction-import.service';
+import { SanctionCronService } from './sanction-cron.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 
@@ -9,7 +11,9 @@ import { PermissionsGuard } from '../auth/guards/permissions.guard';
 export class SanctionController {
     constructor(
         private readonly sanctionService: SanctionService,
-        private readonly masakService: MasakService
+        private readonly masakService: MasakService,
+        private readonly importService: SanctionImportService,
+        private readonly cronService: SanctionCronService
     ) { }
 
     @Get('dashboard')
@@ -29,6 +33,17 @@ export class SanctionController {
     @Post('scan')
     async runScan(@Body() body: any, @Req() req: any) {
         const username = req.user?.displayName || req.user?.username || 'Sistem';
+        return this.sanctionService.screenAllPortfolios(username);
+    }
+
+    @Post('screening/customer/:id')
+    async screenCustomer(@Param('id') id: string) {
+        return this.sanctionService.screenCustomer(id);
+    }
+
+    @Post('screening/portfolio')
+    async screenPortfolio(@Req() req: any) {
+        const username = req.user?.displayName || req.user?.username || 'Sistem Uyum Görevlisi';
         return this.sanctionService.screenAllPortfolios(username);
     }
 
@@ -52,6 +67,16 @@ export class SanctionController {
     async createCustomEntity(@Body() body: any, @Req() req: any) {
         const username = req.user?.displayName || req.user?.username || 'Sistem';
         return this.sanctionService.createCustomEntity(body, username);
+    }
+
+    @Post('sync/:kod')
+    async syncList(@Param('kod') kod: string) {
+        return this.importService.syncList(kod);
+    }
+
+    @Post('cron/run')
+    async runCron() {
+        return this.cronService.handleDailySanctionCron();
     }
 
     @Get('history')
