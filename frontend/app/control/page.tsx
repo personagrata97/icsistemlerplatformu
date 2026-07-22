@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
+import PageHeader from '@/components/audit/PageHeader';
 import { ShieldCheck, CheckCircle2, AlertOctagon, Sliders, RefreshCw, Layers, Activity, FileCheck } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
@@ -76,15 +77,10 @@ export default function PharosControlPage() {
 
     return (
         <div className="space-y-6">
-            <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-md flex justify-between items-center">
-                <div>
-                    <h2 className="text-xl font-bold">{TERMS.controlModule} — COSO 2013 İç Kontrol Yönetimi</h2>
-                    <p className="text-slate-300 text-xs mt-1">{TERMS.controlModuleDescription}</p>
-                </div>
-                <div className="px-4 py-2 bg-slate-800 rounded-xl text-xs font-semibold border border-slate-700">
-                    2. Savunma Hattı (İç Kontrol)
-                </div>
-            </div>
+            <PageHeader
+                title={`${TERMS.controlModule} — COSO 2013 İç Kontrol Yönetimi`}
+                subtitle={TERMS.controlModuleDescription}
+            />
 
             {/* Top StatCards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

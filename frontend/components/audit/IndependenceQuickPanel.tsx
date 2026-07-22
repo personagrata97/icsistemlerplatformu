@@ -1,155 +1,154 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Scale, CheckCircle, AlertTriangle, ShieldCheck, XCircle } from 'lucide-react';
-import { auditApi } from '@/lib/audit-api';
-import { useToast } from '@/components/Toast';
+import { Scale, CheckCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import IndependenceExceptionModal from '@/components/audit/modals/IndependenceExceptionModal';
 import Checkbox from '@/components/ui/Checkbox';
+import { IndependenceExceptionModal } from './IndependenceExceptionModal';
 
 interface IndependenceQuickPanelProps {
     auditId: string;
-    userId: string;
     onDeclared: () => void;
-    isDeclared?: boolean;
 }
 
-export default function IndependenceQuickPanel({ auditId, userId, onDeclared, isDeclared }: IndependenceQuickPanelProps) {
-    const { showToast } = useToast();
-    const [loading, setLoading] = useState(false);
+export function IndependenceQuickPanel({ auditId, onDeclared }: IndependenceQuickPanelProps) {
     const [isAgreed, setIsAgreed] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [isDeclared, setIsDeclared] = useState(false);
     const [isExceptionModalOpen, setIsExceptionModalOpen] = useState(false);
 
-    if (isDeclared) {
-        return (
-            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 mb-6 flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
-                <div className="flex items-center gap-4">
-                    <div className="bg-emerald-500 p-2.5 rounded-xl shadow-lg shadow-emerald-200">
-                        <ShieldCheck className="text-white" size={20} />
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-emerald-900 text-sm">Bağımsızlık Beyanı Onaylandı</h3>
-                        <p className="text-emerald-700 text-xs opacity-80">Bu denetim için tarafsızlık taahhüdünüz kaydedilmiştir.</p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <CheckCircle className="text-emerald-500" size={20} />
-                    <span className="text-xs font-bold text-emerald-600 uppercase tracking-tighter">Aktif</span>
-                </div>
-            </div>
-        );
-    }
-
     const handleQuickDeclare = async () => {
-        if (!isAgreed) {
-            showToast('Lütfen beyanı onayladığınızı belirten kutucuğu işaretleyin.', 'warning');
-            return;
-        }
+        if (!isAgreed) return;
 
         setLoading(true);
         try {
-            await auditApi.createIndependenceDeclaration({
-                auditId,
-                declarationType: 'Denetim Bazlı',
-                year: new Date().getFullYear(),
-                status: 'Onaylandı', // Smart declaration is auto-approved as it's a positive declaration
-                hasConflict: false,
-                hasFinancialLink: false,
-                hasFamilyLink: false,
-                hasPreviousRole: false,
-                hasOtherIssue: false,
-                declaredAt: new Date().toISOString()
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/v1/pharos/independence', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    auditId,
+                    hasConflict: false,
+                    declarationText: 'Mesleki etik kurallara ve bağımsızlık ilkelerine uygun olduğumu beyan ederim. Bu denetim süreci boyunca tarafsızlığımı koruyacağımı taahhüt ederim.'
+                })
             });
 
-            showToast('Bağımsızlık beyanınız başarıyla kaydedildi. Denetime başlayabilirsiniz.', 'success');
-            onDeclared();
-        } catch (error: any) {
-            console.error('Declaration error:', error);
-            showToast(error.message || 'Beyan kaydedilirken bir hata oluştu.', 'error');
+            if (res.ok) {
+                setIsDeclared(true);
+                onDeclared();
+            } else {
+                console.error('Bağımsızlık beyanı kaydedilemedi');
+            }
+        } catch (error) {
+            console.error('Bağımsızlık beyan hatası:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleExceptionSubmit = async (data: any) => {
+    const handleExceptionSubmit = async (reason: string) => {
+        setLoading(true);
         try {
-            await auditApi.createIndependenceDeclaration({
-                auditId,
-                declarationType: 'Denetim Bazlı',
-                year: new Date().getFullYear(),
-                status: 'Beklemede', // Requires human review
-                hasConflict: true, // Marked as exception
-                hasFinancialLink: data.hasFinancialLink,
-                hasFamilyLink: data.hasFamilyLink,
-                hasPreviousRole: data.hasPreviousRole,
-                hasOtherIssue: data.hasOtherIssue,
-                notes: data.explanation,
-                declaredAt: new Date().toISOString()
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/v1/pharos/independence', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    auditId,
+                    hasConflict: true,
+                    conflictReason: reason,
+                    declarationText: 'İstisna bildirimi: ' + reason
+                })
             });
-            showToast('İstisna bildiriminiz yöneticinize / kalite güvence ekibine iletilmiştir.', 'success');
-            setIsExceptionModalOpen(false);
-            onDeclared();
-        } catch (error: any) {
-            console.error('Exception declaration error:', error);
-            showToast(error.message || 'İstisna bildirimi kaydedilirken hata oluştu.', 'error');
+
+            if (res.ok) {
+                setIsDeclared(true);
+                setIsExceptionModalOpen(false);
+                onDeclared();
+            } else {
+                console.error('İstisna beyanı kaydedilemedi');
+            }
+        } catch (error) {
+            console.error('İstisna beyan hatası:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
+    if (isDeclared) {
+        return (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6 flex items-center gap-3 text-emerald-800">
+                <ShieldCheck className="text-emerald-600 shrink-0" size={24} />
+                <div className="text-xs">
+                    <span className="font-bold text-emerald-900 block text-sm">Bağımsızlık Beyanı Tamamlandı</span>
+                    Bu denetim görevi için mesleki bağımsızlık beyanınız elektronik olarak imzalanıp kayda alınmıştır.
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-6 shadow-sm ring-1 ring-blue-500/10">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 mb-6 shadow-sm ring-1 ring-blue-500/10">
             <div className="flex items-start gap-5">
-                <div className="bg-blue-600 p-3 rounded-lg shadow-blue-200 shadow-lg">
-                    <Scale className="text-white" size={24} />
+                <div className="bg-blue-600 p-3.5 rounded-xl shadow-blue-200 shadow-lg text-white shrink-0">
+                    <Scale size={24} />
                 </div>
 
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-bold text-blue-900">Bağımsızlık Beyanı</h3>
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full border border-blue-200 uppercase tracking-wider">Gerekli</span>
+                <div className="flex-1 space-y-4">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <h3 className="text-base font-bold text-blue-950">Bağımsızlık Beyanı</h3>
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-[11px] font-bold rounded-md border border-blue-200 uppercase">Gerekli</span>
+                        </div>
+
+                        <p className="text-blue-900 text-xs leading-relaxed opacity-90">
+                            Görev aldığınız bu denetim sürecine başlamadan önce, şirket içi mesleki etik kurallar ve ilgili yönetmelikler gereği, bağımsızlığınızı veya tarafsızlığınızı etkileyebilecek herhangi bir çıkar çatışması olmadığını beyan etmeniz gerekmektedir.
+                        </p>
+                        <p className="text-blue-800/80 text-[11px] mt-1.5 italic leading-relaxed">
+                            * Bu beyan, yalnızca denetim ekibinde görevli müfettişler tarafından sistem üzerinden elektronik olarak verilir. Teftiş Kurulu Müdürü veya yalnızca yönetici rolünde olup doğrudan saha görevinde bulunmayan kişilerin beyan vermesi zorunlu değildir.
+                        </p>
                     </div>
 
-                    <p className="text-blue-800 text-sm mb-2 leading-relaxed opacity-90">
-                        Görev aldığınız bu denetim sürecine başlamadan önce, şirket içi mesleki etik kurallar ve ilgili yönetmelikler gereği, bağımsızlığınızı veya tarafsızlığınızı etkileyebilecek herhangi bir çıkar çatışması olmadığını beyan etmeniz gerekmektedir.
-                    </p>
-                    <p className="text-blue-800/80 text-xs mb-4 italic leading-relaxed">
-                        * Bu beyan, yalnızca denetim ekibinde görevli müfettişler tarafından sistem üzerinden elektronik olarak verilir. Teftiş Kurulu Müdürü veya yalnızca yönetici rolünde olup doğrudan saha görevinde bulunmayan kişilerin beyan vermesi zorunlu değildir.
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-                        <div className="flex items-center gap-2 text-xs font-medium text-blue-700 bg-white/50 p-2 rounded-lg border border-blue-100">
-                            <ShieldCheck size={16} className="text-blue-500" />
-                            Çıkar Çatışması Yok
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="flex items-center gap-2 text-xs font-semibold text-blue-800 bg-white/70 px-3 py-2 rounded-lg border border-blue-100 shadow-2xs">
+                            <ShieldCheck size={16} className="text-blue-600 shrink-0" />
+                            <span>Çıkar Çatışması Yok</span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs font-medium text-blue-700 bg-white/50 p-2 rounded-lg border border-blue-100">
-                            <ShieldCheck size={16} className="text-blue-500" />
-                            Akrabalık / Bağ Yok
+                        <div className="flex items-center gap-2 text-xs font-semibold text-blue-800 bg-white/70 px-3 py-2 rounded-lg border border-blue-100 shadow-2xs">
+                            <ShieldCheck size={16} className="text-blue-600 shrink-0" />
+                            <span>Akrabalık / Bağ Yok</span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs font-medium text-blue-700 bg-white/50 p-2 rounded-lg border border-blue-100">
-                            <ShieldCheck size={16} className="text-blue-500" />
-                            Eski Görev İlişkisi Yok
+                        <div className="flex items-center gap-2 text-xs font-semibold text-blue-800 bg-white/70 px-3 py-2 rounded-lg border border-blue-100 shadow-2xs">
+                            <ShieldCheck size={16} className="text-blue-600 shrink-0" />
+                            <span>Eski Görev İlişkisi Yok</span>
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-6 pt-5 border-t border-blue-200/50">
+                    <div className="pt-4 border-t border-blue-200/60 space-y-4">
                         <Checkbox
                             id="independence-agree"
                             checked={isAgreed}
                             onChange={(checked) => setIsAgreed(checked)}
-                            className="w-full"
+                            className="w-full items-start"
                             label={
-                                <span className="text-sm font-semibold text-blue-900 leading-relaxed block pl-1">
+                                <span className="text-xs font-semibold text-blue-950 leading-relaxed block pl-1">
                                     Mesleki etik kurallara ve bağımsızlık ilkelerine uygun olduğumu beyan ederim. Bu denetim süreci boyunca tarafsızlığımı koruyacağımı taahhüt ederim.
                                 </span>
                             }
                         />
 
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full bg-blue-100/20 p-4 rounded-xl border border-blue-100/50">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full bg-blue-100/30 p-3.5 rounded-xl border border-blue-200/50">
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setIsExceptionModalOpen(true)}
-                                className="text-xs font-bold text-amber-700 hover:text-amber-800 hover:bg-amber-50 transition-colors shadow-none whitespace-nowrap"
+                                className="text-xs font-bold text-amber-800 hover:text-amber-900 hover:bg-amber-100/60 transition-colors shadow-none whitespace-nowrap"
                             >
                                 İstisna Bildir (Risk Var)
                             </Button>
@@ -157,13 +156,12 @@ export default function IndependenceQuickPanel({ auditId, userId, onDeclared, is
                                 onClick={handleQuickDeclare}
                                 disabled={loading || !isAgreed}
                                 isLoading={loading}
-                                className={`px-10 py-3 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center justify-center gap-3 w-full sm:w-auto ${isAgreed
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-200/50 active:transform active:scale-95'
-                                    : 'bg-gray-200 text-gray-500 cursor-not-allowed border-none shadow-none'
-                                    }`}
-                                rightIcon={<CheckCircle size={20} />}
+                                size="md"
+                                variant={isAgreed ? 'primary' : 'secondary'}
+                                className="whitespace-nowrap px-6 text-xs font-bold shrink-0 min-h-[40px]"
+                                rightIcon={<CheckCircle size={16} />}
                             >
-                                {loading ? 'Kaydediliyor...' : 'Bağımsızlığımı Beyan Et ve Başla'}
+                                {loading ? 'Kaydediliyor...' : 'Bağımsızlığı Beyan Et ve Başla'}
                             </Button>
                         </div>
                     </div>
