@@ -136,7 +136,7 @@ export class DocumentsService {
 
             // --- AUDITRON AI ENTEGRASYONU (RAG MEMORY) ---
             if (file.originalname.match(/\.(pdf|docx|txt)$/i)) {
-                this.auditronService.processDocument(file.buffer, file.originalname, file.mimetype)
+                this.pharosService.processDocument(file.buffer, file.originalname, file.mimetype)
                     .then(res => this.logger.log(`[Auditron AI Okundu]: ${res}`))
                     .catch(e => this.logger.warn(`[Auditron AI Başarısız]: ${e.message}`));
             }
@@ -250,7 +250,7 @@ export class DocumentsService {
     }
 
     async aiSearch(query: string) {
-        return this.auditronService.getRagContext(query);
+        return this.pharosService.getRagContext(query);
     }
 
     async findOne(id: string) {
@@ -409,7 +409,7 @@ export class DocumentsService {
         if (file) {
             try {
                 if (file.originalname.match(/\.(pdf|docx|txt)$/i)) {
-                    this.auditronService.processDocument(file.buffer, file.originalname, file.mimetype)
+                    this.pharosService.processDocument(file.buffer, file.originalname, file.mimetype)
                         .then(res => this.logger.log(`[Auditron AI Okundu]: ${res}`))
                         .catch(e => this.logger.warn(`[Auditron AI Başarısız]: ${e.message}`));
                 }

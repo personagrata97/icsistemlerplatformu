@@ -9,8 +9,8 @@ jest.mock('mammoth', () => ({
   extractRawText: jest.fn().mockResolvedValue({ value: 'docx content' })
 }));
 
-describe('AuditronService', () => {
-  let service: AuditronService;
+describe('PharosService', () => {
+  let service: PharosService;
   let prisma: PrismaService;
 
   const mockPrismaService = {
@@ -37,13 +37,13 @@ describe('AuditronService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AuditronService,
+        PharosService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 
-    service = module.get<AuditronService>(AuditronService);
+    service = module.get<PharosService>(PharosService);
     prisma = module.get<PrismaService>(PrismaService);
     jest.clearAllMocks();
   });

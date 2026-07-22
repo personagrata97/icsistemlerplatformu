@@ -836,7 +836,7 @@ export class AuditService {
         try {
             if (safeFilename.match(/\.(pdf|docx|txt)$/i)) {
                 this.logger.log(`[Auditron AI] Oto-Aktarım başlatılıyor: ${safeFilename}`);
-                this.auditronService.processDocument(file.buffer, safeFilename, file.mimetype)
+                this.pharosService.processDocument(file.buffer, safeFilename, file.mimetype)
                     .then(res => this.logger.log(`[Auditron AI Okundu]: ${res}`))
                     .catch(e => this.logger.warn(`[Auditron AI Başarısız]: ${e.message}`));
             }
@@ -3039,7 +3039,7 @@ export class AuditService {
         try {
             if (safeName.match(/\.(pdf|docx|txt)$/i)) {
                 this.logger.log(`[Auditron AI] Oto-Aktarım başlatılıyor (Kanıt Dosyası): ${safeName}`);
-                this.auditronService.processDocument(file.buffer, safeName, file.mimetype)
+                this.pharosService.processDocument(file.buffer, safeName, file.mimetype)
                     .then(res => this.logger.log(`[Auditron AI Okundu]: ${res}`))
                     .catch(e => this.logger.warn(`[Auditron AI Başarısız]: ${e.message}`));
             }

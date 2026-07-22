@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuditService } from './audit.service';
 import { PrismaService } from '../common/prisma.service';
-import { AuditronService } from '../auditron/auditron.service';
+import { PharosService } from '../pharos/pharos.service';
 import { AuditLogService } from './audit-log.service';
 import { AuditRiskService } from './audit-risk.service';
 import { FindingService } from './finding.service';
