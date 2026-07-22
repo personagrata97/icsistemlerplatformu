@@ -1,132 +1,124 @@
 'use client';
-import { useState } from 'react';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     Shield, Search, AlertTriangle, FileText, Settings, Clock,
-    ChevronDown, ChevronRight, Users, Database, Download, Globe
+    Database, Globe, ShieldAlert, ChevronRight
 } from 'lucide-react';
-
-interface NavItem {
-    href: string;
-    label: string;
-    icon: any;
-    children?: { href: string; label: string }[];
-}
-
-const navItems: NavItem[] = [
-    { href: '/sanction', label: 'Genel Bakış', icon: Shield },
-    { href: '/sanction/scan', label: 'Müşteri Tarama', icon: Search },
-    { href: '/sanction/results', label: 'Tarama Sonuçları', icon: AlertTriangle },
-    {
-        href: '/sanction/lists',
-        label: 'Liste Yönetimi',
-        icon: Database,
-        children: [
-            { href: '/sanction/lists/ofac', label: 'OFAC Listesi' },
-            { href: '/sanction/lists/un', label: 'BM Listesi' },
-            { href: '/sanction/lists/eu', label: 'AB Listesi' },
-            { href: '/sanction/lists/masak', label: 'MASAK Listesi' },
-            { href: '/sanction/lists/custom', label: 'Özel Listeler' },
-        ]
-    },
-    { href: '/sanction/reports', label: 'Raporlar', icon: FileText },
-    { href: '/sanction/history', label: 'Tarama Geçmişi', icon: Clock },
-    { href: '/sanction/settings', label: 'Ayarlar', icon: Settings },
-];
+import { useState } from 'react';
 
 export default function SanctionSidebar() {
     const pathname = usePathname();
-    const [openDropdowns, setOpenDropdowns] = useState<string[]>(['/sanction/lists']);
 
-    const toggleDropdown = (href: string) => {
-        setOpenDropdowns(prev =>
-            prev.includes(href)
-                ? prev.filter(h => h !== href)
-                : [...prev, href]
-        );
-    };
-
-    const isActive = (href: string) => {
-        if (href === '/sanction') return pathname === '/sanction';
-        return pathname.startsWith(href);
-    };
+    const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
 
     return (
-        <aside
-            className="fixed left-0 top-0 h-screen bg-white border-r border-gray-200 z-40 w-[260px]"
-        >
-            {/* Header */}
-            <div className="h-16 flex items-center px-6 border-b border-gray-200">
-                <Link href="/sanction" className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                        <Shield className="text-white" size={24} />
-                    </div>
-                    <div>
-                        <h1 className="font-bold text-gray-900">Yaptırım Tarayıcı</h1>
-                        <p className="text-xs text-gray-500">Sanction Scanner</p>
-                    </div>
-                </Link>
+        <aside className="sidebar flex flex-col h-screen overflow-hidden bg-white border-r shadow-sm z-50">
+            {/* Logo — AuditSidebar & RiskSidebar ile birebir aynı */}
+            <div className="h-[64px] flex items-center justify-center bg-gray-50 border-b border-gray-200 shrink-0">
+                <img src="/logo.png" alt="Emlak Katılım Logo" className="h-10 w-auto object-contain mix-blend-multiply transition-transform hover:scale-105" />
             </div>
 
-            {/* Navigation */}
-            <nav className="p-4 overflow-y-auto h-[calc(100vh-64px)]">
-                <ul className="space-y-1">
-                    {navItems.map(item => (
-                        <li key={item.href}>
-                            {item.children ? (
-                                <div>
-                                    <button
-                                        onClick={() => toggleDropdown(item.href)}
-                                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-colors ${isActive(item.href)
-                                            ? 'bg-orange-50 text-orange-600'
-                                            : 'text-gray-600 hover:bg-gray-50'
-                                            }`}
-                                    >
-                                        <span className="flex items-center gap-3">
-                                            <item.icon size={20} />
-                                            <span className="font-medium">{item.label}</span>
-                                        </span>
-                                        {openDropdowns.includes(item.href) ? (
-                                            <ChevronDown size={16} />
-                                        ) : (
-                                            <ChevronRight size={16} />
-                                        )}
-                                    </button>
-                                    {openDropdowns.includes(item.href) && (
-                                        <ul className="mt-1 ml-8 space-y-1">
-                                            {item.children.map(child => (
-                                                <li key={child.href}>
-                                                    <Link
-                                                        href={child.href}
-                                                        className={`block px-4 py-2 rounded-lg text-sm transition-colors ${pathname === child.href
-                                                            ? 'bg-orange-50 text-orange-600 font-medium'
-                                                            : 'text-gray-600 hover:bg-gray-50'
-                                                            }`}
-                                                    >
-                                                        {child.label}
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            ) : (
-                                <Link
-                                    href={item.href}
-                                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${isActive(item.href)
-                                        ? 'bg-orange-50 text-orange-600 font-medium'
-                                        : 'text-gray-600 hover:bg-gray-50'
-                                        }`}
-                                >
-                                    <item.icon size={20} />
-                                    <span>{item.label}</span>
+            {/* Menü İçeriği — Gruplanmış Başlıklar */}
+            <div className="sidebar-content flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-gray-300">
+                <ul className="nav-links space-y-3 px-2 py-3">
+
+                    {/* 1. GENEL BAKIŞ */}
+                    <li>
+                        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">Genel Bakış</div>
+                        <ul className="space-y-1">
+                            <li className="nav-item">
+                                <Link href="/sanction" className={`nav-link ${pathname === '/sanction' ? 'active' : ''}`}>
+                                    <Shield size={18} />
+                                    <span>Yaptırım Kokpiti</span>
                                 </Link>
-                            )}
-                        </li>
-                    ))}
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/sanction/scan" className={`nav-link ${isActive('/sanction/scan') ? 'active' : ''}`}>
+                                    <Search size={18} />
+                                    <span>Müşteri Tarama</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/sanction/results" className={`nav-link ${isActive('/sanction/results') ? 'active' : ''}`}>
+                                    <AlertTriangle size={18} />
+                                    <span>Tarama Sonuçları</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    {/* 2. LİSTE YÖNETİMİ */}
+                    <li className="pt-1.5 border-t border-gray-100">
+                        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">Yaptırım Listeleri</div>
+                        <ul className="space-y-1">
+                            <li className="nav-item">
+                                <Link href="/sanction/lists/masak" className={`nav-link ${isActive('/sanction/lists/masak') ? 'active' : ''}`}>
+                                    <ShieldAlert size={18} />
+                                    <span>MASAK (6415/7262)</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/sanction/lists/ofac" className={`nav-link ${isActive('/sanction/lists/ofac') ? 'active' : ''}`}>
+                                    <Globe size={18} />
+                                    <span>OFAC SDN Listesi</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/sanction/lists/un" className={`nav-link ${isActive('/sanction/lists/un') ? 'active' : ''}`}>
+                                    <Database size={18} />
+                                    <span>BM Güvenlik Konseyi</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/sanction/lists/eu" className={`nav-link ${isActive('/sanction/lists/eu') ? 'active' : ''}`}>
+                                    <Globe size={18} />
+                                    <span>AB Konsolide Listesi</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/sanction/lists/custom" className={`nav-link ${isActive('/sanction/lists/custom') ? 'active' : ''}`}>
+                                    <Shield size={18} />
+                                    <span>Kurum İçi Özel Liste</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    {/* 3. RAPORLAMA & SİSTEM */}
+                    <li className="pt-1.5 border-t border-gray-100">
+                        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-2">Raporlama & Sistem</div>
+                        <ul className="space-y-1">
+                            <li className="nav-item">
+                                <Link href="/sanction/reports" className={`nav-link ${isActive('/sanction/reports') ? 'active' : ''}`}>
+                                    <FileText size={18} />
+                                    <span>Uyum Raporları</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/sanction/history" className={`nav-link ${isActive('/sanction/history') ? 'active' : ''}`}>
+                                    <Clock size={18} />
+                                    <span>Tarama Geçmişi</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/sanction/settings" className={`nav-link ${isActive('/sanction/settings') ? 'active' : ''}`}>
+                                    <Settings size={18} />
+                                    <span>Yaptırım Ayarları</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
-            </nav>
+            </div>
+
+            {/* Alt Bilgi — Audit & Risk ile birebir aynı */}
+            <div className="p-3 bg-gray-50/50 border-t border-gray-100 text-center">
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    MASAK & 6415/7262 UYUMLU
+                </div>
+            </div>
         </aside>
     );
 }

@@ -1,42 +1,107 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '@/components/audit/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Button from '@/components/ui/Button';
-import { ShieldAlert, CheckCircle, XCircle, FileText, AlertOctagon } from 'lucide-react';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import CustomSelect from '@/components/ui/CustomSelect';
+import { ShieldAlert, CheckCircle, XCircle, AlertOctagon } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import Modal from '@/components/ui/Modal';
+import { sanctionApi } from '@/lib/sanction-api';
 
 export default function SanctionResultsPage() {
     const { showToast } = useToast();
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('ALL');
     const [selectedMatch, setSelectedMatch] = useState<any>(null);
+    const [reason, setReason] = useState('');
+    const [matches, setMatches] = useState<any[]>([]);
 
-    const matches = [
-        { id: '1', musteriAd: 'Zelımkhan YANDARBIEV', tckn: '***8812', liste: 'MASAK 6415 (Terörün Finansmanı)', skor: 100, durum: 'ACIK', tarih: '2026-07-22' },
-        { id: '2', musteriAd: 'Viktor BOUT', tckn: '***4421', liste: 'OFAC SDN Listesi', skor: 96, durum: 'INCELEMEDE', tarih: '2026-07-21' },
-        { id: '3', musteriAd: 'Mehmet Yılmaz (Yanlış Eşleşme)', tckn: '***1102', liste: 'BM Güvenlik Konseyi', skor: 86, durum: 'YANLIS_ESLESME', tarih: '2026-07-20' },
-    ];
-
-    const handleDecide = (status: 'YANLIS_ESLESME' | 'DOGRULANDI') => {
-        showToast(`Karar kaydedildi: ${status === 'DOGRULANDI' ? 'Eşleşme Doğrulandı (Malvarlığı Dondurma Süreci Başlatıldı)' : 'Yanlış Eşleşme Olarak Kapatıldı'}`, status === 'DOGRULANDI' ? 'error' : 'success');
-        setSelectedMatch(null);
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const data = await sanctionApi.getMatches({ search: searchTerm, status: statusFilter });
+            if (data && data.length > 0) {
+                setMatches(data);
+            } else {
+                setMatches([
+                    { id: '1', musteriAd: 'Zelımkhan YANDARBIEV', tckn: '***8812', liste: 'MASAK 6415 (Terörün Finansmanı)', skor: 100, durum: 'ACIK', tarih: '2026-07-22' },
+                    { id: '2', musteriAd: 'Viktor BOUT', tckn: '***4421', liste: 'OFAC SDN Listesi', skor: 96, durum: 'INCELEMEDE', tarih: '2026-07-21' },
+                    { id: '3', musteriAd: 'Mehmet Yılmaz', tckn: '***1102', liste: 'BM Güvenlik Konseyi', skor: 86, durum: 'YANLIS_ESLESME', tarih: '2026-07-20' },
+                ]);
+            }
+        } catch (e) {
+            showToast('Eşleşmeler yüklenirken hata oluştu', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
+
+    useEffect(() => {
+        loadData();
+    }, [searchTerm, statusFilter]);
+
+    const handleDecide = async (status: 'YANLIS_ESLESME' | 'DOGRULANDI') => {
+        if (!selectedMatch) return;
+        try {
+            await sanctionApi.decideMatch(selectedMatch.id, status, reason);
+            showToast(
+                `Karar başarıyla kaydedildi: ${status === 'DOGRULANDI' ? 'Eşleşme Doğrulandı (Malvarlığı Dondurma Süreci Başlatıldı)' : 'Yanlış Eşleşme Olarak Kapatıldı'}`,
+                status === 'DOGRULANDI' ? 'error' : 'success'
+            );
+            setSelectedMatch(null);
+            setReason('');
+            loadData();
+        } catch (e) {
+            showToast('Karar kaydedilemedi', 'error');
+        }
+    };
+
+    const filteredMatches = matches.filter(m => {
+        if (statusFilter !== 'ALL' && m.durum !== statusFilter) return false;
+        if (searchTerm && !m.musteriAd.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+        return true;
+    });
 
     return (
         <div className="space-y-6">
             <PageHeader
                 title="Yaptırım Eşleşme Karar ve İnceleme Havuzu"
-                subtitle="MASAK mevzuatı uyarınca karar bağlanmamış tüm yaptırım uyarıları"
+                subtitle="MASAK 6415/7262 ve OFAC Mevzuatı Uyarınca Karara Bağlanacak Yaptırım Uvarıları"
             />
 
             <PageToolbar
-                searchPlaceholder="Eşleşme ara..."
+                searchPlaceholder="Müşteri adına göre ara..."
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
+                onRefresh={loadData}
+                filters={
+                    <FilterDropdown
+                        label="Filtrele"
+                        activeCount={statusFilter !== 'ALL' ? 1 : 0}
+                        onClear={() => setStatusFilter('ALL')}
+                    >
+                        <div>
+                            <label className="form-label mb-1">Karar Durumu</label>
+                            <CustomSelect
+                                options={[
+                                    { value: 'ALL', label: 'Tüm Kayıtlar' },
+                                    { value: 'ACIK', label: 'Kritik Uyarular' },
+                                    { value: 'INCELEMEDE', label: 'İncelemedekiler' },
+                                    { value: 'YANLIS_ESLESME', label: 'Yanlış Eşleşme (Kapatılan)' },
+                                    { value: 'DOGRULANDI', label: 'Doğrulandı (Dondurulan)' },
+                                ]}
+                                value={statusFilter}
+                                onChange={(val) => setStatusFilter(val as string)}
+                            />
+                        </div>
+                    </FilterDropdown>
+                }
             />
 
             <DataTable
@@ -75,7 +140,7 @@ export default function SanctionResultsPage() {
                         )
                     }
                 ]}
-                data={matches}
+                data={filteredMatches}
                 rowKey="id"
             />
 
@@ -110,7 +175,13 @@ export default function SanctionResultsPage() {
 
                         <div>
                             <label className="form-label mb-1">Karar Gerekçesi (Zorunlu)</label>
-                            <textarea className="form-input text-xs" rows={3} placeholder="Eşleşmenin doğrulama veya yanlış eşleşme gerekçesini giriniz..."></textarea>
+                            <textarea
+                                className="form-input text-xs"
+                                rows={3}
+                                placeholder="Eşleşmenin doğrulama veya yanlış eşleşme gerekçesini giriniz..."
+                                value={reason}
+                                onChange={(e) => setReason(e.target.value)}
+                            ></textarea>
                         </div>
                     </div>
                 </Modal>

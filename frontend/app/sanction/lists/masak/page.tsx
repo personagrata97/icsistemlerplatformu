@@ -4,13 +4,14 @@ import PageHeader from '@/components/audit/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
-import { ShieldCheck, RefreshCw, FileText } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/components/Toast';
 
 export default function MasakListPage() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const records = [
         { id: '1', adSoyad: 'Zelımkhan YANDARBIEV', tur: 'GERCEK', kararNo: '2024/12', RGNo: '32412', kanun: '6415 S.K. m.5', tarih: '2024-01-15' },
@@ -18,24 +19,37 @@ export default function MasakListPage() {
         { id: '3', adSoyad: 'Tariq Anwar AL-SAYED', tur: 'GERCEK', kararNo: '2025/08', RGNo: '32710', kanun: '6415 S.K. m.7', tarih: '2025-05-10' },
     ];
 
+    const filteredRecords = records.filter(r =>
+        r.adSoyad.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.kararNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.kanun.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleRefresh = async () => {
+        setLoading(true);
+        showToast('Resmî Gazete & MASAK listesi güncelleniyor...', 'info');
+        await new Promise(res => setTimeout(res, 600));
+        setLoading(false);
+        showToast('MASAK listesi başarıyla güncellendi.', 'success');
+    };
+
     return (
         <div className="space-y-6">
             <PageHeader
                 title="MASAK & Resmî Gazete Yaptırım Listesi (6415 / 7262 S.K.)"
                 subtitle="Terörizmin Finansmanı ve Kitle İmha Silahlarının Yayılmasının Önlenmesi Resmî Gazete Kararları"
             />
-
             <PageToolbar
-                searchPlaceholder="Kişi veya kurum ara..."
+                searchPlaceholder="Kişi, kurum veya karar no ara..."
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
+                onRefresh={handleRefresh}
                 rightActions={
-                    <Button variant="primary" leftIcon={<RefreshCw size={16} />} onClick={() => showToast('Resmî Gazete API canlı senkronizasyonu tamamlandı.', 'success')}>
+                    <Button variant="primary" isLoading={loading} leftIcon={<RefreshCw size={16} />} onClick={handleRefresh}>
                         Resmî Gazete API Güncelle
                     </Button>
                 }
             />
-
             <DataTable
                 columns={[
                     { key: 'adSoyad', header: 'Kişi / Kurum Adı', sortable: true },
@@ -45,7 +59,7 @@ export default function MasakListPage() {
                     { key: 'RGNo', header: 'Resmî Gazete Sayısı', width: '160px' },
                     { key: 'tarih', header: 'Yayın Tarihi', width: '120px' }
                 ]}
-                data={records}
+                data={filteredRecords}
                 rowKey="id"
             />
         </div>

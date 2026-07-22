@@ -5,6 +5,7 @@ import PageHeader from '@/components/audit/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import { Search, ShieldAlert, CheckCircle, RefreshCw, UserCheck, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import DataTable from '@/components/ui/DataTable';
@@ -15,6 +16,7 @@ export default function SanctionScanPage() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [scanType, setScanType] = useState('ANLIK');
+    const [scoreFilter, setScoreFilter] = useState('ALL');
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<any[]>([]);
 
@@ -22,7 +24,7 @@ export default function SanctionScanPage() {
         setLoading(true);
         showToast('MASAK, OFAC, BM ve AB listeleri üzerinden tarama yürütülüyor...', 'info');
         try {
-            await new Promise(resolve => setTimeout(resolve, 1200));
+            await new Promise(resolve => setTimeout(resolve, 800));
             setResults([
                 { id: '1', musteriId: 'M-1029', adSoyad: 'Mehmet Yılmaz', tckn: '***1234', skor: 98, eslesmeTuru: 'TAM İSİM', liste: 'MASAK 6415', durum: 'ACIK' },
                 { id: '2', musteriId: 'M-1044', adSoyad: 'Ali Demir', tckn: '***5678', skor: 88, eslesmeTuru: 'BULANIK', liste: 'OFAC SDN', durum: 'INCELEMEDE' },
@@ -34,6 +36,12 @@ export default function SanctionScanPage() {
             setLoading(false);
         }
     };
+
+    const filteredResults = results.filter(r => {
+        if (scoreFilter === 'HIGH' && r.skor < 95) return false;
+        if (scoreFilter === 'MEDIUM' && (r.skor < 85 || r.skor >= 95)) return false;
+        return true;
+    });
 
     return (
         <div className="space-y-6">
@@ -82,7 +90,30 @@ export default function SanctionScanPage() {
 
             {results.length > 0 && (
                 <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-gray-900">Tarama Sonuçları ({results.length})</h3>
+                    <PageToolbar
+                        searchPlaceholder="Sonuçlarda filtrele..."
+                        filters={
+                            <FilterDropdown
+                                label="Filtrele"
+                                activeCount={scoreFilter !== 'ALL' ? 1 : 0}
+                                onClear={() => setScoreFilter('ALL')}
+                            >
+                                <div>
+                                    <label className="form-label mb-1">Skor Eşiği</label>
+                                    <CustomSelect
+                                        options={[
+                                            { value: 'ALL', label: 'Tüm Eşleşmeler (%85+)' },
+                                            { value: 'HIGH', label: 'Kritik Eşleşmeler (%95+)' },
+                                            { value: 'MEDIUM', label: 'İnceleme Adayları (%85-%94)' },
+                                        ]}
+                                        value={scoreFilter}
+                                        onChange={(val) => setScoreFilter(val as string)}
+                                    />
+                                </div>
+                            </FilterDropdown>
+                        }
+                    />
+
                     <DataTable
                         columns={[
                             { key: 'musteriId', header: 'Müşteri No', width: '120px' },
@@ -111,7 +142,7 @@ export default function SanctionScanPage() {
                                 )
                             }
                         ]}
-                        data={results}
+                        data={filteredResults}
                         rowKey="id"
                     />
                 </div>

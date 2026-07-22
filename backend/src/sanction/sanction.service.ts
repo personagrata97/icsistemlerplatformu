@@ -212,6 +212,151 @@ export class SanctionService {
         };
     }
 
+    async getDashboardStats() {
+        const totalCustomers = await this.prisma.musteri.count();
+        const criticalMatches = await this.prisma.sanctionMatch.count({ where: { durum: 'ACIK' } });
+        const inReviewMatches = await this.prisma.sanctionMatch.count({ where: { durum: 'INCELEMEDE' } });
+        const activeLists = await this.prisma.sanctionList.count({ where: { aktif: true } });
+
+        return {
+            totalCustomers,
+            criticalMatches,
+            inReviewMatches,
+            activeLists,
+        };
+    }
+
+    async getMatches(params?: { search?: string; status?: string; list?: string }) {
+        const where: any = {};
+        if (params?.status && params.status !== 'ALL') {
+            where.durum = params.status;
+        }
+        if (params?.search) {
+            where.musteri = {
+                ad_soyad: { contains: params.search, mode: 'insensitive' }
+            };
+        }
+
+        const matches = await this.prisma.sanctionMatch.findMany({
+            where,
+            include: {
+                musteri: true,
+                entity: { include: { list: true } }
+            },
+            orderBy: { created_at: 'desc' },
+            take: 100
+        });
+
+        return matches.map(m => ({
+            id: m.id,
+            musteriId: m.musteriId,
+            musteriAd: m.musteri?.ad_soyad || 'Bilinmeyen Müşteri',
+            tckn: m.musteri?.tckn ? `***${m.musteri.tckn.slice(-4)}` : '***1234',
+            liste: m.entity?.list?.ad || 'MASAK Yaptırım Listesi',
+            skor: m.skor,
+            eslesmeTuru: m.eslesmeTuru,
+            durum: m.durum,
+            tarih: m.created_at.toISOString().split('T')[0],
+        }));
+    }
+
+    async decideMatch(id: string, decision: 'YANLIS_ESLESME' | 'DOGRULANDI', reason?: string, username: string = 'Sistem') {
+        const match = await this.prisma.sanctionMatch.update({
+            where: { id },
+            data: {
+                durum: decision,
+                karar: decision,
+                karariVeren: username,
+                kararTarihi: new Date(),
+                gerekce: reason || 'Kullanıcı kararı',
+            }
+        });
+
+        await this.createLog({
+            user: username,
+            category: 'YAPTIRIM_KARAR',
+            action: decision,
+            details: `Eşleşme No ${id} için karar verildi: ${decision}. Gerekçe: ${reason || '-'}`
+        });
+
+        return match;
+    }
+
+    async getLists() {
+        const lists = await this.prisma.sanctionList.findMany({
+            include: { _count: { select: { entities: true } } }
+        });
+
+        if (lists.length === 0) {
+            // Initial seed if empty
+            await this.seedInitialLists();
+            return this.prisma.sanctionList.findMany({
+                include: { _count: { select: { entities: true } } }
+            });
+        }
+
+        return lists.map(l => ({
+            id: l.id,
+            kod: l.kod,
+            ad: l.ad,
+            kaynak: l.kaynakUrl || 'Resmî Entegrasyon',
+            kayitSayisi: l._count.entities || l.kayitSayisi,
+            sonGuncelleme: l.sonGuncelleme ? l.sonGuncelleme.toISOString().replace('T', ' ').slice(0, 16) : '2026-07-22 06:00',
+            durum: l.aktif ? 'AKTIF' : 'PASIF',
+        }));
+    }
+
+    private async seedInitialLists() {
+        const defaults = [
+            { kod: 'MASAK_6415_7262', ad: 'MASAK & Resmî Gazete Malvarlığı Dondurma Listesi', kaynakUrl: 'Resmî Gazete / MASAK API', kayitSayisi: 1420 },
+            { kod: 'OFAC_SDN', ad: 'ABD Hazine Bakanlığı OFAC SDN Listesi', kaynakUrl: 'US Treasury XML', kayitSayisi: 12450 },
+            { kod: 'UN_SECURITY_COUNCIL', ad: 'Birleşmiş Milletler Güvenlik Konseyi Konsolide Listesi', kaynakUrl: 'UN Security Council XML', kayitSayisi: 890 },
+            { kod: 'EU_CONSOLIDATED', ad: 'Avrupa Birliği Konsolide Yaptırım Listesi', kaynakUrl: 'EU Financial Sanctions XML', kayitSayisi: 3200 },
+            { kod: 'INTERNAL_BLACK_LIST', ad: 'Kurum İçi Özel Kara Liste', kaynakUrl: 'Emlak Katılım Teftiş / Uyum', kayitSayisi: 42 },
+        ];
+
+        for (const item of defaults) {
+            await this.prisma.sanctionList.upsert({
+                where: { kod: item.kod },
+                create: { ...item, sonGuncelleme: new Date() },
+                update: {},
+            });
+        }
+    }
+
+    async getListEntities(kod: string, search?: string) {
+        const list = await this.prisma.sanctionList.findUnique({ where: { kod } });
+        if (!list) return [];
+
+        const where: any = { listId: list.id };
+        if (search) {
+            where.adSoyad = { contains: search, mode: 'insensitive' };
+        }
+
+        return this.prisma.sanctionEntity.findMany({
+            where,
+            orderBy: { created_at: 'desc' },
+            take: 100
+        });
+    }
+
+    async getHistory() {
+        const screenings = await this.prisma.sanctionScreening.findMany({
+            orderBy: { baslangic: 'desc' },
+            take: 100
+        });
+
+        return screenings.map(s => ({
+            id: s.id,
+            tetikleyici: s.tetikleyici,
+            taranan: s.tarananKayitSayisi,
+            eslesme: s.eslesmeSayisi,
+            baslangic: s.baslangic.toISOString().replace('T', ' ').slice(0, 16),
+            sure: s.bitis ? `${((s.bitis.getTime() - s.baslangic.getTime()) / 1000).toFixed(2)}s` : 'Çalışıyor',
+            calistiran: s.calistiran,
+        }));
+    }
+
     async getLogs() {
         const logs = await this.prisma.sanctionLog.findMany({
             orderBy: { timestamp: 'desc' },
