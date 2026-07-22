@@ -144,6 +144,19 @@ export class CreateAuditDto {
 
     @IsOptional()
     involvedParties?: string;
+
+    // İnceleme/Soruşturma Rapor Metinleri
+    @IsString()
+    @IsOptional()
+    investigationSummary?: string;
+
+    @IsString()
+    @IsOptional()
+    investigationFindings?: string;
+
+    @IsString()
+    @IsOptional()
+    investigationOpinion?: string;
 }
 
 /**
@@ -269,4 +282,17 @@ export class UpdateAuditDto {
 
     @IsOptional()
     involvedParties?: string;
+
+    // İnceleme/Soruşturma Rapor Metinleri
+    @IsString()
+    @IsOptional()
+    investigationSummary?: string;
+
+    @IsString()
+    @IsOptional()
+    investigationFindings?: string;
+
+    @IsString()
+    @IsOptional()
+    investigationOpinion?: string;
 }

@@ -270,7 +270,7 @@ function FastTrackPageContent() {
                 {/* Step 1: SSO Authentication Gate */}
                 {!isAuthenticated && (
                     <div className="p-8 md:p-12 flex flex-col items-center">
-                        <div className="bg-[#004a99]/20 p-4 rounded-full border border-[#004a99]/40 mb-6 animate-pulse">
+                        <div className="bg-[#0A7A4B]/20 p-4 rounded-full border border-[#0A7A4B]/40 mb-6 animate-pulse">
                             <Lock className="w-10 h-10 text-[#c9a84c]" />
                         </div>
                         
@@ -289,7 +289,7 @@ function FastTrackPageContent() {
                                         value={adUsername}
                                         onChange={(e) => setAdUsername(e.target.value)}
                                         placeholder="ornek.kullanici"
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-[#004a99] transition-all"
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-[#0A7A4B] transition-all"
                                     />
                                 </div>
                             </div>
@@ -303,7 +303,7 @@ function FastTrackPageContent() {
                                         value={adPassword}
                                         onChange={(e) => setAdPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-[#004a99] transition-all"
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-[#0A7A4B] transition-all"
                                     />
                                 </div>
                             </div>
@@ -318,7 +318,7 @@ function FastTrackPageContent() {
                             <button 
                                 type="submit" 
                                 disabled={authLoading}
-                                className="w-full py-3 bg-gradient-to-r from-[#004a99] to-[#002d62] text-white font-bold text-sm rounded-xl hover:from-[#005cbe] hover:to-[#00428d] transition-all duration-300 shadow-lg shadow-[#004a99]/20 flex items-center justify-center gap-2 border border-[#003a78] disabled:opacity-50"
+                                className="w-full py-3 bg-gradient-to-r from-[#0A7A4B] to-[#064F31] text-white font-bold text-sm rounded-xl hover:from-[#0C9A5F] hover:to-[#087A4D] transition-all duration-300 shadow-lg shadow-[#0A7A4B]/20 flex items-center justify-center gap-2 border border-[#055A37] disabled:opacity-50"
                             >
                                 {authLoading ? <RotateCw className="w-4 h-4 animate-spin" /> : 'Doğrula ve Devam Et'}
                             </button>
@@ -336,7 +336,7 @@ function FastTrackPageContent() {
                     <div className="p-6 md:p-8 space-y-8">
                         
                         {/* Upper Active Profile Ribbon */}
-                        <div className="bg-[#004a99]/10 border border-[#004a99]/20 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="bg-[#0A7A4B]/10 border border-[#0A7A4B]/20 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
                                 <div className="bg-[#c9a84c]/20 p-2.5 rounded-xl border border-[#c9a84c]/40">
                                     <ShieldCheck className="w-5 h-5 text-[#c9a84c]" />
@@ -366,7 +366,7 @@ function FastTrackPageContent() {
                                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
                                             findingDetails.risk === 'Kritik' || findingDetails.risk === 'Yüksek' 
                                                 ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
-                                                : 'bg-[#004a99]/20 text-[#004a99] border border-[#004a99]/30'
+                                                : 'bg-[#0A7A4B]/20 text-[#0A7A4B] border border-[#0A7A4B]/30'
                                         }`}>
                                             {findingDetails.risk}
                                         </span>
@@ -446,7 +446,7 @@ function FastTrackPageContent() {
                                         value={rootCause}
                                         onChange={(e) => setRootCause(e.target.value)}
                                         placeholder="Bulgunun ortaya çıkmasına zemin hazırlayan kök nedeni analiz ederek buraya yazınız..."
-                                        className="w-full p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-200 focus:outline-none focus:border-[#004a99] transition-all resize-none"
+                                        className="w-full p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-200 focus:outline-none focus:border-[#0A7A4B] transition-all resize-none"
                                     />
                                 </div>
 
@@ -459,7 +459,7 @@ function FastTrackPageContent() {
                                         value={response}
                                         onChange={(e) => setResponse(e.target.value)}
                                         placeholder={isAgreed ? "Bulguya ve aksiyon planına ilişkin yönetim görüşünüzü buraya yazınız..." : "Bulguya katılmama gerekçenizi mevzuat, süreç veya fiili durum açıklamaları ile detaylıca giriniz..."}
-                                        className="w-full p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-200 focus:outline-none focus:border-[#004a99] transition-all resize-none"
+                                        className="w-full p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-200 focus:outline-none focus:border-[#0A7A4B] transition-all resize-none"
                                     />
                                 </div>
                             </div>
@@ -476,7 +476,7 @@ function FastTrackPageContent() {
                                     <button 
                                         type="button" 
                                         onClick={addActionRow}
-                                        className="px-3 py-1.5 bg-[#004a99]/20 hover:bg-[#004a99]/30 text-xs font-bold text-[#c9a84c] border border-[#004a99]/40 rounded-xl flex items-center gap-1.5 transition-all"
+                                        className="px-3 py-1.5 bg-[#0A7A4B]/20 hover:bg-[#0A7A4B]/30 text-xs font-bold text-[#c9a84c] border border-[#0A7A4B]/40 rounded-xl flex items-center gap-1.5 transition-all"
                                     >
                                         <Plus className="w-3.5 h-3.5" /> Aksiyon Ekle
                                     </button>
@@ -496,7 +496,7 @@ function FastTrackPageContent() {
                                                     value={act.action}
                                                     onChange={(e) => updateActionRow(index, 'action', e.target.value)}
                                                     placeholder="Alınacak aksiyon veya düzeltici işlem..."
-                                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-[#004a99]"
+                                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-[#0A7A4B]"
                                                 />
                                             </div>
 
@@ -551,7 +551,7 @@ function FastTrackPageContent() {
                                             ✔ Kripto Kilit Aktif
                                         </div>
                                         
-                                        <h4 className="text-sm font-extrabold text-[#004a99]">Active Directory Güvenlik Mührü Beyanı</h4>
+                                        <h4 className="text-sm font-extrabold text-[#0A7A4B]">Active Directory Güvenlik Mührü Beyanı</h4>
                                         
                                         <p className="text-xs text-slate-600 leading-relaxed font-semibold">
                                             Aşağıda belirtilen işlem parametreleri ve yönetim beyanınız, Emlak Katılım Teftiş Kurulu AMS altyapısı üzerinde 
@@ -561,9 +561,9 @@ function FastTrackPageContent() {
 
                                         {/* Seal details in small table */}
                                         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-3 border-t border-slate-200 text-[11px] font-semibold text-slate-700">
-                                            <div>Yetkili İmzalayan: <span className="font-bold text-[#004a99]">{managerProfile.displayName}</span></div>
-                                            <div>AD Sicil ID: <span className="font-bold text-[#004a99]">{adUsername}</span></div>
-                                            <div>Damga Zamanı: <span className="font-bold text-[#004a99]">{new Date(timestamp).toLocaleString('tr-TR')}</span></div>
+                                            <div>Yetkili İmzalayan: <span className="font-bold text-[#0A7A4B]">{managerProfile.displayName}</span></div>
+                                            <div>AD Sicil ID: <span className="font-bold text-[#0A7A4B]">{adUsername}</span></div>
+                                            <div>Damga Zamanı: <span className="font-bold text-[#0A7A4B]">{new Date(timestamp).toLocaleString('tr-TR')}</span></div>
                                             <div>İşlem Durumu: <span className="font-bold text-emerald-700">{isAgreed ? 'MUTABIK' : 'BULGU RED'}</span></div>
                                         </div>
                                     </div>
@@ -572,7 +572,7 @@ function FastTrackPageContent() {
                                     <div className="shrink-0 flex items-center justify-center">
                                         <div className="w-32 h-32 rounded-full border-4 border-dashed border-[#c9a84c] flex flex-col items-center justify-center bg-white shadow-lg p-2 text-center animate-spin-slow">
                                             <ShieldCheck className="w-8 h-8 text-emerald-600 mb-1" />
-                                            <span className="text-[8px] font-extrabold text-[#004a99] uppercase tracking-wider">TASARRUF FİNANSMAN</span>
+                                            <span className="text-[8px] font-extrabold text-[#0A7A4B] uppercase tracking-wider">TASARRUF FİNANSMAN</span>
                                             <span className="text-[9px] font-extrabold text-emerald-600 uppercase tracking-widest">{isAgreed ? 'MUTABIK' : 'RED'}</span>
                                             <span className="text-[6px] font-bold text-slate-400 mt-1">AMS INTEGRITY</span>
                                         </div>

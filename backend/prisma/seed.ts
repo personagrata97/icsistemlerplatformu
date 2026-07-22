@@ -513,7 +513,7 @@ async function main() {
                 title: 'Parola Politikası Yetersizliği',
                 risk: 'Yüksek',
                 status: 'Açık',
-                dueDate: '2024-06-01',
+                dueDate: new Date('2024-06-01T00:00:00Z'),
                 description: 'Sistemlerde karmaşık parola politikası zorunlu tutulmamaktadır.',
                 department: 'Bilgi Teknolojileri',
                 assignedUserId: auditUser.id // audit_user'a atandı
@@ -523,7 +523,7 @@ async function main() {
                 title: 'Yedekleme Testlerinin Eksikliği',
                 risk: 'Orta',
                 status: 'Kapalı',
-                dueDate: '2024-03-01',
+                dueDate: new Date('2024-03-01T00:00:00Z'),
                 description: 'Kritik sistemlerin yedekleme testleri düzenli yapılmamaktadır.',
                 department: 'Bilgi Teknolojileri',
                 assignedUserId: adminUser.id // admin'e atandı
@@ -533,7 +533,7 @@ async function main() {
                 title: 'Kasa Mutabakat Farkları',
                 risk: 'Kritik',
                 status: 'Açık',
-                dueDate: '2024-04-01',
+                dueDate: new Date('2024-04-01T00:00:00Z'),
                 description: 'Günlük kasa mutabakatlarında açıklanamayan farklar tespit edilmiştir.',
                 department: 'Operasyon',
                 assignedUserId: auditUser.id // audit_user'a atandı

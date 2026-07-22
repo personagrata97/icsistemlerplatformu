@@ -3,7 +3,11 @@ import SanctionSidebar from '@/components/sanction/SanctionSidebar';
 import UserInfo from '@/components/UserInfo';
 import Link from 'next/link';
 import { Home, Settings, LogOut } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+
 export default function SanctionLayout({ children }: { children: React.ReactNode }) {
+    const { logout } = useAuth();
+
     return (
         <div className="flex min-h-screen bg-gray-50 uppercase-fonts-disabled">
             {/* Sidebar */}
@@ -35,10 +39,7 @@ export default function SanctionLayout({ children }: { children: React.ReactNode
                         <UserInfo />
                         <button
                             className="flex items-center gap-2 text-gray-500 hover:text-red-600 transition-colors"
-                            onClick={() => {
-                                localStorage.removeItem('access_token');
-                                window.location.href = '/login';
-                            }}
+                            onClick={() => logout()}
                         >
                             <LogOut size={18} />
                             <span className="text-sm font-medium">Çıkış</span>
@@ -54,4 +55,5 @@ export default function SanctionLayout({ children }: { children: React.ReactNode
         </div>
     );
 }
+
 

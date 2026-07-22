@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import ConfirmModal from '@/components/ConfirmModal';
+import { authEvents } from '@/lib/auth-events';
 
 export interface UserPermission {
     module: string;
@@ -52,13 +53,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (parsedUser && Array.isArray(parsedUser.roles) && parsedUser.username) {
                     setUser(parsedUser);
                 } else {
-                console.warn('Geçersiz kullanıcı verisi, oturum temizleniyor');
+                    console.warn('Geçersiz kullanıcı verisi, oturum temizleniyor');
                     clearSession();
                 }
             } catch (e) {
                 console.warn('Kullanıcı verisi ayrıştırılamadı');
                 clearSession();
             }
+        } else {
+            setUser(null);
         }
         setIsLoading(false);
     }, []);
@@ -152,8 +155,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const publicRoutes = ['/login', '/audit/ethics/submit', '/ethics'];
         const isPublic = publicRoutes.some(path => pathname?.startsWith(path));
 
-        if (!isLoading && !user && !isPublic) {
-            router.push('/login');
+        // Bekleme esnasında (isLoading=true) veya kullanıcı yüklendiğinde yönlendirme yapılmaz.
+        // Yalnızca yükleme bittiğinde, kullanıcı yoksa ve public rota değilse yönlendir.
+        if (!isLoading && user === null && !isPublic) {
+            router.push(`/login?redirect=${encodeURIComponent(pathname || '/')}`);
         }
     }, [user, isLoading, pathname, router]);
 
@@ -225,6 +230,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return false;
         }
     }, []);
+
+    // ============================================
+    // Merkezi Auth Event Entegrasyonu
+    // ============================================
+    // API istemcileri (audit-api, api-client, admin-api) 401 aldığında
+    // authEvents.emitUnauthorized() çağırır. Bu handler önce token
+    // yenilemeyi dener, başarısız olursa logout yapar.
+    useEffect(() => {
+        authEvents.setUnauthorizedHandler(async (): Promise<boolean> => {
+            const refreshToken = localStorage.getItem('refresh_token');
+            if (!refreshToken) {
+                clearSession();
+                setUser(null);
+                router.push('/login');
+                return false;
+            }
+
+            const success = await refreshAccessToken();
+            if (!success) {
+                clearSession();
+                setUser(null);
+                router.push('/login');
+                return false;
+            }
+            return true;
+        });
+    }, [refreshAccessToken, router]);
 
     // Yetki kontrol fonksiyonları
     const hasPermission = useCallback((module: string, action: string): boolean => {

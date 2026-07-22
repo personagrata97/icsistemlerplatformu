@@ -3,6 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { formatDate } from './audit-utils';
+import { authEvents } from './auth-events';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1'; // Backend URL
 
@@ -37,15 +38,15 @@ const transformDecimals = (data: any): any => {
 const handleResponse = async (res: Response) => {
     if (res.status === 401) {
         if (typeof window !== 'undefined') {
-            // Eğer zaten login sayfasındaysak redirect etme, hatayı fırlat
+            // Zaten login sayfasındaysak tekrar yönlendirme
             if (window.location.pathname === '/login') {
                 const errorData = await res.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.');
             }
 
-            localStorage.removeItem('access_token');
-            // localStorage.removeItem('user'); // Optional: clear user data too
-            window.location.href = '/login';
+            // Merkezi auth event sistemi üzerinden token yenileme dene.
+            // Başarısız olursa authEvents içindeki handler logout yapacak.
+            await authEvents.emitUnauthorized();
         }
         throw new Error('Oturum süresi doldu');
     }

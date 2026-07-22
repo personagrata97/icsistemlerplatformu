@@ -58,42 +58,23 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
     // Load initial data from DB and LocalStorage
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            // Priority: Local storage for drafts
+            // DB'den gelen rapor metinleri öncelikli, yoksa localStorage (draft fallback), hiçbiri yoksa boş bırak
+            let parsedDraft: any = null;
             const savedData = localStorage.getItem(`inv_report_${auditId}`);
             if (savedData) {
                 try {
-                    const parsed = JSON.parse(savedData);
-                    setSummary(parsed.summary || '');
-                    setFindings(parsed.findings || '');
-                    setOpinion(parsed.opinion || '');
-                    if (parsed.lastSaved) {
-                        setLastSaved(parsed.lastSaved);
-                    }
+                    parsedDraft = JSON.parse(savedData);
                 } catch (e) {
                     console.error('LocalStorage load error', e);
                 }
-            } else {
-                setSummary(
-                    auditData.title?.includes('Eskişehir') 
-                    ? `Teftiş Kurulu Müdürlüğüne 12.01.2026 tarihinde gelen e-postada; Eskişehir Şubesi'nde çalışan Ahmet Veli'nin (sicil no 123) müşteri adına evrak düzenlediğine dair şikayet tarafımıza iletilmiştir.`
-                    : auditData.title?.includes('CRM') 
-                    ? `Teftiş Kurulu Müdürlüğünün 05.02.2026 tarihli görevlendirmesine istinaden; Bankamız CRM (Müşteri İlişkileri Yönetimi) uygulamasında kullanıcı yetki tanımları ve onay mekanizmalarının güncel durumu ve işlem logları incelenmiştir.`
-                    : `Olay, ${auditData.title || 'Soruşturma Konusu İşlem'} kapsamında tebliğ edilen ihbar/etik bildirim üzerine incelenmiştir.`
-                );
-                setFindings(
-                    auditData.title?.includes('Eskişehir')
-                    ? `Eskişehir Şubesi'nde, imza mutabakatsızlığı bulunan tasarruf finansman sözleşmesine ait evraka ilişkin tarihlerin görüntüsünün izlenmesi neticesinde;\n1. İlgili sözleşmenin 07.01.2026 tarihi saat 13.10'da yazdırıldığı, imzalanan sözleşmenin ise CRM uygulamamıza aynı tarihte saat 13.50'de yüklendiği,\n2. 321 numaralı müşterinin o saat aralığında şubeye hiç gelmediği ve Ahmet Veli isimli çalışanın yazıcıdan aldığı evrakı kendi masasında müşteri adına imzalayarak CRM uygulamamıza yüklediği\ngörülmüştür.`
-                    : auditData.title?.includes('CRM')
-                    ? `CRM uygulamasında yapılan teknik ve yerel incelemelerde aşağıdaki tespitlere ulaşılmıştır:\n1. İş akdi feshedilen 15 personelin aktif CRM yetkilerinin manuel olarak kapatılmadığı,\n2. Kredi kullandırım süreçlerinde "Şube Müdürü Onayı" adımının sistemsel bir zafiyet nedeniyle bazı operasyonlarda pas geçilebildiği,\n3. Kritik müşteri verilerinden olan iletişim (telefon) numarası güncelleme işlemlerinde, çift onay (maker-checker) kuralının uygulanmadığı ve tek personelin serbestçe değişiklik yapabildiği\ntespit edilmiştir.`
-                    : `Yapılan yerel saha çalışmasında ve ilgili sistem log kayıtlarının incelenmesi neticesinde somut bulgulara ulaşılmış ve ekler tablosunda sunulmuştur.`
-                );
-                setOpinion(
-                    auditData.title?.includes('Eskişehir')
-                    ? `Ahmet Veli isimli çalışanın yazılı ifadesinde; "Bunu prim kazanabilmek için yaptığını ve pişman olduğunu" belirtmesi ve kamera kayıtları ile evrak loglarının uyuşması neticesinde çalışanın mütamadiyen kusurlu olduğu kanaatine varılmıştır.`
-                    : auditData.title?.includes('CRM')
-                    ? `Elde edilen bulgular doğrultusunda;\n- Kurumdan ayrılan personelin yetkilerinin İK-BT entegrasyonuyla otomatik iptal edilmesi,\n- "Şube Müdürü Onayı" adımındaki sistemsel açığın acilen yamanması,\n- Telefon no güncelleme işlemlerine ivedilikle çift onay (maker-checker) kuralı getirilmesi,\n- İşbu teknik zafiyetlerin giderilmesi adına Bilgi Teknolojileri Müdürlüğü'ne bulgu kaydı açılması\nkanaatine varılmıştır.`
-                    : `Elde edilen deliller ve alınan yazılı ifadeler doğrultusunda, sorumluluğu tespit edilen personel hakkında Kurum disiplin politikaları çerçevesinde işlem yapılması kanaatine varılmıştır.`
-                );
+            }
+
+            setSummary(auditData.investigationSummary || parsedDraft?.summary || '');
+            setFindings(auditData.investigationFindings || parsedDraft?.findings || '');
+            setOpinion(auditData.investigationOpinion || parsedDraft?.opinion || '');
+            
+            if (parsedDraft?.lastSaved) {
+                setLastSaved(parsedDraft.lastSaved);
             }
 
             // DB data for analytical fields
@@ -126,7 +107,10 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                 financialImpact: financialImpact === '' ? null : Number(financialImpact),
                 currency,
                 disciplinaryAction: disciplinaryDecision,
-                involvedParties: JSON.stringify(subjects)
+                involvedParties: JSON.stringify(subjects),
+                investigationSummary: summary,
+                investigationFindings: findings,
+                investigationOpinion: opinion
             });
 
             setLastSaved(dataToDraft.lastSaved);

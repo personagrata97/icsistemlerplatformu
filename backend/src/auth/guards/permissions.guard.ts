@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException, Logger } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException, Logger, Optional } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY, PermissionRequirement } from '../decorators/permissions.decorator';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
@@ -10,7 +10,7 @@ export class PermissionsGuard implements CanActivate {
 
     constructor(
         private reflector: Reflector,
-        private auditLogService: AuditLogService
+        @Optional() private auditLogService?: AuditLogService
     ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -43,13 +43,13 @@ export class PermissionsGuard implements CanActivate {
             this.logger.warn(`[PRIVILEGED_ACCESS_BYPASS] God Mode Yetki Geçişi: Kullanıcı: ${userName}, Uç: ${path}`);
             
             // Log privileged access bypass for compliance auditability
-            this.auditLogService.createLog({
+            this.auditLogService?.createLog({
                 user: userName,
                 action: 'AYRICALIKLI_ERISIM_BYPASS',
                 details: `Yönetici ayrıcalığı (God Mode) ile yetki kontrolü doğrudan onaylandı. Uç Nokta: ${path}, Gerekli Yetkiler: ${requiredPermissions.map(p => `${p.module}:${p.action}`).join(', ')}`,
                 targetType: 'SystemAccess',
                 targetId: path
-            }).catch(err => this.logger.warn('Privileged access log kaydı başarısız:', err));
+            })?.catch(err => this.logger.warn('Privileged access log kaydı başarısız:', err));
 
             return true;
         }

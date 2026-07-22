@@ -16,6 +16,15 @@ export default function LoginPage() {
     const { showToast } = useToast();
     const router = useRouter();
 
+    // Clear stale session items when arriving at login page to prevent redirect loops
+    useState(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user');
+        }
+    });
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);

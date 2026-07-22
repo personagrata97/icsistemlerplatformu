@@ -1,8 +1,5 @@
 # Base Image
-FROM node:20-alpine
-
-# Gerekli sistem kütüphanelerini yükle (Prisma için openssl gerekli)
-RUN apk add --no-cache openssl
+FROM node:20
 
 # Çalışma dizini oluştur
 WORKDIR /app
@@ -10,8 +7,10 @@ WORKDIR /app
 # Bağımlılıkları kopyala
 COPY package*.json ./
 
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+
 # Bağımlılıkları yükle
-RUN npm install --legacy-peer-deps
+RUN npm config set strict-ssl false && npm install --legacy-peer-deps
 
 # Kaynak kodları ve prisma şemasını kopyala
 COPY . .

@@ -379,6 +379,32 @@ export default function SettingsPage() {
 
     // --- Guards ---
     if (!user) return null;
+
+    // Yetki kontrolü: ADMIN:VIEW yetkisi veya yönetici rolü gerekli
+    const canAccessSettings = user.roles?.includes('ADMIN') || 
+                              user.roles?.includes('SYSTEM_ADMIN') || 
+                              user.roles?.includes('AUDIT_ADMIN') ||
+                              user.permissions?.some(p => p.module === 'ADMIN' && (p.action === 'VIEW' || p.action === 'ALL'));
+
+    if (!canAccessSettings) {
+        return (
+            <SharedAuditLayout hideSidebar={true}>
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <div className="text-center space-y-4">
+                        <div className="mx-auto w-20 h-20 rounded-2xl bg-red-50 flex items-center justify-center">
+                            <Shield className="h-10 w-10 text-red-300" />
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-700">Erişim Yetkiniz Bulunmuyor</h2>
+                        <p className="text-gray-500 text-sm max-w-md">
+                            Bu sayfaya erişmek için yönetici yetkisi gereklidir. 
+                            Yetki talep etmek için sistem yöneticinize başvurunuz.
+                        </p>
+                    </div>
+                </div>
+            </SharedAuditLayout>
+        );
+    }
+
     if (loading && roles.length === 0) return <LoadingState message="Ayarlar yükleniyor..." />;
 
     const selectedRole = roles.find(r => r.id === selectedRoleId);

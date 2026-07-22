@@ -4,38 +4,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { AuditLogService } from './audit-log.service';
 import { ORG } from '../common/org-config';
+import { BRAND_COLORS } from '../common/brand-colors';
 const PDFDocument = require('pdfkit');
 const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 
 // ============================================================
-// CORPORATE DESIGN TOKENS
+// CORPORATE DESIGN TOKENS — Merkezi brand-colors.ts'den alınır
 // ============================================================
-const COLORS = {
-    primary: '#004a99',        // Emlak Katılım Koyu Mavi
-    primaryDark: '#001d3d',    // Daha koyu mavi (gradient)
-    primaryLight: '#e8f0fe',   // Açık mavi arka plan
-    gold: '#c9a84c',           // Altın (premium aksan)
-    white: '#ffffff',
-    black: '#000000',
-    text: '#1a1a2e',           // Ana metin
-    textSecondary: '#4a5568',  // İkincil metin
-    textMuted: '#718096',      // Soluk metin
-    border: '#cbd5e0',         // Kenarlık
-    borderLight: '#e2e8f0',    // Hafif kenarlık
-    success: '#059669',        // Yeşil
-    danger: '#dc2626',         // Kırmızı
-    warning: '#f59e0b',        // Sarı
-    orange: '#f97316',         // Turuncu
-    riskKritik: '#881337',     // Bordo
-    riskYuksek: '#dc2626',     // Kırmızı
-    riskOrta: '#f97316',       // Turuncu
-    riskDusuk: '#ca8a04',      // Koyu sarı
-    bgLight: '#f8fafc',        // Açık arka plan
-    bgAccent: '#f0f4ff',       // Aksan arka plan
-};
+const COLORS = BRAND_COLORS;
 
 import { PdfReportService } from './pdf-report.service';
+import { REPORT_TYPES, generateReportNumber } from '../common/report-types';
 
 @Injectable()
 export class ReportGeneratorService {
@@ -384,24 +364,23 @@ export class ReportGeneratorService {
 
     /** Get localized report title */
     private getReportTitle(type: string): string {
-        const titles: Record<string, string> = {
-            'activity': 'Faaliyet Raporu',
-            'Faaliyet Raporu': 'Faaliyet Raporu',
-            'Denetim Komitesi Sunumu': 'Denetim Komitesi Sunumu',
-            'Yönetim Kurulu Raporu': 'Yönetim Kurulu Raporu',
-            'board': 'Yönetim Kurulu Raporu',
-            'Bulgu Özeti': 'Bulgu Özeti Raporu',
-            'finding-summary': 'Bulgu Özeti Raporu',
-            'Bulgu Yaşlandırma': 'Bulgu Yaşlandırma Raporu',
-            'finding-aging': 'Bulgu Yaşlandırma Raporu',
-            'Risk Matrisi': 'Denetim Evreni Risk Matrisi',
-            'risk-assessment': 'Risk Değerlendirme Raporu',
-            'risk-matrix': 'Risk Matrisi',
-            'Denetim Planı İlerleme': 'Yıllık Plan İlerleme Raporu',
-            'plan-progress': 'Yıllık Plan İlerleme Raporu',
-            'audit_docx': 'Denetim Raporu',
-        };
-        return titles[type] || `${type} Raporu`;
+        // REPORT_TYPES'tan otomatik mapping
+        const typeMap: Record<string, string> = {};
+        for (const [, cfg] of Object.entries(REPORT_TYPES)) {
+            typeMap[cfg.label] = cfg.label;
+            typeMap[cfg.shortLabel] = cfg.label;
+        }
+        // Ek eski uyumluluk mapping'leri
+        typeMap['activity'] = REPORT_TYPES.FAALIYET.label;
+        typeMap['board'] = REPORT_TYPES.YONETIM_KURULU.label;
+        typeMap['finding-summary'] = REPORT_TYPES.BULGU_OZETI.label;
+        typeMap['finding-aging'] = REPORT_TYPES.BULGU_YASLANDIRMA.label;
+        typeMap['risk-matrix'] = REPORT_TYPES.RISK_DEGERLENDIRME.label;
+        typeMap['risk-assessment'] = REPORT_TYPES.RISK_DEGERLENDIRME.label;
+        typeMap['plan-progress'] = REPORT_TYPES.PLAN_ILERLEME.label;
+        typeMap['audit_docx'] = REPORT_TYPES.SUREC_DENETIM.label;
+        
+        return typeMap[type] || type;
     }
 
     /** Get risk color for PDFKit */

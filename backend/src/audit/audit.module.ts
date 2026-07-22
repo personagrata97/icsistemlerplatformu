@@ -38,6 +38,8 @@ import { CommunicationService } from './communication.service';
 import { NotificationModule } from '../common/notification/notification.module';
 import { KvkkController } from './kvkk.controller';
 import { KvkkService } from './kvkk.service';
+import { BilgiNotuService } from './bilgi-notu.service';
+import { BilgiNotuController } from './bilgi-notu.controller';
 
 @Module({
     imports: [EmailModule, AuditronModule, RiskEngineModule, NotificationModule],
@@ -53,6 +55,7 @@ import { KvkkService } from './kvkk.service';
         EthicsController,
         CommunicationController,
         KvkkController,
+        BilgiNotuController,
     ],
     providers: [
         AuditService,
@@ -77,6 +80,7 @@ import { KvkkService } from './kvkk.service';
         CommunicationService,
         AuditStaffService,
         KvkkService,
+        BilgiNotuService,
     ],
     exports: [AuditService, FindingService, AuditTrashService, AuditLogService, AuditRiskService, PdfReportService],
 })

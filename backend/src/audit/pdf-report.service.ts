@@ -2,28 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ORG } from '../common/org-config';
+import { BRAND_COLORS } from '../common/brand-colors';
 
 const PDFDocument = require('pdfkit');
 
-export const PDF_COLORS = {
-    primary: '#004a99',        // Emlak Katılım Koyu Mavi
-    primaryDark: '#001d3d',    // Daha koyu mavi
-    primaryLight: '#e8f0fe',   // Açık mavi
-    gold: '#c9a84c',           // Altın aksan
-    white: '#ffffff',
-    text: '#1a1a2e',           // Ana metin
-    textSecondary: '#4a5568',  // İkincil metin
-    textMuted: '#718096',      // Soluk metin
-    border: '#cbd5e0',         // Kenarlık
-    success: '#059669',
-    danger: '#dc2626',
-    warning: '#f59e0b',
-    riskKritik: '#881337',
-    riskYuksek: '#dc2626',
-    riskOrta: '#f97316',
-    riskDusuk: '#ca8a04',
-    bgLight: '#f8fafc',
-};
+// Merkezi brand-colors.ts'den alınır
+export const PDF_COLORS = BRAND_COLORS;
 
 @Injectable()
 export class PdfReportService {

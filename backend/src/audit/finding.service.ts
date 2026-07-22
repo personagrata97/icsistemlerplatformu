@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { PdfReportService } from './pdf-report.service';
+import { BRAND_COLORS, EMAIL_COLORS } from '../common/brand-colors';
 const PDFDocument = require('pdfkit');
 
 @Injectable()
@@ -510,14 +511,14 @@ export class FindingService {
             <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
                 
                 <!-- Header -->
-                <div style="background: linear-gradient(135deg, #004a99 0%, #001d3d 100%); padding: 30px; text-align: center; border-bottom: 3px solid #c9a84c;">
+                <div style="background: linear-gradient(135deg, ${BRAND_COLORS.primary} 0%, ${BRAND_COLORS.primaryDark} 100%); padding: 30px; text-align: center; border-bottom: 3px solid ${BRAND_COLORS.gold};">
                     <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 0.5px;">TASARRUF FİNANSMAN A.Ş.</h1>
                     <p style="color: #c9a84c; margin: 5px 0 0 0; font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">Teftiş Kurulu Başkanlığı</p>
                 </div>
                 
                 <!-- Body -->
                 <div style="padding: 35px 30px;">
-                    <div style="display: inline-block; background-color: #e8f0fe; color: #004a99; padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: bold; margin-bottom: 20px;">
+                    <div style="display: inline-block; background-color: ${BRAND_COLORS.primaryLight}; color: ${BRAND_COLORS.primary}; padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: bold; margin-bottom: 20px;">
                         ⚠️ RESMİ TEBLİĞ & HIZLI MUTABAKAT
                     </div>
                     
@@ -529,7 +530,7 @@ export class FindingService {
                     </p>
                     
                     <!-- Details Box -->
-                    <div style="background-color: #f8fafc; border-left: 4px solid #004a99; padding: 20px; border-radius: 0 8px 8px 0; margin: 25px 0; border-top: 1px solid #edf2f7; border-right: 1px solid #edf2f7; border-bottom: 1px solid #edf2f7;">
+                    <div style="background-color: ${BRAND_COLORS.bgLight}; border-left: 4px solid ${BRAND_COLORS.primary}; padding: 20px; border-radius: 0 8px 8px 0; margin: 25px 0; border-top: 1px solid #edf2f7; border-right: 1px solid #edf2f7; border-bottom: 1px solid #edf2f7;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                             <tr>
                                 <td style="padding: 6px 0; color: #718096; width: 120px; font-weight: bold;">Bulgu Kodu:</td>
@@ -557,7 +558,7 @@ export class FindingService {
                     
                     <!-- CTA Button -->
                     <div style="text-align: center; margin: 35px 0;">
-                        <a href="${magicLink}" style="display: inline-block; background: linear-gradient(135deg, #004a99 0%, #002e62 100%); color: #ffffff; text-decoration: none; padding: 15px 35px; border-radius: 8px; font-weight: bold; font-size: 15px; box-shadow: 0 4px 10px rgba(0,74,153,0.3); border: 1px solid #003a78; transition: all 0.2s;">
+                        <a href="${magicLink}" style="display: inline-block; background: linear-gradient(135deg, ${EMAIL_COLORS.ctaGradientStart} 0%, ${EMAIL_COLORS.ctaGradientEnd} 100%); color: #ffffff; text-decoration: none; padding: 15px 35px; border-radius: 8px; font-weight: bold; font-size: 15px; box-shadow: 0 4px 10px ${EMAIL_COLORS.ctaShadow}; border: 1px solid ${EMAIL_COLORS.ctaBorder}; transition: all 0.2s;">
                             🔐 SSO Doğrulamalı Hızlı Mutabakat Portalı
                         </a>
                     </div>
@@ -1022,19 +1023,8 @@ export class FindingService {
         const stream = fs.createWriteStream(filePath);
         doc.pipe(stream);
 
-        // Corporate Design Tokens
-        const colors = {
-            primary: '#004a99',
-            primaryDark: '#001d3d',
-            gold: '#c9a84c',
-            white: '#ffffff',
-            text: '#1a1a2e',
-            textSecondary: '#4a5568',
-            border: '#cbd5e0',
-            bgLight: '#f8fafc',
-            success: '#059669',
-            danger: '#dc2626'
-        };
+        // Corporate Design Tokens — Merkezi brand-colors.ts'den alınır
+        const colors = BRAND_COLORS;
 
         // Draw elegant double border
         const W = doc.page.width;

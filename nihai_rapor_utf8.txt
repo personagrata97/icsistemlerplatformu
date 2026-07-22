@@ -1,0 +1,256 @@
+--- PAGE 1 ---
+İÇ SİSTEMLER PLATFORMU
+Raporlama Standardı ve Entegrasyon Planı — Nihai Tek Rapor
+Bu belge, önceki tüm ara raporların yerine geçen tek ve nihai rapordur. Sistem kodundan çıkarılan
+GERÇEK tasarım değerleri (renk, font, kurumsal kimlik) esas alınmıştır; varsayım kullanılmamıştır.
+Alan
+Değer (koddan doğrulanmış)
+Depo / commit
+github.com/personagrata97/icsistemlerplatformu — 68918f2 (21.07.2026)
+Kurumsal kimlik
+Emlak Katılım · Teftiş Kurulu (org-config.ts merkezi)
+Font
+Liberation Sans (Regular/Bold) — assets/
+Mevcut ana renk
+#004a99 KOYU MAVİ (tüm rapor + bulgu formu + e-posta)
+Talep edilen renk
+Emlak Katılım YEŞİLİ — bu rapor #0A7A4B esas alır
+Gizlilik
+HİZMETE ÖZEL — GİZLİ (org-config)
+
+
+--- PAGE 2 ---
+1. Önce Net Durum: Ne Yapıldı, Ne Yapılmadı
+Yanlış bir güven bırakmamak için açık olmam gerekiyor:
+Konu
+Gerçek Durum
+Sistemde kod değişikliği
+YAPILMADI. Ben koda yazamam, sadece okuyup analiz ederim. Aşağıdaki her
+şey senin AI'nın uygulaması içindir.
+Rapor türlerinin
+yeknesaklaşması
+HENÜZ YOK. Spec hazır, uygulanması gerekiyor.
+Bilgi Notu
+Sistemde YOK. Bu raporda tasarımı + entegrasyon talimatı var.
+Renk (yeşil)
+Sistem şu an KOYU MAVİ. Yeşile geçiş bu raporda tarif edilen bir değişikliktir.
+Senin rapor
+dilin/şablonların
+DEĞİŞTİRİLMEDİ. Analiz edildi; içeriğine dokunulmadı.
+Yani bu rapor bir 'bitmiş iş' değil, senin AI'nın sistemi tek elden, yeknesak ve doğru biçimde kodlaması için
+hazırlanmış kesin talimattır.
+
+
+--- PAGE 3 ---
+2. Tasarım Doğruluğu — Gerçek Değerler ve Yeşil Geçiş
+Sistemin mevcut renk paleti koddan birebir alınmıştır (report-generator.service.ts, COLORS objesi).
+Talebin üzerine Emlak Katılım yeşiline geçiş için değiştirilmesi gereken değerler:
+Rol
+Mevcut (kod)
+Yeşil Standart (önerilen)
+Ana renk (primary)
+#004a99 koyu mavi
+#0A7A4B Emlak Katılım yeşili
+Koyu ton (primaryDark)
+#001d3d
+#064F31 koyu yeşil
+Açık arka plan
+(primaryLight)
+#e8f0fe
+#E6F4EE açık yeşil
+Altın aksan (gold)
+#c9a84c
+#C9A84C (korunur — yeşille uyumlu)
+Başarı/başlık
+#059669
+#0A7A4B ile birleştirilir
+Risk renkleri
+(kritik/yüksek/orta)
+#881337 / #dc2626 / #f97316
+KORUNUR — anlamsal renkler değişmez
+Kritik not (tek elden değişiklik için): Renk şu an EN AZ 3 yerde ayrı tanımlı: report-generator.service.ts
+(COLORS), finding.service.ts (bulgu formu + e-posta, gömülü #004a99), ve HTML e-posta şablonları. Yeşile
+geçiş TEK YERDE yapılamaz durumda — bu bir merkezileştirme sorunudur. ÇÖZÜM: COLORS paleti
+org-config.ts yanına 'brand-colors.ts' olarak taşınmalı, tüm modüller (rapor, bulgu formu, e-posta, frontend)
+oradan okumalı. Böylece renk bir kez değişince her yer değişir ve yeknesaklık garanti olur.
+
+
+--- PAGE 4 ---
+3. Senin Dilin ve Şablonların — Korundu
+Senin rapor dilini ve şablonlarını DEĞİŞTİRMEDİM; olduğu gibi duruyor. Sisteme entegrasyonda esas
+alınacak dil kuralların (kendi raporlarından damıtılmış):
+
+Edilgen ve -mIştIr yüklem disiplini: 'tespit edilmiştir', 'ulaşılmıştır', 'değerlendirilmiştir', 'görülmüştür',
+'anlaşılmıştır'.
+
+Numaralı bölüm şeması: 1. KONU, 2. OLAYLAR VE SAVLAR, 3. İNCELEME VE ÇÖZÜMLEMELER (3.1, 3.2
+alt başlıklı), 4. SONUÇ VE KANAAT, 5. MÜFETTİŞ ÖNERİLERİ, 6. EKLER TABLOSU.
+
+Ek atıf sistemi: '(Ek.1)' üst simge + dipnot, sonda Ekler Tablosu.
+
+Meta tablo: Başlangıç/Bitiş/Konu/Rapor No/Tarih + Yapan + Gözden Geçiren blokları.
+
+Kapanış cümlesi: 'İşbu rapor kapak dahil X sayfa ve Y ek halinde tarafımca tanzim edilmiştir.'
+
+İmza: Müfettiş(ler) + Gözetim Sorumlusu; 'Saygılarımla'.
+
+Bulgu formu (PKTİD) şeması: Tebliğ Tarihi / Denetlenen Birim-Alt Birim / Bulgu No / Önem Düzeyi /
+Konu / Tespit (mevzuat maddesi tam metni + veri + tablo) / Birim Cevabı / Bulgu Kapatma Tarihi /
+Öneri.
+Not: Ürettiğim Bilgi Notu şablonunda bu dili taklit ettim ama nihai onay sende — birebir tutturup
+tutturmadığımı senin gözünle görmen gerekir. Aşağıda CFE düzeltmelerini de içeren tek gerçek 'olması
+gereken' şema var.
+
+
+--- PAGE 5 ---
+4. CFE/ACFE Çerçevesi — Doğru Mercek
+Değerlendirme iş hukuku değil, CFE (Certified Fraud Examiner) / ACFE standardı ve teftiş tekniği ile
+yapılmıştır. Şablonlarının ACFE ilkelerine göre durumu:
+ACFE İlkesi
+Durum
+Predication (makul dayanak)
+GÜÇLÜ — 'Olaylar ve Savlar' bunu karşılıyor
+Fraud theory (hipotez-test)
+GÜÇLÜ — tespit→kanıt→kanaat akışı
+Impartiality (tarafsızlık)
+GÜÇLÜ — edilgen dil, spekülasyondan kaçınma
+Admission-seeking (ikrar)
+GÜÇLÜ — yazılı ifade bölümü
+Loss quantification (zarar)
+GÜÇLÜ — tutar net veriliyor
+Chain of custody (delil emanet
+zinciri)
+EKSİK — eklenmeli (aşağıda)
+Scope & methodology
+KISMEN — örneklem metodolojisi netleşmeli
+Kanıta dayalı dil (hüküm vermeme)
+TERCİH — 'kusurlu bulunmuştur' yerine 'kanıtlar ... desteklemektedir'
+CFE'ye göre geçerli eklemeler: (1) Delil emanet zinciri — her delilin kaynağı/temin tarihi/muhafaza şekli. (2)
+Kapsam & metodoloji beyanı — veri/dönem/teknik/örneklem/kısıt. (3) Dağıtım listesi + gizlilik derecesi.
+Geri çekilenler (CFE kapsamı dışı): 'lehe/hafifletici nedenler' ve 'zaman aşımı/disiplin süresi' — bunlar Disiplin
+Kurulu/İK'nın görevi, müfettişin değil. Şablonunun bunları içermemesi DOĞRUDUR.
+
+
+--- PAGE 6 ---
+5. Tüm Rapor Türleri — Tek Format Altında
+Sistemde koddan tespit edilen rapor türleri ve her birinin aynı kurumsal kimliğe/dile getirilmesi.
+Hepsi TEK PdfReportService'ten üretilmeli; ortak kapak/footer/imza/renk/dil katmanı merkezî, her tür
+sadece kendi gövdesini vermeli:
+Rapor Türü
+Rapor No
+Öneki
+Notlar
+Süreç/İç Denetim Raporu
+SD
+En olgun; kapsam kısıtı + örnekleme + dağıtım
+eklenecek
+İnceleme Raporu
+İS
+6 bölümlü şema; DB'ye taşınacak (bkz. Bölüm 6)
+Soruşturma Raporu
+İS/D
+İnceleme + Kusurlu/Sorumlular + CFE eklemeleri
+Faaliyet Raporu
+FR
+Dönemsel özet; ortak kimlik
+Denetim Komitesi Sunumu
+DK
+Yönetici özeti + kritik bulgular
+Yönetim Kurulu Raporu
+YK
+Üst düzey, kısa
+Bulgu Özeti Raporu
+BÖ
+Tablo (bulgu no/konu/önem/durum/kapatma)
+Bulgu Yaşlandırma Raporu
+BY
+Açık bulgu yaş analizi
+Risk Değerlendirme / Matris
+RD
+Denetim evreni skorları, ısı haritası
+Yıllık Plan İlerleme
+Pİ
+Plan-gerçekleşme
+Bilgi Notu (YENİ)
+BN
+Kısa; ön değerlendirme/bilgilendirme (bkz. Bölüm 7)
+
+
+--- PAGE 7 ---
+6. İnceleme/Soruşturma — Teknik Düzeltme ve Şema
+İki kritik teknik sorun (koddan doğrulanmış, düzeltilmeli):
+(1) Soruşturma raporu içeriği tarayıcıda LocalStorage'da tutuluyor — veri kaybı ve gizlilik riski;
+backend DB'ye taşınmalı. (2) Örnek raporlar (Eskişehir/Ahmet Veli/CRM) kodun içine gömülü; gerçek
+raporda yanlış/alakasız metin üretme riski — kaldırılmalı, alanlar boş şablon gelmeli.
+Backend model (AI için, CFE + senin dilinle):
+raporNo · raporTuru(INCELEME|SORUSTURMA) · baslangicTarihi · bitisTarihi · konu · raporTarihi · gizlilikDerecesi ·
+hazirlayanlar[] · gozdenGecirenler[] · predication(dayanak+tarih) · olaylarVeSavlar ·
+kapsamVeMetodoloji(veri+dönem+teknikler[]+orneklem+kisitlar) ·
+cozumlemeler[](altBaslik+icerik+deliller[]{tur,kaynak,teminTarihi,muhafaza,ekAtfi}) · delillerinDegerlendirilmesi ·
+sonucVeKanaat(kanıt-dayalı dil) · kusurlular[](kisi+isnat+kanitDayanagi) · idariOneriler[] ·
+surecOnerileri[]{hedefBirim,oneri} · ekler[]{no,ad} · dagitimListesi[] · sayfaSayisi · ekSayisi
+
+
+--- PAGE 8 ---
+7. Bilgi Notu — Eklenmeli (Şema)
+Evet, sistemde olmalı. Her iş tam rapor gerektirmez; predication'ın tam oluşmadığı ön
+değerlendirmeler, hızlı bilgilendirmeler, mevzuat etkisi notları için kısa bir Bilgi Notu standart araçtır.
+Senin dilinle/formatınla şema:
+Bölüm
+İçerik
+Kapak/Başlık
+Emlak Katılım + Teftiş Kurulu + 'BİLGİ NOTU' + Not No (BN.x.yyyy) + Tarih +
+Konu + Gizlilik
+İlgi
+Varsa dayanak yazı/e-posta/talep
+1. KONU / AMAÇ
+Notun amacı, 2-3 cümle, -mIştIr dili
+2. AÇIKLAMA VE
+DEĞERLENDİRME
+Özet + tespit/gözlem + varsa mevzuat atfı; (CFE bağlamında predication ön
+değerlendirmesi de burada)
+3. SONUÇ, KANAAT VE
+ÖNERİ
+Kısa kanaat + öneri
+İmza
+Hazırlayan müfettiş; gerekiyorsa Gözden Geçiren
+Ek (varsa)
+Kısa ek listesi
+Ekteki Word dosyası bu şemanın doldurulabilir halidir; sisteme birebir kodlanabilir. Tam raporla aynı kurumsal
+kimlik ve dil, ama kısa (1-3 sayfa), İçindekiler/bulgu formu içermez.
+
+
+--- PAGE 9 ---
+8. AI İçin Uygulama Sırası (Yeknesaklık + Doğruluk)
+FAZ 1 — Renk/kimlik merkezileştir (yeknesaklık kökü) (3-5 gün)
+
+COLORS paletini 'brand-colors.ts' olarak merkezileştir; ana rengi #004a99 → #0A7A4B (Emlak
+Katılım yeşili) yap.
+
+finding.service.ts ve HTML e-posta şablonlarındaki gömülü #004a99'ları merkezî palete bağla.
+
+Tüm modüller (rapor, bulgu formu, e-posta, frontend) tek yerden renk okusun.
+FAZ 2 — Ortak PdfReportService standardı (1-2 hafta)
+
+Ortak kapak + header/footer (logo, Sayfa X/Y) + imza bloğu + rapor no üretici (tür öneki+sıra+yıl) +
+gizlilik.
+
+Edilgen/-mIştIr yüklem şablonu tüm otomatik metinlere (senin dilin).
+
+11 rapor türü bu ortak servise bağlansın; her biri sadece kendi gövdesini versin.
+FAZ 3 — İnceleme/Soruşturma düzelt (CFE + senin dilin) (1-2 hafta)
+
+LocalStorage kaldır → backend DB modeli (Bölüm 6 şeması).
+
+Hardcoded senaryoları kaldır.
+
+Predication + Kapsam/Metodoloji + Delil emanet zinciri + kanıt-dayalı kanaat + Kusurlu/Sorumlular.
+FAZ 4 — Bilgi Notu ekle (3-5 gün)
+
+BN türü (Bölüm 7); ortak kimlikten türetilsin; kısa form.
+Bu sırayla ilerlenirse: önce renk/dil merkezileşir (yeknesaklık garanti), sonra tüm türler aynı servisten
+üretilir (doğruluk + tutarlılık), en son yeni türler eklenir. 'Yapay görünüm/dil' riski böylece ortadan
+kalkar; çünkü her rapor tek merkezî standarttan, senin dilinle ve gerçek kurumsal renginle üretilir.
+— Nihai Rapor Sonu —
+
+

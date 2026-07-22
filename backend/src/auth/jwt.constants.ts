@@ -29,7 +29,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 export const jwtConstants = {
-    secret: process.env.JWT_SECRET || 'DEVELOPMENT-ONLY-KEY-DEGISTIR-PRODUCTION-DA-' + Date.now(),
+    secret: process.env.JWT_SECRET || 'DEVELOPMENT-STATIC-JWT-SECRET-KEY-DEV-2026',
     accessTokenExpiration: process.env.JWT_ACCESS_EXPIRATION || '15m',
     refreshTokenExpiration: process.env.JWT_REFRESH_EXPIRATION || '7d',
 };
