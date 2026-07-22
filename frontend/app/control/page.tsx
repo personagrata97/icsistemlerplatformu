@@ -92,28 +92,28 @@ export default function PharosControlPage() {
                     title="Toplam Kontrol Envanteri"
                     value={48}
                     icon={Layers}
-                    variant="default"
+                    color="blue"
                     infoTooltip="Sistemde kayıtlı COSO 2013 süreç içi kontrol noktaları"
                 />
                 <StatCard
                     title="Etkin Kontroller (%80+)"
                     value={38}
                     icon={CheckCircle2}
-                    variant="success"
+                    color="emerald"
                     infoTooltip="İç denetim ve birim KÖD testleri sonucunda etkin bulunanlar"
                 />
                 <StatCard
                     title="Gelişime Açık Kontroller"
                     value={7}
                     icon={Sliders}
-                    variant="warning"
+                    color="amber"
                     infoTooltip="Kısmen çalışan veya iyileştirme gereken kontroller"
                 />
                 <StatCard
                     title="KÖD Tamamlanma Oranı"
                     value="%88"
                     icon={FileCheck}
-                    variant="default"
+                    color="purple"
                     infoTooltip="2026 Q2 Birim Kontrol Öz Değerlendirme dönemi katılımı"
                 />
             </div>

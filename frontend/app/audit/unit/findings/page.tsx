@@ -104,28 +104,28 @@ export default function UnitFindingsPage() {
                     title="Yanıt Bekleyen Bulgular"
                     value={unitFindings.filter(f => f.durum !== 'KAPANDI').length}
                     icon={Clock}
-                    variant="danger"
+                    color="red"
                     infoTooltip="Termin süresi yaklaşan ve yanıt girilmesi gereken bulgular"
                 />
                 <StatCard
                     title="Aksiyonu Süren İşler"
                     value={1}
                     icon={AlertTriangle}
-                    variant="warning"
+                    color="amber"
                     infoTooltip="Birim tarafından aksiyon planı girilmiş ve uygulama safhasında olanlar"
                 />
                 <StatCard
                     title="Gecikmiş Aksiyonlar"
                     value={0}
                     icon={AlertTriangle}
-                    variant="default"
+                    color="gray"
                     infoTooltip="Termin süresi dolduğu halde tamamlanmamış aksiyonlar"
                 />
                 <StatCard
                     title="Kapanan Bulgular (2026)"
                     value={4}
                     icon={CheckCircle}
-                    variant="success"
+                    color="emerald"
                     infoTooltip="Müfettiş tarafından aksiyonları onaylanarak kapatılan bulgular"
                 />
             </div>
