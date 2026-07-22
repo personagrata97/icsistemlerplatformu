@@ -11,8 +11,8 @@ interface ConfirmModalProps {
     message?: string;
     confirmText?: string;
     cancelText?: string;
-    type?: 'danger' | 'warning' | 'info' | 'success';
-    variant?: 'danger' | 'warning' | 'info' | 'success';
+    type?: 'danger' | 'warning' | 'info' | 'success' | 'primary';
+    variant?: 'danger' | 'warning' | 'info' | 'success' | 'primary';
     isLoading?: boolean;
     requireReason?: boolean;
     reasonLabel?: string;
