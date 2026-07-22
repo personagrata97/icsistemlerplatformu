@@ -166,14 +166,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
+        if (typeof document !== 'undefined') {
+            document.cookie = 'access_token=; path=/; max-age=0; samesite=lax';
+        }
     };
 
     const login = (accessToken: string, refreshToken: string, userData: User) => {
         localStorage.setItem('access_token', accessToken);
         localStorage.setItem('refresh_token', refreshToken);
         localStorage.setItem('user', JSON.stringify(userData));
+        if (typeof document !== 'undefined') {
+            document.cookie = `access_token=${accessToken}; path=/; max-age=900; samesite=lax`;
+        }
         setUser(userData);
-        router.push('/');
+
+        // Read redirect parameter from URL if present
+        let targetPath = '/';
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const redirectParam = params.get('redirect');
+            if (redirectParam && redirectParam.startsWith('/')) {
+                targetPath = redirectParam;
+            }
+        }
+        router.push(targetPath);
     };
 
     const logout = useCallback(async () => {
@@ -221,6 +237,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('refresh_token', data.refresh_token);
             localStorage.setItem('user', JSON.stringify(data.user));
+            if (typeof document !== 'undefined') {
+                document.cookie = `access_token=${data.access_token}; path=/; max-age=900; samesite=lax`;
+            }
             setUser(data.user);
             return true;
         } catch (error) {

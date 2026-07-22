@@ -16,12 +16,17 @@ export default function LoginPage() {
     const { showToast } = useToast();
     const router = useRouter();
 
-    // Clear stale session items when arriving at login page to prevent redirect loops
+    // Clear stale session items when arriving at login page without redirect target
     useState(() => {
         if (typeof window !== 'undefined') {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('user');
+            const params = new URLSearchParams(window.location.search);
+            const redirectParam = params.get('redirect');
+            if (!redirectParam || params.get('expired') === '1') {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user');
+                document.cookie = 'access_token=; path=/; max-age=0; samesite=lax';
+            }
         }
     });
 
