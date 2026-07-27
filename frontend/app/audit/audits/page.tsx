@@ -248,7 +248,7 @@ function AuditsPageContent() {
     return (
         <>
             <PageHeader
-                title="Denetim Görevleri"
+                title="Denetimler"
                 subtitle="Tüm aktif ve planlanmış denetim faaliyetlerinin merkezi takibi"
             />
             {/* Stats Dashboard */}

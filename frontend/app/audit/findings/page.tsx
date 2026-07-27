@@ -46,9 +46,12 @@ import Modal from '@/components/ui/Modal';
 // --- Sub-Components ---
 // (Modals have been moved to separate files)
 
+import { isAuditManagerRole, isAuditInspectorRole } from '@/lib/permissions-map';
+
 function FindingsPageContent() {
     const { user, hasPermission, hasRole } = useAuth();
-    const isUnit = checkRole(hasRole, ROLES.UNIT);
+    const isAuditor = isAuditManagerRole(hasRole) || isAuditInspectorRole(hasRole) || hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_MANAGER') || hasRole('AUDIT_SUPERVISOR');
+    const isUnit = !isAuditor && checkRole(hasRole, ROLES.UNIT);
     const router = useRouter();
     const pathname = usePathname();
     const { showToast } = useToast();
@@ -94,17 +97,7 @@ function FindingsPageContent() {
     const itemsPerPage = 10;
 
 
-    useEffect(() => {
-        if (isUnit) {
-            if (pathname === '/audit/findings') {
-                router.replace('/audit/unit/findings?tab=all');
-            } else if (pathname === '/audit/conciliation') {
-                router.replace('/audit/unit/findings?tab=teblig');
-            } else if (pathname === '/audit/follow-up') {
-                router.replace('/audit/unit/findings?tab=aksiyon');
-            }
-        }
-    }, [isUnit, pathname, router]);
+
 
     useEffect(() => {
         loadData();

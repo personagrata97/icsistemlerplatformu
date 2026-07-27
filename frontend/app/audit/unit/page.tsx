@@ -13,6 +13,8 @@ import { ClipboardCheck, AlertCircle, Clock, CheckCircle, FileText } from 'lucid
 import { formatDate } from '@/lib/audit-utils';
 import { useRouter } from 'next/navigation';
 
+import EmptyState from '@/components/ui/EmptyState';
+
 export default function UnitPortalPage() {
     const { user } = useAuth();
     const router = useRouter();
@@ -59,7 +61,7 @@ export default function UnitPortalPage() {
         <div className="space-y-6">
             <PageHeader
                 title={`${user?.department || 'Birim'} Portalı`}
-                subtitle="Sorumluluğunuzdaki denetim bulgularını, aksiyon planlarını ve yanıt takibini yönetin"
+                subtitle="Denetlenen birim sorumluluğundaki denetim bulgularının, aksiyon planlarının ve yanıt süreçlerinin takibi"
             />
 
             {/* KPI İstatistik Kartları */}
@@ -108,9 +110,12 @@ export default function UnitPortalPage() {
                     widgetType="findings"
                 >
                     {findings.filter(f => ['Tebliğ Edildi', 'Revizyon Gerekli'].includes(f.status)).length === 0 ? (
-                        <div className="text-center py-8 text-gray-500 text-sm">
-                            Aksiyon bekleyen bulgu bulunmamaktadır.
-                        </div>
+                        <EmptyState
+                            title="Sonuç bulunamadı"
+                            description="Aksiyon bekleyen bulgu bulunmamaktadır."
+                            variant="search"
+                            className="py-6"
+                        />
                     ) : (
                         findings
                             .filter(f => ['Tebliğ Edildi', 'Revizyon Gerekli'].includes(f.status))
@@ -136,9 +141,12 @@ export default function UnitPortalPage() {
                     widgetType="audits"
                 >
                     {audits.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500 text-sm">
-                            Biriminizle ilişkili denetim bulunmamaktadır.
-                        </div>
+                        <EmptyState
+                            title="Sonuç bulunamadı"
+                            description="Biriminizle ilişkili denetim bulunmamaktadır."
+                            variant="search"
+                            className="py-6"
+                        />
                     ) : (
                         audits.slice(0, 5).map((audit) => (
                             <DashboardListItem

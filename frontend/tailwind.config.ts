@@ -13,6 +13,18 @@ const config: Config = {
                     DEFAULT: '#009c45',
                     hover: '#007a36',
                 },
+                emlakBlue: {
+                    DEFAULT: '#0073b7',
+                    hover: '#005a91',
+                },
+                emlakRed: {
+                    DEFAULT: '#e11d48',
+                    hover: '#be123c',
+                },
+                emlakNavy: {
+                    DEFAULT: '#1e1b4b',
+                    hover: '#0f172a',
+                },
                 secondary: '#f3f4f6',
                 danger: '#ef4444',
                 warning: '#f59e0b',

@@ -77,8 +77,8 @@ export default function LoginPage() {
                         <div className="w-full flex justify-center mb-6">
                             <img src="/logo.png" alt="Emlak Katılım Logo" className="h-16 object-contain mix-blend-multiply" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2 font-sans">İç Sistemler Yönetim Sistemi</h1>
-                        <p className="text-gray-500 font-medium">Emlak Katılım Tasarruf Finansman</p>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2 font-sans">Pharos</h1>
+                        <p className="text-gray-500 font-medium">İç Sistemler Platformu</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -188,7 +188,7 @@ export default function LoginPage() {
                     <p className="text-gray-400 text-sm font-medium">
                         © 2026 Emlak Katılım Tasarruf Finansman AŞ
                         <br />
-                        İç Sistemler Yönetim Sistemi
+                        Pharos
                     </p>
                 </div>
             </div>

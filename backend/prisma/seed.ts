@@ -9,25 +9,23 @@ async function main() {
     // 0. Temizlik (Bağımlılık sırasına göre)
     console.log('🧹 Eski veriler temizleniyor...');
 
-    // Auth tabloları
-    await prisma.refreshToken.deleteMany();
-    await prisma.userRole.deleteMany();
-    await prisma.rolePermission.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.role.deleteMany();
-    await prisma.permission.deleteMany();
-
-    // Risk tabloları
-    await prisma.uyari.deleteMany();
-    await prisma.gunlukRiskOzet.deleteMany();
-    await prisma.riskLimit.deleteMany();
-    await prisma.riskKpi.deleteMany();
-    await prisma.senaryo.deleteMany();
-    await prisma.teslimat.deleteMany();
-    await prisma.odemeHareketi.deleteMany();
-    await prisma.sozlesme.deleteMany();
-    await prisma.musteri.deleteMany();
-    await prisma.likiditePozisyonu.deleteMany();
+    try {
+        await prisma.refreshToken.deleteMany();
+        await prisma.userRole.deleteMany();
+        await prisma.rolePermission.deleteMany();
+        await prisma.notification.deleteMany();
+        await prisma.extensionRequest.deleteMany();
+        await prisma.auditConciliation.deleteMany();
+        await prisma.auditFollowUp.deleteMany();
+        await prisma.finding.deleteMany();
+        await prisma.auditTest.deleteMany();
+        await prisma.audit.deleteMany();
+        await prisma.user.deleteMany();
+        await prisma.role.deleteMany();
+        await prisma.permission.deleteMany();
+    } catch (e) {
+        console.log('Temizlik sırasında uyarı (yeni DB):', e);
+    }
 
     // ============================================
     // KULLANICI VE YETKİ SİSTEMİ SEED
@@ -190,14 +188,13 @@ async function main() {
 
     // Kullanıcılar
     console.log('👥 Kullanıcılar oluşturuluyor...');
-    const adminPassword = await bcrypt.hash('Admin123!', 10);
-    const testPassword = await bcrypt.hash('Test123!', 10);
+    const defaultPassword = await bcrypt.hash('Test1234!', 10);
 
     const adminUser = await prisma.user.create({
         data: {
             username: 'admin',
             email: 'admin@emlakkatilimtfs.com.tr',
-            passwordHash: adminPassword,
+            passwordHash: defaultPassword,
             displayName: 'Sistem Yöneticisi',
             department: 'Bilgi Teknolojileri',
             isActive: true,
@@ -205,7 +202,6 @@ async function main() {
             roles: {
                 create: { roleId: adminRole.id },
             },
-            // Staff Fields for Admin (Acting as Manager)
             registerNumber: '1000',
             title: 'Başmüfettiş',
             jobStartDate: '2020-01-01',
@@ -214,35 +210,38 @@ async function main() {
         },
     });
 
-    // Test kullanıcıları
     await prisma.user.create({
         data: {
-            username: 'risk_user',
-            email: 'risk@emlakkatilimtfs.com.tr',
-            passwordHash: testPassword,
-            displayName: 'Risk Uzmanı',
-            department: 'Risk Yönetimi',
+            username: 'mudur',
+            email: 'mudur@emlakkatilimtfs.com.tr',
+            passwordHash: defaultPassword,
+            displayName: 'Teftiş Kurulu Müdürü',
+            department: 'Teftiş Kurulu Başkanlığı',
             isActive: true,
             isAdUser: false,
             roles: {
-                create: { roleId: riskAdminRole.id },
+                create: { roleId: adminRole.id },
             },
+            registerNumber: '1001',
+            title: 'Teftiş Kurulu Müdürü',
+            jobStartDate: '2018-01-01',
+            certifications: JSON.stringify(['CIA', 'CFE']),
+            phoneNumber: '05321234568',
         },
     });
 
-    const auditUser = await prisma.user.create({
+    const mufettisUser = await prisma.user.create({
         data: {
-            username: 'audit_user',
-            email: 'audit@emlakkatilimtfs.com.tr',
-            passwordHash: testPassword,
-            displayName: 'Müfettiş',
+            username: 'mufettis',
+            email: 'mufettis@emlakkatilimtfs.com.tr',
+            passwordHash: defaultPassword,
+            displayName: 'Kıdemli Müfettiş',
             department: 'İç Denetim',
             isActive: true,
             isAdUser: false,
-            // Staff Fields
-            registerNumber: '1001',
+            registerNumber: '1002',
             title: 'Müfettiş',
-            jobStartDate: '2023-01-01',
+            jobStartDate: '2022-01-01',
             certifications: JSON.stringify(['CIA', 'CISA']),
             phoneNumber: '05551234567',
             roles: {
@@ -253,9 +252,44 @@ async function main() {
 
     await prisma.user.create({
         data: {
+            username: 'gozetmen',
+            email: 'gozetmen@emlakkatilimtfs.com.tr',
+            passwordHash: defaultPassword,
+            displayName: 'Gözetim Sorumlusu',
+            department: 'İç Denetim Gözetim',
+            isActive: true,
+            isAdUser: false,
+            registerNumber: '1003',
+            title: 'Gözetim Sorumlusu',
+            jobStartDate: '2021-01-01',
+            certifications: JSON.stringify(['CRMA', 'CISA']),
+            phoneNumber: '05551234568',
+            roles: {
+                create: { roleId: auditAdminRole.id },
+            },
+        },
+    });
+
+    await prisma.user.create({
+        data: {
+            username: 'risk_user',
+            email: 'risk@emlakkatilimtfs.com.tr',
+            passwordHash: defaultPassword,
+            displayName: 'Risk Uzmanı',
+            department: 'Risk Yönetimi',
+            isActive: true,
+            isAdUser: false,
+            roles: {
+                create: { roleId: riskAdminRole.id },
+            },
+        },
+    });
+
+    await prisma.user.create({
+        data: {
             username: 'compliance_user',
             email: 'compliance@emlakkatilimtfs.com.tr',
-            passwordHash: testPassword,
+            passwordHash: defaultPassword,
             displayName: 'Uyum Uzmanı',
             department: 'Uyum',
             isActive: true,
@@ -266,13 +300,18 @@ async function main() {
         },
     });
 
-
     console.log('✅ Kullanıcı ve yetki sistemi seed tamamlandı!');
-    console.log('   - Admin kullanıcı: admin / Admin123!');
-    console.log('   - Test kullanıcıları: risk_user, audit_user, compliance_user / Test123!');
+    console.log('   - Ortak Demo Şifresi: Test1234!');
+    console.log('   - Hesaplar: admin, mudur, mufettis, gozetmen, risk_user, compliance_user');
 
     // 1. KPI Tanımları
     console.log('📊 KPI tanımları oluşturuluyor...');
+    try {
+        await prisma.uyari.deleteMany();
+        await prisma.gunlukRiskOzet.deleteMany();
+        await prisma.riskLimit.deleteMany();
+        await prisma.riskKpi.deleteMany();
+    } catch (e) { }
     await prisma.riskKpi.createMany({
         data: [
             { kpi_kodu: 'NPL', aciklama: 'Takipteki Sözleşme Oranı', birim: 'YUZDE' },
@@ -516,7 +555,7 @@ async function main() {
                 dueDate: new Date('2024-06-01T00:00:00Z'),
                 description: 'Sistemlerde karmaşık parola politikası zorunlu tutulmamaktadır.',
                 department: 'Bilgi Teknolojileri',
-                assignedUserId: auditUser.id // audit_user'a atandı
+                assignedUserId: mufettisUser.id // mufettis'e atandı
             },
             {
                 auditId: audit_1.id,
@@ -536,7 +575,7 @@ async function main() {
                 dueDate: new Date('2024-04-01T00:00:00Z'),
                 description: 'Günlük kasa mutabakatlarında açıklanamayan farklar tespit edilmiştir.',
                 department: 'Operasyon',
-                assignedUserId: auditUser.id // audit_user'a atandı
+                assignedUserId: mufettisUser.id // mufettis'e atandı
             }
         ]
     });

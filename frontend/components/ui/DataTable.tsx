@@ -69,8 +69,8 @@ export default function DataTable<T>({
     data,
     loading = false,
     emptyIcon,
-    emptyTitle = 'Kayıt bulunamadı',
-    emptyDescription = 'Arama kriterlerinizi değiştirin veya yeni kayıt ekleyin.',
+    emptyTitle = 'Sonuç bulunamadı',
+    emptyDescription = 'Arama kriterlerinize uygun kayıt bulunamadı.',
     onRowClick,
     rowKey,
     className = '',
@@ -364,6 +364,7 @@ export default function DataTable<T>({
                         icon={emptyIcon}
                         title={emptyTitle}
                         description={emptyDescription}
+                        variant="search"
                     />
                 </div>
             </div>

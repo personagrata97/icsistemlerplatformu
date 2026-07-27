@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model Musteri {
@@ -52,11 +52,11 @@ model SanctionEntity {
   uyruk              String?
   kimlikNo           String?
   pasaportNo         String?
-  adres              String?         @db.Text
+  adres              String?
   listeyeGirisTarihi DateTime?
   kararNo            String?
-  aciklama           String?         @db.Text
-  ham                String?         @db.Text
+  aciklama           String?
+  ham                String?
   created_at         DateTime        @default(now())
   list               SanctionList    @relation(fields: [listId], references: [id], onDelete: Cascade)
   matches            SanctionMatch[]
@@ -88,7 +88,7 @@ model SanctionMatch {
   karar       String?
   karariVeren String?
   kararTarihi DateTime?
-  gerekce     String?            @db.Text
+  gerekce     String?
   created_at  DateTime           @default(now())
   screening   SanctionScreening? @relation(fields: [screeningId], references: [id])
   entity      SanctionEntity     @relation(fields: [entityId], references: [id])
@@ -1396,7 +1396,7 @@ model ReportSection {
   sira                Int
   numara              String   // örn: '3.2'
   baslik              String
-  icerik              String   @db.Text
+  icerik              String
   hedefBirimIds       String?  // JSON / comma separated birim id list
   gizlilikDerecesi    String   @default("HASSAS")
   kismiCiktidaYerAlir Boolean  @default(true)
@@ -1413,9 +1413,9 @@ model ReportFinding {
   bulguNo       String
   hedefBirimId  String?
   onemDuzeyi    String    // Kritik, Yüksek, Orta, Düşük
-  tespit        String    @db.Text
-  birimCevabi   String?   @db.Text
-  oneri         String?   @db.Text
+  tespit        String
+  birimCevabi   String?
+  oneri         String?
   kapatmaTarihi DateTime?
   created_at    DateTime  @default(now())
 

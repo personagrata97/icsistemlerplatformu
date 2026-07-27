@@ -21,9 +21,9 @@ export default function Home() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-slate-50/60 font-sans text-slate-800">
             {/* Top Bar with Logout */}
-            <div className="h-[64px] bg-white border-b border-gray-200 pr-8 flex justify-between items-center shrink-0">
+            <div className="h-[64px] bg-white border-b border-gray-200/80 pr-8 flex justify-between items-center shrink-0 shadow-xs">
                 <div className="w-[260px] flex items-center justify-center shrink-0">
                     <img
                         src="/logo.png"
@@ -37,13 +37,13 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="text-right hidden md:block">
-                        <div className="text-sm font-semibold text-gray-900">{user?.displayName || user?.username}</div>
-                        <div className="text-xs text-gray-500">{user?.roles?.[0]}</div>
+                        <div className="text-sm font-bold text-slate-900">{user?.displayName || user?.username}</div>
+                        <div className="text-xs text-slate-500 font-medium">{user?.roles?.[0]}</div>
                     </div>
                     <Tooltip content="Çıkış Yap">
                         <button
                             onClick={handleLogout}
-                            className="p-2 ml-4 text-red-500 hover:text-red-700 bg-red-50/50 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-xl transition-all"
+                            className="p-2 ml-4 text-rose-600 hover:text-rose-700 bg-rose-50/60 hover:bg-rose-100/80 border border-rose-200/60 rounded-xl transition-all shadow-xs"
                         >
                             <LogOut size={20} />
                         </button>
@@ -51,74 +51,74 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto pt-12 px-4 pb-12">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <div className="max-w-6xl mx-auto pt-6 px-4 pb-6">
+                <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1.5">
                     Hoş Geldiniz, {user?.displayName || user?.username || 'Kullanıcı'}
                 </h1>
-                <p className="text-gray-600 mb-8">
+                <p className="text-slate-600 font-medium mb-6">
                     İç Sistemler Platformu'na (Pharos) hoş geldiniz. Yetkiniz dahilindeki modülleri aşağıda görüntüleyebilirsiniz.
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Teftiş Kurulu */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-fr">
+                    {/* Teftiş Kurulu — DOKUNULMAZ TAM BİREBİR EMLAK KATILIM LOGO YEŞİLİ (#009c45) */}
                     {canSeeAudit && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 transition-all hover:shadow-md hover:border-emerald-500 group">
-                            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 text-emerald-700 group-hover:bg-emerald-700 group-hover:text-white transition-colors">
-                                <FileText size={32} />
+                        <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-7 transition-all hover:shadow-lg hover:border-[#009c45] group flex flex-col h-full">
+                            <div className="w-14 h-14 bg-[#009c45]/10 rounded-2xl flex items-center justify-center mb-5 text-[#009c45] group-hover:bg-[#009c45] group-hover:text-white transition-all duration-300">
+                                <FileText size={28} />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{TERMS.auditModule} ({TERMS.birimKisa})</h3>
-                            <p className="text-gray-500 text-xs mb-6 leading-relaxed">
+                            <h3 className="text-xl font-bold text-slate-900 mb-2.5 font-sans tracking-tight">{TERMS.auditModule} ({TERMS.birimKisa})</h3>
+                            <p className="text-slate-600 text-sm mb-5 leading-relaxed font-sans">
                                 {TERMS.auditModuleDescription}
                             </p>
-                            <Link href={isUnitOnly ? "/audit/unit/findings" : "/audit"} className="inline-flex items-center text-emerald-700 font-semibold hover:gap-2 transition-all text-sm">
+                            <Link href={isUnitOnly ? "/audit/unit/findings" : "/audit"} className="inline-flex items-center text-[#009c45] font-bold hover:gap-2 transition-all text-sm font-sans mt-auto pt-3">
                                 Uygulamaya Git <ArrowRight size={18} className="ml-1" />
                             </Link>
                         </div>
                     )}
 
-                    {/* İç Kontrol (Pharos Control) */}
+                    {/* İç Kontrol — MAVİ */}
                     {canSeeControl && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 transition-all hover:shadow-md hover:border-slate-800 group">
-                            <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-6 text-slate-800 group-hover:bg-slate-800 group-hover:text-white transition-colors">
-                                <Sliders size={32} />
+                        <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-7 transition-all hover:shadow-lg hover:border-blue-600 group flex flex-col h-full">
+                            <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mb-5 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                                <Sliders size={28} />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{TERMS.controlModule} (İç Kontrol)</h3>
-                            <p className="text-gray-500 text-xs mb-6 leading-relaxed">
+                            <h3 className="text-xl font-bold text-slate-900 mb-2.5 font-sans tracking-tight">{TERMS.controlModule} (İç Kontrol)</h3>
+                            <p className="text-slate-600 text-sm mb-5 leading-relaxed font-sans">
                                 {TERMS.controlModuleDescription}
                             </p>
-                            <Link href="/control" className="inline-flex items-center text-slate-800 font-semibold hover:gap-2 transition-all text-sm">
+                            <Link href="/control" className="inline-flex items-center text-blue-600 font-bold hover:gap-2 transition-all text-sm font-sans mt-auto pt-3">
                                 Uygulamaya Git <ArrowRight size={18} className="ml-1" />
                             </Link>
                         </div>
                     )}
 
-                    {/* Risk Yönetimi */}
+                    {/* Risk Yönetimi — KIRMIZI */}
                     {canSeeRisk && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 transition-all hover:shadow-md hover:border-blue-500 group">
-                            <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                <Shield size={32} />
+                        <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-7 transition-all hover:shadow-lg hover:border-red-600 group flex flex-col h-full">
+                            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-5 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-all duration-300">
+                                <Shield size={28} />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{TERMS.riskModule} (Risk Yönetimi)</h3>
-                            <p className="text-gray-500 text-xs mb-6 leading-relaxed">
+                            <h3 className="text-xl font-bold text-slate-900 mb-2.5 font-sans tracking-tight">{TERMS.riskModule} (Risk Yönetimi)</h3>
+                            <p className="text-slate-600 text-sm mb-5 leading-relaxed font-sans">
                                 {TERMS.riskModuleDescription}
                             </p>
-                            <Link href="/risk" className="inline-flex items-center text-blue-600 font-semibold hover:gap-2 transition-all text-sm">
+                            <Link href="/risk" className="inline-flex items-center text-red-600 font-bold hover:gap-2 transition-all text-sm font-sans mt-auto pt-3">
                                 Uygulamaya Git <ArrowRight size={18} className="ml-1" />
                             </Link>
                         </div>
                     )}
 
-                    {/* Uyum Yönetimi */}
+                    {/* Uyum Yönetimi — MOR / İNDİGO */}
                     {canSeeSanction && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 transition-all hover:shadow-md hover:border-red-500 group">
-                            <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mb-6 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                <ScanLine size={32} />
+                        <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-7 transition-all hover:shadow-lg hover:border-indigo-700 group flex flex-col h-full">
+                            <div className="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center mb-5 text-indigo-700 group-hover:bg-indigo-700 group-hover:text-white transition-all duration-300">
+                                <ScanLine size={28} />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{TERMS.sanctionModule} (Uyum)</h3>
-                            <p className="text-gray-500 text-xs mb-6 leading-relaxed">
+                            <h3 className="text-xl font-bold text-slate-900 mb-2.5 font-sans tracking-tight">{TERMS.sanctionModule} (Uyum)</h3>
+                            <p className="text-slate-600 text-sm mb-5 leading-relaxed font-sans">
                                 {TERMS.sanctionModuleDescription}
                             </p>
-                            <Link href="/sanction" className="inline-flex items-center text-red-600 font-semibold hover:gap-2 transition-all text-sm">
+                            <Link href="/sanction" className="inline-flex items-center text-indigo-700 font-bold hover:gap-2 transition-all text-sm font-sans mt-auto pt-3">
                                 Uygulamaya Git <ArrowRight size={18} className="ml-1" />
                             </Link>
                         </div>
@@ -126,15 +126,15 @@ export default function Home() {
 
                     {/* Sistem Ayarları (Sadece Admin) */}
                     {isAdmin && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 transition-all hover:shadow-md hover:border-gray-500 group">
-                            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 text-gray-600 group-hover:bg-gray-600 group-hover:text-white transition-colors">
-                                <Settings size={32} />
+                        <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-7 transition-all hover:shadow-lg hover:border-gray-600 group flex flex-col h-full">
+                            <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-5 text-gray-600 group-hover:bg-gray-600 group-hover:text-white transition-all duration-300">
+                                <Settings size={28} />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{TERMS.adminModule} (Ayarlar)</h3>
-                            <p className="text-gray-500 text-xs mb-6 leading-relaxed">
+                            <h3 className="text-xl font-bold text-slate-900 mb-2.5 font-sans tracking-tight">{TERMS.adminModule} (Ayarlar)</h3>
+                            <p className="text-slate-600 text-sm mb-5 leading-relaxed font-sans">
                                 {TERMS.adminModuleDescription}
                             </p>
-                            <Link href="/settings" className="inline-flex items-center text-gray-600 font-semibold hover:gap-2 transition-all text-sm">
+                            <Link href="/settings" className="inline-flex items-center text-gray-600 font-bold hover:gap-2 transition-all text-sm font-sans mt-auto pt-3">
                                 Ayarlara Git <ArrowRight size={18} className="ml-1" />
                             </Link>
                         </div>

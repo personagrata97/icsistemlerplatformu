@@ -196,8 +196,8 @@ export default function OfficialReportingPage() {
     return (
         <div className="space-y-6">
             <PageHeader
-                title="Yasal ve Kurumsal Raporlama"
-                subtitle="Regülasyon kurumları ve üst yönetim için periyodik raporlar"
+                title="Resmi Raporlama"
+                subtitle="Mevzuat uyumlu resmi denetim raporlarının hazırlanması ve merkezi takibi"
             />
             <PageToolbar
                 noSearch={true}
@@ -384,9 +384,9 @@ export default function OfficialReportingPage() {
 
                 {reportHistory.length === 0 && (
                     <EmptyState
-                        entityType="REPORT"
-                        title="Henüz rapor oluşturulmamış"
-                        description="Yukarıdaki şablonlardan birini kullanarak ilk raporunuzu oluşturun."
+                        title="Sonuç bulunamadı"
+                        description="Yukarıdaki şablonlardan birini kullanarak ilk raporunuzu oluşturabilirsiniz."
+                        variant="search"
                     />
                 )}
             </DashboardWidget>

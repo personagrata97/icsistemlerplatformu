@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
+import PageHeader from '@/components/audit/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
+import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
-import { Calendar, FileText, CheckCircle, ShieldCheck, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
-import { TERMS } from '@/lib/terminology';
 
 export default function UnitAuditsPage() {
     const { showToast } = useToast();
@@ -46,15 +47,10 @@ export default function UnitAuditsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="bg-emerald-800 text-white rounded-2xl p-6 shadow-md flex justify-between items-center">
-                <div>
-                    <h2 className="text-xl font-bold">Birim Denetim Geçmişi ve Raporlar</h2>
-                    <p className="text-emerald-100 text-xs mt-1">Biriminiz bünyesinde gerçekleştirilen tüm teftiş ve inceleme faaliyetleri.</p>
-                </div>
-                <div className="px-4 py-2 bg-emerald-700/60 rounded-xl text-xs font-semibold border border-emerald-500/30">
-                    {TERMS.birimKisa}
-                </div>
-            </div>
+            <PageHeader
+                title="Birim Denetimleri"
+                subtitle="Birim bünyesinde gerçekleştirilen tüm denetim ve inceleme faaliyetlerinin takibi"
+            />
 
             <PageToolbar
                 searchPlaceholder="Denetim adı veya kodu ara..."
@@ -68,11 +64,7 @@ export default function UnitAuditsPage() {
                         key: 'kod',
                         header: 'Denetim Kodu',
                         width: '140px',
-                        render: (item: any) => (
-                            <code className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded">
-                                {item.kod}
-                            </code>
-                        )
+                        render: (item: any) => <CodeBadge code={item.kod} />
                     },
                     {
                         key: 'ad',
@@ -133,3 +125,4 @@ export default function UnitAuditsPage() {
         </div>
     );
 }
+

@@ -1,19 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
+import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import ConfirmModal from '@/components/ConfirmModal';
-import { CheckCircle2, Clock, AlertTriangle, FileCheck, ShieldCheck, Download, Upload } from 'lucide-react';
+import SegmentedTabs from '@/components/ui/SegmentedTabs';
+import LoadingState from '@/components/ui/LoadingState';
+import { CheckCircle2, Clock, AlertTriangle, FileCheck, ShieldCheck, Download, List, FileSignature } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
-import { TERMS } from '@/lib/terminology';
 
-export default function FollowUpPage() {
+function FollowUpPageContent() {
+    const router = useRouter();
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedAction, setSelectedAction] = useState<any>(null);
@@ -54,19 +58,39 @@ export default function FollowUpPage() {
         showToast('Aksiyon kanıtı onaylandı. Bulgu kapatıldı.', 'success');
     };
 
+    const filteredFollowUps = followUps.filter(item =>
+        item.konu.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.birim.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.sorumlu.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const navTabs = [
+        { id: '/audit/findings', label: 'Tüm Bulgular', icon: List },
+        { id: '/audit/conciliation', label: 'Tebliğ ve Mutabakat', icon: FileSignature },
+        { id: '/audit/follow-up', label: 'Aksiyon Takip', icon: Clock }
+    ];
+
     return (
         <div className="space-y-6">
-            <div className="bg-emerald-900 text-white rounded-2xl p-6 shadow-md flex justify-between items-center">
-                <div>
-                    <h2 className="text-xl font-bold">Aksiyon Takibi ve Bulgu Kapanış Onay Paneli</h2>
-                    <p className="text-emerald-100 text-xs mt-1">Birimler tarafından tamamlanan aksiyon kanıtlarının incelenmesi ve bulguların kapatılması</p>
-                </div>
-                <div className="px-4 py-2 bg-emerald-800 rounded-xl text-xs font-semibold border border-emerald-700">
-                    IIA 2500 Uyumlu
-                </div>
+            {/* Top Navigation Tabs */}
+            <div className="mb-6">
+                <PageToolbar
+                    noSearch={true}
+                    leftActions={
+                        <SegmentedTabs
+                            tabs={navTabs}
+                            activeTab="/audit/follow-up"
+                            onChange={(id) => router.push(id)}
+                        />
+                    }
+                />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+
+            {/* StatCards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
                     title="Takip Edilen Aksiyonlar"
                     value={followUps.length}
@@ -109,11 +133,7 @@ export default function FollowUpPage() {
                         key: 'id',
                         header: 'Aksiyon Kodu',
                         width: '140px',
-                        render: (item: any) => (
-                            <code className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-1 rounded">
-                                {item.id}
-                            </code>
-                        )
+                        render: (item: any) => <CodeBadge code={item.id} />
                     },
                     {
                         key: 'konu',
@@ -121,8 +141,8 @@ export default function FollowUpPage() {
                         sortable: true,
                         render: (item: any) => (
                             <div>
-                                <div className="font-bold text-gray-900">{item.konu}</div>
-                                <div className="text-[11px] text-gray-500 mt-0.5">Birim: {item.birim} • Sorumlu: {item.sorumlu}</div>
+                                <div className="font-bold text-gray-900 text-sm">{item.konu}</div>
+                                <div className="text-xs text-gray-500 mt-1">Birim: {item.birim} • Sorumlu: {item.sorumlu}</div>
                             </div>
                         )
                     },
@@ -146,7 +166,7 @@ export default function FollowUpPage() {
                     {
                         key: 'actions',
                         header: 'Kanıt İncele',
-                        width: '140px',
+                        width: '150px',
                         align: 'center',
                         render: (item: any) => (
                             <Button size="sm" variant="secondary" onClick={() => setSelectedAction(item)}>
@@ -155,7 +175,7 @@ export default function FollowUpPage() {
                         )
                     }
                 ]}
-                data={followUps}
+                data={filteredFollowUps}
                 searchTerm={searchTerm}
                 onClearFilters={() => setSearchTerm('')}
                 rowKey="id"
@@ -214,3 +234,15 @@ export default function FollowUpPage() {
         </div>
     );
 }
+
+export default function FollowUpPage() {
+    return (
+        <Suspense fallback={<LoadingState message="Aksiyon Takip Yükleniyor..." />}>
+            <FollowUpPageContent />
+        </Suspense>
+    );
+}
+// HMR force refresh
+
+
+
