@@ -102,7 +102,7 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
                         </div>
                         
                         {/* MFA / Sistem ve Güvenlik Ayarları Dropdown */}
-                        {isAuditor ? (
+                        {(isAuditor || pathname?.startsWith('/control')) ? (
                             <div className="relative" ref={settingsRef}>
                                 <Tooltip content="Sistem Ayarları" position="bottom">
                                     <button 
@@ -118,14 +118,14 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
                                         <DropdownHeader title="Sistem & Güvenlik" />
                                         <div className="p-2 space-y-1">
 
-                                            <Link href="/audit/logs" onClick={() => setIsSettingsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary rounded-lg transition-colors group">
+                                            <Link href={pathname?.startsWith('/control') ? "/control/logs" : "/audit/logs"} onClick={() => setIsSettingsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary rounded-lg transition-colors group">
                                                 <div className="flex items-center gap-3 w-full">
                                                     <History size={16} className="text-gray-400 group-hover:text-primary transition-colors" />
                                                     <span>Denetim İzi</span>
                                                 </div>
                                             </Link>
                                             <div className="h-px bg-gray-100 my-1"></div>
-                                            <Link href="/audit/trash" onClick={() => setIsSettingsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors group">
+                                            <Link href={pathname?.startsWith('/control') ? "/control/trash" : "/audit/trash"} onClick={() => setIsSettingsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors group">
                                                 <div className="flex items-center gap-3 w-full">
                                                     <Trash2 size={16} className="text-red-400 group-hover:text-red-600 transition-colors" />
                                                     <span>Silinen Kayıtlar</span>

@@ -154,31 +154,6 @@ export default function ControlSidebar() {
                             </li>
                         </ul>
                     </li>
-
-                    {/* 5. SİSTEM */}
-                    <li className="pt-2 border-t border-slate-100">
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Sistem</div>
-                        <ul className="space-y-1">
-                            <li className="nav-item">
-                                <Link href="/control/logs" className={`nav-link ${isActive('/control/logs') ? 'active' : ''}`}>
-                                    <History size={18} />
-                                    <span>Denetim İzi</span>
-                                </Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link href="/control/notifications" className={`nav-link ${isActive('/control/notifications') ? 'active' : ''}`}>
-                                    <Bell size={18} />
-                                    <span>Bildirimler</span>
-                                </Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link href="/control/trash" className={`nav-link ${isActive('/control/trash') ? 'active' : ''}`}>
-                                    <Trash2 size={18} />
-                                    <span>Silinen Kayıtlar</span>
-                                </Link>
-                            </li>
-                        </ul>
-                    </li>
                 </ul>
             </div>
         </aside>

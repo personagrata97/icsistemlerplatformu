@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, Check, Clock, AlertTriangle, Info, X } from 'lucide-react';
 import useOnClickOutside from '@/hooks/useOnClickOutside';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import DropdownHeader from './ui/DropdownHeader';
 import { auditApi } from '@/lib/audit-api';
 
@@ -27,6 +27,7 @@ export default function NotificationDropdown({
     badgeRingColor = 'ring-white' 
 }: NotificationDropdownProps) {
     const router = useRouter();
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -169,7 +170,7 @@ export default function NotificationDropdown({
 
                     <div className="p-3 bg-gray-50 border-t text-center">
                         <button 
-                            onClick={() => { router.push('/audit/notifications'); setIsOpen(false); }}
+                            onClick={() => { router.push(pathname?.startsWith('/control') ? '/control/notifications' : '/audit/notifications'); setIsOpen(false); }}
                             className="text-xs text-gray-500 font-bold hover:text-gray-700"
                         >
                             Tüm Bildirimleri Gör
