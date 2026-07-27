@@ -8,8 +8,8 @@ import CodeBadge from '@/components/ui/CodeBadge';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import { FileCheck, CheckCircle2, Clock, Plus } from 'lucide-react';
-import { formatDate } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';
 
 export default function ControlRCSAPage() {
@@ -61,7 +61,7 @@ export default function ControlRCSAPage() {
                         <span className="font-mono text-xs font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded">%{item.skor}</span>
                     ) },
                     { key: 'durum', header: 'Durum', width: '160px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
-                    { key: 'tarih', header: 'Tamamlanma Tarihi', width: '150px', render: (item: any) => <span className="font-mono text-xs text-slate-500">{formatDate(item.tarih)}</span> }
+                    { key: 'tarih', header: 'Tamamlanma Tarihi', width: '150px', render: (item: any) => <DateDisplay date={item.tarih} /> }
                 ]}
                 data={selfAssessments}
                 rowKey="id"

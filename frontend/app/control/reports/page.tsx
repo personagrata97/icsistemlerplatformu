@@ -8,8 +8,8 @@ import CodeBadge from '@/components/ui/CodeBadge';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import { FileBarChart, CheckCircle2, Download, Plus } from 'lucide-react';
-import { formatDate } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';
 
 export default function ControlReportsPage() {
@@ -59,7 +59,7 @@ export default function ControlReportsPage() {
                         </div>
                     ) },
                     { key: 'durum', header: 'Durum', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
-                    { key: 'tarih', header: 'Rapor Tarihi', width: '150px', render: (item: any) => <span className="font-mono text-xs text-slate-500">{formatDate(item.tarih)}</span> },
+                    { key: 'tarih', header: 'Rapor Tarihi', width: '150px', render: (item: any) => <DateDisplay date={item.tarih} /> },
                     { key: 'actions', header: 'İşlem', width: '120px', render: () => (
                         <Button variant="secondary" size="sm" leftIcon={<Download size={14} />} onClick={() => showToast('Rapor PDF olarak indiriliyor', 'success')}>
                             İndir

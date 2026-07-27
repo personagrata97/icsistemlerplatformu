@@ -9,8 +9,8 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import { BookOpen, Award, GraduationCap, Clock, Play } from 'lucide-react';
-import { formatDate } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';
 
 export default function ControlTrainingSection() {
@@ -153,7 +153,7 @@ export default function ControlTrainingSection() {
                             {item.zorunlu ? 'ZORUNLU' : 'SEÇMELİ'}
                         </span>
                     ) },
-                    { key: 'sonGuncelleme', header: 'Son Güncelleme', width: '140px', render: (item: any) => <span className="font-mono text-xs text-slate-500">{formatDate(item.sonGuncelleme)}</span> }
+                    { key: 'sonGuncelleme', header: 'Son Güncelleme', width: '150px', render: (item: any) => <DateDisplay date={item.sonGuncelleme} /> }
                 ]}
                 data={filteredTrainings}
                 searchTerm={searchTerm}

@@ -11,6 +11,7 @@ import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import PageHeader from '@/components/audit/PageHeader';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import { 
     Layers, FileCheck, CheckCircle2, Sliders, 
     ShieldCheck, AlertOctagon, Users, BookOpen, 
@@ -334,17 +335,11 @@ export default function PharosControlPage() {
                                 )
                             },
                             {
-                                key: 'durum',
-                                header: 'Durum',
-                                width: '160px',
-                                render: (item: any) => <StatusBadge value={item.durum} type="status" />
-                            },
-                            {
                                 key: 'tarih',
                                 header: 'Tamamlanma Tarihi',
                                 width: '150px',
                                 render: (item: any) => (
-                                    <span className="font-mono text-xs text-slate-500">{formatDate(item.tarih)}</span>
+                                    <DateDisplay date={item.tarih} />
                                 )
                             }
                         ]}
