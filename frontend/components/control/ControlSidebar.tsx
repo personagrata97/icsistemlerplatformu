@@ -28,10 +28,10 @@ const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
     '/control/rcsa': { title: 'Birim Öz Değerlendirmeleri', subtitle: 'İş birimlerinin kendi süreç içi kontrollerini dönemsel değerlendirdiği öz değerlendirme modülü' },
     '/control/testing': { title: 'Kontrol Testleri & Saha', subtitle: 'İç Kontrolörler tarafından gerçekleştirilen tasarım ve işletim etkinlik testleri' },
     '/control/deficiencies': { title: 'Eksiklik Takibi', subtitle: 'Süreç içi kontrol testlerinde tespit edilen eksiklikler ve düzeltici aksiyon planları' },
-    '/control/reports': { title: 'İç Kontrol Raporları', subtitle: 'Üst Yönetim ve Denetim Komitesi sunumuna hazır İç Kontrol Dönem Raporları' },
+    '/control/reports': { title: 'Raporlar', subtitle: 'Üst Yönetim ve Denetim Komitesi sunumuna hazır Dönem Raporları' },
     '/control/training': { title: 'Eğitim Kataloğu', subtitle: 'İç Kontrol personeli ve Birim Kontrol Sorumluları için eğitim programları' },
     '/control/skills': { title: 'Yetkinlik Matrisi', subtitle: 'İç Kontrolörlerin uzmanlık alanları ve yetkinlik matrislerinin yönetimi' },
-    '/control/knowledge-base': { title: 'İç Kontrol Bilgi Bankası', subtitle: 'İç kontrol rehberleri, COSO/BDDK standartları, prosedürler ve çalışma şablonları' },
+    '/control/knowledge-base': { title: 'Bilgi Bankası', subtitle: 'İç kontrol rehberleri, COSO/BDDK standartları, prosedürler ve çalışma şablonları' },
     '/control/logs': { title: 'Denetim İzi', subtitle: 'İç Kontrol modülü işlem geçmişi ve değişiklik kayıtlarının takibi' },
     '/control/notifications': { title: 'Bildirimler', subtitle: 'İç Kontrol süreçlerine ait görev hatırlatmaları ve sistem bildirimlerinin takibi' },
     '/control/trash': { title: 'Silinen Kayıtlar', subtitle: 'Geri dönüştürülebilir silinmiş iç kontrol kayıtlarının takibi' },
@@ -130,7 +130,7 @@ export default function ControlSidebar() {
                             <li className="nav-item">
                                 <Link href="/control/reports" className={`nav-link ${isActive('/control/reports') ? 'active' : ''}`}>
                                     <FileBarChart size={18} />
-                                    <span>İç Kontrol Raporları</span>
+                                    <span>Raporlar</span>
                                 </Link>
                             </li>
                         </ul>
