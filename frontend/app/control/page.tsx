@@ -201,7 +201,7 @@ export default function PharosControlPage() {
                             <Button
                                 variant="primary"
                                 leftIcon={<Plus size={18} />}
-                                onClick={() => showToast('Yeni Kontrol Noktası Tanımlama ekranı açıldı', 'info')}
+                                onClick={() => setIsAddModalOpen(true)}
                             >
                                 Yeni Kontrol Tanımla
                             </Button>
@@ -358,6 +358,38 @@ export default function PharosControlPage() {
             {activeTab === 'deficiencies' && <ControlDeficienciesSection />}
             {activeTab === 'staff' && <ControlStaffSection />}
             {activeTab === 'training' && <ControlTrainingSection />}
+
+            {/* Live New Control Modal */}
+            <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Yeni Kontrol Noktası Tanımla" size="lg">
+                <form onSubmit={handleSaveControl} className="space-y-4">
+                    <div>
+                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Kontrol Kodu</label>
+                        <input type="text" className="form-input text-xs w-full bg-slate-100 font-mono" value={newControl.id} readOnly />
+                    </div>
+                    <div>
+                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Kontrol Tanımı (Zorunlu)</label>
+                        <input type="text" className="form-input text-xs w-full" placeholder="Örn: Gün Sonu Genel Muhasebe Mutabakatı..." value={newControl.ad} onChange={(e) => setNewControl({ ...newControl, ad: e.target.value })} required />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">İlgili Süreç</label>
+                            <input type="text" className="form-input text-xs w-full" value={newControl.surec} onChange={(e) => setNewControl({ ...newControl, surec: e.target.value })} />
+                        </div>
+                        <div>
+                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Sorumlu Birim</label>
+                            <input type="text" className="form-input text-xs w-full" value={newControl.sahip} onChange={(e) => setNewControl({ ...newControl, sahip: e.target.value })} />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Dayandığı Risk Tanımı</label>
+                        <input type="text" className="form-input text-xs w-full" placeholder="Örn: Hatalı Muhasebe Girişi Riski" value={newControl.dayandigiRisk} onChange={(e) => setNewControl({ ...newControl, dayandigiRisk: e.target.value })} />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-3 border-t">
+                        <Button variant="secondary" type="button" onClick={() => setIsAddModalOpen(false)}>İptal</Button>
+                        <Button variant="primary" type="submit">Kontrolü Kaydet</Button>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 }
