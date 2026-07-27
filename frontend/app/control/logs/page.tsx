@@ -88,12 +88,12 @@ export default function ControlLogsPage() {
         },
         {
             id: 'LOG-IK-008', action: 'Eksiklik Aksiyonu Kapatıldı', entity: 'Eksiklik Takibi', entityId: 'EKS-2025-014',
-            user: 'Ali Koç (BKS)', date: '2026-07-20T15:10:00', details: 'Hazine müdürlüğü aksiyonu tamamlandı, kanıt belgesi yüklendi ve İç Kontrol Merkezi tarafından doğrulandı',
+            user: 'Ali Koç (BKS)', date: '2026-07-20T15:10:00', details: 'Finans Servisi aksiyonu tamamlandı, kanıt belgesi yüklendi ve İç Kontrol ve Uyum Müdürlüğü tarafından doğrulandı',
             type: 'status', ipAddress: '10.0.3.22'
         },
         {
             id: 'LOG-IK-009', action: 'Kullanıcı Oturum Açtı', entity: 'Sistem', entityId: 'USR-AY001',
-            user: 'Ahmet Yılmaz', date: '2026-07-20T08:05:00', details: 'İç Kontrol Merkezi modülüne başarılı giriş',
+            user: 'Ahmet Yılmaz', date: '2026-07-20T08:05:00', details: 'İç Kontrol ve Uyum Müdürlüğü modülüne başarılı giriş',
             type: 'login', ipAddress: '10.0.1.45'
         },
         {

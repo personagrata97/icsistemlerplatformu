@@ -33,21 +33,21 @@ export default function ControlTrainingPage() {
         },
         {
             id: 'EGT-IK-002', ad: 'Birim Kontrol Sorumluları (BKS) Rol ve Sorumluluklar Eğitimi',
-            egitmen: 'Canan Öztürk (İç Kontrol Merkezi)', hedefKitle: 'Tüm BKS Personeli',
+            egitmen: 'Canan Öztürk (İç Kontrol ve Uyum Müdürlüğü)', hedefKitle: 'Tüm BKS Personeli',
             sure: '8 Saat (1 Gün)', tarih: '2026-07-05', katilimci: 28,
             durum: 'TAMAMLANDI', icerik: 'BKS görev tanımı, KÖD süreci, eksiklik raporlama yükümlülükleri',
             sertifika: 'İç Kontrol BKS Yetkinlik Belgesi'
         },
         {
             id: 'EGT-IK-003', ad: 'Kontrol Testi Tasarım ve İşletim Etkinliği Metodolojisi',
-            egitmen: 'Ahmet Yılmaz (İç Kontrol Merkezi)', hedefKitle: 'İç Kontrolör Kadrosu',
+            egitmen: 'Ahmet Yılmaz (İç Kontrol ve Uyum Müdürlüğü)', hedefKitle: 'İç Kontrolör Kadrosu',
             sure: '12 Saat (1.5 Gün)', tarih: '2026-08-20', katilimci: 8,
             durum: 'PLANLANMIŞ', icerik: 'Tasarım etkinliği değerlendirme, örneklem büyüklüğü belirleme, walktrough prosedürleri',
             sertifika: 'İç Kontrol Test Uzmanı Belgesi'
         },
         {
             id: 'EGT-IK-004', ad: 'Operasyonel Risk ve İç Kontrol Farkındalık Eğitimi',
-            egitmen: 'Ahmet Yılmaz (İç Kontrol Merkezi)', hedefKitle: 'Tüm Birim Yöneticileri',
+            egitmen: 'Ahmet Yılmaz (İç Kontrol ve Uyum Müdürlüğü)', hedefKitle: 'Tüm Birim Yöneticileri',
             sure: '4 Saat (Yarım Gün)', tarih: '2026-09-15', katilimci: 35,
             durum: 'PLANLANMIŞ', icerik: 'Operasyonel risk kavramı, iç kontrol sistemi nedir, birim sorumluluğu ve KÖD süreci',
             sertifika: 'Katılım Belgesi'

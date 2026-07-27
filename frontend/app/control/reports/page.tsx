@@ -12,6 +12,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import ActionMenu from '@/components/ui/ActionMenu';
 import { FileBarChart, CheckCircle2, Download, Plus, Eye, Trash2, Send, FileText, Printer } from 'lucide-react';
 import { useToast } from '@/components/Toast';
+import { DEPARTMENTS } from '@/lib/organization-constants';
 
 export default function ControlReportsPage() {
     const { showToast } = useToast();
@@ -20,16 +21,16 @@ export default function ControlReportsPage() {
     const [selectedReport, setSelectedReport] = useState<any>(null);
 
     const [reportsList, setReportsList] = useState([
-        { id: 'RPR-2026-Q2', ad: '2026 Q2 Dönemsel İç Kontrol Değerlendirme Raporu', birim: 'İç Kontrol Merkezi', tarih: '2026-07-20', durum: 'ONAYLANDI', yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)', icerik: 'İç kontrol sistemi 2026 ikinci çeyrek genel etkinlik değerlendirmesi. 86 test, 12 eksiklik, %91 kontrol etkinlik oranı.' },
-        { id: 'RPR-2026-KRE', ad: 'Kredi Operasyonları Süreç İçi Kontrol Etkinlik Raporu', birim: 'Kredi Operasyonları Müdürlüğü', tarih: '2026-07-15', durum: 'ONAYLANDI', yazar: 'Canan Öztürk (Kıdemli Kontrolör)', icerik: 'Kredi süreçlerindeki kontrol noktalarının tasarım ve işletim etkinliği değerlendirmesi. 14 test noktası, %95 etkinlik oranı.' },
-        { id: 'RPR-2026-KVKK', ad: 'Müşteri Hakları ve KVKK Kontrol Uyum Raporu', birim: 'Müşteri İlişkileri', tarih: '2026-07-10', durum: 'TASLAK', yazar: 'Zeynep Kaya (İç Kontrolör)', icerik: 'KVKK uyumlu müşteri veri işleme kontrollerinin değerlendirmesi. 2 eksiklik tespit edildi.' },
-        { id: 'RPR-2026-HZ', ad: 'Hazine İşlemleri Kontrol Testi Sonuç Raporu', birim: 'Hazine Müdürlüğü', tarih: '2026-06-28', durum: 'ONAYLANDI', yazar: 'Emre Aksoy (İç Kontrolör)', icerik: 'Hazine pozisyon limitleri, gün sonu mutabakatları ve FX kontrollerinin testi. 1 yüksek öncelikli eksiklik.' },
+        { id: 'RPR-2026-Q2', ad: '2026 Q2 Dönemsel İç Kontrol Değerlendirme Raporu', birim: 'İç Kontrol ve Uyum Müdürlüğü', tarih: '2026-07-20', durum: 'ONAYLANDI', yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)', icerik: 'İç kontrol sistemi 2026 ikinci çeyrek genel etkinlik değerlendirmesi. 86 test, 12 eksiklik, %91 kontrol etkinlik oranı.' },
+        { id: 'RPR-2026-KRE', ad: 'Kredi Operasyonları Süreç İçi Kontrol Etkinlik Raporu', birim: 'Tahsisat Servisi', tarih: '2026-07-15', durum: 'ONAYLANDI', yazar: 'Canan Öztürk (Kıdemli Kontrolör)', icerik: 'Kredi süreçlerindeki kontrol noktalarının tasarım ve işletim etkinliği değerlendirmesi. 14 test noktası, %95 etkinlik oranı.' },
+        { id: 'RPR-2026-KVKK', ad: 'Müşteri Hakları ve KVKK Kontrol Uyum Raporu', birim: 'Satış Servisi', tarih: '2026-07-10', durum: 'TASLAK', yazar: 'Zeynep Kaya (İç Kontrolör)', icerik: 'KVKK uyumlu müşteri veri işleme kontrollerinin değerlendirmesi. 2 eksiklik tespit edildi.' },
+        { id: 'RPR-2026-HZ', ad: 'Hazine İşlemleri Kontrol Testi Sonuç Raporu', birim: 'Finans Servisi', tarih: '2026-06-28', durum: 'ONAYLANDI', yazar: 'Emre Aksoy (İç Kontrolör)', icerik: 'Hazine pozisyon limitleri, gün sonu mutabakatları ve FX kontrollerinin testi. 1 yüksek öncelikli eksiklik.' },
     ]);
 
     const [newReport, setNewReport] = useState({
         id: `RPR-2026-00${reportsList.length + 1}`,
         ad: '',
-        birim: 'İç Kontrol Merkezi',
+        birim: 'İç Kontrol ve Uyum Müdürlüğü',
         tarih: '2026-07-27',
         durum: 'TASLAK',
         yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)',
@@ -50,7 +51,7 @@ export default function ControlReportsPage() {
         setNewReport({
             id: `RPR-2026-00${reportsList.length + 2}`,
             ad: '',
-            birim: 'İç Kontrol Merkezi',
+            birim: 'İç Kontrol ve Uyum Müdürlüğü',
             tarih: '2026-07-27',
             durum: 'TASLAK',
             yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)',
@@ -91,12 +92,12 @@ export default function ControlReportsPage() {
                     { key: 'tarih', header: 'Rapor Tarihi', type: 'date', width: '150px' },
                     { key: 'actions', header: 'İşlemler', width: '120px', render: (item: any) => (
                         <ActionMenu items={[
-                            { label: 'Detay Görüntüle', icon: <Eye size={14} />, onClick: () => setSelectedReport(item) },
-                            { label: 'PDF İndir', icon: <Download size={14} />, onClick: () => showToast(`${item.ad} PDF olarak indiriliyor`, 'success') },
-                            { label: 'Word Oluştur', icon: <FileText size={14} />, onClick: () => showToast(`${item.ad} Word formatında oluşturuluyor`, 'success') },
-                            { label: 'Yazdır', icon: <Printer size={14} />, onClick: () => showToast(`${item.ad} yazdırılmak üzere hazırlanıyor`, 'success') },
-                            { label: 'Denetim Komitesine Gönder', icon: <Send size={14} />, onClick: () => showToast(`${item.ad} Denetim Komitesine iletildi`, 'success') },
-                            { label: 'Sil', icon: <Trash2 size={14} />, onClick: () => showToast(`${item.id} silindi`, 'success'), variant: 'danger' as any }
+                            { label: 'Detay Görüntüle', icon: Eye, onClick: () => setSelectedReport(item) },
+                            { label: 'PDF İndir', icon: Download, onClick: () => showToast(`${item.ad} PDF olarak indiriliyor`, 'success') },
+                            { label: 'Word Oluştur', icon: FileText, onClick: () => showToast(`${item.ad} Word formatında oluşturuluyor`, 'success') },
+                            { label: 'Yazdır', icon: Printer, onClick: () => showToast(`${item.ad} yazdırılmak üzere hazırlanıyor`, 'success') },
+                            { label: 'Denetim Komitesine Gönder', icon: Send, onClick: () => showToast(`${item.ad} Denetim Komitesine iletildi`, 'success') },
+                            { label: 'Sil', icon: Trash2, onClick: () => showToast(`${item.id} silindi`, 'success'), variant: 'danger' as any }
                         ]} />
                     ) }
                 ]}
@@ -152,8 +153,12 @@ export default function ControlReportsPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Sorumlu Birim</label>
-                            <input type="text" className="form-input text-xs w-full" value={newReport.birim} onChange={(e) => setNewReport({ ...newReport, birim: e.target.value })} />
+                            <CustomSelect
+                                label="Sorumlu Birim (Resmi Şema)"
+                                options={DEPARTMENTS.map(d => ({ value: d, label: d }))}
+                                value={newReport.birim}
+                                onChange={(val) => setNewReport({ ...newReport, birim: val as string })}
+                            />
                         </div>
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Hazırlayan İç Kontrolör</label>

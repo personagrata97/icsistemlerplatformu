@@ -17,7 +17,7 @@ import { useToast } from '@/components/Toast';
 type DocCategory = 'IC_MERKEZ' | 'MEVZUAT' | 'SABLONLAR' | 'EGITIM';
 
 const TAB_LABELS: Record<DocCategory, string> = {
-    IC_MERKEZ: 'İç Kontrol Merkezi',
+    IC_MERKEZ: 'İç Kontrol ve Uyum',
     MEVZUAT: 'BDDK & Mevzuat',
     SABLONLAR: 'Şablonlar & Formlar',
     EGITIM: 'Eğitim Materyalleri'
@@ -31,8 +31,8 @@ export default function ControlKnowledgeBasePage() {
     const [selectedDoc, setSelectedDoc] = useState<any>(null);
 
     const allDocs = [
-        // İç Kontrol Merkezi
-        { id: 'DOK-IK-001', ad: 'İç Kontrol Merkezi Yıllık Faaliyet Planı 2026', kategori: 'IC_MERKEZ', tur: 'PDF Doküman', versiyon: 'v3.1', tarih: '2026-07-01', boyut: '4.2 MB', durum: 'YÜRÜRLÜKTE', aciklama: 'Yıllık kontrol testi planı, KÖD takvimi ve kaynak tahsis planı' },
+        // İç Kontrol ve Uyum
+        { id: 'DOK-IK-001', ad: 'İç Kontrol Yıllık Faaliyet Planı 2026', kategori: 'IC_MERKEZ', tur: 'PDF Doküman', versiyon: 'v3.1', tarih: '2026-07-01', boyut: '4.2 MB', durum: 'YÜRÜRLÜKTE', aciklama: 'Yıllık kontrol testi planı, KÖD takvimi ve kaynak tahsis planı' },
         { id: 'DOK-IK-002', ad: 'Kontrol Testi Uygulama Prosedürü', kategori: 'IC_MERKEZ', tur: 'PDF Prosedür', versiyon: 'v2.0', tarih: '2026-06-15', boyut: '2.8 MB', durum: 'YÜRÜRLÜKTE', aciklama: 'Tasarım ve işletim etkinliği testi metodolojisi, örneklem belirleme ve raporlama standartları' },
         { id: 'DOK-IK-003', ad: 'Eksiklik Yönetimi ve Aksiyon Takip Rehberi', kategori: 'IC_MERKEZ', tur: 'PDF Rehber', versiyon: 'v1.5', tarih: '2026-05-20', boyut: '1.9 MB', durum: 'YÜRÜRLÜKTE', aciklama: 'Eksiklik sınıflandırma, aksiyon planı belirleme ve kanıt doğrulama süreçleri' },
         // BDDK & Mevzuat
@@ -87,7 +87,7 @@ export default function ControlKnowledgeBasePage() {
 
             <SegmentedTabs
                 tabs={[
-                    { id: 'IC_MERKEZ', label: 'İç Kontrol Merkezi', icon: ShieldCheck },
+                    { id: 'IC_MERKEZ', label: 'İç Kontrol ve Uyum', icon: ShieldCheck },
                     { id: 'MEVZUAT', label: 'BDDK & Mevzuat', icon: Scale },
                     { id: 'SABLONLAR', label: 'Şablonlar & Formlar', icon: ClipboardList },
                     { id: 'EGITIM', label: 'Eğitim Materyalleri', icon: BookOpen },

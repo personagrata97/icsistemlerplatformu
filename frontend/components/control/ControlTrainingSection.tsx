@@ -34,7 +34,7 @@ export default function ControlTrainingSection() {
         {
             id: 'EGT-IK-002',
             ad: 'Birim Kontrol Sorumluları (BKS) Rol ve Sorumluluklar Eğitimi',
-            egitmen: 'Canan Öztürk (İç Kontrol Merkezi)',
+            egitmen: 'Canan Öztürk (İç Kontrol ve Uyum Müdürlüğü)',
             hedefKitle: 'Tüm BKS Personeli',
             sure: '8 Saat (1 Gün)',
             tarih: '2026-07-05',
@@ -46,7 +46,7 @@ export default function ControlTrainingSection() {
         {
             id: 'EGT-IK-003',
             ad: 'Kontrol Testi Tasarım ve İşletim Etkinliği Metodolojisi',
-            egitmen: 'Ahmet Yılmaz (İç Kontrol Merkezi)',
+            egitmen: 'Ahmet Yılmaz (İç Kontrol ve Uyum Müdürlüğü)',
             hedefKitle: 'İç Kontrolör Kadrosu',
             sure: '12 Saat (1.5 Gün)',
             tarih: '2026-08-20',
@@ -60,7 +60,7 @@ export default function ControlTrainingSection() {
     const [newTraining, setNewTraining] = useState({
         id: `EGT-IK-00${trainingList.length + 1}`,
         ad: '',
-        egitmen: 'Canan Öztürk (İç Kontrol Merkezi)',
+        egitmen: 'Canan Öztürk (İç Kontrol ve Uyum Müdürlüğü)',
         hedefKitle: 'İç Kontrolör Kadrosu',
         sure: '8 Saat (1 Gün)',
         tarih: '2026-09-15',
@@ -84,7 +84,7 @@ export default function ControlTrainingSection() {
         setNewTraining({
             id: `EGT-IK-00${trainingList.length + 2}`,
             ad: '',
-            egitmen: 'Canan Öztürk (İç Kontrol Merkezi)',
+            egitmen: 'Canan Öztürk (İç Kontrol ve Uyum Müdürlüğü)',
             hedefKitle: 'İç Kontrolör Kadrosu',
             sure: '8 Saat (1 Gün)',
             tarih: '2026-09-15',

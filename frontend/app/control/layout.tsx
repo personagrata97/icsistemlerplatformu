@@ -36,8 +36,8 @@ function ControlLayoutContent({ children }: { children: React.ReactNode }) {
                 </div>
                 <main className="main-content">
                     <AuditHeader
-                        title={title || "İç Kontrol Merkezi"}
-                        subtitle={subtitle || "İç Kontrol Merkezi — Süreç İçi Kontrol ve Risk İzleme Platformu"}
+                        title={title || "İç Kontrol ve Uyum"}
+                        subtitle={subtitle || "İç Kontrol ve Uyum Müdürlüğü — Süreç İçi Kontrol ve Risk İzleme Platformu"}
                         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
                     />
                     <div className="content-area">
