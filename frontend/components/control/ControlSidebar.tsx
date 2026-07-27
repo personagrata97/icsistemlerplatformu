@@ -17,7 +17,7 @@ import {
 import { useAuditTitle } from '@/context/AuditTitleContext';
 
 const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
-    '/control': { title: 'Ana Panel & Kokpit', subtitle: 'İç Kontrol genel performans göstergeleri ve 2. hat durum takibi' },
+    '/control': { title: 'Ana Panel', subtitle: 'İç Kontrol genel performans göstergeleri ve durum takibi' },
     '/control/staff': { title: 'Kontrolör Kadrosu (BKS)', subtitle: 'İç Kontrolör kadrosu ve Birim Kontrol Sorumluları (BKS) yönetimi' },
     '/control/inventory': { title: 'Süreç & Kontrol Envanteri', subtitle: 'Tüm operasyonel süreçlerde tanımlı kontrol noktaları ve etkinlik matrisi' },
     '/control/rcsa': { title: 'Birim Öz Değerlendirmeleri', subtitle: 'İş birimlerinin kendi süreç içi kontrollerini dönemsel değerlendirdiği öz değerlendirme modülü' },
@@ -66,7 +66,7 @@ export default function ControlSidebar() {
                             <li className="nav-item">
                                 <Link href="/control" className={`nav-link ${pathname === '/control' ? 'active' : ''}`}>
                                     <LayoutDashboard size={18} />
-                                    <span>Ana Panel & Kokpit</span>
+                                    <span>Ana Panel</span>
                                 </Link>
                             </li>
                             <li className="nav-item">

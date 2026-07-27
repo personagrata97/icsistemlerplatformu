@@ -160,8 +160,8 @@ export default function PharosControlPage() {
                                 <Shield size={20} />
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900 text-sm">COSO İç Kontrol Olgunluk Matrisi</h3>
-                                <p className="text-xs text-slate-500">2. Savunma Hattı 5 Ana Bileşen Etkinlik Göstergeleri</p>
+                                <h3 className="font-bold text-slate-900 text-sm">İç Kontrol Olgunluk Matrisi</h3>
+                                <p className="text-xs text-slate-500">İç Kontrol 5 Ana Bileşen Etkinlik Göstergeleri</p>
                             </div>
                         </div>
                         <span className="text-xs font-bold px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full flex items-center gap-1">
