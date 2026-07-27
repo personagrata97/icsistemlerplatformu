@@ -10,12 +10,11 @@ import Button from '@/components/ui/Button';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
-import PageHeader from '@/components/audit/PageHeader';
 import { DateDisplay } from '@/components/ui/DateDisplay';
 import { 
     Layers, FileCheck, CheckCircle2, Sliders, 
     ShieldCheck, AlertOctagon, Users, BookOpen, 
-    Plus, Activity, Database
+    Plus, Activity, Target, Shield, Award, BarChart3, TrendingUp, Cpu
 } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
@@ -141,12 +140,95 @@ export default function PharosControlPage() {
         return true;
     });
 
+    const cosoComponents = [
+        { name: 'Kontrol Ortamı (Control Environment)', score: 92, count: 14, color: 'bg-emerald-500' },
+        { name: 'Risk Değerlendirme (Risk Assessment)', score: 88, count: 18, color: 'bg-blue-500' },
+        { name: 'Kontrol Faaliyetleri (Control Activities)', score: 94, count: 48, color: 'bg-purple-500' },
+        { name: 'Bilgi ve İletişim (Info & Communication)', score: 85, count: 12, color: 'bg-amber-500' },
+        { name: 'İzleme Faaliyetleri (Monitoring)', score: 90, count: 16, color: 'bg-cyan-500' },
+    ];
+
     return (
         <div className="space-y-6">
-            <PageHeader
-                title={`${TERMS.controlModule} — İç Kontrol Çerçevesi ve Süreç Yönetimi`}
-                subtitle={TERMS.controlModuleDescription}
-            />
+            {/* Visual COSO & Executive Dashboard Panel */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* COSO Maturity Visual Card */}
+                <div className="lg:col-span-2 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div className="flex items-center gap-2.5">
+                            <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                                <Shield size={20} />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-slate-900 text-sm">COSO İç Kontrol Olgunluk Matrisi</h3>
+                                <p className="text-xs text-slate-500">2. Savunma Hattı 5 Ana Bileşen Etkinlik Göstergeleri</p>
+                            </div>
+                        </div>
+                        <span className="text-xs font-bold px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full flex items-center gap-1">
+                            <TrendingUp size={12} /> Genel Skor: %90
+                        </span>
+                    </div>
+
+                    <div className="space-y-3 pt-1">
+                        {cosoComponents.map((item, idx) => (
+                            <div key={idx} className="space-y-1">
+                                <div className="flex items-center justify-between text-xs font-semibold">
+                                    <span className="text-slate-700">{item.name}</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-slate-400 font-mono text-[11px]">{item.count} Kontrol</span>
+                                        <span className="font-mono font-bold text-slate-900">%{item.score}</span>
+                                    </div>
+                                </div>
+                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                    <div className={`${item.color} h-full rounded-full transition-all duration-500`} style={{ width: `${item.score}%` }}></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Automation & Control Category Distribution Card */}
+                <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between space-y-4">
+                    <div>
+                        <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                            <div className="p-2 bg-purple-50 text-purple-600 rounded-xl">
+                                <Cpu size={20} />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-slate-900 text-sm">Otomasyon & Tür Dağılımı</h3>
+                                <p className="text-xs text-slate-500">Kontrol Yöntem ve Önleyicilik Oranları</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 pt-4">
+                            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                <span className="text-[11px] text-slate-500 block font-medium">Otomatik / Yarı Otomatik</span>
+                                <span className="text-xl font-extrabold text-slate-900 font-mono">%75</span>
+                                <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">+%5 bu çeyrek</span>
+                            </div>
+                            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                <span className="text-[11px] text-slate-500 block font-medium">Önleyici Kontroller</span>
+                                <span className="text-xl font-extrabold text-slate-900 font-mono">%68</span>
+                                <span className="text-[10px] text-blue-600 font-semibold block mt-0.5">32 Önleyici Nokta</span>
+                            </div>
+                            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                <span className="text-[11px] text-slate-500 block font-medium">Tespit Edici Kontroller</span>
+                                <span className="text-xl font-extrabold text-slate-900 font-mono">%32</span>
+                                <span className="text-[10px] text-amber-600 font-semibold block mt-0.5">16 Tespit Noktası</span>
+                            </div>
+                            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                <span className="text-[11px] text-slate-500 block font-medium">KÖD Birim Katılımı</span>
+                                <span className="text-xl font-extrabold text-slate-900 font-mono">%94</span>
+                                <span className="text-[10px] text-purple-600 font-semibold block mt-0.5">28 Aktif Birim</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Button variant="secondary" className="w-full text-xs gap-1.5" onClick={() => showToast('İç Kontrol Olgunluk Raporu İndiriliyor', 'info')}>
+                        <BarChart3 size={14} /> Olgunluk Raporunu İndir
+                    </Button>
+                </div>
+            </div>
 
             <SegmentedTabs
                 tabs={[
@@ -166,28 +248,28 @@ export default function PharosControlPage() {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <StatCard
                             title="Toplam Kontrol Noktası"
-                            value={48}
+                            value={controlsList.length}
                             icon={Layers}
                             color="blue"
                             infoTooltip="Süreçlerde tanımlı aktif iç kontrol faaliyetleri envanteri"
                         />
                         <StatCard
                             title="Etkin Kontroller (%80+)"
-                            value={38}
+                            value={controlsList.filter(c => c.durum === 'ETKİN').length}
                             icon={CheckCircle2}
                             color="emerald"
                             infoTooltip="Yapılan testler sonucunda etkin bulunan kontrol oranı"
                         />
                         <StatCard
                             title="Gelişime Açık Kontroller"
-                            value={7}
+                            value={controlsList.filter(c => c.durum === 'GELİŞİME_AÇIK').length}
                             icon={Sliders}
                             color="amber"
                             infoTooltip="İyileştirme gereken süreç içi kontrol noktaları"
                         />
                         <StatCard
                             title="Otomatik Kontrol Oranı"
-                            value="%65"
+                            value="%75"
                             icon={Activity}
                             color="purple"
                             infoTooltip="Sistem üzerinde otomatik veya yarı otomatik çalışan kontroller"
@@ -263,7 +345,6 @@ export default function PharosControlPage() {
                             {
                                 key: 'dayandigiRisk',
                                 header: 'Dayandığı Risk',
-                                width: '200px',
                                 render: (item: any) => (
                                     <span className="text-xs text-slate-600 font-medium">{item.dayandigiRisk}</span>
                                 )
@@ -294,7 +375,7 @@ export default function PharosControlPage() {
             )}
 
             {activeTab === 'kod' && (
-                <div className="space-y-4">
+                <div className="space-y-6">
                     <PageToolbar
                         searchPlaceholder="Birim veya dönem ile ara..."
                         searchValue={searchTerm}
@@ -309,6 +390,7 @@ export default function PharosControlPage() {
                             </Button>
                         }
                     />
+
                     <DataTable
                         columns={[
                             {
@@ -317,7 +399,11 @@ export default function PharosControlPage() {
                                 width: '150px',
                                 render: (item: any) => <CodeBadge code={item.id} />
                             },
-                            { key: 'birim', header: 'Değerlendirilen Birim', sortable: true },
+                            {
+                                key: 'birim',
+                                header: 'Değerlendirilen Birim',
+                                sortable: true
+                            },
                             { key: 'donem', header: 'Dönem', width: '120px' },
                             {
                                 key: 'sorumlusu',
@@ -335,12 +421,16 @@ export default function PharosControlPage() {
                                 )
                             },
                             {
+                                key: 'durum',
+                                header: 'Durum',
+                                width: '160px',
+                                render: (item: any) => <StatusBadge value={item.durum} type="status" />
+                            },
+                            {
                                 key: 'tarih',
                                 header: 'Tamamlanma Tarihi',
-                                width: '150px',
-                                render: (item: any) => (
-                                    <DateDisplay date={item.tarih} />
-                                )
+                                type: 'date',
+                                width: '150px'
                             }
                         ]}
                         data={selfAssessments}

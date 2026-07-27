@@ -26,6 +26,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
     '/control/reports': { title: 'İç Kontrol Raporları', subtitle: 'Üst Yönetim ve Denetim Komitesi sunumuna hazır İç Kontrol Dönem Raporları' },
     '/control/training': { title: 'Eğitim Kataloğu', subtitle: 'İç Kontrol personeli ve Birim Kontrol Sorumluları için eğitim programları' },
     '/control/skills': { title: 'Yetkinlik Matrisi', subtitle: 'İç Kontrolörlerin uzmanlık alanları ve yetkinlik matrislerinin yönetimi' },
+    '/control/knowledge-base': { title: 'İç Kontrol Bilgi Bankası', subtitle: 'İç kontrol rehberleri, COSO/BDDK standartları, prosedürler ve çalışma şablonları' },
 };
 
 export default function ControlSidebar() {

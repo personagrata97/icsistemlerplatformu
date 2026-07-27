@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Menu, ShieldCheck, Bell, History, Settings, User, LogOut, BookOpen, ShieldAlert, Key, Trash2, Home } from 'lucide-react';
 
 import Tooltip from '@/components/ui/Tooltip';
@@ -25,6 +25,7 @@ const ROLE_MAP: Record<string, string> = {
 
 export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSidebarToggle = false, hideLogout = false }: { title: string, subtitle?: string, onToggleSidebar?: () => void, hideSidebarToggle?: boolean, hideLogout?: boolean }) {
     const router = useRouter();
+    const pathname = usePathname();
     const { user, hasRole, logout } = useAuth();
     
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -72,10 +73,10 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
                 </Tooltip>
                 
                 {/* Knowledge Base */}
-                {isAuditor && (
-                    <Tooltip content="Bilgi Bankası" position="bottom">
+                {(isAuditor || pathname?.startsWith('/control')) && (
+                    <Tooltip content="İç Kontrol Bilgi Bankası" position="bottom">
                         <Link 
-                            href="/audit/knowledge-base" 
+                            href={pathname?.startsWith('/control') ? "/control/knowledge-base" : "/audit/knowledge-base"} 
                             className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
                         >
                             <BookOpen size={20} />
