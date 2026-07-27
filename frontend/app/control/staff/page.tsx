@@ -415,6 +415,8 @@ export default function ControlStaffPage() {
                 searchPlaceholder="Personel adı, sicil no veya birim ile ara..."
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
+                showExportButton={true}
+                onExportClick={() => showToast('İç Kontrol Personel Listesi dışa aktarıldı.', 'info')}
                 filters={
                     <FilterDropdown
                         activeCount={filters.title.length + filters.role.length + filters.department.length + filters.status.length}
@@ -428,8 +430,14 @@ export default function ControlStaffPage() {
                 }
                 rightActions={
                     <div className="flex items-center gap-2">
-                        <Button variant="secondary" leftIcon={<Award size={16} />} onClick={() => setIsBulkTrainingModalOpen(true)}>
-                            Toplu Eğitim Ekle
+                        <Button variant="secondary" leftIcon={<Award size={16} />} onClick={() => router.push('/control/training')}>
+                            Eğitim Raporu
+                        </Button>
+                        <Button variant="secondary" leftIcon={<Award size={16} />} onClick={() => router.push('/control/skills')}>
+                            Yetkinlikler
+                        </Button>
+                        <Button variant="secondary" leftIcon={<Plus size={16} />} onClick={() => setIsBulkTrainingModalOpen(true)}>
+                            Toplu Eğitim
                         </Button>
                         <Button variant="primary" leftIcon={<Plus size={16} />} onClick={() => { setIsEditingStaff(false); setIsAddModalOpen(true); }}>
                             Yeni Personel Ekle

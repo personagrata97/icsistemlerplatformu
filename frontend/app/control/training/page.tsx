@@ -13,6 +13,7 @@ import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import ActionMenu from '@/components/ui/ActionMenu';
 import { BookOpen, Award, Users, Plus, Eye, Calendar, CheckCircle2, Clock, User } from 'lucide-react';
 import { useToast } from '@/components/Toast';
+import ControlStaffTabs from '@/components/control/ControlStaffTabs';
 
 export default function ControlTrainingPage() {
     const { showToast } = useToast();
@@ -76,6 +77,7 @@ export default function ControlTrainingPage() {
 
     return (
         <div className="space-y-6">
+            <ControlStaffTabs />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Toplam Eğitim Programı" value={trainingList.length} icon={BookOpen} color="blue" />
                 <StatCard title="Tamamlanan Eğitimler" value={trainingList.filter(t => t.durum === 'TAMAMLANDI').length} icon={CheckCircle2} color="emerald" />

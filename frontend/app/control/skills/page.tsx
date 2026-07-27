@@ -10,6 +10,7 @@ import ActionMenu from '@/components/ui/ActionMenu';
 import RatingStars from '@/components/ui/RatingStars';
 import { Award, Users, TrendingUp, Eye, Edit2, History, Star } from 'lucide-react';
 import { useToast } from '@/components/Toast';
+import ControlStaffTabs from '@/components/control/ControlStaffTabs';
 
 interface SkillRatings {
     coso_framework: number;
@@ -91,6 +92,7 @@ export default function ControlSkillsPage() {
 
     return (
         <div className="space-y-6">
+            <ControlStaffTabs />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Değerlendirilen Kontrolör" value={staffSkills.length} icon={Users} color="blue" />
                 <StatCard title="Ekip Ortalama Puanı" value={avgTeamScore} icon={Star} color="amber" />
