@@ -10,6 +10,7 @@ import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { Users, Award, UserCheck, Plus, Eye, BookOpen, ShieldCheck } from 'lucide-react';
+import { DEPARTMENTS } from '@/lib/organization-constants';
 import { useToast } from '@/components/Toast';
 
 export default function ControlStaffSection() {
@@ -19,18 +20,18 @@ export default function ControlStaffSection() {
     const [selectedStaff, setSelectedStaff] = useState<any>(null);
 
     const [staffList, setStaffList] = useState([
-        { id: 'KNT-01', ad: 'Canan Öztürk', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol Merkezi', rol: 'KONTROLÖR', uzmanlik: 'Kredi Operasyonları, Bilgi Teknolojileri', sertifikalar: 'CIA, CISA, ISO 27001 LA', tecrube: '8 Yıl' },
-        { id: 'KNT-02', ad: 'Ahmet Yılmaz', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol Merkezi', rol: 'KONTROLÖR', uzmanlik: 'Hazine, Fon Yönetimi, Mali İşler', sertifikalar: 'CFA, FRM, SPK Düzey 3', tecrube: '10 Yıl' },
-        { id: 'KNT-03', ad: 'Zeynep Kaya', unvan: 'İç Kontrolör', birim: 'İç Kontrol Merkezi', rol: 'KONTROLÖR', uzmanlik: 'KVKK, Müşteri İlişkileri, Uyum', sertifikalar: 'CPA, KVKK Uzmanlığı', tecrube: '5 Yıl' },
-        { id: 'BKS-01', ad: 'Mehmet Demir', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Kredi Operasyonları Müdürlüğü', rol: 'BKS', uzmanlik: 'Kredi Tahsis ve Teminat İşlemleri', sertifikalar: 'Kredi Derecelendirme Sertifikası', tecrube: '12 Yıl' },
-        { id: 'BKS-02', ad: 'Ayşe Şahin', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Hazine ve Fon Yönetimi', rol: 'BKS', uzmanlik: 'Piyasa Riski, Likidite Kontrolü', sertifikalar: 'Hazine Lisansı', tecrube: '9 Yıl' },
+        { id: 'KNT-01', ad: 'Canan Öztürk', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', rol: 'KONTROLÖR', uzmanlik: 'Tahsisat Servisi, Bilgi Teknolojileri Servisi', sertifikalar: 'CIA, CISA, ISO 27001 LA', tecrube: '8 Yıl' },
+        { id: 'KNT-02', ad: 'Ahmet Yılmaz', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', rol: 'KONTROLÖR', uzmanlik: 'Finans Servisi, Muhasebe Servisi', sertifikalar: 'CFA, FRM, SPK Düzey 3', tecrube: '10 Yıl' },
+        { id: 'KNT-03', ad: 'Zeynep Kaya', unvan: 'İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', rol: 'KONTROLÖR', uzmanlik: 'CRM ve Performans Servisi, Uyum', sertifikalar: 'CPA, KVKK Uzmanlığı', tecrube: '5 Yıl' },
+        { id: 'BKS-01', ad: 'Mehmet Demir', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Tahsisat Servisi', rol: 'BKS', uzmanlik: 'Tahsisat ve Teminat İşlemleri', sertifikalar: 'Kredi Derecelendirme Sertifikası', tecrube: '12 Yıl' },
+        { id: 'BKS-02', ad: 'Ayşe Şahin', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Finans Servisi', rol: 'BKS', uzmanlik: 'Piyasa Riski, Likidite Kontrolü', sertifikalar: 'Hazine Lisansı', tecrube: '9 Yıl' },
     ]);
 
     const [newStaff, setNewStaff] = useState({
         id: `BKS-0${staffList.length + 1}`,
         ad: '',
         unvan: 'Birim Kontrol Sorumlusu (BKS)',
-        birim: 'Şube Operasyonları Müdürlüğü',
+        birim: 'Operasyon Servisi',
         rol: 'BKS',
         uzmanlik: 'Operasyonel Risk, Gişe Kontrolleri',
         sertifikalar: 'Temel Bankacılık Sertifikası',

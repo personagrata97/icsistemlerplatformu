@@ -13,6 +13,8 @@ import ActionMenu from '@/components/ui/ActionMenu';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import { Users, Shield, Plus, Eye, Edit2, Mail, Phone, Award, Briefcase, Calendar, UserCheck, TrendingUp } from 'lucide-react';
+import ControlStaffTabs from '@/components/control/ControlStaffTabs';
+import { DEPARTMENTS } from '@/lib/organization-constants';
 import { useToast } from '@/components/Toast';
 
 interface ControlStaff {
@@ -41,60 +43,60 @@ export default function ControlStaffPage() {
 
     const staffList: ControlStaff[] = [
         {
-            id: 'IKM-001', ad: 'Ahmet Yılmaz', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol Merkezi',
+            id: 'IKM-001', ad: 'Ahmet Yılmaz', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü',
             email: 'ahmet.yilmaz@banka.com', telefon: '+90 212 555 01 01', iseBaslama: '2018-03-15',
             durum: 'AKTİF', rol: 'İç Kontrolör', testSayisi: 14, egitimSaat: 32,
             sertifikalar: ['COSO Foundation Certificate', 'CIA Part I'],
-            uzmanlikAlanlari: ['Kredi Operasyonları', 'Operasyonel Risk', 'COSO Çerçevesi']
+            uzmanlikAlanlari: ['Tahsisat Servisi', 'Operasyonel Risk', 'COSO Çerçevesi']
         },
         {
-            id: 'IKM-002', ad: 'Canan Öztürk', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol Merkezi',
+            id: 'IKM-002', ad: 'Canan Öztürk', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü',
             email: 'canan.ozturk@banka.com', telefon: '+90 212 555 01 02', iseBaslama: '2019-06-01',
             durum: 'AKTİF', rol: 'İç Kontrolör', testSayisi: 12, egitimSaat: 28,
             sertifikalar: ['COSO Foundation Certificate', 'İç Kontrol Test Uzmanı'],
-            uzmanlikAlanlari: ['Müşteri İlişkileri', 'KVKK Uyumu', 'BKS Koordinasyonu']
+            uzmanlikAlanlari: ['CRM ve Performans Servisi', 'KVKK Uyumu', 'BKS Koordinasyonu']
         },
         {
-            id: 'IKM-003', ad: 'Zeynep Kaya', unvan: 'İç Kontrolör', birim: 'İç Kontrol Merkezi',
+            id: 'IKM-003', ad: 'Zeynep Kaya', unvan: 'İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü',
             email: 'zeynep.kaya@banka.com', telefon: '+90 212 555 01 03', iseBaslama: '2021-09-01',
             durum: 'AKTİF', rol: 'İç Kontrolör', testSayisi: 10, egitimSaat: 24,
             sertifikalar: ['COSO Foundation Certificate'],
-            uzmanlikAlanlari: ['Finansal Kontrol', 'Muhasebe Süreçleri']
+            uzmanlikAlanlari: ['Finans Servisi', 'Muhasebe Servisi']
         },
         {
-            id: 'IKM-004', ad: 'Emre Aksoy', unvan: 'İç Kontrolör', birim: 'İç Kontrol Merkezi',
+            id: 'IKM-004', ad: 'Emre Aksoy', unvan: 'İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü',
             email: 'emre.aksoy@banka.com', telefon: '+90 212 555 01 04', iseBaslama: '2022-02-15',
             durum: 'AKTİF', rol: 'İç Kontrolör', testSayisi: 8, egitimSaat: 20,
             sertifikalar: ['İç Kontrol BKS Yetkinlik Belgesi'],
-            uzmanlikAlanlari: ['Hazine İşlemleri', 'Pozisyon Limitleri']
+            uzmanlikAlanlari: ['Finans Servisi', 'Bütçe ve Raporlama Servisi']
         },
         {
-            id: 'BKS-001', ad: 'Mehmet Demir', unvan: 'İK Müdür Yardımcısı (BKS)', birim: 'İnsan Kaynakları Müd.',
+            id: 'BKS-001', ad: 'Mehmet Demir', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Tahsisat Servisi',
             email: 'mehmet.demir@banka.com', telefon: '+90 212 555 02 01', iseBaslama: '2015-01-10',
             durum: 'AKTİF', rol: 'BKS', testSayisi: 4, egitimSaat: 16,
             sertifikalar: ['İç Kontrol BKS Yetkinlik Belgesi'],
-            uzmanlikAlanlari: ['İK Süreçleri', 'Personel Yönetimi']
+            uzmanlikAlanlari: ['Tahsisat İşlemleri', 'Risk Takip']
         },
         {
-            id: 'BKS-002', ad: 'Ali Koç', unvan: 'Hazine Operasyon Uzmanı (BKS)', birim: 'Hazine Müdürlüğü',
+            id: 'BKS-002', ad: 'Ali Koç', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Finans Servisi',
             email: 'ali.koc@banka.com', telefon: '+90 212 555 03 01', iseBaslama: '2016-05-20',
             durum: 'AKTİF', rol: 'BKS', testSayisi: 5, egitimSaat: 12,
             sertifikalar: ['İç Kontrol BKS Yetkinlik Belgesi'],
-            uzmanlikAlanlari: ['FX İşlemleri', 'Hazine Mutabakatı']
+            uzmanlikAlanlari: ['FX İşlemleri', 'Finans Mutabakatı']
         },
         {
-            id: 'BKS-003', ad: 'Fatma Yıldız', unvan: 'Operasyon Şefi (BKS)', birim: 'Operasyonlar Müd.',
+            id: 'BKS-003', ad: 'Fatma Yıldız', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Operasyon Servisi',
             email: 'fatma.yildiz@banka.com', telefon: '+90 212 555 04 01', iseBaslama: '2017-08-15',
             durum: 'AKTİF', rol: 'BKS', testSayisi: 6, egitimSaat: 18,
             sertifikalar: ['İç Kontrol BKS Yetkinlik Belgesi'],
             uzmanlikAlanlari: ['Ödeme Sistemleri', 'Transfer İşlemleri']
         },
         {
-            id: 'BKS-004', ad: 'Selin Kara', unvan: 'Kredi Operasyon Uzmanı (BKS)', birim: 'Kredi Operasyonları Müd.',
+            id: 'BKS-004', ad: 'Selin Kara', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Bilgi Teknolojileri Servisi',
             email: 'selin.kara@banka.com', telefon: '+90 212 555 05 01', iseBaslama: '2020-11-01',
             durum: 'AKTİF', rol: 'BKS', testSayisi: 3, egitimSaat: 8,
             sertifikalar: [],
-            uzmanlikAlanlari: ['Kredi Tahsis', 'Teminat Yönetimi']
+            uzmanlikAlanlari: ['BT Güvenliği', 'Erişim Kontrolleri']
         },
     ];
 
@@ -108,6 +110,7 @@ export default function ControlStaffPage() {
 
     return (
         <div className="space-y-6">
+            <ControlStaffTabs />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Toplam Kadro" value={staffList.length} icon={Users} color="blue" />
                 <StatCard title="İç Kontrolör" value={staffList.filter(s => s.rol === 'İç Kontrolör').length} icon={Shield} color="emerald" />
@@ -275,8 +278,12 @@ export default function ControlStaffPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Birim</label>
-                            <input type="text" className="form-input text-xs w-full" placeholder="Örn: İç Kontrol Merkezi" />
+                            <CustomSelect
+                                label="Birim"
+                                options={DEPARTMENTS.map(d => ({ value: d, label: d }))}
+                                value="Tahsisat Servisi"
+                                onChange={() => {}}
+                            />
                         </div>
                         <div>
                             <CustomSelect label="Rol" options={[
