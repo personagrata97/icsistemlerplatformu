@@ -74,7 +74,7 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
                 
                 {/* Knowledge Base */}
                 {(isAuditor || pathname?.startsWith('/control')) && (
-                    <Tooltip content="İç Kontrol Bilgi Bankası" position="bottom">
+                    <Tooltip content={pathname?.startsWith('/control') ? "İç Kontrol Bilgi Bankası" : "Bilgi Bankası"} position="bottom">
                         <Link 
                             href={pathname?.startsWith('/control') ? "/control/knowledge-base" : "/audit/knowledge-base"} 
                             className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
