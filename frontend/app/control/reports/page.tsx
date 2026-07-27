@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import PageHeader from '@/components/audit/PageHeader';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
-import { DateDisplay } from '@/components/ui/DateDisplay';
 import { FileBarChart, CheckCircle2, Download, Plus } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
@@ -24,10 +22,6 @@ export default function ControlReportsPage() {
 
     return (
         <div className="space-y-6">
-            <PageHeader
-                title="İç Kontrol Raporları"
-                subtitle="Üst Yönetim ve Denetim Komitesi sunumuna hazır İç Kontrol Dönem Raporları"
-            />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatCard title="Yayınlanan Dönem Raporu" value={3} icon={FileBarChart} color="blue" />
                 <StatCard title="Onaylanan Raporlar" value={2} icon={CheckCircle2} color="emerald" />
@@ -59,7 +53,7 @@ export default function ControlReportsPage() {
                         </div>
                     ) },
                     { key: 'durum', header: 'Durum', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
-                    { key: 'tarih', header: 'Rapor Tarihi', width: '150px', render: (item: any) => <DateDisplay date={item.tarih} /> },
+                    { key: 'tarih', header: 'Rapor Tarihi', type: 'date', width: '150px' },
                     { key: 'actions', header: 'İşlem', width: '120px', render: () => (
                         <Button variant="secondary" size="sm" leftIcon={<Download size={14} />} onClick={() => showToast('Rapor PDF olarak indiriliyor', 'success')}>
                             İndir

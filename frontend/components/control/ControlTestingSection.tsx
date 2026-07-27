@@ -9,7 +9,6 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
-import { DateDisplay } from '@/components/ui/DateDisplay';
 import { ShieldCheck, CheckCircle2, RefreshCw, FileCheck, Layers } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
@@ -138,7 +137,7 @@ export default function ControlTestingSection() {
                     ) },
                     { key: 'testEden', header: 'Test Eden Kontrolör', width: '180px', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.testEden}</span> },
                     { key: 'sonuc', header: 'Test Sonucu', width: '140px', render: (item: any) => <StatusBadge value={item.sonuc} type="status" /> },
-                    { key: 'testTarihi', header: 'Test Tarihi', width: '150px', render: (item: any) => <DateDisplay date={item.testTarihi} /> }
+                    { key: 'testTarihi', header: 'Test Tarihi', type: 'date', width: '150px' }
                 ]}
                 data={filteredTests}
                 searchTerm={searchTerm}

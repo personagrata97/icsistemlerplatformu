@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import PageHeader from '@/components/audit/PageHeader';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
-import { DateDisplay } from '@/components/ui/DateDisplay';
 import { FileCheck, CheckCircle2, Clock, Plus } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
@@ -25,10 +23,6 @@ export default function ControlRCSAPage() {
 
     return (
         <div className="space-y-6">
-            <PageHeader
-                title="Birim Öz Değerlendirmeleri (KÖD)"
-                subtitle="İş birimlerinin kendi süreç içi kontrollerini dönemsel değerlendirdiği öz değerlendirme modülü"
-            />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Aktif Dönem Formları" value={4} icon={FileCheck} color="blue" />
                 <StatCard title="Tamamlanma Oranı" value="%88" icon={CheckCircle2} color="emerald" />
@@ -61,7 +55,7 @@ export default function ControlRCSAPage() {
                         <span className="font-mono text-xs font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded">%{item.skor}</span>
                     ) },
                     { key: 'durum', header: 'Durum', width: '160px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
-                    { key: 'tarih', header: 'Tamamlanma Tarihi', width: '150px', render: (item: any) => <DateDisplay date={item.tarih} /> }
+                    { key: 'tarih', header: 'Tamamlanma Tarihi', type: 'date', width: '150px' }
                 ]}
                 data={selfAssessments}
                 rowKey="id"

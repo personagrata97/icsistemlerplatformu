@@ -7,13 +7,11 @@ import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
-import PageHeader from '@/components/audit/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Modal from '@/components/ui/Modal';
 import { Layers, CheckCircle2, Sliders, Activity, Plus } from 'lucide-react';
 import { useToast } from '@/components/Toast';
-import { TERMS } from '@/lib/terminology';
 
 export default function ControlInventoryPage() {
     const { showToast } = useToast();
@@ -116,11 +114,6 @@ export default function ControlInventoryPage() {
 
     return (
         <div className="space-y-6">
-            <PageHeader
-                title="Süreç ve Kontrol Envanteri"
-                subtitle="Tüm operasyonel süreçlerde tanımlı kontrol noktaları ve etkinlik matrisi"
-            />
-
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Toplam Kontrol Noktası" value={controlsList.length} icon={Layers} color="blue" />
                 <StatCard title="Etkin Kontroller" value={controlsList.filter(c => c.durum === 'ETKİN').length} icon={CheckCircle2} color="emerald" />

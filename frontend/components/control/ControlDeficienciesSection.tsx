@@ -9,7 +9,6 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
-import { DateDisplay } from '@/components/ui/DateDisplay';
 import { AlertOctagon, CheckCircle2, Clock, Plus, Sliders } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
@@ -135,7 +134,7 @@ export default function ControlDeficienciesSection() {
                     ) },
                     { key: 'sorumlu', header: 'Sorumlu BKS', width: '170px', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.sorumlu}</span> },
                     { key: 'durum', header: 'Durum', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
-                    { key: 'hedetTarih', header: 'Hedef Termin', width: '150px', render: (item: any) => <DateDisplay date={item.hedetTarih} /> }
+                    { key: 'hedetTarih', header: 'Hedef Termin', type: 'date', width: '150px' }
                 ]}
                 data={filteredDeficiencies}
                 searchTerm={searchTerm}
