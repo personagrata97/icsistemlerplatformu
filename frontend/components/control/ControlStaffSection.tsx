@@ -93,7 +93,7 @@ export default function ControlStaffSection() {
             <DataTable
                 columns={[
                     { key: 'id', header: 'Kod', width: '100px', render: (item: any) => <CodeBadge code={item.id} /> },
-                    { key: 'ad', header: 'Personel Adı & Unvan', sortable: true, render: (item: any) => (
+                    { key: 'ad', header: 'Personel Adı & Ünvan', sortable: true, render: (item: any) => (
                         <div>
                             <div className="font-bold text-slate-900">{item.ad}</div>
                             <div className="text-xs text-slate-500 font-medium">{item.unvan}</div>
@@ -134,7 +134,7 @@ export default function ControlStaffSection() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Unvan</label>
+                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Ünvan</label>
                             <input
                                 type="text"
                                 className="form-input text-xs w-full"

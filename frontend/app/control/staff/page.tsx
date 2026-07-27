@@ -409,7 +409,7 @@ export default function ControlStaffPage() {
                 onSearchChange={setSearchTerm}
                 filters={
                     <div className="flex items-center gap-2">
-                        <FilterDropdown label="Unvan" activeCount={titleFilter.length} onClear={() => setTitleFilter([])}>
+                        <FilterDropdown label="Ünvan" activeCount={titleFilter.length} onClear={() => setTitleFilter([])}>
                             <div className="space-y-2">
                                 {CONTROL_TITLES.map(title => (
                                     <Checkbox
@@ -440,7 +440,7 @@ export default function ControlStaffPage() {
             <DataTable
                 columns={[
                     { key: 'registrationNumber', header: 'Sicil No', width: '120px', render: (item: any) => <CodeBadge code={item.registrationNumber} /> },
-                    { key: 'fullName', header: 'Ad Soyad & Unvan', sortable: true, render: (item: any) => (
+                    { key: 'fullName', header: 'Ad Soyad & Ünvan', sortable: true, render: (item: any) => (
                         <div className="flex items-center gap-3">
                             <UserAvatar name={`${item.firstName} ${item.lastName}`} size="md" />
                             <div>
@@ -632,7 +632,7 @@ export default function ControlStaffPage() {
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <CustomSelect label="Unvan" options={CONTROL_TITLES.map(t => ({ value: t, label: t }))} value={staffForm.title} onChange={(val) => setStaffForm({ ...staffForm, title: val as string })} />
+                            <CustomSelect label="Ünvan" options={CONTROL_TITLES.map(t => ({ value: t, label: t }))} value={staffForm.title} onChange={(val) => setStaffForm({ ...staffForm, title: val as string })} />
                         </div>
                         <div>
                             <CustomSelect label="Sorumlu Rol" options={CONTROL_ROLES.map(r => ({ value: r, label: r }))} value={staffForm.role} onChange={(val) => setStaffForm({ ...staffForm, role: val as string })} />
