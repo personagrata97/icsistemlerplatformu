@@ -74,11 +74,18 @@ const CONTROL_ROLES = ['İç Kontrol Yöneticisi', 'İç Kontrolör', 'Birim Kon
 export default function ControlStaffPage() {
     const router = useRouter();
     const { showToast } = useToast();
-    const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState<string[]>([]);
-    const [titleFilter, setTitleFilter] = useState<string[]>([]);
-    const [departmentFilter, setDepartmentFilter] = useState<string[]>([]);
+    const [filters, setFilters] = useState<{
+        title: string[];
+        role: string[];
+        department: string[];
+        status: string[];
+    }>({
+        title: [],
+        role: [],
+        department: [],
+        status: []
+    });
     
     // Selected staff detail panel state
     const [selectedStaff, setSelectedStaff] = useState<ControlStaffMember | null>(null);
@@ -352,9 +359,10 @@ export default function ControlStaffPage() {
         if (searchTerm && !fullName.includes(searchTerm.toLowerCase()) &&
             !member.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) &&
             !member.department.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-        if (statusFilter.length > 0 && !statusFilter.includes(member.status)) return false;
-        if (titleFilter.length > 0 && !titleFilter.includes(member.title)) return false;
-        if (departmentFilter.length > 0 && !departmentFilter.includes(member.department)) return false;
+        if (filters.status.length > 0 && !filters.status.includes(member.status)) return false;
+        if (filters.title.length > 0 && !filters.title.includes(member.title)) return false;
+        if (filters.role.length > 0 && !filters.role.includes(member.role)) return false;
+        if (filters.department.length > 0 && !filters.department.includes(member.department)) return false;
         return true;
     });
 
@@ -408,21 +416,15 @@ export default function ControlStaffPage() {
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 filters={
-                    <div className="flex items-center gap-2">
-                        <FilterDropdown label="Ünvan" activeCount={titleFilter.length} onClear={() => setTitleFilter([])}>
-                            <div className="space-y-2">
-                                {CONTROL_TITLES.map(title => (
-                                    <Checkbox
-                                        key={title}
-                                        id={`title-${title}`}
-                                        label={title}
-                                        checked={titleFilter.includes(title)}
-                                        onChange={(checked) => setTitleFilter(prev => checked ? [...prev, title] : prev.filter(t => t !== title))}
-                                    />
-                                ))}
-                            </div>
-                        </FilterDropdown>
-                    </div>
+                    <FilterDropdown
+                        activeCount={filters.title.length + filters.role.length + filters.department.length + filters.status.length}
+                        onClear={() => { setFilters({ title: [], role: [], department: [], status: [] }); setSearchTerm(''); }}
+                    >
+                        <CustomSelect label="Ünvan" value={filters.title} onChange={(val) => setFilters({ ...filters, title: val as string[] })} isMulti options={CONTROL_TITLES.map(t => ({ value: t, label: t }))} />
+                        <CustomSelect label="Sorumlu Rol" value={filters.role} onChange={(val) => setFilters({ ...filters, role: val as string[] })} isMulti options={CONTROL_ROLES.map(r => ({ value: r, label: r }))} />
+                        <CustomSelect label="Görevli Birim" value={filters.department} onChange={(val) => setFilters({ ...filters, department: val as string[] })} isMulti options={DEPARTMENTS.map(d => ({ value: d, label: d }))} />
+                        <CustomSelect label="Durum" value={filters.status} onChange={(val) => setFilters({ ...filters, status: val as string[] })} isMulti options={[{ value: "Aktif", label: "Aktif" }, { value: "İzinli", label: "İzinli" }, { value: "Pasif", label: "Pasif" }]} />
+                    </FilterDropdown>
                 }
                 rightActions={
                     <div className="flex items-center gap-2">
@@ -467,7 +469,7 @@ export default function ControlStaffPage() {
                 ]}
                 data={filteredStaff}
                 searchTerm={searchTerm}
-                onClearFilters={() => { setSearchTerm(''); setStatusFilter([]); setTitleFilter([]); setDepartmentFilter([]); }}
+                onClearFilters={() => { setSearchTerm(''); setFilters({ title: [], role: [], department: [], status: [] }); }}
                 rowKey="id"
             />
 
