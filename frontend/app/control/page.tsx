@@ -11,6 +11,7 @@ import DashboardWidget from '@/components/ui/DashboardWidget';
 import DashboardListItem from '@/components/ui/DashboardListItem';
 import EntityIcon from '@/components/ui/EntityIcon';
 import { DateDisplay } from '@/components/ui/DateDisplay';
+import ExecutiveActionCards from '@/components/audit/ExecutiveActionCards';
 import { 
     Layers, FileCheck, CheckCircle2, Sliders, 
     ShieldCheck, AlertOctagon, Users, BookOpen, 
@@ -78,25 +79,19 @@ export default function PharosControlDashboard() {
                 }
             />
 
-            {/* 1. SATIR: Acil Kontrol Aksiyon Kartları */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {actionCards.map(card => (
-                    <div 
-                        key={card.id}
-                        onClick={() => router.push(card.href)}
-                        className={`p-4 rounded-xl border-l-4 border border-slate-200/80 shadow-sm cursor-pointer hover:shadow-md transition-all duration-200 flex flex-col justify-between ${card.color}`}
-                    >
-                        <div className="flex items-start justify-between">
-                            <span className="text-xs font-bold text-slate-700">{card.title}</span>
-                            <span className="text-2xl font-extrabold font-mono text-slate-900">{card.count}</span>
-                        </div>
-                        <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-200/40">
-                            <span className="text-[11px] font-semibold text-slate-500">{card.label}</span>
-                            <ArrowRight size={14} className="text-slate-400" />
-                        </div>
-                    </div>
-                ))}
-            </div>
+            {/* 1. SATIR: Acil Aksiyonlar (Focus Zone) */}
+            <DashboardWidget widgetType="actions" variant="transparent">
+                <ExecutiveActionCards 
+                    variant="dashboard"
+                    pendingApprovals={3}
+                    ongoingAudits={6}
+                    pendingNotifications={4}
+                    pendingVerification={3}
+                    pendingRevisions={1}
+                    overdueActionsCount={1}
+                    dueSoonActionsCount={4}
+                />
+            </DashboardWidget>
 
             {/* 2. SATIR: Performans & KPI Metrikleri */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
