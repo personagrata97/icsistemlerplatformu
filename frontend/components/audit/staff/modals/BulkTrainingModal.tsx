@@ -122,13 +122,13 @@ export default function BulkTrainingModal({
                     </div>
 
                     <div className="flex-1 border-l pl-6">
-                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Katılımcı Seçimi ({bulkTrainingForm.participantIds.length})</h3>
+                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Katılımcı Seçimi ({(bulkTrainingForm?.participantIds || bulkTrainingForm?.selectedStaffIds || []).length})</h3>
                         <div className="mt-2">
                             <CustomSelect
                                 isMulti
-                                value={bulkTrainingForm.participantIds}
-                                onChange={(val) => setBulkTrainingForm({ ...bulkTrainingForm, participantIds: val as string[] })}
-                                options={staffList.map(member => ({ value: member.id, label: `${member.name} (${member.title})` }))}
+                                value={bulkTrainingForm?.participantIds || bulkTrainingForm?.selectedStaffIds || []}
+                                onChange={(val) => setBulkTrainingForm({ ...bulkTrainingForm, participantIds: val as string[], selectedStaffIds: val as string[] })}
+                                options={(staffList || []).map((member: any) => ({ value: member.id, label: `${member.name || member.displayName || `${member.firstName || ''} ${member.lastName || ''}`} (${member.title || ''})` }))}
                                 placeholder="Personel seçiniz..."
                             />
                         </div>
