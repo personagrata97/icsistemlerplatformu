@@ -83,6 +83,7 @@ export default function PharosControlDashboard() {
             <DashboardWidget widgetType="actions" variant="transparent">
                 <ExecutiveActionCards 
                     variant="dashboard"
+                    basePath="/control"
                     pendingApprovals={3}
                     ongoingAudits={6}
                     pendingNotifications={4}

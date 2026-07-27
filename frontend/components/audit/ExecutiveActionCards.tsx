@@ -11,6 +11,7 @@ interface ExecutiveActionCardsProps {
     overdueActionsCount?: number;
     dueSoonActionsCount?: number;
     variant?: 'executive' | 'dashboard';
+    basePath?: string;
 }
 
 const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
@@ -21,7 +22,8 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
     pendingRevisions = 0,
     overdueActionsCount = 0,
     dueSoonActionsCount = 0,
-    variant = 'executive'
+    variant = 'executive',
+    basePath = '/audit'
 }) => {
     const gridCols = variant === 'dashboard' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-4';
     return (
@@ -103,7 +105,7 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                     {/* --- SATIR 1: SAHA VE RAPORLAMA --- */}
                     
                     {/* 1. Aktif Denetimlerim - Koyu Gri/Mavi */}
-                    <Link href="/audit/audits?status=Devam%20Ediyor" className="group relative overflow-hidden bg-slate-700 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                    <Link href={basePath === '/control' ? "/control/testing" : "/audit/audits?status=Devam%20Ediyor"} className="group relative overflow-hidden bg-slate-700 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
                         <div className="flex justify-between items-start">
                             <span className="text-3xl font-bold text-white">{ongoingAudits}</span>
                             <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-md">
@@ -111,8 +113,8 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                             </div>
                         </div>
                         <div className="mt-auto">
-                            <h4 className="font-bold text-base text-white mb-0.5">Aktif Denetimler</h4>
-                            <p className="text-slate-200 text-[11px] mb-2 leading-tight">Sahada devam eden denetim faaliyetleri</p>
+                            <h4 className="font-bold text-base text-white mb-0.5">{basePath === '/control' ? 'Devam Eden Kontrol Testleri' : 'Aktif Denetimler'}</h4>
+                            <p className="text-slate-200 text-[11px] mb-2 leading-tight">{basePath === '/control' ? 'Süreçlerde yürütülen kontrol testleri' : 'Sahada devam eden denetim faaliyetleri'}</p>
                             <div className="flex items-center gap-1.5 text-xs font-bold text-white/90">
                                 Görüntüle <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
                             </div>
@@ -120,7 +122,7 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                     </Link>
 
                     {/* 2. Revizyon Bekleyenler - Kırmızı (Kritik) */}
-                    <Link href="/audit/findings?status=Revizyon%20Gerekli" className="group relative overflow-hidden bg-rose-600 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                    <Link href={basePath === '/control' ? "/control/deficiencies" : "/audit/findings?status=Revizyon%20Gerekli"} className="group relative overflow-hidden bg-rose-600 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
                         <div className="flex justify-between items-start">
                             <span className="text-3xl font-bold text-white">{pendingRevisions}</span>
                             <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-md">
@@ -128,7 +130,7 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                             </div>
                         </div>
                         <div className="mt-auto">
-                            <h4 className="font-bold text-base text-white mb-0.5">Revizyon Bekleyenler</h4>
+                            <h4 className="font-bold text-base text-white mb-0.5">{basePath === '/control' ? 'Yüksek Öncelikli Eksiklikler' : 'Revizyon Bekleyenler'}</h4>
                             <p className="text-rose-100 text-[11px] mb-2 leading-tight">Acil düzeltme bekleyen kayıtlar</p>
                             <div className="flex items-center gap-1.5 text-xs font-bold text-white/90">
                                 Görüntüle <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
@@ -137,7 +139,7 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                     </Link>
 
                     {/* 3. Onay Bekliyor (Rapor/Denetim onayları) - Mavi */}
-                    <Link href="/audit/findings?status=Onay%20Bekliyor" className="group relative overflow-hidden bg-blue-600 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                    <Link href={basePath === '/control' ? "/control/rcsa" : "/audit/findings?status=Onay%20Bekliyor"} className="group relative overflow-hidden bg-blue-600 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
                         <div className="flex justify-between items-start">
                             <span className="text-3xl font-bold text-white">{pendingApprovals}</span>
                             <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-md">
@@ -145,8 +147,8 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                             </div>
                         </div>
                         <div className="mt-auto">
-                            <h4 className="font-bold text-base text-white mb-0.5">Onay Bekleyenler</h4>
-                            <p className="text-blue-100 text-[11px] mb-2 leading-tight">Gözetim sorumlusu onayı gereken rapor ve bulgular</p>
+                            <h4 className="font-bold text-base text-white mb-0.5">{basePath === '/control' ? 'Bekleyen Öz Değerlendirmeler' : 'Onay Bekleyenler'}</h4>
+                            <p className="text-blue-100 text-[11px] mb-2 leading-tight">{basePath === '/control' ? 'İnceleme bekleyen KÖD formları' : 'Gözetim sorumlusu onayı gereken rapor ve bulgular'}</p>
                             <div className="flex items-center gap-1.5 text-xs font-bold text-white/90">
                                 Görüntüle <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
                             </div>
@@ -156,7 +158,7 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                     {/* --- SATIR 2: BULGU VE AKSİYON --- */}
 
                     {/* 4. Mutabakat Bekliyor (Birim yanıtı) - Mor */}
-                    <Link href="/audit/conciliation?status=Tebliğ%20Edildi,Birim%20Yanıtladı" className="group relative overflow-hidden bg-purple-600 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                    <Link href={basePath === '/control' ? "/control/reports" : "/audit/conciliation?status=Tebliğ%20Edildi,Birim%20Yanıtladı"} className="group relative overflow-hidden bg-purple-600 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
                         <div className="flex justify-between items-start">
                             <span className="text-3xl font-bold text-white">{pendingNotifications}</span>
                             <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-md">
@@ -164,8 +166,8 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                             </div>
                         </div>
                         <div className="mt-auto">
-                            <h4 className="font-bold text-base text-white mb-0.5">Mutabakat Bekleyenler</h4>
-                            <p className="text-purple-100 text-[11px] mb-2 leading-tight">Birim yanıtı beklenen tebliğler</p>
+                            <h4 className="font-bold text-base text-white mb-0.5">{basePath === '/control' ? 'Taslak Kontrol Raporları' : 'Mutabakat Bekleyenler'}</h4>
+                            <p className="text-purple-100 text-[11px] mb-2 leading-tight">{basePath === '/control' ? 'Hazırlık aşamasındaki raporlar' : 'Birim yanıtı beklenen tebliğler'}</p>
                             <div className="flex items-center gap-1.5 text-xs font-bold text-white/90">
                                 Görüntüle <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
                             </div>
@@ -173,7 +175,7 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                     </Link>
 
                     {/* 5. Aksiyon Takibi (Vadesi Yaklaşan & Geciken Birleşik) - Turuncu/Kırmızı (Dinamik) */}
-                    <Link href="/audit/follow-up?status=Takip%20Ediliyor" className={`group relative overflow-hidden rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px] ${overdueActionsCount > 0 ? 'bg-rose-600' : 'bg-amber-500'}`}>
+                    <Link href={basePath === '/control' ? "/control/deficiencies" : "/audit/follow-up?status=Takip%20Ediliyor"} className={`group relative overflow-hidden rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px] ${overdueActionsCount > 0 ? 'bg-rose-600' : 'bg-amber-500'}`}>
                         <div className="flex justify-between items-start">
                             <div className="flex items-end gap-1.5">
                                 <span className="text-3xl font-bold text-white">{overdueActionsCount + dueSoonActionsCount}</span>
@@ -196,7 +198,7 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                     </Link>
 
                     {/* 6. Doğrulama Bekliyor (Teyit) - Zümrüt Yeşili */}
-                    <Link href="/audit/follow-up?status=Doğrulama%20Bekliyor" className="group relative overflow-hidden bg-emerald-600 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
+                    <Link href={basePath === '/control' ? "/control/testing" : "/audit/follow-up?status=Doğrulama%20Bekliyor"} className="group relative overflow-hidden bg-emerald-600 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between min-h-[110px]">
                         <div className="flex justify-between items-start">
                             <span className="text-3xl font-bold text-white">{pendingVerification}</span>
                             <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-md">
@@ -204,8 +206,8 @@ const ExecutiveActionCards: React.FC<ExecutiveActionCardsProps> = ({
                             </div>
                         </div>
                         <div className="mt-auto">
-                            <h4 className="font-bold text-base text-white mb-0.5">Doğrulama Bekleyenler</h4>
-                            <p className="text-emerald-100 text-[11px] mb-2 leading-tight">Aksiyon kontrolü yapılacak tamamlanmış bulgular</p>
+                            <h4 className="font-bold text-base text-white mb-0.5">{basePath === '/control' ? 'Tamamlanan Kontrol Testleri' : 'Doğrulama Bekleyenler'}</h4>
+                            <p className="text-emerald-100 text-[11px] mb-2 leading-tight">{basePath === '/control' ? 'Doğrulaması biten saha testleri' : 'Aksiyon kontrolü yapılacak tamamlanmış bulgular'}</p>
                             <div className="flex items-center gap-1.5 text-xs font-bold text-white/90">
                                 Görüntüle <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
                             </div>
