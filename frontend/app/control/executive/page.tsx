@@ -163,14 +163,14 @@ export default function ControlExecutiveDashboard() {
                             { key: 'durum', header: 'Durum', width: '120px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> }
                         ]}
                         data={[
-                            { ad: 'Ahmet Yılmaz', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol Merkezi', testSayisi: 14, acikEksiklik: 2, egitimSaat: 32, durum: 'AKTİF' },
-                            { ad: 'Canan Öztürk', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol Merkezi', testSayisi: 12, acikEksiklik: 1, egitimSaat: 28, durum: 'AKTİF' },
-                            { ad: 'Zeynep Kaya', unvan: 'İç Kontrolör', birim: 'İç Kontrol Merkezi', testSayisi: 10, acikEksiklik: 3, egitimSaat: 24, durum: 'AKTİF' },
-                            { ad: 'Emre Aksoy', unvan: 'İç Kontrolör', birim: 'İç Kontrol Merkezi', testSayisi: 8, acikEksiklik: 0, egitimSaat: 20, durum: 'AKTİF' },
-                            { ad: 'Mehmet Demir', unvan: 'BKS — İnsan Kaynakları', birim: 'İnsan Kaynakları Müd.', testSayisi: 4, acikEksiklik: 1, egitimSaat: 16, durum: 'AKTİF' },
-                            { ad: 'Ali Koç', unvan: 'BKS — Hazine', birim: 'Hazine Müdürlüğü', testSayisi: 5, acikEksiklik: 2, egitimSaat: 12, durum: 'AKTİF' },
-                            { ad: 'Fatma Yıldız', unvan: 'BKS — Operasyonlar', birim: 'Operasyonlar Müd.', testSayisi: 6, acikEksiklik: 0, egitimSaat: 18, durum: 'AKTİF' },
-                            { ad: 'Selin Kara', unvan: 'BKS — Krediler', birim: 'Kredi Operasyonları Müd.', testSayisi: 3, acikEksiklik: 3, egitimSaat: 8, durum: 'AKTİF' },
+                            { ad: 'Ahmet Yılmaz', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 14, acikEksiklik: 2, egitimSaat: 32, durum: 'AKTİF' },
+                            { ad: 'Canan Öztürk', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 12, acikEksiklik: 1, egitimSaat: 28, durum: 'AKTİF' },
+                            { ad: 'Zeynep Kaya', unvan: 'İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 10, acikEksiklik: 3, egitimSaat: 24, durum: 'AKTİF' },
+                            { ad: 'Emre Aksoy', unvan: 'İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 8, acikEksiklik: 0, egitimSaat: 20, durum: 'AKTİF' },
+                            { ad: 'Mehmet Demir', unvan: 'BKS — Tahsisat Servisi', birim: 'Tahsisat Servisi', testSayisi: 4, acikEksiklik: 1, egitimSaat: 16, durum: 'AKTİF' },
+                            { ad: 'Ali Koç', unvan: 'BKS — Finans Servisi', birim: 'Finans Servisi', testSayisi: 5, acikEksiklik: 2, egitimSaat: 12, durum: 'AKTİF' },
+                            { ad: 'Fatma Yıldız', unvan: 'BKS — Operasyon Servisi', birim: 'Operasyon Servisi', testSayisi: 6, acikEksiklik: 0, egitimSaat: 18, durum: 'AKTİF' },
+                            { ad: 'Selin Kara', unvan: 'BKS — Satış Servisi', birim: 'Satış Servisi', testSayisi: 3, acikEksiklik: 3, egitimSaat: 8, durum: 'AKTİF' },
                         ]}
                         rowKey="ad"
                     />
@@ -191,12 +191,12 @@ export default function ControlExecutiveDashboard() {
                         <DashboardWidget title="Süreç Bazlı Kontrol Etkinliği" icon={BarChart3}>
                             <div className="space-y-3">
                                 {[
-                                    { label: 'Kredi Operasyonları', score: 95, color: 'bg-emerald-500' },
-                                    { label: 'Hazine İşlemleri', score: 88, color: 'bg-blue-500' },
-                                    { label: 'Müşteri İlişkileri', score: 82, color: 'bg-amber-500' },
-                                    { label: 'İnsan Kaynakları', score: 92, color: 'bg-emerald-500' },
-                                    { label: 'Bilgi Teknolojileri', score: 76, color: 'bg-orange-500' },
-                                    { label: 'Finansal Kontrol', score: 97, color: 'bg-emerald-500' },
+                                    { label: 'Tahsisat Servisi', score: 95, color: 'bg-emerald-500' },
+                                    { label: 'Finans Servisi', score: 88, color: 'bg-blue-500' },
+                                    { label: 'Satış Servisi', score: 82, color: 'bg-amber-500' },
+                                    { label: 'Operasyon Servisi', score: 92, color: 'bg-emerald-500' },
+                                    { label: 'Bilgi Teknolojileri Servisi', score: 76, color: 'bg-orange-500' },
+                                    { label: 'Muhasebe Servisi', score: 97, color: 'bg-emerald-500' },
                                 ].map((item) => (
                                     <div key={item.label} className="space-y-1">
                                         <div className="flex justify-between text-xs">
@@ -219,11 +219,11 @@ export default function ControlExecutiveDashboard() {
                                     { key: 'tarih', header: 'Gönderim', width: '120px', type: 'date' as any }
                                 ]}
                                 data={[
-                                    { birim: 'Kredi Operasyonları', durum: 'TAMAMLANDI', tarih: '2026-07-05' },
-                                    { birim: 'Hazine Müdürlüğü', durum: 'TAMAMLANDI', tarih: '2026-07-08' },
-                                    { birim: 'İnsan Kaynakları', durum: 'İNCELEMEDE', tarih: '2026-07-25' },
-                                    { birim: 'Bilgi Teknolojileri', durum: 'BEKLENİYOR', tarih: '' },
-                                    { birim: 'Müşteri İlişkileri', durum: 'TAMAMLANDI', tarih: '2026-07-12' },
+                                    { birim: 'Tahsisat Servisi', durum: 'TAMAMLANDI', tarih: '2026-07-05' },
+                                    { birim: 'Finans Servisi', durum: 'TAMAMLANDI', tarih: '2026-07-08' },
+                                    { birim: 'Operasyon Servisi', durum: 'İNCELEMEDE', tarih: '2026-07-25' },
+                                    { birim: 'Bilgi Teknolojileri Servisi', durum: 'BEKLENİYOR', tarih: '' },
+                                    { birim: 'Satış Servisi', durum: 'TAMAMLANDI', tarih: '2026-07-12' },
                                 ]}
                                 rowKey="birim"
                             />
