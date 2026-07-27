@@ -13,7 +13,10 @@ import {
     BookOpen,
     FileBarChart,
     Award,
-    Target
+    Target,
+    History,
+    Bell,
+    Trash2
 } from 'lucide-react';
 import { useAuditTitle } from '@/context/AuditTitleContext';
 
@@ -29,6 +32,9 @@ const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
     '/control/training': { title: 'Eğitim Kataloğu', subtitle: 'İç Kontrol personeli ve Birim Kontrol Sorumluları için eğitim programları' },
     '/control/skills': { title: 'Yetkinlik Matrisi', subtitle: 'İç Kontrolörlerin uzmanlık alanları ve yetkinlik matrislerinin yönetimi' },
     '/control/knowledge-base': { title: 'İç Kontrol Bilgi Bankası', subtitle: 'İç kontrol rehberleri, COSO/BDDK standartları, prosedürler ve çalışma şablonları' },
+    '/control/logs': { title: 'Denetim İzi', subtitle: 'İç Kontrol modülü işlem geçmişi ve değişiklik kayıtlarının takibi' },
+    '/control/notifications': { title: 'Bildirimler', subtitle: 'İç Kontrol süreçlerine ait görev hatırlatmaları ve sistem bildirimlerinin takibi' },
+    '/control/trash': { title: 'Silinen Kayıtlar', subtitle: 'Geri dönüştürülebilir silinmiş iç kontrol kayıtlarının takibi' },
 };
 
 export default function ControlSidebar() {
@@ -61,7 +67,7 @@ export default function ControlSidebar() {
 
             <div className="sidebar-content flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-gray-300">
                 <ul className="nav-links space-y-2 px-2 py-3">
-                    {/* 1. YÖNETİM VE KOKPİT */}
+                    {/* 1. YÖNETİM & ANALİZ */}
                     <li>
                         <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">YÖNETİM & ANALİZ</div>
                         <ul className="space-y-1">
@@ -144,6 +150,31 @@ export default function ControlSidebar() {
                                 <Link href="/control/skills" className={`nav-link ${isActive('/control/skills') ? 'active' : ''}`}>
                                     <Award size={18} />
                                     <span>Yetkinlik Matrisi</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    {/* 5. SİSTEM */}
+                    <li className="pt-2 border-t border-slate-100">
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Sistem</div>
+                        <ul className="space-y-1">
+                            <li className="nav-item">
+                                <Link href="/control/logs" className={`nav-link ${isActive('/control/logs') ? 'active' : ''}`}>
+                                    <History size={18} />
+                                    <span>Denetim İzi</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/notifications" className={`nav-link ${isActive('/control/notifications') ? 'active' : ''}`}>
+                                    <Bell size={18} />
+                                    <span>Bildirimler</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/trash" className={`nav-link ${isActive('/control/trash') ? 'active' : ''}`}>
+                                    <Trash2 size={18} />
+                                    <span>Silinen Kayıtlar</span>
                                 </Link>
                             </li>
                         </ul>

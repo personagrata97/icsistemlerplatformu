@@ -9,13 +9,14 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
-import { AlertOctagon, CheckCircle2, Clock, Plus, Sliders } from 'lucide-react';
+import { AlertOctagon, CheckCircle2, Clock, Plus, Eye, Sliders, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
 export default function ControlDeficienciesSection() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [selectedDeficiency, setSelectedDeficiency] = useState<any>(null);
 
     const [deficienciesList, setDeficienciesList] = useState([
         {
@@ -27,7 +28,9 @@ export default function ControlDeficienciesSection() {
             durum: 'AKSIYONDA',
             sorumlu: 'Zeynep Kaya (BKS)',
             hedetTarih: '2026-08-15',
-            tespitTarihi: '2026-07-02'
+            tespitTarihi: '2026-07-02',
+            aksiyonPlani: 'Gişe yetkilileri için sisteme zorunlu 2. onay kontrolü yazılımsal olarak eklenecektir.',
+            kökNeden: 'Sistem altyapısında kontrol kuralının opsiyonel bırakılmış olması.'
         },
         {
             id: 'EKS-2026-002',
@@ -38,18 +41,22 @@ export default function ControlDeficienciesSection() {
             durum: 'GÖZDEN_GEÇİRMEDE',
             sorumlu: 'Ayşe Şahin (BKS)',
             hedetTarih: '2026-08-30',
-            tespitTarihi: '2026-07-10'
+            tespitTarihi: '2026-07-10',
+            aksiyonPlani: 'Pozisyon raporlama servisi saat 17:30 itibarıyla otomatik e-posta uyarısı tetikleyecektir.',
+            kökNeden: 'Operasyonel yoğunluk kaynaklı manuel kontrol gecikmesi.'
         },
         {
             id: 'EKS-2026-003',
-            ad: 'Kredi Dosyalarında Çapraz İptek Şerhi Girişi Unutulması',
+            ad: 'Kredi Dosyalarında Çapraz İpotek Şerhi Girişi Unutulması',
             birim: 'Kredi Operasyonları Müdürlüğü',
             kontroKodu: 'KNT-KRE-001',
             seviye: 'DÜŞÜK',
             durum: 'KAPANDI',
             sorumlu: 'Mehmet Demir (BKS)',
             hedetTarih: '2026-07-20',
-            tespitTarihi: '2026-06-15'
+            tespitTarihi: '2026-06-15',
+            aksiyonPlani: 'Şablon dosyaya kontrol listesi (checklist) eklenmiş ve kapatılmıştır.',
+            kökNeden: 'Manuel kontrol listesinin güncellenmemiş olması.'
         }
     ]);
 
@@ -62,7 +69,9 @@ export default function ControlDeficienciesSection() {
         durum: 'AKSIYONDA',
         sorumlu: 'Mehmet Demir (BKS)',
         hedetTarih: '2026-09-15',
-        tespitTarihi: '2026-07-27'
+        tespitTarihi: '2026-07-27',
+        aksiyonPlani: 'Düzeltici aksiyon tanımlanacaktır.',
+        kökNeden: 'Süreç kontrol adımı eksikliği.'
     });
 
     const handleSaveDeficiency = (e: React.FormEvent) => {
@@ -85,7 +94,9 @@ export default function ControlDeficienciesSection() {
             durum: 'AKSIYONDA',
             sorumlu: 'Mehmet Demir (BKS)',
             hedetTarih: '2026-09-15',
-            tespitTarihi: '2026-07-27'
+            tespitTarihi: '2026-07-27',
+            aksiyonPlani: 'Düzeltici aksiyon tanımlanacaktır.',
+            kökNeden: 'Süreç kontrol adımı eksikliği.'
         });
     };
 
@@ -134,7 +145,12 @@ export default function ControlDeficienciesSection() {
                     ) },
                     { key: 'sorumlu', header: 'Sorumlu BKS', width: '170px', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.sorumlu}</span> },
                     { key: 'durum', header: 'Durum', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
-                    { key: 'hedetTarih', header: 'Hedef Termin', type: 'date', width: '150px' }
+                    { key: 'hedetTarih', header: 'Hedef Termin', type: 'date', width: '150px' },
+                    { key: 'actions', header: 'İncele', width: '100px', render: (item: any) => (
+                        <Button variant="secondary" size="sm" leftIcon={<Eye size={14} />} onClick={() => setSelectedDeficiency(item)}>
+                            Detay
+                        </Button>
+                    ) }
                 ]}
                 data={filteredDeficiencies}
                 searchTerm={searchTerm}
@@ -205,6 +221,48 @@ export default function ControlDeficienciesSection() {
                     </div>
                 </form>
             </Modal>
+
+            {/* Rich Deficiency Detail Review Modal */}
+            {selectedDeficiency && (
+                <Modal isOpen={!!selectedDeficiency} onClose={() => setSelectedDeficiency(null)} title={`Kontrol Eksikliği Detayı — ${selectedDeficiency.id}`} size="lg">
+                    <div className="space-y-4 text-xs">
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h4 className="font-bold text-sm text-slate-900">{selectedDeficiency.ad}</h4>
+                                    <p className="text-slate-500 font-medium mt-0.5">Birim: {selectedDeficiency.birim} • Kontrol Kodu: {selectedDeficiency.kontroKodu}</p>
+                                </div>
+                                <StatusBadge value={selectedDeficiency.durum} type="status" />
+                            </div>
+                        </div>
+
+                        <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                            <span className="text-slate-700 font-bold block">Kök Neden Analizi:</span>
+                            <p className="text-slate-600 leading-relaxed">{selectedDeficiency.kökNeden}</p>
+                        </div>
+
+                        <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-xl space-y-1">
+                            <span className="text-amber-900 font-bold block">Düzeltici Aksiyon Planı:</span>
+                            <p className="text-amber-800 leading-relaxed">{selectedDeficiency.aksiyonPlani}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="p-3 bg-white border border-slate-200 rounded-xl">
+                                <span className="text-slate-500 font-medium block">Sorumlu BKS</span>
+                                <span className="font-bold text-slate-900">{selectedDeficiency.sorumlu}</span>
+                            </div>
+                            <div className="p-3 bg-white border border-slate-200 rounded-xl">
+                                <span className="text-slate-500 font-medium block">Hedef Termin Tarihi</span>
+                                <span className="font-bold text-slate-900">{selectedDeficiency.hedetTarih}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end pt-3 border-t">
+                            <Button variant="secondary" onClick={() => setSelectedDeficiency(null)}>Kapat</Button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 }

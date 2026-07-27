@@ -6,124 +6,72 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
 import PageToolbar from '@/components/ui/PageToolbar';
-import { FilterDropdown } from '@/components/ui/FilterDropdown';
-import CustomSelect from '@/components/ui/CustomSelect';
-import Modal from '@/components/ui/Modal';
-import { Users, Award, BookOpen, UserCheck } from 'lucide-react';
 import StatCard from '@/components/ui/StatCard';
+import Modal from '@/components/ui/Modal';
+import CustomSelect from '@/components/ui/CustomSelect';
+import { Users, Award, UserCheck, Plus, Eye, BookOpen, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
 export default function ControlStaffSection() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
-    const [roleFilter, setRoleFilter] = useState('ALL');
-    const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [selectedStaff, setSelectedStaff] = useState<any>(null);
 
     const [staffList, setStaffList] = useState([
-        {
-            id: 'IKP-001',
-            ad: 'Ahmet Yılmaz',
-            unvan: 'Kıdemli İç Kontrolör',
-            birim: 'İç Kontrol Merkezi / Finansal Kontroller',
-            uzmanlik: 'Mali İşler, Hazine, Kredi Operasyonları',
-            sertifikalar: ['İç Kontrol Uzmanlık Sertifikası', 'Risk Yönetimi Lisansı'],
-            sorumluBirimSayisi: 4,
-            durum: 'AKTİF'
-        },
-        {
-            id: 'IKP-002',
-            ad: 'Zeynep Kaya',
-            unvan: 'İç Kontrolör',
-            birim: 'İç Kontrol Merkezi / Operasyonel Kontroller',
-            uzmanlik: 'Şube Operasyonları, KVKK, Müşteri Hakları',
-            sertifikalar: ['Uyum & Mevzuat Sertifikası'],
-            sorumluBirimSayisi: 6,
-            durum: 'AKTİF'
-        },
-        {
-            id: 'IKP-003',
-            ad: 'Mehmet Demir',
-            unvan: 'Birim Kontrol Sorumlusu (BKS)',
-            birim: 'Kredi Operasyonları Müdürlüğü',
-            uzmanlik: 'Kredi Tahsis Kontrolleri, Teminat Yönetimi',
-            sertifikalar: ['Süreç İçi Kontrol İlkeleri'],
-            sorumluBirimSayisi: 1,
-            durum: 'AKTİF'
-        },
-        {
-            id: 'IKP-004',
-            ad: 'Ayşe Şahin',
-            unvan: 'Birim Kontrol Sorumlusu (BKS)',
-            birim: 'Hazine ve Fon Yönetimi',
-            uzmanlik: 'Piyasa Riski Kontrolleri, Likidite İzleme',
-            sertifikalar: ['Sermaye Piyasaları Lisansı'],
-            sorumluBirimSayisi: 1,
-            durum: 'AKTİF'
-        },
-        {
-            id: 'IKP-005',
-            ad: 'Canan Öztürk',
-            unvan: 'Kıdemli İç Kontrolör',
-            birim: 'İç Kontrol Merkezi / Bilgi Sistemleri Kontrolleri',
-            uzmanlik: 'Veri Güvenliği, Yetki Matrisi, IT Genel Kontrolleri',
-            sertifikalar: ['CISA Uluslararası Bilgi Sistemleri Kontrolörü'],
-            sorumluBirimSayisi: 3,
-            durum: 'EĞİTİMDE'
-        }
+        { id: 'KNT-01', ad: 'Canan Öztürk', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol Merkezi', rol: 'KONTROLÖR', uzmanlik: 'Kredi Operasyonları, Bilgi Teknolojileri', sertifikalar: 'CIA, CISA, ISO 27001 LA', tecrube: '8 Yıl' },
+        { id: 'KNT-02', ad: 'Ahmet Yılmaz', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol Merkezi', rol: 'KONTROLÖR', uzmanlik: 'Hazine, Fon Yönetimi, Mali İşler', sertifikalar: 'CFA, FRM, SPK Düzey 3', tecrube: '10 Yıl' },
+        { id: 'KNT-03', ad: 'Zeynep Kaya', unvan: 'İç Kontrolör', birim: 'İç Kontrol Merkezi', rol: 'KONTROLÖR', uzmanlik: 'KVKK, Müşteri İlişkileri, Uyum', sertifikalar: 'CPA, KVKK Uzmanlığı', tecrube: '5 Yıl' },
+        { id: 'BKS-01', ad: 'Mehmet Demir', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Kredi Operasyonları Müdürlüğü', rol: 'BKS', uzmanlik: 'Kredi Tahsis ve Teminat İşlemleri', sertifikalar: 'Kredi Derecelendirme Sertifikası', tecrube: '12 Yıl' },
+        { id: 'BKS-02', ad: 'Ayşe Şahin', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Hazine ve Fon Yönetimi', rol: 'BKS', uzmanlik: 'Piyasa Riski, Likidite Kontrolü', sertifikalar: 'Hazine Lisansı', tecrube: '9 Yıl' },
     ]);
 
     const [newStaff, setNewStaff] = useState({
-        id: `IKP-00${staffList.length + 1}`,
+        id: `BKS-0${staffList.length + 1}`,
         ad: '',
         unvan: 'Birim Kontrol Sorumlusu (BKS)',
-        birim: 'Kredi Operasyonları Müdürlüğü',
-        uzmanlik: 'Süreç İçi Kontrol ve Risk İzleme',
-        sertifikalar: 'Süreç İçi Kontrol Sertifikası',
-        sorumluBirimSayisi: 1,
-        durum: 'AKTİF'
+        birim: 'Şube Operasyonları Müdürlüğü',
+        rol: 'BKS',
+        uzmanlik: 'Operasyonel Risk, Gişe Kontrolleri',
+        sertifikalar: 'Temel Bankacılık Sertifikası',
+        tecrube: '6 Yıl'
     });
 
-    const handleAssignStaff = (e: React.FormEvent) => {
+    const handleSaveStaff = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newStaff.ad.trim()) {
-            showToast('Lütfen personel adını ve soyadını giriniz', 'warning');
+            showToast('Lütfen personel adını giriniz', 'warning');
             return;
         }
 
-        const createdItem = {
-            ...newStaff,
-            sertifikalar: newStaff.sertifikalar.split(',').map(s => s.trim())
-        };
-
-        setStaffList([createdItem, ...staffList]);
-        setIsAssignModalOpen(false);
-        showToast(`Birim Kontrol Sorumlusu (${newStaff.ad}) başarıyla atandı`, 'success');
+        setStaffList([newStaff, ...staffList]);
+        setIsAddModalOpen(false);
+        showToast(`Yeni BKS / Kontrolör Ataması (${newStaff.ad}) başarıyla yapıldı`, 'success');
 
         setNewStaff({
-            id: `IKP-00${staffList.length + 2}`,
+            id: `BKS-0${staffList.length + 2}`,
             ad: '',
             unvan: 'Birim Kontrol Sorumlusu (BKS)',
-            birim: 'Kredi Operasyonları Müdürlüğü',
-            uzmanlik: 'Süreç İçi Kontrol ve Risk İzleme',
-            sertifikalar: 'Süreç İçi Kontrol Sertifikası',
-            sorumluBirimSayisi: 1,
-            durum: 'AKTİF'
+            birim: 'Şube Operasyonları Müdürlüğü',
+            rol: 'BKS',
+            uzmanlik: 'Operasyonel Risk, Gişe Kontrolleri',
+            sertifikalar: 'Temel Bankacılık Sertifikası',
+            tecrube: '6 Yıl'
         });
     };
 
     const filteredStaff = staffList.filter(s => {
-        if (roleFilter !== 'ALL' && !s.unvan.includes(roleFilter)) return false;
-        if (searchTerm && !s.ad.toLowerCase().includes(searchTerm.toLowerCase()) && !s.birim.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+        if (searchTerm && !s.ad.toLowerCase().includes(searchTerm.toLowerCase()) && !s.unvan.toLowerCase().includes(searchTerm.toLowerCase())) return false;
         return true;
     });
 
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <StatCard title="İç Kontrolör Kadrosu" value={staffList.filter(s => s.unvan.includes('Kontrolör')).length} icon={Users} color="blue" />
-                <StatCard title="Birim Kontrol Sorumluları (BKS)" value={staffList.filter(s => s.unvan.includes('BKS')).length} icon={UserCheck} color="emerald" />
-                <StatCard title="Sertifikalı Personel Oranı" value="%92" icon={Award} color="purple" />
-                <StatCard title="Tamamlanan Yıllık Eğitim" value="42 Saat" icon={BookOpen} color="amber" />
+                <StatCard title="İç Kontrol Kadrosu" value={staffList.filter(s => s.rol === 'KONTROLÖR').length} icon={Users} color="blue" />
+                <StatCard title="Birim Kontrol Sorumluları (BKS)" value={staffList.filter(s => s.rol === 'BKS').length} icon={UserCheck} color="emerald" />
+                <StatCard title="Sertifikalı Personel" value={4} icon={Award} color="purple" />
+                <StatCard title="Kapsanan Birim Sayısı" value={28} icon={ShieldCheck} color="amber" />
             </div>
 
             <PageToolbar
@@ -133,76 +81,51 @@ export default function ControlStaffSection() {
                 rightActions={
                     <Button
                         variant="primary"
-                        leftIcon={<UserCheck size={18} />}
-                        onClick={() => setIsAssignModalOpen(true)}
+                        leftIcon={<Plus size={18} />}
+                        onClick={() => setIsAddModalOpen(true)}
                     >
-                        Kontrol Sorumlusu Atama
+                        BKS Atama
                     </Button>
-                }
-                filters={
-                    <FilterDropdown
-                        label="Filtrele"
-                        activeCount={roleFilter !== 'ALL' ? 1 : 0}
-                        onClear={() => setRoleFilter('ALL')}
-                    >
-                        <div>
-                            <label className="form-label mb-1">Unvan Filtresi</label>
-                            <CustomSelect
-                                options={[
-                                    { value: 'ALL', label: 'Tüm Personel' },
-                                    { value: 'İç Kontrolör', label: 'Merkezi İç Kontrolörler' },
-                                    { value: 'Birim Kontrol Sorumlusu', label: 'Birim Kontrol Sorumluları (BKS)' }
-                                ]}
-                                value={roleFilter}
-                                onChange={(val) => setRoleFilter(val as string)}
-                            />
-                        </div>
-                    </FilterDropdown>
                 }
             />
 
             <DataTable
                 columns={[
-                    { key: 'id', header: 'Sicil / Kod', width: '120px', render: (item: any) => <CodeBadge code={item.id} /> },
-                    { key: 'ad', header: 'Personel Adı & Unvanı', sortable: true, render: (item: any) => (
+                    { key: 'id', header: 'Kod', width: '100px', render: (item: any) => <CodeBadge code={item.id} /> },
+                    { key: 'ad', header: 'Personel Adı & Unvan', sortable: true, render: (item: any) => (
                         <div>
                             <div className="font-bold text-slate-900">{item.ad}</div>
                             <div className="text-xs text-slate-500 font-medium">{item.unvan}</div>
                         </div>
                     ) },
-                    { key: 'birim', header: 'Bağlı Olduğu Birim', render: (item: any) => <span className="text-xs text-slate-700 font-medium">{item.birim}</span> },
-                    { key: 'uzmanlik', header: 'Uzmanlık Alanı ve Kontroller', render: (item: any) => (
-                        <div className="text-xs text-slate-600">
-                            <div>{item.uzmanlik}</div>
-                            <div className="text-[11px] text-blue-600 font-semibold mt-0.5">{item.sorumluBirimSayisi} Sorumlu Birim</div>
-                        </div>
+                    { key: 'birim', header: 'Görevli Birim', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.birim}</span> },
+                    { key: 'uzmanlik', header: 'Uzmanlık Alanı', render: (item: any) => <span className="text-xs text-slate-600 font-medium">{item.uzmanlik}</span> },
+                    { key: 'rol', header: 'Rol Türü', width: '130px', render: (item: any) => (
+                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${item.rol === 'KONTROLÖR' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
+                            {item.rol}
+                        </span>
                     ) },
-                    { key: 'sertifikalar', header: 'Sertifikalar', render: (item: any) => (
-                        <div className="flex flex-wrap gap-1">
-                            {item.sertifikalar.map((s: string, idx: number) => (
-                                <span key={idx} className="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-100">
-                                    {s}
-                                </span>
-                            ))}
-                        </div>
-                    ) },
-                    { key: 'durum', header: 'Durum', width: '120px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> }
+                    { key: 'actions', header: 'İncele', width: '100px', render: (item: any) => (
+                        <Button variant="secondary" size="sm" leftIcon={<Eye size={14} />} onClick={() => setSelectedStaff(item)}>
+                            Detay
+                        </Button>
+                    ) }
                 ]}
                 data={filteredStaff}
                 searchTerm={searchTerm}
-                onClearFilters={() => { setSearchTerm(''); setRoleFilter('ALL'); }}
+                onClearFilters={() => setSearchTerm('')}
                 rowKey="id"
             />
 
-            {/* Modal for Assigning BKS Staff */}
-            <Modal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)} title="Kontrol Sorumlusu (BKS) Atama Formu" size="lg">
-                <form onSubmit={handleAssignStaff} className="space-y-4">
+            {/* Modal for BKS Assignment */}
+            <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Yeni Birim Kontrol Sorumlusu (BKS) Atama" size="lg">
+                <form onSubmit={handleSaveStaff} className="space-y-4">
                     <div>
                         <label className="form-label mb-1 block text-xs font-bold text-slate-700">Personel Adı Soyadı (Zorunlu)</label>
                         <input
                             type="text"
                             className="form-input text-xs w-full"
-                            placeholder="Örn: Serkan Arslan..."
+                            placeholder="Örn: Selin Aksoy..."
                             value={newStaff.ad}
                             onChange={(e) => setNewStaff({ ...newStaff, ad: e.target.value })}
                             required
@@ -210,19 +133,16 @@ export default function ControlStaffSection() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <CustomSelect
-                                label="Unvan"
-                                options={[
-                                    { value: 'Birim Kontrol Sorumlusu (BKS)', label: 'Birim Kontrol Sorumlusu (BKS)' },
-                                    { value: 'İç Kontrolör', label: 'İç Kontrolör' },
-                                    { value: 'Kıdemli İç Kontrolör', label: 'Kıdemli İç Kontrolör' }
-                                ]}
+                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Unvan</label>
+                            <input
+                                type="text"
+                                className="form-input text-xs w-full"
                                 value={newStaff.unvan}
-                                onChange={(val) => setNewStaff({ ...newStaff, unvan: val as string })}
+                                onChange={(e) => setNewStaff({ ...newStaff, unvan: e.target.value })}
                             />
                         </div>
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Görevli Olduğu Birim</label>
+                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Atandığı Birim</label>
                             <input
                                 type="text"
                                 className="form-input text-xs w-full"
@@ -231,30 +151,73 @@ export default function ControlStaffSection() {
                             />
                         </div>
                     </div>
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Uzmanlık Alanları ve Sorumlu Olduğu Kontroller</label>
-                        <input
-                            type="text"
-                            className="form-input text-xs w-full"
-                            value={newStaff.uzmanlik}
-                            onChange={(e) => setNewStaff({ ...newStaff, uzmanlik: e.target.value })}
-                        />
-                    </div>
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Sertifikalar (Virgülle Ayırın)</label>
-                        <input
-                            type="text"
-                            className="form-input text-xs w-full"
-                            value={newStaff.sertifikalar}
-                            onChange={(e) => setNewStaff({ ...newStaff, sertifikalar: e.target.value })}
-                        />
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <CustomSelect
+                                label="Rol Türü"
+                                options={[
+                                    { value: 'BKS', label: 'Birim Kontrol Sorumlusu (BKS)' },
+                                    { value: 'KONTROLÖR', label: 'İç Kontrolör' }
+                                ]}
+                                value={newStaff.rol}
+                                onChange={(val) => setNewStaff({ ...newStaff, rol: val as string })}
+                            />
+                        </div>
+                        <div>
+                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Uzmanlık Alanları</label>
+                            <input
+                                type="text"
+                                className="form-input text-xs w-full"
+                                value={newStaff.uzmanlik}
+                                onChange={(e) => setNewStaff({ ...newStaff, uzmanlik: e.target.value })}
+                            />
+                        </div>
                     </div>
                     <div className="flex justify-end gap-2 pt-3 border-t">
-                        <Button variant="secondary" type="button" onClick={() => setIsAssignModalOpen(false)}>İptal</Button>
-                        <Button variant="primary" type="submit">Sorumluyu Ata ve Kaydet</Button>
+                        <Button variant="secondary" type="button" onClick={() => setIsAddModalOpen(false)}>İptal</Button>
+                        <Button variant="primary" type="submit">Atamayı Tamamla</Button>
                     </div>
                 </form>
             </Modal>
+
+            {/* Rich Staff Detail Profile Modal */}
+            {selectedStaff && (
+                <Modal isOpen={!!selectedStaff} onClose={() => setSelectedStaff(null)} title={`Personel Yetkinlik Profili — ${selectedStaff.ad}`} size="lg">
+                    <div className="space-y-4 text-xs">
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h4 className="font-bold text-sm text-slate-900">{selectedStaff.ad}</h4>
+                                    <p className="text-slate-500 font-medium mt-0.5">{selectedStaff.unvan} • {selectedStaff.birim}</p>
+                                </div>
+                                <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${selectedStaff.rol === 'KONTROLÖR' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
+                                    {selectedStaff.rol}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                                <span className="text-slate-500 font-medium block">Mesleki Tecrübe</span>
+                                <span className="font-bold text-slate-900">{selectedStaff.tecrube}</span>
+                            </div>
+                            <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                                <span className="text-slate-500 font-medium block">Uzmanlık Alanları</span>
+                                <span className="font-bold text-slate-900">{selectedStaff.uzmanlik}</span>
+                            </div>
+                        </div>
+
+                        <div className="p-3 bg-purple-50/60 border border-purple-200 rounded-xl space-y-1">
+                            <span className="text-purple-900 font-bold block">Sahip Olduğu Sertifikalar & Lisanslar:</span>
+                            <p className="text-purple-800 font-mono font-medium">{selectedStaff.sertifikalar}</p>
+                        </div>
+
+                        <div className="flex justify-end pt-3 border-t">
+                            <Button variant="secondary" onClick={() => setSelectedStaff(null)}>Kapat</Button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 }

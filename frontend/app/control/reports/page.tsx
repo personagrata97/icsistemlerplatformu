@@ -9,18 +9,21 @@ import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
-import { FileBarChart, CheckCircle2, Download, Plus } from 'lucide-react';
+import ActionMenu from '@/components/ui/ActionMenu';
+import { FileBarChart, CheckCircle2, Download, Plus, Eye, Trash2, Send, FileText, Printer } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
 export default function ControlReportsPage() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [selectedReport, setSelectedReport] = useState<any>(null);
 
     const [reportsList, setReportsList] = useState([
-        { id: 'RPR-2026-Q2', ad: '2026 Q2 Dönemsel İç Kontrol Değerlendirme Raporu', birim: 'İç Kontrol Merkezi', tarih: '2026-07-20', durum: 'ONAYLANDI', yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)' },
-        { id: 'RPR-2026-KRE', ad: 'Kredi Operasyonları Süreç İçi Kontrol Etkinlik Raporu', birim: 'Kredi Operasyonları Müdürlüğü', tarih: '2026-07-15', durum: 'ONAYLANDI', yazar: 'Canan Öztürk (Kıdemli Kontrolör)' },
-        { id: 'RPR-2026-KVKK', ad: 'Müşteri Hakları ve KVKK Kontrol Uyum Raporu', birim: 'Müşteri İlişkileri', tarih: '2026-07-10', durum: 'TASLAK', yazar: 'Zeynep Kaya (İç Kontrolör)' },
+        { id: 'RPR-2026-Q2', ad: '2026 Q2 Dönemsel İç Kontrol Değerlendirme Raporu', birim: 'İç Kontrol Merkezi', tarih: '2026-07-20', durum: 'ONAYLANDI', yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)', icerik: 'İç kontrol sistemi 2026 ikinci çeyrek genel etkinlik değerlendirmesi. 86 test, 12 eksiklik, %91 kontrol etkinlik oranı.' },
+        { id: 'RPR-2026-KRE', ad: 'Kredi Operasyonları Süreç İçi Kontrol Etkinlik Raporu', birim: 'Kredi Operasyonları Müdürlüğü', tarih: '2026-07-15', durum: 'ONAYLANDI', yazar: 'Canan Öztürk (Kıdemli Kontrolör)', icerik: 'Kredi süreçlerindeki kontrol noktalarının tasarım ve işletim etkinliği değerlendirmesi. 14 test noktası, %95 etkinlik oranı.' },
+        { id: 'RPR-2026-KVKK', ad: 'Müşteri Hakları ve KVKK Kontrol Uyum Raporu', birim: 'Müşteri İlişkileri', tarih: '2026-07-10', durum: 'TASLAK', yazar: 'Zeynep Kaya (İç Kontrolör)', icerik: 'KVKK uyumlu müşteri veri işleme kontrollerinin değerlendirmesi. 2 eksiklik tespit edildi.' },
+        { id: 'RPR-2026-HZ', ad: 'Hazine İşlemleri Kontrol Testi Sonuç Raporu', birim: 'Hazine Müdürlüğü', tarih: '2026-06-28', durum: 'ONAYLANDI', yazar: 'Emre Aksoy (İç Kontrolör)', icerik: 'Hazine pozisyon limitleri, gün sonu mutabakatları ve FX kontrollerinin testi. 1 yüksek öncelikli eksiklik.' },
     ]);
 
     const [newReport, setNewReport] = useState({
@@ -29,7 +32,8 @@ export default function ControlReportsPage() {
         birim: 'İç Kontrol Merkezi',
         tarih: '2026-07-27',
         durum: 'TASLAK',
-        yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)'
+        yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)',
+        icerik: ''
     });
 
     const handleSaveReport = (e: React.FormEvent) => {
@@ -49,16 +53,18 @@ export default function ControlReportsPage() {
             birim: 'İç Kontrol Merkezi',
             tarih: '2026-07-27',
             durum: 'TASLAK',
-            yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)'
+            yazar: 'Ahmet Yılmaz (Kıdemli Kontrolör)',
+            icerik: ''
         });
     };
 
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatCard title="Yayınlanan Dönem Raporu" value={reportsList.length} icon={FileBarChart} color="blue" />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <StatCard title="Toplam Dönem Raporu" value={reportsList.length} icon={FileBarChart} color="blue" />
                 <StatCard title="Onaylanan Raporlar" value={reportsList.filter(r => r.durum === 'ONAYLANDI').length} icon={CheckCircle2} color="emerald" />
-                <StatCard title="Taslak Raporlar" value={reportsList.filter(r => r.durum === 'TASLAK').length} icon={FileBarChart} color="amber" />
+                <StatCard title="Taslak Raporlar" value={reportsList.filter(r => r.durum === 'TASLAK').length} icon={FileText} color="amber" />
+                <StatCard title="Denetim Komitesine Sunulan" value={2} icon={Send} color="purple" />
             </div>
 
             <PageToolbar
@@ -66,11 +72,7 @@ export default function ControlReportsPage() {
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 rightActions={
-                    <Button
-                        variant="primary"
-                        leftIcon={<Plus size={18} />}
-                        onClick={() => setIsAddModalOpen(true)}
-                    >
+                    <Button variant="primary" leftIcon={<Plus size={18} />} onClick={() => setIsAddModalOpen(true)}>
                         Yeni Rapor Oluştur
                     </Button>
                 }
@@ -87,17 +89,57 @@ export default function ControlReportsPage() {
                     ) },
                     { key: 'durum', header: 'Durum', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
                     { key: 'tarih', header: 'Rapor Tarihi', type: 'date', width: '150px' },
-                    { key: 'actions', header: 'İşlem', width: '120px', render: (item: any) => (
-                        <Button variant="secondary" size="sm" leftIcon={<Download size={14} />} onClick={() => showToast(`${item.ad} PDF indiriliyor`, 'success')}>
-                            İndir
-                        </Button>
+                    { key: 'actions', header: 'İşlemler', width: '120px', render: (item: any) => (
+                        <ActionMenu items={[
+                            { label: 'Detay Görüntüle', icon: <Eye size={14} />, onClick: () => setSelectedReport(item) },
+                            { label: 'PDF İndir', icon: <Download size={14} />, onClick: () => showToast(`${item.ad} PDF olarak indiriliyor`, 'success') },
+                            { label: 'Word Oluştur', icon: <FileText size={14} />, onClick: () => showToast(`${item.ad} Word formatında oluşturuluyor`, 'success') },
+                            { label: 'Yazdır', icon: <Printer size={14} />, onClick: () => showToast(`${item.ad} yazdırılmak üzere hazırlanıyor`, 'success') },
+                            { label: 'Denetim Komitesine Gönder', icon: <Send size={14} />, onClick: () => showToast(`${item.ad} Denetim Komitesine iletildi`, 'success') },
+                            { label: 'Sil', icon: <Trash2 size={14} />, onClick: () => showToast(`${item.id} silindi`, 'success'), variant: 'danger' as any }
+                        ]} />
                     ) }
                 ]}
-                data={reportsList}
+                data={reportsList.filter(r => !searchTerm || r.ad.toLowerCase().includes(searchTerm.toLowerCase()) || r.id.toLowerCase().includes(searchTerm.toLowerCase()))}
                 rowKey="id"
             />
 
-            {/* Real Interactive Report Modal */}
+            {/* Report Detail Modal */}
+            {selectedReport && (
+                <Modal isOpen={!!selectedReport} onClose={() => setSelectedReport(null)} title={`Rapor Detayı — ${selectedReport.id}`} size="lg">
+                    <div className="space-y-4 text-xs">
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h4 className="font-bold text-sm text-slate-900">{selectedReport.ad}</h4>
+                                    <p className="text-slate-500 font-medium mt-0.5">Hazırlayan: {selectedReport.yazar}</p>
+                                </div>
+                                <StatusBadge value={selectedReport.durum} type="status" />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                                <span className="text-slate-500 font-medium block">Sorumlu Birim</span>
+                                <span className="font-bold text-slate-900">{selectedReport.birim}</span>
+                            </div>
+                            <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                                <span className="text-slate-500 font-medium block">Rapor Tarihi</span>
+                                <span className="font-bold text-slate-900">{new Date(selectedReport.tarih).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+                            </div>
+                        </div>
+                        <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                            <span className="text-slate-700 font-bold block">Rapor Özeti:</span>
+                            <p className="text-slate-600 leading-relaxed">{selectedReport.icerik}</p>
+                        </div>
+                        <div className="flex justify-end gap-2 pt-3 border-t">
+                            <Button variant="secondary" onClick={() => setSelectedReport(null)}>Kapat</Button>
+                            <Button variant="primary" leftIcon={<Download size={14} />} onClick={() => showToast(`${selectedReport.ad} PDF indiriliyor`, 'success')}>PDF İndir</Button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Report Creation Modal */}
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Yeni İç Kontrol Dönem Raporu Oluştur" size="lg">
                 <form onSubmit={handleSaveReport} className="space-y-4">
                     <div>
@@ -106,45 +148,27 @@ export default function ControlReportsPage() {
                     </div>
                     <div>
                         <label className="form-label mb-1 block text-xs font-bold text-slate-700">Rapor Başlığı / Tanımı (Zorunlu)</label>
-                        <input
-                            type="text"
-                            className="form-input text-xs w-full"
-                            placeholder="Örn: 2026 Q3 Dönemsel İç Kontrol Değerlendirme Raporu..."
-                            value={newReport.ad}
-                            onChange={(e) => setNewReport({ ...newReport, ad: e.target.value })}
-                            required
-                        />
+                        <input type="text" className="form-input text-xs w-full" placeholder="Örn: 2026 Q3 Dönemsel İç Kontrol Değerlendirme Raporu..." value={newReport.ad} onChange={(e) => setNewReport({ ...newReport, ad: e.target.value })} required />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Sorumlu Birim</label>
-                            <input
-                                type="text"
-                                className="form-input text-xs w-full"
-                                value={newReport.birim}
-                                onChange={(e) => setNewReport({ ...newReport, birim: e.target.value })}
-                            />
+                            <input type="text" className="form-input text-xs w-full" value={newReport.birim} onChange={(e) => setNewReport({ ...newReport, birim: e.target.value })} />
                         </div>
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Hazırlayan İç Kontrolör</label>
-                            <input
-                                type="text"
-                                className="form-input text-xs w-full"
-                                value={newReport.yazar}
-                                onChange={(e) => setNewReport({ ...newReport, yazar: e.target.value })}
-                            />
+                            <input type="text" className="form-input text-xs w-full" value={newReport.yazar} onChange={(e) => setNewReport({ ...newReport, yazar: e.target.value })} />
                         </div>
                     </div>
                     <div>
-                        <CustomSelect
-                            label="Rapor Durumu"
-                            options={[
-                                { value: 'TASLAK', label: 'TASLAK' },
-                                { value: 'ONAYLANDI', label: 'ONAYLANDI' }
-                            ]}
-                            value={newReport.durum}
-                            onChange={(val) => setNewReport({ ...newReport, durum: val as string })}
-                        />
+                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Rapor İçerik Özeti</label>
+                        <textarea className="form-input text-xs w-full" rows={3} placeholder="Rapor kapsamı, test edilen kontroller, tespit edilen eksiklikler..." value={newReport.icerik} onChange={(e) => setNewReport({ ...newReport, icerik: e.target.value })} />
+                    </div>
+                    <div>
+                        <CustomSelect label="Rapor Durumu" options={[
+                            { value: 'TASLAK', label: 'TASLAK' },
+                            { value: 'ONAYLANDI', label: 'ONAYLANDI' }
+                        ]} value={newReport.durum} onChange={(val) => setNewReport({ ...newReport, durum: val as string })} />
                     </div>
                     <div className="flex justify-end gap-2 pt-3 border-t">
                         <Button variant="secondary" type="button" onClick={() => setIsAddModalOpen(false)}>İptal</Button>

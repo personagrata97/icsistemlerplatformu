@@ -9,109 +9,126 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
-import { ShieldCheck, CheckCircle2, RefreshCw, FileCheck, Layers } from 'lucide-react';
+import { DateDisplay } from '@/components/ui/DateDisplay';
+import { ShieldCheck, CheckCircle2, Clock, Plus, Eye, FileText, UserCheck, ShieldAlert } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
 export default function ControlTestingSection() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
-    const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [selectedTest, setSelectedTest] = useState<any>(null);
 
-    const [testList, setTestList] = useState([
+    const [testsList, setTestsList] = useState([
         {
             id: 'TST-2026-089',
+            ad: 'Kredi Limit Aşımlarının Otomatik Blokaj Kontrol Testi',
             kontrolKodu: 'KNT-KRE-001',
-            kontrolAdi: 'Kredi Limit Aşımlarının Otomatik Blokaj Kontrolü',
-            testTürü: 'İŞLETİM ETKİNLİĞİ',
-            orneklemBüyüklügü: 50,
-            basariliOrneklem: 49,
-            testEden: 'Canan Öztürk (Kıdemli Kontrolör)',
-            sonuc: 'ETKİN',
-            testTarihi: '2026-07-15'
+            birim: 'Kredi Operasyonları Müdürlüğü',
+            yürüten: 'Canan Öztürk (Kıdemli Kontrolör)',
+            durum: 'ETKİN',
+            orneklem: '150 Adet İşlem',
+            baslangic: '2026-07-01',
+            bitis: '2026-07-15',
+            tasarimEtkinligi: 'ETKİN (%95)',
+            isletimEtkinligi: 'ETKİN (%92)',
+            notlar: 'Sistem üzerinden 150 adet yetki aşımı denemesi simüle edilmiş, blokaj mekanizmasının %100 oranında çalıştığı doğrulanmıştır.'
         },
         {
             id: 'TST-2026-090',
+            ad: 'Müşteri İzin Formu Girişi ve KVKK Uyum Testi',
             kontrolKodu: 'KNT-KVKK-008',
-            kontrolAdi: 'Müşteri İzin Formu Girişi ve Onay Kontrolü',
-            testTürü: 'TASARIM VE İŞLETİM',
-            orneklemBüyüklügü: 30,
-            basariliOrneklem: 21,
-            testEden: 'Zeynep Kaya (İç Kontrolör)',
-            sonuc: 'GELİŞİME_AÇIK',
-            testTarihi: '2026-07-10'
+            birim: 'Müşteri İlişkileri ve Gişe',
+            yürüten: 'Zeynep Kaya (İç Kontrolör)',
+            durum: 'GELİŞİME_AÇIK',
+            orneklem: '50 Adet Müşteri Dosyası',
+            baslangic: '2026-07-05',
+            bitis: '2026-07-10',
+            tasarimEtkinligi: 'KISMEN ETKİN (%70)',
+            isletimEtkinligi: 'GELİŞİME AÇIK (%65)',
+            notlar: 'İncelenen 50 dosyadan 4 tanesinde ikinci onay imzasının taranıp sisteme yüklenmediği tespit edilmiştir.'
         },
         {
             id: 'TST-2026-091',
+            ad: 'Gün Sonu Genel Muhasebe Mutabakat Testi',
             kontrolKodu: 'KNT-MUH-012',
-            kontrolAdi: 'Gün Sonu Genel Muhasebe Mutabakatı',
-            testTürü: 'OTOMATİK KONTROL TESTİ',
-            orneklemBüyüklügü: 100,
-            basariliOrneklem: 98,
-            testEden: 'Ahmet Yılmaz (Kıdemli Kontrolör)',
-            sonuc: 'ETKİN',
-            testTarihi: '2026-07-21'
+            birim: 'Mali İşler ve Muhasebe',
+            yürüten: 'Ahmet Yılmaz (Kıdemli Kontrolör)',
+            durum: 'ETKİN',
+            orneklem: '30 Günlük Otomatik Log',
+            baslangic: '2026-07-10',
+            bitis: '2026-07-21',
+            tasarimEtkinligi: 'ETKİN (%98)',
+            isletimEtkinligi: 'ETKİN (%96)',
+            notlar: 'Gün sonu bakiye eşleşmelerinin otomatik betikler tarafından tam uyumla sağlandığı görülmüştür.'
         }
     ]);
 
     const [newTest, setNewTest] = useState({
-        id: `TST-2026-09${testList.length + 2}`,
-        kontrolKodu: 'KNT-HZ-004',
-        kontrolAdi: 'Hazine Gün Sonu Pozisyon Limit Kontrolü',
-        testTürü: 'İŞLETİM ETKİNLİĞİ',
-        orneklemBüyüklügü: 40,
-        basariliOrneklem: 40,
-        testEden: 'Ahmet Yılmaz (Kıdemli Kontrolör)',
-        sonuc: 'ETKİN',
-        testTarihi: '2026-07-27'
+        id: `TST-2026-09${testsList.length + 2}`,
+        ad: '',
+        kontrolKodu: 'KNT-KRE-001',
+        birim: 'Kredi Operasyonları Müdürlüğü',
+        yürüten: 'Canan Öztürk (Kıdemli Kontrolör)',
+        durum: 'DEVAM_EDİYOR',
+        orneklem: '100 Adet Örneklem',
+        baslangic: '2026-07-27',
+        bitis: '2026-08-15',
+        tasarimEtkinligi: 'TEST EDİLİYOR',
+        isletimEtkinligi: 'TEST EDİLİYOR',
+        notlar: 'Test çalışması yeni başlatılmıştır.'
     });
 
-    const handleStartTest = (e: React.FormEvent) => {
+    const handleSaveTest = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newTest.kontrolAdi.trim()) {
-            showToast('Lütfen test edilecek kontrol tanımını giriniz', 'warning');
+        if (!newTest.ad.trim()) {
+            showToast('Lütfen test adını giriniz', 'warning');
             return;
         }
 
-        setTestList([newTest, ...testList]);
-        setIsTestModalOpen(false);
-        showToast(`Kontrol Etkinlik Testi (${newTest.id}) başarıyla başlatıldı`, 'success');
+        setTestsList([newTest, ...testsList]);
+        setIsAddModalOpen(false);
+        showToast(`Yeni Kontrol Testi (${newTest.id}) başarıyla başlatıldı`, 'success');
 
         setNewTest({
-            id: `TST-2026-09${testList.length + 3}`,
-            kontrolKodu: 'KNT-HZ-004',
-            kontrolAdi: 'Hazine Gün Sonu Pozisyon Limit Kontrolü',
-            testTürü: 'İŞLETİM ETKİNLİĞİ',
-            orneklemBüyüklügü: 40,
-            basariliOrneklem: 40,
-            testEden: 'Ahmet Yılmaz (Kıdemli Kontrolör)',
-            sonuc: 'ETKİN',
-            testTarihi: '2026-07-27'
+            id: `TST-2026-09${testsList.length + 3}`,
+            ad: '',
+            kontrolKodu: 'KNT-KRE-001',
+            birim: 'Kredi Operasyonları Müdürlüğü',
+            yürüten: 'Canan Öztürk (Kıdemli Kontrolör)',
+            durum: 'DEVAM_EDİYOR',
+            orneklem: '100 Adet Örneklem',
+            baslangic: '2026-07-27',
+            bitis: '2026-08-15',
+            tasarimEtkinligi: 'TEST EDİLİYOR',
+            isletimEtkinligi: 'TEST EDİLİYOR',
+            notlar: 'Test çalışması yeni başlatılmıştır.'
         });
     };
 
-    const filteredTests = testList.filter(t => {
-        if (searchTerm && !t.kontrolAdi.toLowerCase().includes(searchTerm.toLowerCase()) && !t.id.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    const filteredTests = testsList.filter(t => {
+        if (searchTerm && !t.ad.toLowerCase().includes(searchTerm.toLowerCase()) && !t.id.toLowerCase().includes(searchTerm.toLowerCase())) return false;
         return true;
     });
 
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <StatCard title="Tamamlanan Kontrol Testi" value={testList.length} icon={FileCheck} color="blue" />
-                <StatCard title="Etkin Bulunan Kontroller" value="%86" icon={CheckCircle2} color="emerald" />
-                <StatCard title="Test Edilen Örneklem" value="2,450 Kayıt" icon={Layers} color="purple" />
-                <StatCard title="Devam Eden Test Çalışması" value={6} icon={RefreshCw} color="amber" />
+                <StatCard title="Toplam Saha Testi" value={testsList.length} icon={ShieldCheck} color="blue" />
+                <StatCard title="Etkin Test Sonuçları" value={testsList.filter(t => t.durum === 'ETKİN').length} icon={CheckCircle2} color="emerald" />
+                <StatCard title="Devam Eden Testler" value={testsList.filter(t => t.durum === 'DEVAM_EDİYOR').length} icon={Clock} color="amber" />
+                <StatCard title="Gelişime Açık Testler" value={testsList.filter(t => t.durum === 'GELİŞİME_AÇIK').length} icon={ShieldCheck} color="purple" />
             </div>
 
             <PageToolbar
-                searchPlaceholder="Kontrol adı veya test kodu ile ara..."
+                searchPlaceholder="Test adı, kodu veya süreci ile ara..."
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 rightActions={
                     <Button
                         variant="primary"
-                        leftIcon={<ShieldCheck size={18} />}
-                        onClick={() => setIsTestModalOpen(true)}
+                        leftIcon={<Plus size={18} />}
+                        onClick={() => setIsAddModalOpen(true)}
                     >
                         Yeni Test Çalışması Başlat
                     </Button>
@@ -121,23 +138,20 @@ export default function ControlTestingSection() {
             <DataTable
                 columns={[
                     { key: 'id', header: 'Test Kodu', width: '130px', render: (item: any) => <CodeBadge code={item.id} /> },
-                    { key: 'kontrolAdi', header: 'Test Edilen Kontrol', sortable: true, render: (item: any) => (
+                    { key: 'ad', header: 'Kontrol Testi Tanımı & İlgili Kontrol', sortable: true, render: (item: any) => (
                         <div>
-                            <div className="font-bold text-slate-900">{item.kontrolAdi}</div>
-                            <div className="text-xs text-slate-500 font-medium">Kontrol Kodu: {item.kontrolKodu} • Tür: {item.testTürü}</div>
+                            <div className="font-bold text-slate-900">{item.ad}</div>
+                            <div className="text-xs text-slate-500 font-medium">Birim: {item.birim} • Kontrol Kodu: {item.kontrolKodu}</div>
                         </div>
                     ) },
-                    { key: 'orneklemBüyüklügü', header: 'Örneklem Başarısı', width: '160px', render: (item: any) => (
-                        <div>
-                            <div className="text-xs font-bold text-slate-900">{item.basariliOrneklem} / {item.orneklemBüyüklügü} Başarılı</div>
-                            <div className="w-full bg-slate-100 h-1.5 rounded-full mt-1 overflow-hidden">
-                                <div className="bg-blue-600 h-full rounded-full" style={{ width: `${(item.basariliOrneklem / item.orneklemBüyüklügü) * 100}%` }}></div>
-                            </div>
-                        </div>
-                    ) },
-                    { key: 'testEden', header: 'Test Eden Kontrolör', width: '180px', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.testEden}</span> },
-                    { key: 'sonuc', header: 'Test Sonucu', width: '140px', render: (item: any) => <StatusBadge value={item.sonuc} type="status" /> },
-                    { key: 'testTarihi', header: 'Test Tarihi', type: 'date', width: '150px' }
+                    { key: 'yürüten', header: 'Yürüten Kontrolör', width: '180px', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.yürüten}</span> },
+                    { key: 'durum', header: 'Test Sonucu', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
+                    { key: 'bitis', header: 'Tamamlanma', type: 'date', width: '140px' },
+                    { key: 'actions', header: 'İncele', width: '100px', render: (item: any) => (
+                        <Button variant="secondary" size="sm" leftIcon={<Eye size={14} />} onClick={() => setSelectedTest(item)}>
+                            Detay
+                        </Button>
+                    ) }
                 ]}
                 data={filteredTests}
                 searchTerm={searchTerm}
@@ -145,69 +159,115 @@ export default function ControlTestingSection() {
                 rowKey="id"
             />
 
-            {/* Modal for Starting Test */}
-            <Modal isOpen={isTestModalOpen} onClose={() => setIsTestModalOpen(false)} title="Yeni Kontrol Etkinlik Testi Başlat" size="lg">
-                <form onSubmit={handleStartTest} className="space-y-4">
+            {/* Test Creation Modal */}
+            <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Yeni Kontrol Test Çalışması Başlat" size="lg">
+                <form onSubmit={handleSaveTest} className="space-y-4">
                     <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Test Edilecek Kontrol Tanımı (Zorunlu)</label>
+                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Test Kodu</label>
+                        <input type="text" className="form-input text-xs w-full bg-slate-100 font-mono" value={newTest.id} readOnly />
+                    </div>
+                    <div>
+                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Kontrol Test Tanımı (Zorunlu)</label>
                         <input
                             type="text"
                             className="form-input text-xs w-full"
-                            placeholder="Örn: Hazine Gün Sonu Pozisyon Limit Kontrolü..."
-                            value={newTest.kontrolAdi}
-                            onChange={(e) => setNewTest({ ...newTest, kontrolAdi: e.target.value })}
+                            placeholder="Örn: Kredi Limit Aşımlarının Otomatik Blokaj Kontrol Testi..."
+                            value={newTest.ad}
+                            onChange={(e) => setNewTest({ ...newTest, ad: e.target.value })}
                             required
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Kontrol Kodu</label>
+                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">İlgili Kontrol Kodu</label>
                             <input
                                 type="text"
-                                className="form-input text-xs w-full font-mono bg-slate-100"
+                                className="form-input text-xs w-full font-mono"
                                 value={newTest.kontrolKodu}
                                 onChange={(e) => setNewTest({ ...newTest, kontrolKodu: e.target.value })}
                             />
                         </div>
                         <div>
-                            <CustomSelect
-                                label="Test Türü"
-                                options={[
-                                    { value: 'İŞLETİM ETKİNLİĞİ', label: 'İŞLETİM ETKİNLİĞİ' },
-                                    { value: 'TASARIM ETKİNLİĞİ', label: 'TASARIM ETKİNLİĞİ' },
-                                    { value: 'OTOMATİK KONTROL TESTİ', label: 'OTOMATİK KONTROL TESTİ' }
-                                ]}
-                                value={newTest.testTürü}
-                                onChange={(val) => setNewTest({ ...newTest, testTürü: val as string })}
+                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Test Edilecek Birim</label>
+                            <input
+                                type="text"
+                                className="form-input text-xs w-full"
+                                value={newTest.birim}
+                                onChange={(e) => setNewTest({ ...newTest, birim: e.target.value })}
                             />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">İncelenecek Örneklem Büyüklüğü</label>
-                            <input
-                                type="number"
-                                className="form-input text-xs w-full font-mono"
-                                value={newTest.orneklemBüyüklügü}
-                                onChange={(e) => setNewTest({ ...newTest, orneklemBüyüklügü: parseInt(e.target.value) || 0 })}
-                            />
-                        </div>
-                        <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Test Eden Kontrolör</label>
+                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Yürüten İç Kontrolör</label>
                             <input
                                 type="text"
                                 className="form-input text-xs w-full"
-                                value={newTest.testEden}
-                                onChange={(e) => setNewTest({ ...newTest, testEden: e.target.value })}
+                                value={newTest.yürüten}
+                                onChange={(e) => setNewTest({ ...newTest, yürüten: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <CustomSelect
+                                label="Test Durumu"
+                                options={[
+                                    { value: 'DEVAM_EDİYOR', label: 'DEVAM EDİYOR' },
+                                    { value: 'ETKİN', label: 'ETKİN' },
+                                    { value: 'GELİŞİME_AÇIK', label: 'GELİŞİME AÇIK' }
+                                ]}
+                                value={newTest.durum}
+                                onChange={(val) => setNewTest({ ...newTest, durum: val as string })}
                             />
                         </div>
                     </div>
                     <div className="flex justify-end gap-2 pt-3 border-t">
-                        <Button variant="secondary" type="button" onClick={() => setIsTestModalOpen(false)}>İptal</Button>
+                        <Button variant="secondary" type="button" onClick={() => setIsAddModalOpen(false)}>İptal</Button>
                         <Button variant="primary" type="submit">Test Çalışmasını Başlat</Button>
                     </div>
                 </form>
             </Modal>
+
+            {/* Rich Test Detail Review Modal */}
+            {selectedTest && (
+                <Modal isOpen={!!selectedTest} onClose={() => setSelectedTest(null)} title={`Kontrol Testi Detayı — ${selectedTest.id}`} size="lg">
+                    <div className="space-y-4 text-xs">
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h4 className="font-bold text-sm text-slate-900">{selectedTest.ad}</h4>
+                                    <p className="text-slate-500 font-medium mt-0.5">Birim: {selectedTest.birim} • Kontrol Kodu: {selectedTest.kontrolKodu}</p>
+                                </div>
+                                <StatusBadge value={selectedTest.durum} type="status" />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                                <span className="text-slate-500 font-medium block">Tasarım Etkinliği</span>
+                                <span className="font-bold text-slate-900 text-xs font-mono">{selectedTest.tasarimEtkinligi}</span>
+                            </div>
+                            <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                                <span className="text-slate-500 font-medium block">İşletim Etkinliği</span>
+                                <span className="font-bold text-slate-900 text-xs font-mono">{selectedTest.isletimEtkinligi}</span>
+                            </div>
+                        </div>
+
+                        <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                            <span className="text-slate-500 font-medium block">Örneklem & Test Metodolojisi</span>
+                            <span className="font-bold text-slate-800">{selectedTest.orneklem}</span>
+                        </div>
+
+                        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                            <span className="text-slate-700 font-bold block">İç Kontrolör Test Değerlendirme Notu:</span>
+                            <p className="text-slate-600 leading-relaxed">{selectedTest.notlar}</p>
+                        </div>
+
+                        <div className="flex justify-end pt-3 border-t">
+                            <Button variant="secondary" onClick={() => setSelectedTest(null)}>Kapat</Button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 }
