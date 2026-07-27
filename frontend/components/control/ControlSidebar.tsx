@@ -60,7 +60,7 @@ export default function ControlSidebar() {
                 <ul className="nav-links space-y-2 px-2 py-3">
                     {/* 1. YÖNETİM VE KOKPİT */}
                     <li>
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">2. HAT YÖNETİMİ</div>
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">YÖNETİM & ANALİZ</div>
                         <ul className="space-y-1">
                             <li className="nav-item">
                                 <Link href="/control" className={`nav-link ${pathname === '/control' ? 'active' : ''}`}>
