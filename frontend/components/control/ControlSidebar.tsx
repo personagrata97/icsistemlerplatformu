@@ -1,0 +1,120 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+    LayoutDashboard,
+    Layers,
+    FileCheck,
+    ShieldCheck,
+    AlertOctagon,
+    Users,
+    BookOpen,
+    FileBarChart,
+    Award,
+    Activity,
+    Sliders,
+    Building2
+} from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+
+export default function ControlSidebar() {
+    const pathname = usePathname();
+    const { user } = useAuth();
+
+    const isActive = (path: string) => pathname === path || (path !== '/control' && pathname.startsWith(path));
+
+    return (
+        <aside className="sidebar flex flex-col h-screen overflow-hidden bg-white border-r shadow-sm z-50">
+            <div className="h-[64px] flex items-center justify-center bg-gray-50 border-b border-gray-200 shrink-0">
+                <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain mix-blend-multiply transition-transform hover:scale-105" />
+            </div>
+
+            <div className="sidebar-content flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-gray-300">
+                <ul className="nav-links space-y-2 px-2 py-3">
+                    {/* 1. YÖNETİM VE KOKPİT */}
+                    <li>
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">2. HAT YÖNETİMİ</div>
+                        <ul className="space-y-1">
+                            <li className="nav-item">
+                                <Link href="/control" className={`nav-link ${pathname === '/control' ? 'active' : ''}`}>
+                                    <LayoutDashboard size={18} />
+                                    <span>Ana Panel & Kokpit</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/staff" className={`nav-link ${isActive('/control/staff') ? 'active' : ''}`}>
+                                    <Users size={18} />
+                                    <span>Kontrolör Kadrosu (BKS)</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    {/* 2. KONTROL ÇERÇEVESİ & İZLEME */}
+                    <li className="pt-2 border-t border-slate-100">
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Kontrol Çerçevesi & İzleme</div>
+                        <ul className="space-y-1">
+                            <li className="nav-item">
+                                <Link href="/control/inventory" className={`nav-link ${isActive('/control/inventory') ? 'active' : ''}`}>
+                                    <Layers size={18} />
+                                    <span>Süreç & Kontrol Envanteri</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/rcsa" className={`nav-link ${isActive('/control/rcsa') ? 'active' : ''}`}>
+                                    <FileCheck size={18} />
+                                    <span>Birim Öz Değerlendirmeleri</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/testing" className={`nav-link ${isActive('/control/testing') ? 'active' : ''}`}>
+                                    <ShieldCheck size={18} />
+                                    <span>Kontrol Testleri & Saha</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    {/* 3. EKSİKLİK & AKSİYON YÖNETİMİ */}
+                    <li className="pt-2 border-t border-slate-100">
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Eksiklik & Aksiyonlar</div>
+                        <ul className="space-y-1">
+                            <li className="nav-item">
+                                <Link href="/control/deficiencies" className={`nav-link ${isActive('/control/deficiencies') ? 'active' : ''}`}>
+                                    <AlertOctagon size={18} />
+                                    <span>Eksiklik Takibi</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/reports" className={`nav-link ${isActive('/control/reports') ? 'active' : ''}`}>
+                                    <FileBarChart size={18} />
+                                    <span>İç Kontrol Raporları</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    {/* 4. EĞİTİM & YETKİNLİK */}
+                    <li className="pt-2 border-t border-slate-100">
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Eğitim & Yetkinlik</div>
+                        <ul className="space-y-1">
+                            <li className="nav-item">
+                                <Link href="/control/training" className={`nav-link ${isActive('/control/training') ? 'active' : ''}`}>
+                                    <BookOpen size={18} />
+                                    <span>Eğitim Kataloğu</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/skills" className={`nav-link ${isActive('/control/skills') ? 'active' : ''}`}>
+                                    <Award size={18} />
+                                    <span>Yetkinlik Matrisi</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    );
+}

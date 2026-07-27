@@ -5,23 +5,50 @@ import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
+import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import PageHeader from '@/components/audit/PageHeader';
-import { ShieldCheck, CheckCircle2, AlertOctagon, Sliders, RefreshCw, Layers, Activity, FileCheck } from 'lucide-react';
+import { 
+    Layers, FileCheck, CheckCircle2, Sliders, 
+    ShieldCheck, AlertOctagon, Users, BookOpen, 
+    Plus, Activity, Database
+} from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 import { TERMS } from '@/lib/terminology';
 
+import ControlStaffSection from '@/components/control/ControlStaffSection';
+import ControlTrainingSection from '@/components/control/ControlTrainingSection';
+import ControlDeficienciesSection from '@/components/control/ControlDeficienciesSection';
+import ControlTestingSection from '@/components/control/ControlTestingSection';
+
+import Modal from '@/components/ui/Modal';
+
 export default function PharosControlPage() {
     const { showToast } = useToast();
-    const [activeTab, setActiveTab] = useState<'inventory' | 'kod'>('inventory');
+    const [activeTab, setActiveTab] = useState<'inventory' | 'kod' | 'testing' | 'deficiencies' | 'staff' | 'training'>('inventory');
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-    const controls = [
+    const [newControl, setNewControl] = useState({
+        id: `KNT-${Math.floor(100 + Math.random() * 900)}`,
+        ad: '',
+        surec: 'Kredi Tahsis ve Operasyon',
+        tur: 'ÖNLEYİCİ',
+        yontem: 'OTOMATİK',
+        siklik: 'GÜNLÜK',
+        sahip: 'Kredi Operasyonları Müdürlüğü',
+        dayandigiRisk: '',
+        etkinlikSkoru: 90,
+        durum: 'ETKİN',
+        sonTest: '2026-07-27'
+    });
+
+    const [controlsList, setControlsList] = useState([
         {
             id: 'KNT-KRE-001',
             ad: 'Kredi Limit Aşımlarının Otomatik Blokaj Kontrolü',
@@ -60,16 +87,54 @@ export default function PharosControlPage() {
             etkinlikSkoru: 98,
             durum: 'ETKİN',
             sonTest: '2026-07-21'
+        },
+        {
+            id: 'KNT-HZ-004',
+            ad: 'Hazine Gün Sonu Pozisyon Limit Kontrolü',
+            surec: 'Hazine ve Fon Yönetimi',
+            tur: 'ÖNLEYİCİ',
+            yontem: 'YARI_OTOMATİK',
+            siklik: 'GÜNLÜK',
+            sahip: 'Hazine Operasyon Servisi',
+            dayandigiRisk: 'Piyasa ve Likidite Limiti Aşımı Riski',
+            etkinlikSkoru: 88,
+            durum: 'ETKİN',
+            sonTest: '2026-07-18'
         }
-    ];
+    ]);
+
+    const handleSaveControl = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newControl.ad.trim()) {
+            showToast('Lütfen kontrol tanımını giriniz', 'warning');
+            return;
+        }
+        setControlsList([newControl, ...controlsList]);
+        setIsAddModalOpen(false);
+        showToast(`Yeni Kontrol Noktası (${newControl.id}) başarıyla eklendi`, 'success');
+        setNewControl({
+            id: `KNT-${Math.floor(100 + Math.random() * 900)}`,
+            ad: '',
+            surec: 'Kredi Tahsis ve Operasyon',
+            tur: 'ÖNLEYİCİ',
+            yontem: 'OTOMATİK',
+            siklik: 'GÜNLÜK',
+            sahip: 'Kredi Operasyonları Müdürlüğü',
+            dayandigiRisk: '',
+            etkinlikSkoru: 90,
+            durum: 'ETKİN',
+            sonTest: '2026-07-27'
+        });
+    };
 
     const selfAssessments = [
-        { id: '1', birim: 'Kredi Operasyonları Müdürlüğü', donem: '2026 Q2', durum: 'TAMAMLANDI', skor: 92, tarih: '2026-07-15' },
-        { id: '2', birim: 'Hazine ve Fon Yönetimi', donem: '2026 Q2', durum: 'TAMAMLANDI', skor: 96, tarih: '2026-07-18' },
-        { id: '3', birim: 'Şube Operasyonları Müdürlüğü', donem: '2026 Q2', durum: 'DEĞERLENDİRMEDE', skor: 78, tarih: '2026-07-20' },
+        { id: 'KÖD-2026-Q2-01', birim: 'Kredi Operasyonları Müdürlüğü', donem: '2026 Q2', durum: 'TAMAMLANDI', skor: 92, tarih: '2026-07-15', sorumlusu: 'Mehmet Demir (BKS)' },
+        { id: 'KÖD-2026-Q2-02', birim: 'Hazine ve Fon Yönetimi', donem: '2026 Q2', durum: 'TAMAMLANDI', skor: 96, tarih: '2026-07-18', sorumlusu: 'Ayşe Şahin (BKS)' },
+        { id: 'KÖD-2026-Q2-03', birim: 'Şube Operasyonları Müdürlüğü', donem: '2026 Q2', durum: 'DEĞERLENDİRMEDE', skor: 78, tarih: '2026-07-20', sorumlusu: 'Zeynep Kaya (İç Kontrolör)' },
+        { id: 'KÖD-2026-Q2-04', birim: 'Bilgi Teknolojileri ve Altyapı', donem: '2026 Q2', durum: 'TAMAMLANDI', skor: 94, tarih: '2026-07-22', sorumlusu: 'Canan Öztürk (Kıdemli Kontrolör)' },
     ];
 
-    const filteredControls = controls.filter(c => {
+    const filteredControls = controlsList.filter(c => {
         if (statusFilter !== 'ALL' && c.durum !== statusFilter) return false;
         if (searchTerm && !c.ad.toLowerCase().includes(searchTerm.toLowerCase()) && !c.id.toLowerCase().includes(searchTerm.toLowerCase())) return false;
         return true;
@@ -78,57 +143,69 @@ export default function PharosControlPage() {
     return (
         <div className="space-y-6">
             <PageHeader
-                title={`${TERMS.controlModule} — COSO 2013 İç Kontrol Yönetimi`}
+                title={`${TERMS.controlModule} — İç Kontrol Çerçevesi ve Süreç Yönetimi`}
                 subtitle={TERMS.controlModuleDescription}
             />
 
-            {/* Top StatCards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <StatCard
-                    title="Toplam Kontrol Envanteri"
-                    value={48}
-                    icon={Layers}
-                    color="blue"
-                    infoTooltip="Sistemde kayıtlı COSO 2013 süreç içi kontrol noktaları"
-                />
-                <StatCard
-                    title="Etkin Kontroller (%80+)"
-                    value={38}
-                    icon={CheckCircle2}
-                    color="emerald"
-                    infoTooltip="İç denetim ve birim KÖD testleri sonucunda etkin bulunanlar"
-                />
-                <StatCard
-                    title="Gelişime Açık Kontroller"
-                    value={7}
-                    icon={Sliders}
-                    color="amber"
-                    infoTooltip="Kısmen çalışan veya iyileştirme gereken kontroller"
-                />
-                <StatCard
-                    title="KÖD Tamamlanma Oranı"
-                    value="%88"
-                    icon={FileCheck}
-                    color="purple"
-                    infoTooltip="2026 Q2 Birim Kontrol Öz Değerlendirme dönemi katılımı"
-                />
-            </div>
-
             <SegmentedTabs
                 tabs={[
-                    { id: 'inventory', label: 'Kontrol Envanteri (COSO 2013)', icon: Layers },
-                    { id: 'kod', label: 'Birim Öz Değerlendirmesi (KÖD)', icon: FileCheck },
+                    { id: 'inventory', label: 'Kontrol Envanteri & Çerçeve', icon: Layers },
+                    { id: 'kod', label: 'Birim Öz Değerlendirmeleri (KÖD)', icon: FileCheck },
+                    { id: 'testing', label: 'Kontrol Testleri & Saha', icon: ShieldCheck },
+                    { id: 'deficiencies', label: 'Eksiklik & Aksiyon Takibi', icon: AlertOctagon },
+                    { id: 'staff', label: 'Personel & Yetkinlik Matrisi', icon: Users },
+                    { id: 'training', label: 'Eğitim & Sertifikasyon', icon: BookOpen },
                 ]}
                 activeTab={activeTab}
-                onChange={(id) => setActiveTab(id as 'inventory' | 'kod')}
+                onChange={(id) => setActiveTab(id as any)}
             />
 
-            {activeTab === 'inventory' ? (
-                <div className="space-y-4">
+            {activeTab === 'inventory' && (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <StatCard
+                            title="Toplam Kontrol Noktası"
+                            value={48}
+                            icon={Layers}
+                            color="blue"
+                            infoTooltip="Süreçlerde tanımlı aktif iç kontrol faaliyetleri envanteri"
+                        />
+                        <StatCard
+                            title="Etkin Kontroller (%80+)"
+                            value={38}
+                            icon={CheckCircle2}
+                            color="emerald"
+                            infoTooltip="Yapılan testler sonucunda etkin bulunan kontrol oranı"
+                        />
+                        <StatCard
+                            title="Gelişime Açık Kontroller"
+                            value={7}
+                            icon={Sliders}
+                            color="amber"
+                            infoTooltip="İyileştirme gereken süreç içi kontrol noktaları"
+                        />
+                        <StatCard
+                            title="Otomatik Kontrol Oranı"
+                            value="%65"
+                            icon={Activity}
+                            color="purple"
+                            infoTooltip="Sistem üzerinde otomatik veya yarı otomatik çalışan kontroller"
+                        />
+                    </div>
+
                     <PageToolbar
-                        searchPlaceholder="Kontrol kodu veya adı ile ara..."
+                        searchPlaceholder="Kontrol kodu, tanımı veya süreci ile ara..."
                         searchValue={searchTerm}
                         onSearchChange={setSearchTerm}
+                        rightActions={
+                            <Button
+                                variant="primary"
+                                leftIcon={<Plus size={18} />}
+                                onClick={() => showToast('Yeni Kontrol Noktası Tanımlama ekranı açıldı', 'info')}
+                            >
+                                Yeni Kontrol Tanımla
+                            </Button>
+                        }
                         filters={
                             <FilterDropdown
                                 label="Filtrele"
@@ -158,11 +235,7 @@ export default function PharosControlPage() {
                                 key: 'id',
                                 header: 'Kontrol Kodu',
                                 width: '140px',
-                                render: (item: any) => (
-                                    <code className="font-mono text-xs font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded">
-                                        {item.id}
-                                    </code>
-                                )
+                                render: (item: any) => <CodeBadge code={item.id} />
                             },
                             {
                                 key: 'ad',
@@ -170,8 +243,8 @@ export default function PharosControlPage() {
                                 sortable: true,
                                 render: (item: any) => (
                                     <div>
-                                        <div className="font-bold text-gray-900">{item.ad}</div>
-                                        <div className="text-[11px] text-gray-500 mt-0.5">Süreç: {item.surec} • Sahip: {item.sahip}</div>
+                                        <div className="font-bold text-slate-900">{item.ad}</div>
+                                        <div className="text-[11px] text-slate-500 mt-0.5">Süreç: {item.surec} • Sahip: {item.sahip}</div>
                                     </div>
                                 )
                             },
@@ -180,9 +253,9 @@ export default function PharosControlPage() {
                                 header: 'Tür / Yöntem',
                                 width: '160px',
                                 render: (item: any) => (
-                                    <div className="text-xs text-gray-700 font-medium">
+                                    <div className="text-xs text-slate-700 font-medium">
                                         <div>{item.tur}</div>
-                                        <div className="text-[10px] text-gray-400 font-mono">{item.yontem} ({item.siklik})</div>
+                                        <div className="text-[10px] text-slate-400 font-mono">{item.yontem} ({item.siklik})</div>
                                     </div>
                                 )
                             },
@@ -191,7 +264,7 @@ export default function PharosControlPage() {
                                 header: 'Dayandığı Risk',
                                 width: '200px',
                                 render: (item: any) => (
-                                    <span className="text-xs text-gray-600 font-medium">{item.dayandigiRisk}</span>
+                                    <span className="text-xs text-slate-600 font-medium">{item.dayandigiRisk}</span>
                                 )
                             },
                             {
@@ -217,12 +290,39 @@ export default function PharosControlPage() {
                         rowKey="id"
                     />
                 </div>
-            ) : (
+            )}
+
+            {activeTab === 'kod' && (
                 <div className="space-y-4">
+                    <PageToolbar
+                        searchPlaceholder="Birim veya dönem ile ara..."
+                        searchValue={searchTerm}
+                        onSearchChange={setSearchTerm}
+                        rightActions={
+                            <Button
+                                variant="primary"
+                                leftIcon={<FileCheck size={18} />}
+                                onClick={() => showToast('Yeni Dönem Birim Öz Değerlendirme (KÖD) Dönemi Başlatıldı', 'info')}
+                            >
+                                Yeni Öz Değerlendirme Başlat
+                            </Button>
+                        }
+                    />
                     <DataTable
                         columns={[
+                            {
+                                key: 'id',
+                                header: 'Form Kodu',
+                                width: '150px',
+                                render: (item: any) => <CodeBadge code={item.id} />
+                            },
                             { key: 'birim', header: 'Değerlendirilen Birim', sortable: true },
                             { key: 'donem', header: 'Dönem', width: '120px' },
+                            {
+                                key: 'sorumlusu',
+                                header: 'Birim Sorumlusu',
+                                render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.sorumlusu}</span>
+                            },
                             {
                                 key: 'skor',
                                 header: 'Öz Değerlendirme Skoru',
@@ -244,7 +344,7 @@ export default function PharosControlPage() {
                                 header: 'Tamamlanma Tarihi',
                                 width: '150px',
                                 render: (item: any) => (
-                                    <span className="font-mono text-xs text-gray-500">{formatDate(item.tarih)}</span>
+                                    <span className="font-mono text-xs text-slate-500">{formatDate(item.tarih)}</span>
                                 )
                             }
                         ]}
@@ -253,6 +353,11 @@ export default function PharosControlPage() {
                     />
                 </div>
             )}
+
+            {activeTab === 'testing' && <ControlTestingSection />}
+            {activeTab === 'deficiencies' && <ControlDeficienciesSection />}
+            {activeTab === 'staff' && <ControlStaffSection />}
+            {activeTab === 'training' && <ControlTrainingSection />}
         </div>
     );
 }
