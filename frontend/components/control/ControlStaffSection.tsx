@@ -210,16 +210,16 @@ export default function ControlStaffSection() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Unvan</label>
-                            <select
-                                className="form-select text-xs w-full"
+                            <CustomSelect
+                                label="Unvan"
+                                options={[
+                                    { value: 'Birim Kontrol Sorumlusu (BKS)', label: 'Birim Kontrol Sorumlusu (BKS)' },
+                                    { value: 'İç Kontrolör', label: 'İç Kontrolör' },
+                                    { value: 'Kıdemli İç Kontrolör', label: 'Kıdemli İç Kontrolör' }
+                                ]}
                                 value={newStaff.unvan}
-                                onChange={(e) => setNewStaff({ ...newStaff, unvan: e.target.value })}
-                            >
-                                <option value="Birim Kontrol Sorumlusu (BKS)">Birim Kontrol Sorumlusu (BKS)</option>
-                                <option value="İç Kontrolör">İç Kontrolör</option>
-                                <option value="Kıdemli İç Kontrolör">Kıdemli İç Kontrolör</option>
-                            </select>
+                                onChange={(val) => setNewStaff({ ...newStaff, unvan: val as string })}
+                            />
                         </div>
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Görevli Olduğu Birim</label>
@@ -251,7 +251,7 @@ export default function ControlStaffSection() {
                     </div>
                     <div className="flex justify-end gap-2 pt-3 border-t">
                         <Button variant="secondary" type="button" onClick={() => setIsAssignModalOpen(false)}>İptal</Button>
-                        <Button variant="primary" type="submit">Sorumluyu Atave Kaydet</Button>
+                        <Button variant="primary" type="submit">Sorumluyu Ata ve Kaydet</Button>
                     </div>
                 </form>
             </Modal>

@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
+import CustomSelect from '@/components/ui/CustomSelect';
 import { BookOpen, Award, GraduationCap, Clock, Play } from 'lucide-react';
 import { formatDate } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';
@@ -205,15 +206,15 @@ export default function ControlTrainingSection() {
                             />
                         </div>
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Zorunluluk Durumu</label>
-                            <select
-                                className="form-select text-xs w-full"
+                            <CustomSelect
+                                label="Zorunluluk Durumu"
+                                options={[
+                                    { value: 'true', label: 'ZORUNLU EĞİTİM' },
+                                    { value: 'false', label: 'SEÇMELİ EĞİTİM' }
+                                ]}
                                 value={newTraining.zorunlu ? 'true' : 'false'}
-                                onChange={(e) => setNewTraining({ ...newTraining, zorunlu: e.target.value === 'true' })}
-                            >
-                                <option value="true">ZORUNLU EĞİTİM</option>
-                                <option value="false">SEÇMELİ EĞİTİM</option>
-                            </select>
+                                onChange={(val) => setNewTraining({ ...newTraining, zorunlu: val === 'true' })}
+                            />
                         </div>
                     </div>
                     <div className="flex justify-end gap-2 pt-3 border-t">

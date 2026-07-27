@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
+import CustomSelect from '@/components/ui/CustomSelect';
 import { ShieldCheck, CheckCircle2, RefreshCw, FileCheck, Layers } from 'lucide-react';
 import { formatDate } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';
@@ -170,16 +171,16 @@ export default function ControlTestingSection() {
                             />
                         </div>
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Test Türü</label>
-                            <select
-                                className="form-select text-xs w-full"
+                            <CustomSelect
+                                label="Test Türü"
+                                options={[
+                                    { value: 'İŞLETİM ETKİNLİĞİ', label: 'İŞLETİM ETKİNLİĞİ' },
+                                    { value: 'TASARIM ETKİNLİĞİ', label: 'TASARIM ETKİNLİĞİ' },
+                                    { value: 'OTOMATİK KONTROL TESTİ', label: 'OTOMATİK KONTROL TESTİ' }
+                                ]}
                                 value={newTest.testTürü}
-                                onChange={(e) => setNewTest({ ...newTest, testTürü: e.target.value })}
-                            >
-                                <option value="İŞLETİM ETKİNLİĞİ">İŞLETİM ETKİNLİĞİ</option>
-                                <option value="TASARIM ETKİNLİĞİ">TASARIM ETKİNLİĞİ</option>
-                                <option value="OTOMATİK KONTROL TESTİ">OTOMATİK KONTROL TESTİ</option>
-                            </select>
+                                onChange={(val) => setNewTest({ ...newTest, testTürü: val as string })}
+                            />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">

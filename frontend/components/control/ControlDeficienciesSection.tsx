@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
+import CustomSelect from '@/components/ui/CustomSelect';
 import { AlertOctagon, CheckCircle2, Clock, Plus, Sliders } from 'lucide-react';
 import { formatDate } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';
@@ -178,16 +179,16 @@ export default function ControlDeficienciesSection() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Önem Seviyesi</label>
-                            <select
-                                className="form-select text-xs w-full"
+                            <CustomSelect
+                                label="Önem Seviyesi"
+                                options={[
+                                    { value: 'YÜKSEK', label: 'YÜKSEK' },
+                                    { value: 'ORTA', label: 'ORTA' },
+                                    { value: 'DÜŞÜK', label: 'DÜŞÜK' }
+                                ]}
                                 value={newDeficiency.seviye}
-                                onChange={(e) => setNewDeficiency({ ...newDeficiency, seviye: e.target.value })}
-                            >
-                                <option value="YÜKSEK">YÜKSEK</option>
-                                <option value="ORTA">ORTA</option>
-                                <option value="DÜŞÜK">DÜŞÜK</option>
-                            </select>
+                                onChange={(val) => setNewDeficiency({ ...newDeficiency, seviye: val as string })}
+                            />
                         </div>
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Sorumlu Birim Kontrol Sorumlusu (BKS)</label>
