@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import { RiskLogger } from '@/lib/risk-logger';
 import { useToast } from '@/components/Toast';
 import PageHeader from '@/components/audit/PageHeader';
+import RequireRole from '@/components/auth/RequireRole';
 
 // Senaryo parametreleri — backend ScenarioParameters tipiyle uyumlu
 const scenarios = [
@@ -56,7 +57,7 @@ const scenarios = [
     },
 ];
 
-export default function ScenariosPage() {
+function ScenariosPageContent() {
     const { showToast } = useToast();
     const [running, setRunning] = useState(false);
     const [runningCode, setRunningCode] = useState<string | null>(null);
@@ -191,5 +192,13 @@ export default function ScenariosPage() {
                 ))}
             </div>
         </div>
+    );
+}
+
+export default function ScenariosPage() {
+    return (
+        <RequireRole allowedRoles={['ADMIN', 'RISK_ADMIN', 'RISK_MANAGER', 'RISK_ANALYST', 'SUPER_ADMIN']}>
+            <ScenariosPageContent />
+        </RequireRole>
     );
 }

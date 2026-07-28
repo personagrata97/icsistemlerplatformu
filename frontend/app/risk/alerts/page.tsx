@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { AlertTriangle, CheckCircle, X, Clock, RefreshCw, MessageSquare } from 'lucide-react';
@@ -14,11 +15,12 @@ import ActionMenu from '@/components/ui/ActionMenu';
 
 import PageToolbar from '@/components/ui/PageToolbar';
 import PageHeader from '@/components/audit/PageHeader';
+import RequireRole from '@/components/auth/RequireRole';
 
-export default function AlertsPage() {
+function AlertsPageContent() {
     const [alerts, setAlerts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('OPEN'); // OPEN, CLOSED, ALL
+    const [filter, setFilter] = useState('OPEN');
     const [confirmCloseId, setConfirmCloseId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -31,180 +33,110 @@ export default function AlertsPage() {
             const data = await apiClient.getAlerts(
                 filter === 'ALL' ? undefined : { durum: filter }
             );
-            setAlerts(data);
+            setAlerts(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Uyarılar yüklenemedi:', error);
+            setAlerts([]);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleCloseAlert = (id: string) => {
-        setConfirmCloseId(id);
-    };
-
-    const executeCloseAlert = async () => {
-        if (!confirmCloseId) return;
-
+    const handleCloseAlert = async (id: string) => {
         try {
-            await apiClient.closeAlert(confirmCloseId);
-            loadAlerts(); // Listeyi yenile
+            await apiClient.closeAlert(id);
+            setAlerts(alerts.map(a => a.id === id ? { ...a, durum: 'CLOSED' } : a));
+            setConfirmCloseId(null);
         } catch (error) {
             console.error('Uyarı kapatılamadı:', error);
-        } finally {
-            setConfirmCloseId(null);
         }
     };
 
     return (
         <div className="space-y-6">
             <PageHeader
-                title="Risk İkaz ve Limit İhlalleri"
-                subtitle="Otomatik Hesaplanan Erken Uyarılar ve Alarm Kayıtları"
+                title="Limit Aşımları & Uyarılar"
+                subtitle="Mevzuat ve banka içi risk limiti ihlal uyarılarının takibi"
             />
+
             <PageToolbar
-                noSearch={true}
-                onRefresh={loadAlerts}
-                filters={
-                    <div className="flex gap-1 bg-gray-100 p-1 rounded-lg border border-gray-200">
+                searchPlaceholder="Uyarı ara..."
+                searchValue=""
+                onSearchChange={() => {}}
+                rightActions={
+                    <div className="flex gap-2">
                         <Button
-                            variant={filter === 'OPEN' ? 'primary' : 'ghost'}
+                            variant={filter === 'OPEN' ? 'primary' : 'secondary'}
+                            size="sm"
                             onClick={() => setFilter('OPEN')}
-                            className={`!h-8 !px-4 text-xs font-semibold rounded-md transition-all ${filter === 'OPEN' ? 'shadow-sm text-white' : 'text-gray-600 hover:text-gray-900'}`}
                         >
-                            Açık
+                            Açık Uyarılar
                         </Button>
                         <Button
-                            variant={filter === 'CLOSED' ? 'primary' : 'ghost'}
+                            variant={filter === 'CLOSED' ? 'primary' : 'secondary'}
+                            size="sm"
                             onClick={() => setFilter('CLOSED')}
-                            className={`!h-8 !px-4 text-xs font-semibold rounded-md transition-all ${filter === 'CLOSED' ? 'shadow-sm text-white' : 'text-gray-600 hover:text-gray-900'}`}
                         >
-                            Kapalı
+                            Kapatılanlar
                         </Button>
                         <Button
-                            variant={filter === 'ALL' ? 'primary' : 'ghost'}
+                            variant={filter === 'ALL' ? 'primary' : 'secondary'}
+                            size="sm"
                             onClick={() => setFilter('ALL')}
-                            className={`!h-8 !px-4 text-xs font-semibold rounded-md transition-all ${filter === 'ALL' ? 'shadow-sm text-white' : 'text-gray-600 hover:text-gray-900'}`}
                         >
                             Tümü
                         </Button>
+                        <RefreshButton onClick={loadAlerts} loading={loading} />
                     </div>
                 }
             />
 
-            <DataTable
-                columns={[
-                    {
-                        key: 'created_at',
-                        header: 'Tarih',
-                        width: '180px',
-                        align: 'center',
-                        render: (alert: any) => (
-                            <div className="cell-date justify-center">
-                                <Clock size={14} className="text-gray-400" />
-                                {formatDate(alert.created_at)}
+            {loading ? (
+                <LoadingState message="Limit aşımları ve uyarılar yükleniyor..." />
+            ) : (
+                <DataTable
+                    columns={[
+                        { key: 'kod', header: 'Uyarı Kodu', width: '130px' },
+                        { key: 'baslik', header: 'Uyarı Başlığı & Detay', sortable: true, render: (item: any) => (
+                            <div>
+                                <div className="font-bold text-gray-900 text-sm">{item.baslik}</div>
+                                <div className="text-xs text-gray-500">{item.aciklama}</div>
                             </div>
-                        )
-                    },
-                    {
-                        key: 'kpi_kodu',
-                        header: 'KPI & Açıklama',
-                        render: (alert: any) => (
-                            <div className="flex flex-col gap-0.5">
-                                <div className="cell-title">{alert.kpi.aciklama}</div>
-                                <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-tighter">{alert.kpi_kodu}</div>
-                            </div>
-                        )
-                    },
-                    {
-                        key: 'senaryo_kodu',
-                        header: 'Senaryo',
-                        width: '120px',
-                        align: 'center',
-                        render: (alert: any) => (
-                            <span className="bg-slate-100 text-slate-600 text-[10px] px-2 py-1 rounded font-black uppercase tracking-wider border border-slate-200">
-                                {alert.senaryo_kodu}
-                            </span>
-                        )
-                    },
-                    {
-                        key: 'gerceklesen_deger',
-                        header: 'Değerler (G/E)',
-                        width: '150px',
-                        align: 'center',
-                        render: (alert: any) => (
-                            <div className="flex flex-col items-center">
-                                <div className="text-sm font-black text-slate-900">
-                                    {Number(alert.gerceklesen_deger).toFixed(4)}
-                                </div>
-                                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                                    Eşik: {Number(alert.esik_deger).toFixed(4)}
-                                </div>
-                            </div>
-                        )
-                    },
-                    {
-                        key: 'risk_seviyesi',
-                        header: 'Risk Seviyesi',
-                        width: '130px',
-                        align: 'center',
-                        render: (alert: any) => {
-                            const val = alert.risk_seviyesi === 'KRITIK' || alert.risk_seviyesi === 'YUKSEK' ? 'Kritik' : 
-                                       alert.risk_seviyesi === 'ORTA' ? 'Orta' : 'Düşük';
-                            return <StatusBadge type="risk" value={val} />;
-                        }
-                    },
-                    {
-                        key: 'durum',
-                        header: 'Durum',
-                        width: '120px',
-                        align: 'center',
-                        render: (alert: any) => (
-                            <StatusBadge 
-                                type="status" 
-                                value={alert.durum === 'OPEN' ? 'Yeni' : 'Tamamlandı'} 
-                            />
-                        )
-                    },
-                    {
-                        key: 'actions',
-                        header: 'İşlemler',
-                        width: '100px',
-                        align: 'center',
-                        render: (alert: any) => (
-                            <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                {alert.durum === 'OPEN' ? (
-                                    <ActionMenu items={[{ label: 'Uyarıyı Kapat', icon: X, variant: 'danger' as const, onClick: () => handleCloseAlert(alert.uyari_id) }]} />
-                                ) : (
-                                    <div className="w-9 h-9 flex items-center justify-center text-green-500 bg-green-50 rounded-lg border border-green-100 shadow-inner">
-                                        <CheckCircle size={20} />
-                                    </div>
-                                )}
-                            </div>
-                        )
-                    }
-                ]}
-                data={alerts}
-                loading={loading}
-                rowKey="uyari_id"
-                paginated={true}
-                itemsPerPage={10}
-                itemUnit="uyarı"
-                emptyIcon={AlertTriangle}
-                emptyTitle="Aktif Uyarı Bulunmuyor"
-                emptyDescription="Şu an için sistemde takip edilen bir risk uyarısı bulunmamaktadır."
-                className="shadow-sm border border-gray-100"
-            />
+                        ) },
+                        { key: 'seviye', header: 'Önem Seviyesi', width: '140px', render: (item: any) => <StatusBadge value={item.seviye} type="status" /> },
+                        { key: 'durum', header: 'Durum', width: '130px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
+                        { key: 'olusturmaTarihi', header: 'Tarih', width: '140px', render: (item: any) => formatDate(item.olusturmaTarihi) },
+                        { key: 'actions', header: 'İşlem', width: '120px', render: (item: any) => (
+                            item.durum === 'OPEN' ? (
+                                <Button variant="secondary" size="sm" onClick={() => setConfirmCloseId(item.id)}>
+                                    Kapat
+                                </Button>
+                            ) : (
+                                <span className="text-xs text-gray-400">Kapalı</span>
+                            )
+                        ) }
+                    ]}
+                    data={alerts}
+                    rowKey="id"
+                />
+            )}
 
             <ConfirmModal
                 isOpen={!!confirmCloseId}
                 onClose={() => setConfirmCloseId(null)}
-                onConfirm={executeCloseAlert}
                 title="Uyarıyı Kapat"
-                message="Bu risk uyarısını kapatmak istediğinize emin misiniz? Uyarı arşive taşınacaktır."
+                message="Bu risk uyarısını kapatmak istediğinize emin misiniz?"
                 confirmText="Evet, Kapat"
+                onConfirm={() => confirmCloseId && handleCloseAlert(confirmCloseId)}
             />
         </div>
     );
 }
 
+export default function AlertsPage() {
+    return (
+        <RequireRole allowedRoles={['ADMIN', 'RISK_ADMIN', 'RISK_MANAGER', 'RISK_ANALYST', 'SUPER_ADMIN']}>
+            <AlertsPageContent />
+        </RequireRole>
+    );
+}
