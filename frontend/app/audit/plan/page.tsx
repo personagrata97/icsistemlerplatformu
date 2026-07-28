@@ -532,16 +532,12 @@ export default function AuditPlanPage() {
                                 label="Plan Türü"
                                 value={newPlan.planType}
                                 onChange={(val) => setNewPlan({ ...newPlan, planType: val as any })}
-                                disabled={!hasAnnualPlan && !editingPlan}
                                 options={PLAN_TYPES.map(t => ({
                                     value: t,
                                     label: t + (t === 'Yıllık Plan' && hasAnnualPlan && !editingPlan ? ' (Mevcut)' : ''),
-                                    disabled: t === 'Yıllık Plan' && hasAnnualPlan && !editingPlan
+                                    disabled: editingPlan ? false : (t === 'Yıllık Plan' ? hasAnnualPlan : !hasAnnualPlan)
                                 }))}
                             />
-                            {!hasAnnualPlan && !editingPlan && (
-                                <p className="text-xs text-amber-600 mt-1">⚠ Önce yıllık plan oluşturulmalıdır</p>
-                            )}
                         </div>
                         <div className="form-group">
                             <CustomSelect

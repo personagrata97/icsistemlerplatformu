@@ -53,12 +53,12 @@ export default function SanctionSettingsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-md flex justify-between items-center">
+            <div className="bg-white border border-gray-200 text-gray-900 rounded-2xl p-6 shadow-sm flex justify-between items-center">
                 <div>
                     <h2 className="text-xl font-bold">{TERMS.sanctionModule} — Dinamik Eşik ve Parametre Yönetimi</h2>
-                    <p className="text-slate-300 text-xs mt-1">Yaptırım taraması ve itibar riski kural motorundaki tüm eşikleri merkezi yönetin. Koda gömülü sabit değer bulunmamaktadır.</p>
+                    <p className="text-gray-500 text-xs mt-1">Yaptırım taraması ve itibar riski kural motorundaki tüm eşikleri merkezi yönetin. Koda gömülü sabit değer bulunmamaktadır.</p>
                 </div>
-                <div className="px-4 py-2 bg-slate-800 rounded-xl text-xs font-semibold border border-slate-700">
+                <div className="px-4 py-2 bg-blue-50 text-blue-800 rounded-xl text-xs font-bold border border-blue-200">
                     Parametre Ayarları
                 </div>
             </div>
