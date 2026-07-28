@@ -17,7 +17,7 @@ export default function ControlStaffTabs() {
                 leftActions={
                     <SegmentedTabs
                         tabs={[
-                            { id: '/control/staff', label: 'Kontrolör Kadrosu & BKS', icon: Users },
+                            { id: '/control/staff', label: 'Denetçi Kadrosu & BKS', icon: Users },
                             { id: '/control/staff/calendar', label: 'Kapasite & Takvim', icon: Calendar },
                             { id: '/control/staff/timesheet', label: 'Efor & Zaman İzleme', icon: Clock },
                             { id: '/control/skills', label: 'Yetkinlik Matrisi', icon: Award },

@@ -138,7 +138,7 @@ export default function ControlExecutiveDashboard() {
             {activeTab === 'team' && (
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <StatCard title="İç Kontrolör Sayısı" value={8} icon={Users} color="blue" />
+                        <StatCard title="Denetçi Sayısı" value={8} icon={Users} color="blue" />
                         <StatCard title="Birim Kontrol Sorumlusu" value={24} icon={Shield} color="purple" />
                         <StatCard title="Ortalama Test/Kişi" value="10.8" icon={BarChart3} color="emerald" />
                         <StatCard title="Eğitim Tamamlama" value="%87" icon={Award} color="amber" />
@@ -146,7 +146,7 @@ export default function ControlExecutiveDashboard() {
 
                     <DataTable
                         columns={[
-                            { key: 'ad', header: 'Kontrolör / BKS', sortable: true, render: (item: any) => (
+                            { key: 'ad', header: 'Denetçi / BKS', sortable: true, render: (item: any) => (
                                 <div>
                                     <div className="font-bold text-slate-900 text-xs">{item.ad}</div>
                                     <div className="text-[11px] text-slate-500">{item.unvan}</div>
@@ -163,10 +163,10 @@ export default function ControlExecutiveDashboard() {
                             { key: 'durum', header: 'Durum', width: '120px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> }
                         ]}
                         data={[
-                            { ad: 'Ahmet Yılmaz', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 14, acikEksiklik: 2, egitimSaat: 32, durum: 'AKTİF' },
-                            { ad: 'Canan Öztürk', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 12, acikEksiklik: 1, egitimSaat: 28, durum: 'AKTİF' },
-                            { ad: 'Zeynep Kaya', unvan: 'İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 10, acikEksiklik: 3, egitimSaat: 24, durum: 'AKTİF' },
-                            { ad: 'Emre Aksoy', unvan: 'İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 8, acikEksiklik: 0, egitimSaat: 20, durum: 'AKTİF' },
+                            { ad: 'Ahmet Yılmaz', unvan: 'Başdenetçi', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 14, acikEksiklik: 2, egitimSaat: 32, durum: 'AKTİF' },
+                            { ad: 'Canan Öztürk', unvan: 'Başdenetçi', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 12, acikEksiklik: 1, egitimSaat: 28, durum: 'AKTİF' },
+                            { ad: 'Zeynep Kaya', unvan: 'Denetçi', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 10, acikEksiklik: 3, egitimSaat: 24, durum: 'AKTİF' },
+                            { ad: 'Emre Aksoy', unvan: 'Denetçi', birim: 'İç Kontrol ve Uyum Müdürlüğü', testSayisi: 8, acikEksiklik: 0, egitimSaat: 20, durum: 'AKTİF' },
                             { ad: 'Mehmet Demir', unvan: 'BKS — Tahsisat Servisi', birim: 'Tahsisat Servisi', testSayisi: 4, acikEksiklik: 1, egitimSaat: 16, durum: 'AKTİF' },
                             { ad: 'Ali Koç', unvan: 'BKS — Finans Servisi', birim: 'Finans Servisi', testSayisi: 5, acikEksiklik: 2, egitimSaat: 12, durum: 'AKTİF' },
                             { ad: 'Fatma Yıldız', unvan: 'BKS — Operasyon Servisi', birim: 'Operasyon Servisi', testSayisi: 6, acikEksiklik: 0, egitimSaat: 18, durum: 'AKTİF' },

@@ -166,7 +166,7 @@ export default function PharosControlDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <DashboardWidget 
                     title="Son Kontrol Testleri" 
-                    subtitle="İç Kontrolörler tarafından yürütülen son etkinlik testleri" 
+                    subtitle="Denetçiler tarafından yürütülen son etkinlik testleri" 
                     widgetType="audits" 
                     actionHref="/control/testing" 
                     actionLabel="Tüm Testlere Git"

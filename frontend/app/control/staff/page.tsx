@@ -68,8 +68,8 @@ interface ControlStaffMember {
     leaves: any[];
 }
 
-const CONTROL_TITLES = ['Bölüm Başkanı', 'Kıdemli İç Kontrolör', 'İç Kontrolör', 'Birim Kontrol Sorumlusu (BKS)'];
-const CONTROL_ROLES = ['İç Kontrol Yöneticisi', 'İç Kontrolör', 'Birim Kontrol Sorumlusu (BKS)'];
+const CONTROL_TITLES = ['İç Kontrol Müdürü', 'Başdenetçi', 'Denetçi', 'Yetkili Denetçi Yardımcısı', 'Denetçi Yardımcısı', 'Birim Kontrol Sorumlusu (BKS)'];
+const CONTROL_ROLES = ['İç Kontrol Müdürü', 'Başdenetçi', 'Denetçi', 'Birim Kontrol Sorumlusu (BKS)'];
 
 export default function ControlStaffPage() {
     const router = useRouter();
@@ -107,8 +107,8 @@ export default function ControlStaffPage() {
         {
             id: 'USR-IK-001',
             registrationNumber: 'IKM-001',
-            title: 'Kıdemli İç Kontrolör',
-            role: 'İç Kontrolör',
+            title: 'Başdenetçi',
+            role: 'Başdenetçi',
             firstName: 'Ahmet',
             lastName: 'Yılmaz',
             email: 'ahmet.yilmaz@banka.com',
@@ -130,15 +130,15 @@ export default function ControlStaffPage() {
                 { id: 'TRN-1', name: 'COSO 2013 Uygulama Kılavuzu', hours: 16, date: '2026-06-10', provider: 'İç Kontrol Merkezi' }
             ],
             promotions: [
-                { id: 'PRM-1', oldTitle: 'İç Kontrolör', newTitle: 'Kıdemli İç Kontrolör', date: '2022-01-01' }
+                { id: 'PRM-1', oldTitle: 'Denetçi', newTitle: 'Başdenetçi', date: '2022-01-01' }
             ],
             leaves: []
         },
         {
             id: 'USR-IK-002',
             registrationNumber: 'IKM-002',
-            title: 'Kıdemli İç Kontrolör',
-            role: 'İç Kontrolör',
+            title: 'Başdenetçi',
+            role: 'Başdenetçi',
             firstName: 'Canan',
             lastName: 'Öztürk',
             email: 'canan.ozturk@banka.com',
@@ -159,8 +159,8 @@ export default function ControlStaffPage() {
         {
             id: 'USR-IK-003',
             registrationNumber: 'IKM-003',
-            title: 'İç Kontrolör',
-            role: 'İç Kontrolör',
+            title: 'Denetçi',
+            role: 'Denetçi',
             firstName: 'Zeynep',
             lastName: 'Kaya',
             email: 'zeynep.kaya@banka.com',

@@ -45,9 +45,8 @@ export class AuditService {
 
     // Risk hesaplama: Sistem, Açık Bulgular/Risk Skoruna (RCM) göre Denetim Evrenini otomatik günceller
     // Risk hesaplama mantığı AuditRiskService'e taşındı.
-    async getAllAudits(user: any) {
+    async getAllAudits(user: any, options?: { page?: number; limit?: number; search?: string; status?: string }) {
         try {
-            // Ensure uploads directories exist
             const uploadsDir = path.join(process.cwd(), 'uploads');
             const workpapersDir = path.join(uploadsDir, 'workpapers');
             const evidenceDir = path.join(uploadsDir, 'evidence');
@@ -61,7 +60,6 @@ export class AuditService {
             const safeUser = user || { id: 'unknown', permissions: [], roles: [] };
 
             if (!this.isAdmin(safeUser)) {
-                // If permissions array is missing, default to empty to avoid crash
                 const perms = safeUser.permissions || [];
                 const auditViewPerm = perms.find((p: any) =>
                     (p.module === 'AUDIT' || p.module === 'ALL') &&
@@ -69,14 +67,11 @@ export class AuditService {
                 );
                 let scope = auditViewPerm?.scope || 'OWN';
 
-                // Security check for AUDIT_UNIT role
                 const roles = safeUser.roles?.map((r: any) => typeof r === 'string' ? r : r.code || r.role?.code) || [];
                 if (roles.includes('AUDIT_UNIT') && scope === 'ALL') {
                     this.logger.warn(`Security Warning: User ${safeUser.username} has AUDIT_UNIT role but ALL scope. Forcing DEPARTMENT scope.`);
                     scope = 'DEPARTMENT';
                 }
-
-                this.logger.debug(`AuditService.getAllAudits: Calculated Scope: ${scope}`);
 
                 if (scope === 'OWN') {
                     const orConditions: any[] = [
@@ -90,20 +85,33 @@ export class AuditService {
                 } else if (scope === 'DEPARTMENT') {
                     if (!safeUser.department) {
                         this.logger.warn('AuditService.getAllAudits: User has DEPARTMENT scope but no department defined. Returning empty list.');
-                        return [];
+                        return options?.page ? { data: [], total: 0, page: 1, limit: 50, totalPages: 0 } : [];
                     }
                     where.department = safeUser.department;
                 }
             }
 
-            // this.logger.debug('AuditService.getAllAudits: Generated WHERE clause');
+            if (options?.status) where.status = options.status;
+            if (options?.search) {
+                where.OR = [
+                    { title: { contains: options.search } },
+                    { auditCode: { contains: options.search } },
+                    { department: { contains: options.search } }
+                ];
+            }
+
+            const fullWhere = { ...where, isDeleted: false };
+            const total = await this.prisma.audit.count({ where: fullWhere });
+
+            const page = options?.page ? Math.max(1, Number(options.page)) : 1;
+            const limit = options?.limit ? Math.min(200, Math.max(1, Number(options.limit))) : (options?.page ? 50 : undefined);
+            const skip = limit ? (page - 1) * limit : undefined;
 
             const results = await this.prisma.audit.findMany({
-                where: {
-                    ...where,
-                    isDeleted: false
-                },
+                where: fullWhere,
                 orderBy: { created_at: 'desc' },
+                take: limit,
+                skip: skip,
                 include: {
                     findings: {
                         where: { isDeleted: false }
@@ -121,26 +129,35 @@ export class AuditService {
                 }
             });
 
-            // Map supervisorUser to supervisor if supervisor is missing or just an ID
             const mappedResults = results.map(audit => {
                 const auditObj: Record<string, any> = { ...audit };
                 if (audit.supervisorUser) {
                     auditObj.supervisor = audit.supervisorUser.displayName;
                 }
 
-                // Safely parse JSON fields (they might be plain strings, not JSON)
                 try { auditObj.team = auditObj.team ? JSON.parse(auditObj.team) : []; } catch { auditObj.team = auditObj.team ? [auditObj.team] : []; }
                 auditObj.workpapers = audit.workpaperFiles || [];
 
                 return auditObj;
             });
 
-            this.logger.log(`AuditService.getAllAudits: Found ${results.length} audits.`);
+            this.logger.log(`AuditService.getAllAudits: Found ${results.length} audits (Total: ${total}).`);
+
+            if (options?.page || options?.limit) {
+                return {
+                    data: mappedResults,
+                    total,
+                    page,
+                    limit: limit || 50,
+                    totalPages: Math.ceil(total / (limit || 50))
+                };
+            }
+
             return mappedResults;
 
         } catch (error) {
             this.logger.error('AuditService.getAllAudits CRITICAL ERROR:', error);
-            throw error; // Re-throw to let global filter handle 500, but now we have logs
+            throw error;
         }
     }
 

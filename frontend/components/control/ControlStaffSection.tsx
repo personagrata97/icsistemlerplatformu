@@ -20,9 +20,9 @@ export default function ControlStaffSection() {
     const [selectedStaff, setSelectedStaff] = useState<any>(null);
 
     const [staffList, setStaffList] = useState([
-        { id: 'KNT-01', ad: 'Canan Öztürk', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', rol: 'KONTROLÖR', uzmanlik: 'Tahsisat Servisi, Bilgi Teknolojileri Servisi', sertifikalar: 'CIA, CISA, ISO 27001 LA', tecrube: '8 Yıl' },
-        { id: 'KNT-02', ad: 'Ahmet Yılmaz', unvan: 'Kıdemli İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', rol: 'KONTROLÖR', uzmanlik: 'Finans Servisi, Muhasebe Servisi', sertifikalar: 'CFA, FRM, SPK Düzey 3', tecrube: '10 Yıl' },
-        { id: 'KNT-03', ad: 'Zeynep Kaya', unvan: 'İç Kontrolör', birim: 'İç Kontrol ve Uyum Müdürlüğü', rol: 'KONTROLÖR', uzmanlik: 'CRM ve Performans Servisi, Uyum', sertifikalar: 'CPA, KVKK Uzmanlığı', tecrube: '5 Yıl' },
+        { id: 'KNT-01', ad: 'Canan Öztürk', unvan: 'Başdenetçi', birim: 'İç Kontrol ve Uyum Müdürlüğü', rol: 'DENETÇİ', uzmanlik: 'Tahsisat Servisi, Bilgi Teknolojileri Servisi', sertifikalar: 'CIA, CISA, ISO 27001 LA', tecrube: '8 Yıl' },
+        { id: 'KNT-02', ad: 'Ahmet Yılmaz', unvan: 'Başdenetçi', birim: 'İç Kontrol ve Uyum Müdürlüğü', rol: 'DENETÇİ', uzmanlik: 'Finans Servisi, Muhasebe Servisi', sertifikalar: 'CFA, FRM, SPK Düzey 3', tecrube: '10 Yıl' },
+        { id: 'KNT-03', ad: 'Zeynep Kaya', unvan: 'Denetçi', birim: 'İç Kontrol ve Uyum Müdürlüğü', rol: 'DENETÇİ', uzmanlik: 'CRM ve Performans Servisi, Uyum', sertifikalar: 'CPA, KVKK Uzmanlığı', tecrube: '5 Yıl' },
         { id: 'BKS-01', ad: 'Mehmet Demir', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Tahsisat Servisi', rol: 'BKS', uzmanlik: 'Tahsisat ve Teminat İşlemleri', sertifikalar: 'Kredi Derecelendirme Sertifikası', tecrube: '12 Yıl' },
         { id: 'BKS-02', ad: 'Ayşe Şahin', unvan: 'Birim Kontrol Sorumlusu (BKS)', birim: 'Finans Servisi', rol: 'BKS', uzmanlik: 'Piyasa Riski, Likidite Kontrolü', sertifikalar: 'Hazine Lisansı', tecrube: '9 Yıl' },
     ]);

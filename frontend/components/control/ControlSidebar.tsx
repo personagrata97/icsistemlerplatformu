@@ -5,32 +5,35 @@ import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import {
     LayoutDashboard,
+    Target,
+    Users,
     Layers,
     FileCheck,
     ShieldCheck,
     AlertOctagon,
-    Users,
-    BookOpen,
     FileBarChart,
     Award,
-    Target,
+    BookOpen,
     History,
-    Bell,
-    Trash2
+    Trash2,
+    Send,
+    Shield,
+    Calendar
 } from 'lucide-react';
 import { useAuditTitle } from '@/context/AuditTitleContext';
 
 const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
     '/control': { title: 'Ana Panel', subtitle: 'İç Kontrol genel performans göstergeleri ve durum takibi' },
     '/control/executive': { title: 'Yönetici Paneli', subtitle: 'Üst yönetim özet göstergeleri ve stratejik iç kontrol metriklerinin takibi' },
-    '/control/staff': { title: 'Kontrolör Kadrosu (BKS)', subtitle: 'İç Kontrolör kadrosu ve Birim Kontrol Sorumluları (BKS) yönetimi' },
+    '/control/staff': { title: 'Denetçi Kadrosu (BKS)', subtitle: 'İç Kontrol Denetçi kadrosu ve Birim Kontrol Sorumluları (BKS) yönetimi' },
     '/control/inventory': { title: 'Süreç & Kontrol Envanteri', subtitle: 'Tüm operasyonel süreçlerde tanımlı kontrol noktaları ve etkinlik matrisi' },
     '/control/rcsa': { title: 'Birim Öz Değerlendirmeleri', subtitle: 'İş birimlerinin kendi süreç içi kontrollerini dönemsel değerlendirdiği öz değerlendirme modülü' },
-    '/control/testing': { title: 'Kontrol Testleri & Saha', subtitle: 'İç Kontrolörler tarafından gerçekleştirilen tasarım ve işletim etkinlik testleri' },
+    '/control/testing': { title: 'Kontrol Testleri & Saha', subtitle: 'İç Kontrol Denetçileri tarafından gerçekleştirilen tasarım ve işletim etkinlik testleri' },
     '/control/deficiencies': { title: 'Eksiklik Takibi', subtitle: 'Süreç içi kontrol testlerinde tespit edilen eksiklikler ve düzeltici aksiyon planları' },
+    '/control/conciliation': { title: 'Mutabakat ve Tebliğ', subtitle: 'Tespit edilen kontrol eksikliklerinin sorumlu birimlerle mutabakatı ve resmi tebliğ takibi' },
     '/control/reports': { title: 'Raporlar', subtitle: 'Üst Yönetim ve Denetim Komitesi sunumuna hazır Dönem Raporları' },
-    '/control/training': { title: 'Eğitim Kataloğu', subtitle: 'İç Kontrol personeli ve Birim Kontrol Sorumluları için eğitim programları' },
-    '/control/skills': { title: 'Yetkinlik Matrisi', subtitle: 'İç Kontrolörlerin uzmanlık alanları ve yetkinlik matrislerinin yönetimi' },
+    '/control/skills': { title: 'Yetkinlik Matrisi & Kalite', subtitle: 'İç Kontrol Denetçilerinin uzmanlık alanları ve yetkinlik matrislerinin yönetimi' },
+    '/control/training': { title: 'Eğitim Kataloğu & CPE', subtitle: 'İç Kontrol personeli ve Birim Kontrol Sorumluları için eğitim programları' },
     '/control/knowledge-base': { title: 'Bilgi Bankası', subtitle: 'İç kontrol rehberleri, COSO/BDDK standartları, prosedürler ve çalışma şablonları' },
     '/control/logs': { title: 'Denetim İzi', subtitle: 'İç Kontrol modülü işlem geçmişi ve değişiklik kayıtlarının takibi' },
     '/control/notifications': { title: 'Bildirimler', subtitle: 'İç Kontrol süreçlerine ait görev hatırlatmaları ve sistem bildirimlerinin takibi' },
@@ -67,7 +70,7 @@ export default function ControlSidebar() {
 
             <div className="sidebar-content flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-gray-300">
                 <ul className="nav-links space-y-2 px-2 py-3">
-                    {/* 1. YÖNETİM & ANALİZ */}
+                    {/* 1. YÖNETİM & ANALİZ (3 Item) */}
                     <li>
                         <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">YÖNETİM & ANALİZ</div>
                         <ul className="space-y-1">
@@ -92,9 +95,9 @@ export default function ControlSidebar() {
                         </ul>
                     </li>
 
-                    {/* 2. KONTROL ÇERÇEVESİ & İZLEME */}
+                    {/* 2. KONTROL ÇERÇEVESİ & İZLEME (3 Item) */}
                     <li className="pt-2 border-t border-slate-100">
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Kontrol Çerçevesi & İzleme</div>
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">KONTROL ÇERÇEVESİ & İZLEME</div>
                         <ul className="space-y-1">
                             <li className="nav-item">
                                 <Link href="/control/inventory" className={`nav-link ${isActive('/control/inventory') ? 'active' : ''}`}>
@@ -117,9 +120,9 @@ export default function ControlSidebar() {
                         </ul>
                     </li>
 
-                    {/* 3. EKSİKLİK, MUTABAKAT & AKSİYON YÖNETİMİ */}
+                    {/* 3. EKSİKLİK, MUTABAKAT & AKSİYONLAR (3 Item) */}
                     <li className="pt-2 border-t border-slate-100">
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Eksiklik & Mutabakat</div>
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">EKSİKLİK & AKSİYONLAR</div>
                         <ul className="space-y-1">
                             <li className="nav-item">
                                 <Link href="/control/deficiencies" className={`nav-link ${isActive('/control/deficiencies') ? 'active' : ''}`}>
@@ -129,7 +132,7 @@ export default function ControlSidebar() {
                             </li>
                             <li className="nav-item">
                                 <Link href="/control/conciliation" className={`nav-link ${isActive('/control/conciliation') ? 'active' : ''}`}>
-                                    <FileCheck size={18} />
+                                    <Send size={18} />
                                     <span>Mutabakat ve Tebliğ</span>
                                 </Link>
                             </li>
@@ -142,25 +145,49 @@ export default function ControlSidebar() {
                         </ul>
                     </li>
 
-                    {/* 4. EĞİTİM & YETKİNLİK */}
+                    {/* 4. EĞİTİM, BİLGİ & SİSTEM (6 Item -> Toplam 15) */}
                     <li className="pt-2 border-t border-slate-100">
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Eğitim & Yetkinlik</div>
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">EĞİTİM & SİSTEM</div>
                         <ul className="space-y-1">
                             <li className="nav-item">
-                                <Link href="/control/training" className={`nav-link ${isActive('/control/training') ? 'active' : ''}`}>
-                                    <BookOpen size={18} />
-                                    <span>Eğitim Kataloğu</span>
+                                <Link href="/control/skills" className={`nav-link ${isActive('/control/skills') ? 'active' : ''}`}>
+                                    <Shield size={18} />
+                                    <span>Yetkinlik Matrisi & Kalite</span>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link href="/control/skills" className={`nav-link ${isActive('/control/skills') ? 'active' : ''}`}>
-                                    <Award size={18} />
-                                    <span>Yetkinlik Matrisi</span>
+                                <Link href="/control/training" className={`nav-link ${isActive('/control/training') ? 'active' : ''}`}>
+                                    <BookOpen size={18} />
+                                    <span>Eğitim Kataloğu & CPE</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/knowledge-base" className={`nav-link ${isActive('/control/knowledge-base') ? 'active' : ''}`}>
+                                    <BookOpen size={18} />
+                                    <span>Bilgi Bankası</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/logs" className={`nav-link ${isActive('/control/logs') ? 'active' : ''}`}>
+                                    <History size={18} />
+                                    <span>İşlem Kayıtları (Log)</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/trash" className={`nav-link ${isActive('/control/trash') ? 'active' : ''}`}>
+                                    <Trash2 size={18} />
+                                    <span>Geri Dönüşüm Kutusu</span>
                                 </Link>
                             </li>
                         </ul>
                     </li>
                 </ul>
+            </div>
+
+            <div className="p-3 bg-gray-50/50 border-t border-gray-100 text-center">
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    COSO & BDDK Uyumlu
+                </div>
             </div>
         </aside>
     );

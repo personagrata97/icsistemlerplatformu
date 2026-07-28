@@ -34,9 +34,20 @@ export class AuditController {
 
     @Get('audits')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getAudits(@Request() req: any) {
+    async getAudits(
+        @Request() req: any,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+        @Query('search') search?: string,
+        @Query('status') status?: string,
+    ) {
         this.logger.log(`Denetim listesi istendi. Kullanıcı: ${req.user?.username}`);
-        return this.auditService.getAllAudits(req.user);
+        return this.auditService.getAllAudits(req.user, {
+            page: page ? parseInt(page) : undefined,
+            limit: limit ? parseInt(limit) : undefined,
+            search,
+            status,
+        });
     }
 
     // REPORTS & EXECUTIVE SUMMARY
