@@ -19,6 +19,7 @@ import ActionMenu from '@/components/ui/ActionMenu';
 import Button from '@/components/ui/Button';
 import PageToolbar from '@/components/ui/PageToolbar';
 import PartialCopyModal from '@/components/audit/PartialCopyModal';
+import RequireRole from '@/components/auth/RequireRole';
 
 interface ReportStats {
     totalAudits: number;
@@ -29,7 +30,7 @@ interface ReportStats {
     avgDuration: number;
 }
 
-export default function ReportsPage() {
+function ReportsPageContent() {
     const router = useRouter();
     const { showToast } = useToast();
     const [loading, setLoading] = useState(true);
@@ -287,11 +288,7 @@ export default function ReportsPage() {
                 )}
                 loading={loading}
                 searchTerm={searchTerm}
-                onClearFilters={() => setSearchTerm('')}
                 rowKey="id"
-                paginated={true}
-                itemsPerPage={itemsPerPage}
-                itemUnit="rapor"
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
                 onSort={handleSort}
@@ -305,11 +302,18 @@ export default function ReportsPage() {
                 onClose={() => setIsGenerateModalOpen(false)}
                 onGenerate={loadData}
             />
-            {/* Partial Copy Distribution Modal */}
             <PartialCopyModal
                 isOpen={isPartialModalOpen}
                 onClose={() => setIsPartialModalOpen(false)}
             />
         </div>
+    );
+}
+
+export default function ReportsPage() {
+    return (
+        <RequireRole allowedRoles={['ADMIN', 'AUDIT_ADMIN', 'AUDIT_MANAGER', 'AUDIT_LEAD', 'AUDITOR', 'SUPER_ADMIN']}>
+            <ReportsPageContent />
+        </RequireRole>
     );
 }

@@ -1853,3 +1853,123 @@ model FindingObjection {
   @@index([durum])
   @@map("finding_objection")
 }
+
+// ==========================================
+// PHAROS CONTROL (İÇ KONTROL MODÜLÜ TABLOLARI)
+// ==========================================
+
+model ControlItem {
+  id              String      @id @default(cuid())
+  code            String      @unique // örn: KNT-2026-001
+  title           String
+  description     String?
+  processName     String?     // Bağlı süreç
+  riskTitle       String?     // Bağlı risk
+  type            String      @default("Önleyici") // Önleyici, Tespit Edici, Düzeltici
+  method          String      @default("Otomatik") // Elle, Otomatik, Yarı Otomatik
+  frequency       String      @default("Sürekli") // Günlük, Haftalık, Aylık, Üç Aylık, Yıllık, Sürekli
+  owner           String?     // Kontrol Sahibi
+  department      String      // Sorumlu Birim
+  status          String      @default("Aktif") // Aktif, Pasif, Taslak
+  creatorId       String?
+  isDeleted       Boolean     @default(false)
+  deletedAt       DateTime?
+  deletedById     String?
+  deleteReason    String?
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+
+  tests           ControlTest[]
+  deficiencies    ControlDeficiency[]
+  selfAssessments ControlSelfAssessment[]
+
+  @@index([department])
+  @@index([status])
+  @@index([isDeleted])
+  @@map("control_item")
+}
+
+model ControlTest {
+  id              String         @id @default(cuid())
+  controlId       String
+  period          String         // örn: 2026-Q1
+  testMethod      String         // Örneklem, Tam Sayım, Mülakat, Gözlem
+  sampleSize      Int            @default(0)
+  testerId        String?
+  testerName      String?
+  testDate        DateTime       @default(now())
+  result          String         @default("ETKIN") // ETKIN, KISMEN_ETKIN, ETKIN_DEGIL
+  deviationCount  Int            @default(0)
+  description     String?
+  isDeleted       Boolean        @default(false)
+  deletedAt       DateTime?
+  deletedById     String?
+  deleteReason    String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  control         ControlItem    @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  deficiencies    ControlDeficiency[]
+
+  @@index([controlId])
+  @@index([result])
+  @@index([isDeleted])
+  @@map("control_test")
+}
+
+model ControlDeficiency {
+  id              String         @id @default(cuid())
+  code            String?        // örn: EKS-2026-001
+  controlId       String
+  testId          String?
+  severity        String         @default("Orta") // Kritik, Yüksek, Orta, Düşük
+  title           String
+  description     String
+  rootCause       String?
+  responsibleUnit String?
+  actionPlan      String?
+  dueDate         DateTime?
+  status          String         @default("Açık") // Açık, Aksiyon Alınıyor, Kapalı, İptal
+  closedAt        DateTime?
+  isDeleted       Boolean        @default(false)
+  deletedAt       DateTime?
+  deletedById     String?
+  deleteReason    String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  control         ControlItem    @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  test            ControlTest?   @relation(fields: [testId], references: [id], onDelete: SetNull)
+
+  @@index([controlId])
+  @@index([status])
+  @@index([severity])
+  @@index([isDeleted])
+  @@map("control_deficiency")
+}
+
+model ControlSelfAssessment {
+  id              String         @id @default(cuid())
+  department      String
+  period          String         // örn: 2026-Yıllık
+  controlId       String
+  selfRating      String         @default("Etkin") // Etkin, Kısmen Etkin, Etkin Değil
+  justification   String?
+  verifierId      String?
+  verifierName    String?
+  verificationResult String?      // Onaylandı, Revize İste, Reddedildi
+  verifiedAt      DateTime?
+  isDeleted       Boolean        @default(false)
+  deletedAt       DateTime?
+  deletedById     String?
+  deleteReason    String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  control         ControlItem    @relation(fields: [controlId], references: [id], onDelete: Cascade)
+
+  @@index([controlId])
+  @@index([department])
+  @@index([isDeleted])
+  @@map("control_self_assessment")
+}

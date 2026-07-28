@@ -137,8 +137,21 @@ export class AuditController {
     // FINDINGS
     @Get('findings')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getFindings(@Request() req: any) {
-        return this.findingService.getAllFindings(req.user);
+    async getFindings(
+        @Request() req: any,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+        @Query('search') search?: string,
+        @Query('status') status?: string,
+        @Query('risk') risk?: string,
+    ) {
+        return this.findingService.getAllFindings(req.user, {
+            page: page ? parseInt(page) : undefined,
+            limit: limit ? parseInt(limit) : undefined,
+            search,
+            status,
+            risk,
+        });
     }
 
     @Post('findings/check-recurring')

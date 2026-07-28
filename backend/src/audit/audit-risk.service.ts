@@ -124,8 +124,7 @@ export class AuditRiskService {
                 // Orta ve Düşük bulguları tarihçe cezasına katmıyoruz
             }
 
-            // --- ELITE: DINAMIK TEST SONUCU ENTEGRASYONU ---
-            // Birime ait son denetim testlerini kontrol et
+            // --- ELITE & 3 HAT ENTEGRASYONU: DİNAMİK İÇ KONTROL TEST SONUCU ---
             const unitTests = await this.prisma.auditTest.findMany({
                 where: {
                     control: {
@@ -142,11 +141,26 @@ export class AuditRiskService {
 
             let testPenalty = 0;
             if (unitTests.length > 0) {
-                const negativeTests = unitTests.filter(t => t.testResult === 'Olumsuz').length;
+                const negativeTests = unitTests.filter(t => t.testResult === 'Olumsuz' || t.testResult === 'ETKIN_DEGIL').length;
                 const failRate = negativeTests / unitTests.length;
                 
-                if (failRate > 0.5) testPenalty = 20; // Testlerin yarısından fazlası olumsuzsa ağır ceza
-                else if (negativeTests > 0) testPenalty = 10; // En az bir olumsuzluk varsa ceza
+                if (failRate > 0.5) testPenalty = 20;
+                else if (negativeTests > 0) testPenalty = 10;
+            }
+
+            // Pharos Control 2. Hat entegrasyonu: Etkin olmayan kontrol testleri riski yükseltir
+            const cosoControlTests = await this.prisma.controlTest.findMany({
+                where: {
+                    isDeleted: false,
+                    result: 'ETKIN_DEGIL',
+                    control: {
+                        department: unit.name
+                    }
+                }
+            });
+
+            if (cosoControlTests.length > 0) {
+                testPenalty += cosoControlTests.length * 15; // Her etkin olmayan 2. hat testi +15 risk cezası
             }
 
             // --- IIA 2010 ENTEGRASYONU: MEVZUAT & RİSK MOTORU ALARMLARI ---
