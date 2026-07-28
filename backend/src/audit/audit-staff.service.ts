@@ -394,23 +394,33 @@ export class AuditStaffService {
         }
     }
 
-    async deleteStaffPromotion(id: string, user: any) {
+    async deleteStaffPromotion(id: string, user: any, reason?: string) {
         const promo = await this.prisma.userPromotion.findUnique({ where: { id } });
         if (!promo) throw new NotFoundException('Terfi kaydı bulunamadı');
         if (!this.isAdmin(user)) throw new ForbiddenException('Yetkisiz işlem.');
+        const finalReason = (reason || user?.reason || '').trim();
+        if (!finalReason) throw new BadRequestException('Terfi kaydını silmek için gerekçe belirtilmesi zorunludur.');
 
         try {
-            await this.prisma.userPromotion.delete({ where: { id } });
+            const updated = await this.prisma.userPromotion.update({
+                where: { id },
+                data: {
+                    isDeleted: true,
+                    deletedAt: new Date(),
+                    deletedById: user.id || user.sub,
+                    deleteReason: finalReason,
+                }
+            });
 
             await this.auditLogService.createLog({ 
                 user: user.displayName || user.username || 'System',
-                action: 'Personel Terfi Silindi',
-                details: `Personel terfi kaydı silindi: ${promo.title}`,
+                action: 'Personel Terfi Silindi (Kurtarılabilir)',
+                details: `Personel terfi kaydı silindi: ${promo.title} — Gerekçe: ${finalReason}`,
                 targetType: 'Staff',
                 targetId: promo.userId
             });
 
-            return { success: true };
+            return updated;
         } catch (error) {
             this.logger.error('Terfi silinirken hata:', error);
             throw new Error('Terfi silinemedi.');
@@ -425,14 +435,15 @@ export class AuditStaffService {
             where: { id },
             include: {
                 roles: { include: { role: true } },
-                promotions: { orderBy: { promotionDate: 'desc' } },
-                experiences: { orderBy: { startDate: 'desc' } },
-                education: { orderBy: { graduationYear: 'desc' } },
+                promotions: { where: { isDeleted: false }, orderBy: { promotionDate: 'desc' } },
+                experiences: { where: { isDeleted: false }, orderBy: { startDate: 'desc' } },
+                education: { where: { isDeleted: false }, orderBy: { graduationYear: 'desc' } },
                 trainings: {
+                    where: { isDeleted: false },
                     orderBy: { startDate: 'desc' },
                     include: { batch: true }
                 },
-                leaves: { orderBy: { startDate: 'desc' } }
+                leaves: { where: { isDeleted: false }, orderBy: { startDate: 'desc' } }
             }
         });
         if (!staff) throw new NotFoundException('Personel bulunamadı');
@@ -569,22 +580,30 @@ export class AuditStaffService {
         return updated;
     }
 
-    async deleteStaffTraining(id: string, user: any) {
+    async deleteStaffTraining(id: string, user: any, reason?: string) {
         const training = await this.prisma.userTraining.findUnique({ where: { id } });
         if (!training) throw new NotFoundException('Eğitim bulunamadı');
         if (!this.isAdmin(user) && user.id !== training.userId) {
             throw new ForbiddenException('Eğitim silme işlemi için yetkiniz bulunmamaktadır.');
         }
+        const finalReason = (reason || user?.reason || '').trim();
+        if (!finalReason) throw new BadRequestException('Eğitim kaydını silmek için gerekçe belirtilmesi zorunludur.');
 
-        const deleted = await this.prisma.userTraining.delete({
-            where: { id }
+        const deleted = await this.prisma.userTraining.update({
+            where: { id },
+            data: {
+                isDeleted: true,
+                deletedAt: new Date(),
+                deletedById: user.id || user.sub,
+                deleteReason: finalReason,
+            }
         });
 
         const actorName = user?.displayName || user?.username || 'System';
         await this.auditLogService.createLog({
             user: actorName,
             action: 'PERSONEL_EGITIMI_SILINDI',
-            details: `Personel eğitim kaydı silindi: "${training.name}"`,
+            details: `Personel eğitim kaydı silindi (Kurtarılabilir): "${training.name}" — Gerekçe: ${finalReason}`,
             targetType: 'Staff',
             targetId: training.userId
         });
@@ -659,22 +678,33 @@ export class AuditStaffService {
         }
     }
 
-    async deleteStaffExperience(id: string, user: any) {
+    async deleteStaffExperience(id: string, user: any, reason?: string) {
         const exp = await this.prisma.userExperience.findUnique({ where: { id } });
         if (!exp) throw new NotFoundException('Deneyim bulunamadı');
         if (!this.isAdmin(user) && user.id !== exp.userId) throw new ForbiddenException('Yetkisiz işlem.');
+        const finalReason = (reason || user?.reason || '').trim();
+        if (!finalReason) throw new BadRequestException('Deneyim kaydını silmek için gerekçe belirtilmesi zorunludur.');
+
         try {
-            await this.prisma.userExperience.delete({ where: { id } });
+            const updated = await this.prisma.userExperience.update({
+                where: { id },
+                data: {
+                    isDeleted: true,
+                    deletedAt: new Date(),
+                    deletedById: user.id || user.sub,
+                    deleteReason: finalReason,
+                }
+            });
 
             await this.auditLogService.createLog({ 
                 user: user.displayName || user.username || 'System',
-                action: 'Personel Deneyimi Silindi',
-                details: `İş deneyimi silindi: ${exp.companyName} - ${exp.position}`,
+                action: 'Personel Deneyimi Silindi (Kurtarılabilir)',
+                details: `İş deneyimi silindi: ${exp.companyName} - ${exp.position} — Gerekçe: ${finalReason}`,
                 targetType: 'Staff',
                 targetId: exp.userId
             });
 
-            return { success: true };
+            return updated;
         } catch (error) {
             throw new Error('Deneyim silinirken hata oluştu.');
         }
@@ -745,24 +775,35 @@ export class AuditStaffService {
         }
     }
 
-    async deleteStaffEducation(id: string, user: any) {
+    async deleteStaffEducation(id: string, user: any, reason?: string) {
         const edu = await this.prisma.userEducation.findUnique({ where: { id } });
         if (!edu) throw new NotFoundException('Eğitim bilgisi bulunamadı');
         if (!this.isAdmin(user) && user.id !== edu.userId) throw new ForbiddenException('Yetkisiz işlem.');
+        const finalReason = (reason || user?.reason || '').trim();
+        if (!finalReason) throw new BadRequestException('Öğrenim kaydını silmek için gerekçe belirtilmesi zorunludur.');
+
         try {
-            await this.prisma.userEducation.delete({ where: { id } });
+            const updated = await this.prisma.userEducation.update({
+                where: { id },
+                data: {
+                    isDeleted: true,
+                    deletedAt: new Date(),
+                    deletedById: user.id || user.sub,
+                    deleteReason: finalReason,
+                }
+            });
 
             await this.auditLogService.createLog({ 
                 user: user.displayName || user.username || 'System',
-                action: 'Personel Eğitimi Silindi',
-                details: `Eğitim bilgisi silindi: ${edu.schoolName} - ${edu.department}`,
+                action: 'Personel Öğrenimi Silindi (Kurtarılabilir)',
+                details: `Öğrenim bilgisi silindi: ${edu.schoolName} - ${edu.department} — Gerekçe: ${finalReason}`,
                 targetType: 'Staff',
                 targetId: edu.userId
             });
 
-            return { success: true };
+            return updated;
         } catch (error) {
-            throw new Error('Eğitim silinirken hata oluştu.');
+            throw new Error('Öğrenim silinirken hata oluştu.');
         }
     }
 
@@ -932,20 +973,31 @@ export class AuditStaffService {
         return updated;
     }
 
-    async deleteStaffLeave(id: string, user: any) {
+    async deleteStaffLeave(id: string, user: any, reason?: string) {
         const leave = await this.prisma.userLeave.findUnique({ where: { id } });
         if (!leave) throw new NotFoundException('İzin bulunamadı');
 
         if (!this.isAdmin(user) && user.id !== leave.userId) {
-            throw new ForbiddenException('Eğitim silme işlemi için yetkiniz bulunmamaktadır.');
+            throw new ForbiddenException('İzin silme işlemi için yetkiniz bulunmamaktadır.');
         }
 
-        const deleted = await this.prisma.userLeave.delete({ where: { id } });
+        const finalReason = (reason || user?.reason || '').trim();
+        if (!finalReason) throw new BadRequestException('İzin kaydını silmek için gerekçe belirtilmesi zorunludur.');
+
+        const deleted = await this.prisma.userLeave.update({
+            where: { id },
+            data: {
+                isDeleted: true,
+                deletedAt: new Date(),
+                deletedById: user.id || user.sub,
+                deleteReason: finalReason,
+            }
+        });
 
         await this.auditLogService.createLog({
             user: user?.displayName || user?.username || 'System',
             action: 'PERSONEL_IZNI_SILINDI',
-            details: `Personel izin kaydı silindi: "${leave.type}"`,
+            details: `Personel izin kaydı silindi (Kurtarılabilir): "${leave.type}" — Gerekçe: ${finalReason}`,
             targetType: 'Staff',
             targetId: leave.userId
         });

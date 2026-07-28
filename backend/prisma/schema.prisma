@@ -1483,11 +1483,16 @@ model UserTraining {
   hours       Int? // Certificate/CPE hours
   status      String         @default("Planlandı") // Planlandı, Tamamlandı, İptal Edildi
   description String?
+  isDeleted   Boolean        @default(false)
+  deletedAt   DateTime?
+  deletedById String?
+  deleteReason String?
   created_at  DateTime       @default(now())
   updated_at  DateTime       @updatedAt
   user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   batch       TrainingBatch? @relation(fields: [batchId], references: [id])
 
+  @@index([isDeleted])
   @@map("user_training")
 }
 
@@ -1518,10 +1523,15 @@ model UserPromotion {
   promotionDate DateTime
   endDate       DateTime? // Bitiş tarihi (varsa)
   notes         String?
+  isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
+  deletedById   String?
+  deleteReason  String?
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([isDeleted])
   @@map("user_promotion")
 }
 
@@ -1536,10 +1546,15 @@ model UserExperience {
   description String?
   careerPaths String?   @default("[]") // JSON string for role transitions
   isCurrent   Boolean   @default(false)
+  isDeleted   Boolean   @default(false)
+  deletedAt   DateTime?
+  deletedById String?
+  deleteReason String?
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([isDeleted])
   @@map("user_experience")
 }
 
@@ -1553,10 +1568,15 @@ model UserEducation {
   graduationYear Int?
   startDate      DateTime?
   endDate        DateTime?
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+  deletedById    String?
+  deleteReason   String?
   created_at     DateTime  @default(now())
   updated_at     DateTime  @updatedAt
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([isDeleted])
   @@map("user_education")
 }
 
@@ -1566,10 +1586,15 @@ model UserCertificate {
   name       String
   provider   String?
   date       String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isDeleted  Boolean   @default(false)
+  deletedAt  DateTime?
+  deletedById String?
+  deleteReason String?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([isDeleted])
   @@map("user_certificate")
 }
 
@@ -1645,6 +1670,10 @@ model UserLeave {
     proxyUserId   String?   // Vekaleten bakacak kişi
     description   String?
     managerNote   String?   // Yönetici notu / Ret gerekçesi
+    isDeleted     Boolean   @default(false)
+    deletedAt     DateTime?
+    deletedById   String?
+    deleteReason  String?
     created_at    DateTime  @default(now())
     updated_at    DateTime  @updatedAt
 
