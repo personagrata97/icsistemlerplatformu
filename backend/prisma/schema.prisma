@@ -1918,34 +1918,71 @@ model ControlTest {
 }
 
 model ControlDeficiency {
-  id              String         @id @default(cuid())
-  code            String?        // örn: EKS-2026-001
-  controlId       String
-  testId          String?
-  severity        String         @default("Orta") // Kritik, Yüksek, Orta, Düşük
-  title           String
-  description     String
-  rootCause       String?
-  responsibleUnit String?
-  actionPlan      String?
-  dueDate         DateTime?
-  status          String         @default("Açık") // Açık, Aksiyon Alınıyor, Kapalı, İptal
-  closedAt        DateTime?
-  isDeleted       Boolean        @default(false)
-  deletedAt       DateTime?
-  deletedById     String?
-  deleteReason    String?
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
+  id                  String         @id @default(cuid())
+  code                String?        // örn: EKS-2026-001
+  controlId           String
+  testId              String?
+  severity            String         @default("Orta") // Kritik, Yüksek, Orta, Düşük
+  title               String
+  description         String
+  rootCause           String?
+  responsibleUnit     String?
+  actionPlan          String?
+  dueDate             DateTime?
+  status              String         @default("Taslak") // Taslak, Mutabakata Gönderildi, Uzlaşıldı, Uyuşmazlık, Tebliğ Edildi, Aksiyonda, Kapalı, İptal
+  closedAt            DateTime?
 
-  control         ControlItem    @relation(fields: [controlId], references: [id], onDelete: Cascade)
-  test            ControlTest?   @relation(fields: [testId], references: [id], onDelete: SetNull)
+  // Mutabakat ve Tebliğ Akışı Fields
+  sentToUnitAt        DateTime?
+  sentToUnitById      String?
+  replyDeadline       DateTime?
+  unitResponse        String?        // BEKLEMEDE, KATILIYOR, KISMEN_KATILIYOR, KATILMIYOR
+  unitResponseReason  String?
+  unitResponseById    String?
+  unitRespondedAt     DateTime?
+  conciliationStatus  String         @default("BEKLEMEDE") // BEKLEMEDE, UZLASILDI, UYUSMAZLIK, UST_YONETIM
+  evaluationReason    String?
+  evaluatedById       String?
+  notifiedAt          DateTime?
+  notifiedById        String?
+
+  isDeleted           Boolean        @default(false)
+  deletedAt           DateTime?
+  deletedById         String?
+  deleteReason        String?
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+
+  control             ControlItem    @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  test                ControlTest?   @relation(fields: [testId], references: [id], onDelete: SetNull)
+  evidences           ControlActionEvidence[]
 
   @@index([controlId])
   @@index([status])
   @@index([severity])
   @@index([isDeleted])
   @@map("control_deficiency")
+}
+
+model ControlActionEvidence {
+  id              String            @id @default(cuid())
+  deficiencyId    String
+  fileName        String
+  filePath        String?
+  description     String?
+  uploadedById    String
+  uploadedAt      DateTime          @default(now())
+  approvalStatus  String            @default("BEKLEMEDE") // BEKLEMEDE, ONAYLANDI, REDDEDILDI
+  approvedById    String?
+  approvedAt      DateTime?
+  rejectionReason String?
+  created_at      DateTime          @default(now())
+
+  deficiency      ControlDeficiency @relation(fields: [deficiencyId], references: [id], onDelete: Cascade)
+
+  @@index([deficiencyId])
+  @@index([approvalStatus])
+  @@map("control_action_evidence")
 }
 
 model ControlSelfAssessment {

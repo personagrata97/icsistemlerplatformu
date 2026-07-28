@@ -92,6 +92,75 @@ export class ControlController {
         return this.controlService.updateDeficiencyStatus(id, status, userId, actionPlan);
     }
 
+    // Mutabakata Gönder
+    @Post('deficiencies/:id/send-to-conciliation')
+    @RequirePermissions({ module: 'CONTROL', action: 'MANAGE' })
+    async sendToConciliation(@Param('id') id: string, @Request() req: any) {
+        const userId = req.user?.id || req.user?.sub;
+        return this.controlService.sendToConciliation(id, userId);
+    }
+
+    // Birim Mutabakat Yanıtı Gir
+    @Post('deficiencies/:id/unit-response')
+    @RequirePermissions({ module: 'CONTROL', action: 'VIEW' })
+    async submitUnitResponse(
+        @Param('id') id: string,
+        @Body('response') response: 'KATILIYOR' | 'KISMEN_KATILIYOR' | 'KATILMIYOR',
+        @Body('reason') reason: string,
+        @Request() req: any,
+    ) {
+        const userId = req.user?.id || req.user?.sub;
+        return this.controlService.submitUnitResponse(id, response, reason, userId);
+    }
+
+    // Mutabakat Değerlendirme Kararı (İç Kontrol Yöneticisi)
+    @Post('deficiencies/:id/decide-conciliation')
+    @RequirePermissions({ module: 'CONTROL', action: 'MANAGE' })
+    async decideConciliation(
+        @Param('id') id: string,
+        @Body('decision') decision: 'UZLASILDI' | 'UST_YONETIM',
+        @Body('reason') reason: string,
+        @Request() req: any,
+    ) {
+        const userId = req.user?.id || req.user?.sub;
+        return this.controlService.decideConciliation(id, decision, reason, userId);
+    }
+
+    // Resmi Tebliğ Et
+    @Post('deficiencies/:id/notify')
+    @RequirePermissions({ module: 'CONTROL', action: 'MANAGE' })
+    async officiallyNotify(@Param('id') id: string, @Request() req: any) {
+        const userId = req.user?.id || req.user?.sub;
+        return this.controlService.officiallyNotify(id, userId);
+    }
+
+    // Kanıt Yükle
+    @Post('deficiencies/:id/evidences')
+    @RequirePermissions({ module: 'CONTROL', action: 'VIEW' })
+    async uploadEvidence(
+        @Param('id') id: string,
+        @Body('fileName') fileName: string,
+        @Body('description') description: string,
+        @Body('filePath') filePath: string,
+        @Request() req: any,
+    ) {
+        const userId = req.user?.id || req.user?.sub;
+        return this.controlService.uploadEvidence(id, fileName, description, userId, filePath);
+    }
+
+    // Kanıt Değerlendir (Onayla / Reddet)
+    @Put('evidences/:id/approval')
+    @RequirePermissions({ module: 'CONTROL', action: 'MANAGE' })
+    async approveEvidence(
+        @Param('id') id: string,
+        @Body('approvalStatus') approvalStatus: 'ONAYLANDI' | 'REDDEDILDI',
+        @Body('rejectionReason') rejectionReason: string,
+        @Request() req: any,
+    ) {
+        const userId = req.user?.id || req.user?.sub;
+        return this.controlService.approveEvidence(id, approvalStatus, rejectionReason, userId);
+    }
+
     // Birim Öz Değerlendirme Listeleme
     @Get('self-assessment')
     @RequirePermissions({ module: 'CONTROL', action: 'VIEW' })

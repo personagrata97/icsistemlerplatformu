@@ -86,7 +86,7 @@ export default function ControlSidebar() {
                             <li className="nav-item">
                                 <Link href="/control/staff" className={`nav-link ${isActive('/control/staff') ? 'active' : ''}`}>
                                     <Users size={18} />
-                                    <span>Kontrolör Kadrosu (BKS)</span>
+                                    <span>Denetçi Kadrosu (BKS)</span>
                                 </Link>
                             </li>
                         </ul>
@@ -117,14 +117,20 @@ export default function ControlSidebar() {
                         </ul>
                     </li>
 
-                    {/* 3. EKSİKLİK & AKSİYON YÖNETİMİ */}
+                    {/* 3. EKSİKLİK, MUTABAKAT & AKSİYON YÖNETİMİ */}
                     <li className="pt-2 border-t border-slate-100">
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Eksiklik & Aksiyonlar</div>
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">Eksiklik & Mutabakat</div>
                         <ul className="space-y-1">
                             <li className="nav-item">
                                 <Link href="/control/deficiencies" className={`nav-link ${isActive('/control/deficiencies') ? 'active' : ''}`}>
                                     <AlertOctagon size={18} />
                                     <span>Eksiklik Takibi</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/control/conciliation" className={`nav-link ${isActive('/control/conciliation') ? 'active' : ''}`}>
+                                    <FileCheck size={18} />
+                                    <span>Mutabakat ve Tebliğ</span>
                                 </Link>
                             </li>
                             <li className="nav-item">

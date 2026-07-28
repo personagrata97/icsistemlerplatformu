@@ -222,9 +222,168 @@ export class ControlService {
             orderBy: { created_at: 'desc' },
             include: {
                 control: { select: { id: true, code: true, title: true, department: true } },
-                test: true
+                test: true,
+                evidences: true
             }
         });
+    }
+
+    // ─── MUTABAKAT & TEBLİĞ İŞ AKIŞI ─────────────────────────────────────
+    async sendToConciliation(deficiencyId: string, userId: string) {
+        const def = await this.prisma.controlDeficiency.findUnique({ where: { id: deficiencyId } });
+        if (!def) throw new NotFoundException('Eksiklik kaydı bulunamadı');
+
+        const updated = await this.prisma.controlDeficiency.update({
+            where: { id: deficiencyId },
+            data: {
+                status: 'Mutabakata Gönderildi',
+                sentToUnitAt: new Date(),
+                sentToUnitById: userId,
+                replyDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 gün yanıt süresi
+                unitResponse: 'BEKLEMEDE',
+                conciliationStatus: 'BEKLEMEDE'
+            }
+        });
+
+        await this.auditLogService.createLog({
+            user: userId,
+            action: 'KONTROL_EKSIKLIGI_MUTABAKATA_GONDERILDI',
+            details: `Eksiklik kaydı "${def.code || def.id}" sorumlu birime mutabakat için gönderildi.`,
+            targetType: 'Control',
+            targetId: def.controlId
+        });
+
+        return updated;
+    }
+
+    async submitUnitResponse(deficiencyId: string, response: 'KATILIYOR' | 'KISMEN_KATILIYOR' | 'KATILMIYOR', reason: string, userId: string) {
+        const def = await this.prisma.controlDeficiency.findUnique({ where: { id: deficiencyId } });
+        if (!def) throw new NotFoundException('Eksiklik kaydı bulunamadı');
+
+        const updated = await this.prisma.controlDeficiency.update({
+            where: { id: deficiencyId },
+            data: {
+                unitResponse: response,
+                unitResponseReason: reason,
+                unitResponseById: userId,
+                unitRespondedAt: new Date(),
+                status: response === 'KATILIYOR' ? 'Uzlaşıldı' : 'Uyuşmazlık',
+                conciliationStatus: response === 'KATILIYOR' ? 'UZLASILDI' : 'UYUSMAZLIK'
+            }
+        });
+
+        await this.auditLogService.createLog({
+            user: userId,
+            action: 'MUTABAKAT_BIRIM_YANITI_GIRILDI',
+            details: `Sorumlu birim yanıt verdi: ${response} — Gerekçe: ${reason}`,
+            targetType: 'Control',
+            targetId: def.controlId
+        });
+
+        return updated;
+    }
+
+    async decideConciliation(deficiencyId: string, decision: 'UZLASILDI' | 'UST_YONETIM', reason: string, userId: string) {
+        const updated = await this.prisma.controlDeficiency.update({
+            where: { id: deficiencyId },
+            data: {
+                conciliationStatus: decision,
+                evaluationReason: reason,
+                evaluatedById: userId,
+                status: decision === 'UZLASILDI' ? 'Uzlaşıldı' : 'Üst Yönetim Değerlendirmesinde'
+            }
+        });
+
+        await this.auditLogService.createLog({
+            user: userId,
+            action: 'MUTABAKAT_KARARI_VERILDI',
+            details: `İç Kontrol Müdürü mutabakat kararı verdi: ${decision}`,
+            targetType: 'Control',
+            targetId: updated.controlId
+        });
+
+        return updated;
+    }
+
+    async officiallyNotify(deficiencyId: string, userId: string) {
+        const def = await this.prisma.controlDeficiency.findUnique({ where: { id: deficiencyId } });
+        if (!def) throw new NotFoundException('Eksiklik kaydı bulunamadı');
+
+        const updated = await this.prisma.controlDeficiency.update({
+            where: { id: deficiencyId },
+            data: {
+                status: 'Tebliğ Edildi',
+                notifiedAt: new Date(),
+                notifiedById: userId
+            }
+        });
+
+        await this.auditLogService.createLog({
+            user: userId,
+            action: 'KONTROL_EKSIKLIGI_RESMEN_TEBLIG_EDILDI',
+            details: `Eksiklik kaydı "${def.code || def.id}" birime resmen tebliğ edildi. Aksiyon süreci başladı.`,
+            targetType: 'Control',
+            targetId: def.controlId
+        });
+
+        return updated;
+    }
+
+    async uploadEvidence(deficiencyId: string, fileName: string, description: string, userId: string, filePath?: string) {
+        const evidence = await this.prisma.controlActionEvidence.create({
+            data: {
+                deficiencyId,
+                fileName,
+                filePath,
+                description,
+                uploadedById: userId,
+                approvalStatus: 'BEKLEMEDE'
+            }
+        });
+
+        await this.prisma.controlDeficiency.update({
+            where: { id: deficiencyId },
+            data: { status: 'Aksiyonda' }
+        });
+
+        await this.auditLogService.createLog({
+            user: userId,
+            action: 'TEST_KANITI_YUKLENDI',
+            details: `Aksiyon/Test kanıtı yüklendi: "${fileName}"`,
+            targetType: 'Control',
+            targetId: deficiencyId
+        });
+
+        return evidence;
+    }
+
+    async approveEvidence(evidenceId: string, approvalStatus: 'ONAYLANDI' | 'REDDEDILDI', rejectionReason: string, userId: string) {
+        const evidence = await this.prisma.controlActionEvidence.update({
+            where: { id: evidenceId },
+            data: {
+                approvalStatus,
+                approvedById: userId,
+                approvedAt: new Date(),
+                rejectionReason: approvalStatus === 'REDDEDILDI' ? rejectionReason : null
+            }
+        });
+
+        if (approvalStatus === 'ONAYLANDI') {
+            await this.prisma.controlDeficiency.update({
+                where: { id: evidence.deficiencyId },
+                data: { status: 'Kapalı', closedAt: new Date() }
+            });
+        }
+
+        await this.auditLogService.createLog({
+            user: userId,
+            action: 'TEST_KANITI_DEGERLENDIRILDI',
+            details: `Kanıt kararı: ${approvalStatus}`,
+            targetType: 'Control',
+            targetId: evidence.deficiencyId
+        });
+
+        return evidence;
     }
 
     async updateDeficiencyStatus(id: string, status: string, userId: string, actionPlan?: string) {

@@ -14,6 +14,7 @@ import ActionMenu from '@/components/ui/ActionMenu';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import Checkbox from '@/components/ui/Checkbox';
 import { useToast } from '@/components/Toast';
+import RequireRole from '@/components/auth/RequireRole';
 
 type TrashItemType = 'kontrol' | 'test' | 'eksiklik' | 'rapor' | 'dokuman';
 
@@ -43,7 +44,7 @@ const TYPE_COLORS: Record<TrashItemType, string> = {
     dokuman: 'bg-amber-100 text-amber-800'
 };
 
-export default function ControlTrashPage() {
+function ControlTrashPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<string[]>([]);
@@ -235,5 +236,13 @@ export default function ControlTrashPage() {
                 onConfirm={() => confirmPermanentDelete.item && handlePermanentDelete(confirmPermanentDelete.item)}
             />
         </div>
+    );
+}
+
+export default function ControlTrashPage() {
+    return (
+        <RequireRole allowedRoles={['ADMIN', 'AUDIT_ADMIN', 'CONTROL_ADMIN', 'CONTROL_OFFICER', 'CONTROL_MANAGER', 'SUPER_ADMIN']}>
+            <ControlTrashPageContent />
+        </RequireRole>
     );
 }

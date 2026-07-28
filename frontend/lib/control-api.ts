@@ -73,6 +73,58 @@ export const controlApi = {
         return handleResponse(res);
     },
 
+    sendToConciliation: async (id: string) => {
+        const res = await fetch(`${API_BASE_URL}/control/deficiencies/${id}/send-to-conciliation`, {
+            method: 'POST',
+            headers: getHeaders(),
+        });
+        return handleResponse(res);
+    },
+
+    submitUnitResponse: async (id: string, response: 'KATILIYOR' | 'KISMEN_KATILIYOR' | 'KATILMIYOR', reason: string) => {
+        const res = await fetch(`${API_BASE_URL}/control/deficiencies/${id}/unit-response`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ response, reason }),
+        });
+        return handleResponse(res);
+    },
+
+    decideConciliation: async (id: string, decision: 'UZLASILDI' | 'UST_YONETIM', reason: string) => {
+        const res = await fetch(`${API_BASE_URL}/control/deficiencies/${id}/decide-conciliation`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ decision, reason }),
+        });
+        return handleResponse(res);
+    },
+
+    officiallyNotify: async (id: string) => {
+        const res = await fetch(`${API_BASE_URL}/control/deficiencies/${id}/notify`, {
+            method: 'POST',
+            headers: getHeaders(),
+        });
+        return handleResponse(res);
+    },
+
+    uploadEvidence: async (id: string, fileName: string, description: string, filePath?: string) => {
+        const res = await fetch(`${API_BASE_URL}/control/deficiencies/${id}/evidences`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ fileName, description, filePath }),
+        });
+        return handleResponse(res);
+    },
+
+    approveEvidence: async (id: string, approvalStatus: 'ONAYLANDI' | 'REDDEDILDI', rejectionReason?: string) => {
+        const res = await fetch(`${API_BASE_URL}/control/evidences/${id}/approval`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify({ approvalStatus, rejectionReason }),
+        });
+        return handleResponse(res);
+    },
+
     getSelfAssessments: async (department?: string) => {
         const url = department ? `${API_BASE_URL}/control/self-assessment?department=${department}` : `${API_BASE_URL}/control/self-assessment`;
         const res = await fetch(url, { headers: getHeaders() });

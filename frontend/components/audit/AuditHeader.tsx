@@ -35,6 +35,13 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
     const isAdmin = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_MANAGER');
     const isAuditor = isAdmin || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_INSPECTOR');
 
+    // Modül Sızıntısı Önleme: URL path'ine göre modül bağlamını oku
+    const currentModule = pathname?.startsWith('/control') 
+        ? 'control' 
+        : pathname?.startsWith('/risk') 
+        ? 'risk' 
+        : 'audit';
+
     return (
         <header className="header flex items-center justify-between h-20 bg-white border-b border-gray-200 px-8">
             <div className="flex items-center">
@@ -72,19 +79,15 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
                     </Link>
                 </Tooltip>
                 
-                {/* Knowledge Base */}
-                {(isAuditor || pathname?.startsWith('/control')) && (
-                    <Tooltip content="Bilgi Bankası" position="bottom">
-                        <Link 
-                            href={pathname?.startsWith('/control') ? "/control/knowledge-base" : "/audit/knowledge-base"} 
-                            className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                        >
-                            <BookOpen size={20} />
-                        </Link>
-                    </Tooltip>
-                )}
-
-
+                {/* Knowledge Base (Her Modülün Kendi Bilgi Bankası) */}
+                <Tooltip content="Bilgi Bankası" position="bottom">
+                    <Link 
+                        href={`/${currentModule}/knowledge-base`}
+                        className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                    >
+                        <BookOpen size={20} />
+                    </Link>
+                </Tooltip>
 
                 <div className="w-px h-6 bg-gray-200 mx-2 hidden md:block"></div>
 
@@ -101,41 +104,38 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
                             <p className="text-xs text-gray-500 mt-1">{ROLE_MAP[user.roles[0]] || user.roles[0]?.replace('AUDIT_', '') || 'Kullanıcı'}</p>
                         </div>
                         
-                        {/* MFA / Sistem ve Güvenlik Ayarları Dropdown */}
-                        {(isAuditor || pathname?.startsWith('/control')) ? (
-                            <div className="relative" ref={settingsRef}>
-                                <Tooltip content="Sistem Ayarları" position="bottom">
-                                    <button 
-                                        onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                                        className={`p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors ${isSettingsOpen ? 'bg-primary/5 text-primary' : 'bg-gray-50'}`}
-                                    >
-                                        <Settings size={18} />
-                                    </button>
-                                </Tooltip>
-                                
-                                {isSettingsOpen && (
-                                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                                        <DropdownHeader title="Sistem & Güvenlik" />
-                                        <div className="p-2 space-y-1">
-
-                                            <Link href={pathname?.startsWith('/control') ? "/control/logs" : "/audit/logs"} onClick={() => setIsSettingsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary rounded-lg transition-colors group">
-                                                <div className="flex items-center gap-3 w-full">
-                                                    <History size={16} className="text-gray-400 group-hover:text-primary transition-colors" />
-                                                    <span>Denetim İzi</span>
-                                                </div>
-                                            </Link>
-                                            <div className="h-px bg-gray-100 my-1"></div>
-                                            <Link href={pathname?.startsWith('/control') ? "/control/trash" : "/audit/trash"} onClick={() => setIsSettingsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors group">
-                                                <div className="flex items-center gap-3 w-full">
-                                                    <Trash2 size={16} className="text-red-400 group-hover:text-red-600 transition-colors" />
-                                                    <span>Silinen Kayıtlar</span>
-                                                </div>
-                                            </Link>
-                                        </div>
+                        {/* Sistem ve Güvenlik Ayarları Dropdown (Modül Bağlamında) */}
+                        <div className="relative" ref={settingsRef}>
+                            <Tooltip content="Sistem Ayarları" position="bottom">
+                                <button 
+                                    onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                                    className={`p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors ${isSettingsOpen ? 'bg-primary/5 text-primary' : 'bg-gray-50'}`}
+                                >
+                                    <Settings size={18} />
+                                </button>
+                            </Tooltip>
+                            
+                            {isSettingsOpen && (
+                                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                    <DropdownHeader title="Sistem & Güvenlik" />
+                                    <div className="p-2 space-y-1">
+                                        <Link href={`/${currentModule}/logs`} onClick={() => setIsSettingsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary rounded-lg transition-colors group">
+                                            <div className="flex items-center gap-3 w-full">
+                                                <History size={16} className="text-gray-400 group-hover:text-primary transition-colors" />
+                                                <span>İşlem Kayıtları (Log)</span>
+                                            </div>
+                                        </Link>
+                                        <div className="h-px bg-gray-100 my-1"></div>
+                                        <Link href={`/${currentModule}/trash`} onClick={() => setIsSettingsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors group">
+                                            <div className="flex items-center gap-3 w-full">
+                                                <Trash2 size={16} className="text-red-400 group-hover:text-red-600 transition-colors" />
+                                                <span>Geri Dönüşüm Kutusu</span>
+                                            </div>
+                                        </Link>
                                     </div>
-                                )}
-                            </div>
-                        ) : null}
+                                </div>
+                            )}
+                        </div>
 
                         {/* Çıkış */}
                         {!hideLogout && (
