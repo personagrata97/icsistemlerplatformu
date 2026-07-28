@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
@@ -11,9 +11,10 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import LoadingState from '@/components/ui/LoadingState';
-import { Scale, Clock, CheckCircle2, AlertOctagon, Send, List, FileSignature, ArrowRight } from 'lucide-react';
+import { Scale, Clock, CheckCircle2, AlertOctagon, Send, List, FileSignature, RefreshCw } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
+import { auditApi } from '@/lib/audit-api';
 
 function ConciliationPageContent() {
     const router = useRouter();
@@ -22,51 +23,67 @@ function ConciliationPageContent() {
     const [selectedObjection, setSelectedObjection] = useState<any>(null);
     const [auditNote, setAuditNote] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [objections, setObjections] = useState<any[]>([]);
 
-    const objections = [
-        {
-            id: 'ITR-2026-04',
-            kod: 'BLG-2026-014',
-            birim: 'Kredi Operasyonları Müdürlüğü',
-            konu: 'Kredi Tahsis Sürecinde Yetki Limit Aşımları',
-            onem: 'YÜKSEK',
-            itirazTarihi: '2026-07-15',
-            itirazSebep: 'Bölge onay belgesinin sisteme taranmasında teknik aksaklık yaşandığı, işlemin usule uygun tamamlandığı beyan edilmiştir.',
-            durum: 'GÖZETİM_DEĞERLENDİRMESİNDE',
-            mufettisGorus: 'Gözetim Sorumlusu tarafından son karara bağlanması uygun görülmüştür.'
-        },
-        {
-            id: 'ITR-2026-08',
-            kod: 'BLG-2026-022',
-            birim: 'Müşteri İlişkileri ve Gişe Operasyonları',
-            konu: 'KVKK İzin Formlarının Eksik Taranması',
-            onem: 'ORTA',
-            itirazTarihi: '2026-07-18',
-            itirazSebep: 'Sözleşme tarihinde müşterinin fiziksel ıslak imzası alınmış olup arşiv klasöründe mevcuttur.',
-            durum: 'MÜFETTİŞ_İNCELEMESİNDE',
-            mufettisGorus: 'Fiziksel klasör kontrol edilecek.'
+    const fetchObjections = async () => {
+        setLoading(true);
+        try {
+            const data = await auditApi.getConciliationObjections();
+            setObjections(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error('İtirazlar çekilemedi:', error);
+            showToast('İtiraz ve uzlaşma verileri yüklenemedi', 'error');
+            setObjections([]);
+        } finally {
+            setLoading(false);
         }
-    ];
-
-    const handleConfirmDecision = async (decisionType: 'KABUL' | 'RED') => {
-        setSubmitting(true);
-        await new Promise(r => setTimeout(r, 600));
-        setSubmitting(false);
-        setSelectedObjection(null);
-        showToast(`İtiraz değerlendirme kararı (${decisionType}) başarıyla kaydoldu.`, 'success');
     };
 
-    const filteredObjections = objections.filter(item =>
-        item.konu.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.birim.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    useEffect(() => {
+        fetchObjections();
+    }, []);
+
+    const handleConfirmDecision = async (decisionType: 'KABUL_EDILDI' | 'REDDEDILDI') => {
+        if (!selectedObjection) return;
+        setSubmitting(true);
+        try {
+            await auditApi.decideConciliationObjection(selectedObjection.id, {
+                durum: decisionType,
+                kararGerekce: auditNote || 'Gözetim değerlendirmesi tamamlandı.',
+            });
+            showToast(`İtiraz kararı (${decisionType === 'KABUL_EDILDI' ? 'KABUL EDİLDİ - Risk Kabulü Yapıldı' : 'REDDEDİLDİ'}) başarıyla kaydedildi.`, 'success');
+            setSelectedObjection(null);
+            setAuditNote('');
+            await fetchObjections();
+        } catch (error) {
+            console.error('Karar kaydedilemedi:', error);
+            showToast('İtiraz kararı kaydedilirken hata oluştu.', 'error');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const filteredObjections = objections.filter((item: any) => {
+        const konu = item.finding?.title || item.itirazGerekce || '';
+        const id = item.id || '';
+        const birim = item.itirazEden?.department || item.finding?.department || '';
+        const query = searchTerm.toLowerCase();
+
+        return konu.toLowerCase().includes(query) ||
+            id.toLowerCase().includes(query) ||
+            birim.toLowerCase().includes(query);
+    });
 
     const navTabs = [
         { id: '/audit/findings', label: 'Tüm Bulgular', icon: List },
         { id: '/audit/conciliation', label: 'Tebliğ ve Mutabakat', icon: FileSignature },
         { id: '/audit/follow-up', label: 'Aksiyon Takip', icon: Clock }
     ];
+
+    const pendingObjections = objections.filter((o: any) => o.durum === 'BEKLEMEDE').length;
+    const acceptedObjections = objections.filter((o: any) => o.durum === 'KABUL_EDILDI').length;
+    const rejectedObjections = objections.filter((o: any) => o.durum === 'REDDEDILDI').length;
 
     return (
         <div className="space-y-6">
@@ -84,8 +101,6 @@ function ConciliationPageContent() {
                 />
             </div>
 
-
-
             {/* StatCards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
@@ -96,25 +111,25 @@ function ConciliationPageContent() {
                     infoTooltip="Birimler tarafından yapılan ve karara bağlanmayı bekleyen itirazlar"
                 />
                 <StatCard
+                    title="Bekleyen İtirazlar"
+                    value={pendingObjections}
+                    icon={Clock}
+                    color="purple"
+                    infoTooltip="Gözetim Sorumlusu onayına sunulan uzlaşmazlıklar"
+                />
+                <StatCard
                     title="Kabul Edilen İtirazlar"
-                    value={3}
+                    value={acceptedObjections}
                     icon={CheckCircle2}
                     color="emerald"
                     infoTooltip="Müfettiş veya Gözetim tarafından haklı bulunan itirazlar"
                 />
                 <StatCard
                     title="Reddedilen İtirazlar"
-                    value={5}
+                    value={rejectedObjections}
                     icon={AlertOctagon}
                     color="red"
                     infoTooltip="Gerekçesi yetersiz görülerek bulgusu aynen korunanlar"
-                />
-                <StatCard
-                    title="Gözetim Kararı Bekleyenler"
-                    value={1}
-                    icon={Clock}
-                    color="purple"
-                    infoTooltip="Gözetim Sorumlusu onayına sunulan uzlaşmazlıklar"
                 />
             </div>
 
@@ -122,92 +137,101 @@ function ConciliationPageContent() {
                 searchPlaceholder="İtiraz kodu, birim veya bulgu ara..."
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
+                rightActions={
+                    <Button variant="secondary" leftIcon={<RefreshCw size={14} />} onClick={fetchObjections} isLoading={loading}>
+                        Yenile
+                    </Button>
+                }
             />
 
-            <DataTable
-                columns={[
-                    {
-                        key: 'id',
-                        header: 'İtiraz Kodu',
-                        width: '140px',
-                        render: (item: any) => <CodeBadge code={item.id} />
-                    },
-                    {
-                        key: 'konu',
-                        header: 'Bulgu & İtiraz Detayı',
-                        sortable: true,
-                        render: (item: any) => (
-                            <div>
-                                <div className="font-bold text-gray-900 text-sm">{item.konu}</div>
-                                <div className="text-xs text-gray-500 mt-1">Birim: {item.birim} • İtiraz Tarihi: {formatDate(item.itirazTarihi)}</div>
-                            </div>
-                        )
-                    },
-                    {
-                        key: 'onem',
-                        header: 'Önem',
-                        width: '130px',
-                        render: (item: any) => <StatusBadge value={item.onem} type="risk" />
-                    },
-                    {
-                        key: 'durum',
-                        header: 'Durum',
-                        width: '180px',
-                        render: (item: any) => <StatusBadge value={item.durum} type="status" />
-                    },
-                    {
-                        key: 'actions',
-                        header: 'İncele',
-                        width: '140px',
-                        align: 'center',
-                        render: (item: any) => (
-                            <Button size="sm" variant="primary" leftIcon={<ArrowRight size={14} />} onClick={() => setSelectedObjection(item)}>
-                                Değerlendir
-                            </Button>
-                        )
-                    }
-                ]}
-                data={filteredObjections}
-                searchTerm={searchTerm}
-                onClearFilters={() => setSearchTerm('')}
-                rowKey="id"
-            />
+            {loading ? (
+                <LoadingState message="Gerçek uzlaşma ve itiraz verileri veritabanından çekiliyor..." />
+            ) : (
+                <DataTable
+                    columns={[
+                        {
+                            key: 'id',
+                            header: 'İtiraz Kodu',
+                            width: '160px',
+                            render: (item: any) => <CodeBadge code={item.id} />
+                        },
+                        {
+                            key: 'konu',
+                            header: 'Bulgu & İtiraz Detayı',
+                            sortable: true,
+                            render: (item: any) => (
+                                <div>
+                                    <div className="font-bold text-gray-900 text-sm">{item.finding?.title || 'Bulgu Başlığı'}</div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        İtiraz Eden: {item.itirazEden?.displayName || 'TANIMSIZ'} • İtiraz Tarihi: {formatDate(item.itirazTarihi)}
+                                    </div>
+                                </div>
+                            )
+                        },
+                        {
+                            key: 'durum',
+                            header: 'Durum',
+                            width: '180px',
+                            render: (item: any) => <StatusBadge value={item.durum} type="status" />
+                        },
+                        {
+                            key: 'actions',
+                            header: 'İncele',
+                            width: '150px',
+                            align: 'center',
+                            render: (item: any) => (
+                                <Button size="sm" variant="secondary" onClick={() => { setSelectedObjection(item); setAuditNote(item.mufettisGorusu || ''); }}>
+                                    Değerlendir
+                                </Button>
+                            )
+                        }
+                    ]}
+                    data={filteredObjections}
+                    searchTerm={searchTerm}
+                    onClearFilters={() => setSearchTerm('')}
+                    rowKey="id"
+                    paginated={true}
+                    itemsPerPage={20}
+                />
+            )}
 
             {selectedObjection && (
                 <Modal
                     isOpen={!!selectedObjection}
                     onClose={() => setSelectedObjection(null)}
-                    title={`İtiraz Değerlendirme Alanı — ${selectedObjection.kod}`}
+                    title={`Bulgu İtirazı Değerlendirme — ${selectedObjection.id}`}
                     size="lg"
                     footer={
                         <div className="flex justify-between w-full">
-                            <Button variant="secondary" onClick={() => handleConfirmDecision('RED')} disabled={submitting}>
+                            <Button variant="danger" onClick={() => handleConfirmDecision('REDDEDILDI')} isLoading={submitting}>
                                 İtirazı Reddet (Bulguyu Koru)
                             </Button>
-                            <Button variant="primary" onClick={() => handleConfirmDecision('KABUL')} disabled={submitting}>
-                                İtirazı Kabul Et (Bulguyu Kapat)
+                            <Button variant="primary" onClick={() => handleConfirmDecision('KABUL_EDILDI')} isLoading={submitting}>
+                                İtirazı Kabul Et (Riski Kabul Et)
                             </Button>
                         </div>
                     }
                 >
                     <div className="space-y-4 text-xs text-gray-700">
-                        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                            <div className="font-bold text-gray-900 text-sm">{selectedObjection.konu}</div>
-                            <div><strong>Denetlenen Birim:</strong> {selectedObjection.birim}</div>
+                        <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1">
+                            <div className="font-bold text-gray-900 text-sm">{selectedObjection.finding?.title}</div>
+                            <div><strong>İtiraz Eden:</strong> {selectedObjection.itirazEden?.displayName} ({selectedObjection.itirazEden?.department || 'Birim'})</div>
+                            <div><strong>İtiraz Tarihi:</strong> {formatDate(selectedObjection.itirazTarihi)}</div>
                         </div>
 
-                        <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl">
-                            <strong>Birim İtiraz Gerekçesi:</strong> {selectedObjection.itirazSebep}
+                        <div className="p-3 bg-gray-50 border border-gray-200 rounded-xl space-y-1">
+                            <div className="font-bold text-gray-900">Birim İtiraz Gerekçesi:</div>
+                            <p className="text-gray-700 leading-relaxed">{selectedObjection.itirazGerekce}</p>
                         </div>
 
-                        <div>
-                            <label className="form-label mb-1 block font-bold text-gray-900">Müfettiş / Gözetim Değerlendirme Notu (Zorunlu)</label>
+                        <div className="space-y-1">
+                            <label className="font-bold text-gray-800">Müfettiş / Gözetim Değerlendirme Notu:</label>
                             <textarea
-                                className="form-input text-xs w-full"
+                                className="w-full p-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 rows={3}
-                                placeholder="İtirazın kabul veya red gerekçesini teknik açıklamalarla yazınız..."
+                                placeholder="Gerekçe veya ek açıklama giriniz..."
                                 value={auditNote}
-                                onChange={e => setAuditNote(e.target.value)}
+                                onChange={(e) => setAuditNote(e.target.value)}
                             />
                         </div>
                     </div>
@@ -217,15 +241,14 @@ function ConciliationPageContent() {
     );
 }
 
+import RequireRole from '@/components/auth/RequireRole';
+
 export default function ConciliationPage() {
     return (
-        <Suspense fallback={<LoadingState message="Tebliğ ve Mutabakat Yükleniyor..." />}>
-            <ConciliationPageContent />
-        </Suspense>
+        <RequireRole allowedRoles={['ADMIN', 'AUDIT_ADMIN', 'AUDIT_MANAGER', 'AUDIT_LEAD', 'AUDITOR', 'SUPER_ADMIN']}>
+            <Suspense fallback={<LoadingState message="Uzlaşma & Tebliğ Yükleniyor..." />}>
+                <ConciliationPageContent />
+            </Suspense>
+        </RequireRole>
     );
 }
-// HMR force refresh
-
-
-
-

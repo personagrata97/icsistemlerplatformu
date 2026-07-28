@@ -495,10 +495,14 @@ function EthicsPageContent() {
 }
 
 
+import RequireRole from '@/components/auth/RequireRole';
+
 export default function EthicsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingState message="Sayfa Yükleniyor..." /></div>}>
-      <EthicsPageContent />
-    </Suspense>
+    <RequireRole allowedRoles={['ADMIN', 'AUDIT_ADMIN', 'ETHICS_OFFICER', 'BOARD_CHAIRMAN', 'SUPER_ADMIN', 'AUDIT_MANAGER']}>
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingState message="Sayfa Yükleniyor..." /></div>}>
+        <EthicsPageContent />
+      </Suspense>
+    </RequireRole>
   );
 }

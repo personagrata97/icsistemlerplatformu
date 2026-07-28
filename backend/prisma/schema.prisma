@@ -339,6 +339,8 @@ model Audit {
   @@index([unitId])
   @@index([status])
   @@index([isDeleted])
+  @@index([department])
+  @@index([created_at])
   @@map("audit")
 }
 
@@ -400,6 +402,8 @@ model Finding {
   conciliationMessages        ConciliationMessage[]
   followUps                   AuditFollowUp[]
   extensionRequests           ExtensionRequest[]
+  findingActions              FindingAction[]
+  findingObjections           FindingObjection[]
   auditTest                   AuditTest?            @relation(fields: [auditTestId], references: [id])
   workpaper                   AuditWorkpaper?       @relation(fields: [workpaperId], references: [id])
   audit                       Audit                 @relation(fields: [auditId], references: [id], onDelete: Cascade)
@@ -412,6 +416,9 @@ model Finding {
   @@index([auditId])
   @@index([status])
   @@index([risk])
+  @@index([department])
+  @@index([dueDate])
+  @@index([created_at])
   @@index([isDeleted])
   @@index([assignedUserId])
   @@map("finding")
@@ -471,6 +478,9 @@ model AuditPlan {
   created_at         DateTime  @default(now())
   updated_at         DateTime  @updatedAt
 
+  @@index([status])
+  @@index([year])
+  @@index([created_at])
   @@map("audit_plan")
 }
 
@@ -845,6 +855,13 @@ model User {
   leaves              UserLeave[]               @relation("UserLeaves")
   proxyLeaves         UserLeave[]               @relation("ProxyLeaves")
 
+  createdFindingActions   FindingAction[]        @relation("ActionCreator")
+  assignedFindingActions  FindingAction[]        @relation("ActionAssignee")
+  uploadedEvidences       ActionEvidence[]       @relation("EvidenceUploader")
+  approvedEvidences       ActionEvidence[]       @relation("EvidenceApprover")
+  submittedObjections     FindingObjection[]     @relation("ObjectionSubmitter")
+  decidedObjections       FindingObjection[]     @relation("ObjectionDecider")
+
   @@map("user")
 }
 
@@ -1036,6 +1053,10 @@ model AuditWorkpaper {
 
   history AuditWorkpaperHistory[]
 
+  @@index([auditId])
+  @@index([status])
+  @@index([created_at])
+  @@index([isDeleted])
   @@map("audit_workpaper")
 }
 
@@ -1727,4 +1748,79 @@ model EnhancedDueDiligence {
   updated_at          DateTime  @updatedAt
 
   @@map("enhanced_due_diligence")
+}
+
+// ============================================================================
+// ADIM 1 — İzleme ve Uzlaşma Tabloları (PHAROS AUDIT Son Denetim A1)
+// ============================================================================
+
+model FindingAction {
+  id                String            @id @default(cuid())
+  findingId         String
+  aksiyonTanimi     String
+  sorumluId         String
+  terminTarihi      DateTime
+  durum             String            @default("ACIK") // ACIK, DEVAM_EDIYOR, KANIT_BEKLENIYOR, TAMAMLANDI, KAPATILDI
+  tamamlanmaTarihi  DateTime?
+  olusturanId       String
+  notlar            String?
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+
+  finding           Finding           @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  sorumlu           User              @relation("ActionAssignee", fields: [sorumluId], references: [id])
+  olusturan         User              @relation("ActionCreator", fields: [olusturanId], references: [id])
+  evidences         ActionEvidence[]
+
+  @@index([findingId])
+  @@index([sorumluId])
+  @@index([durum])
+  @@index([terminTarihi])
+  @@map("finding_action")
+}
+
+model ActionEvidence {
+  id            String         @id @default(cuid())
+  aksiyonId     String
+  dosyaAdi      String
+  dosyaYolu     String?        // Dosya sistemi yolu veya S3 key
+  aciklama      String?
+  yukleyenId    String
+  yuklemeTarihi DateTime       @default(now())
+  onayDurumu    String         @default("BEKLEMEDE") // BEKLEMEDE, ONAYLANDI, REDDEDILDI
+  onaylayanId   String?
+  onayTarihi    DateTime?
+  redGerekce    String?
+  created_at    DateTime       @default(now())
+
+  aksiyon       FindingAction  @relation(fields: [aksiyonId], references: [id], onDelete: Cascade)
+  yukleyen      User           @relation("EvidenceUploader", fields: [yukleyenId], references: [id])
+  onaylayan     User?          @relation("EvidenceApprover", fields: [onaylayanId], references: [id])
+
+  @@index([aksiyonId])
+  @@index([onayDurumu])
+  @@map("action_evidence")
+}
+
+model FindingObjection {
+  id              String    @id @default(cuid())
+  findingId       String
+  itirazEdenId    String
+  itirazTarihi    DateTime  @default(now())
+  itirazGerekce   String
+  durum           String    @default("BEKLEMEDE") // BEKLEMEDE, KABUL_EDILDI, REDDEDILDI
+  mufettisGorusu  String?
+  kararVerenId    String?
+  kararTarihi     DateTime?
+  kararGerekce    String?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  finding         Finding   @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  itirazEden      User      @relation("ObjectionSubmitter", fields: [itirazEdenId], references: [id])
+  kararVeren      User?     @relation("ObjectionDecider", fields: [kararVerenId], references: [id])
+
+  @@index([findingId])
+  @@index([durum])
+  @@map("finding_objection")
 }

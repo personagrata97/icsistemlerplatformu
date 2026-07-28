@@ -41,6 +41,10 @@ import { KvkkService } from './kvkk.service';
 import { BilgiNotuService } from './bilgi-notu.service';
 import { BilgiNotuController } from './bilgi-notu.controller';
 import { PartialReportService } from './partial-report.service';
+import { FollowUpService } from './follow-up.service';
+import { FollowUpController } from './follow-up.controller';
+import { ConciliationService } from './conciliation-new.service';
+import { ConciliationNewController } from './conciliation-new.controller';
 
 @Module({
     imports: [EmailModule, PharosModule, RiskEngineModule, NotificationModule],
@@ -57,6 +61,8 @@ import { PartialReportService } from './partial-report.service';
         CommunicationController,
         KvkkController,
         BilgiNotuController,
+        FollowUpController,
+        ConciliationNewController,
     ],
     providers: [
         AuditService,
@@ -83,6 +89,8 @@ import { PartialReportService } from './partial-report.service';
         KvkkService,
         BilgiNotuService,
         PartialReportService,
+        FollowUpService,
+        ConciliationService,
     ],
     exports: [AuditService, FindingService, AuditTrashService, AuditLogService, AuditRiskService, PdfReportService, PartialReportService],
 })

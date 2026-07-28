@@ -1,11 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
+import { AuditLogService } from './audit-log.service';
 
 @Injectable()
 export class CommunicationService {
     private readonly logger = new Logger(CommunicationService.name);
 
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService,
+        private auditLogService: AuditLogService,
+    ) {}
 
     // ===========================
     // COMMUNICATIONS (Mektuplar vs)
@@ -31,7 +35,7 @@ export class CommunicationService {
     }
 
     async createCommunication(auditId: string, userId: string, data: any) {
-        return this.prisma.auditCommunication.create({
+        const result = await this.prisma.auditCommunication.create({
             data: {
                 auditId,
                 type: data.type,
@@ -42,10 +46,20 @@ export class CommunicationService {
                 sentAt: data.status === 'Gönderildi' ? new Date() : null,
             },
         });
+
+        await this.auditLogService.createLog({
+            user: userId || 'SYSTEM',
+            action: 'Resmi Yazışma Oluşturuldu',
+            details: `Denetim ${auditId} için ${data.type || 'Resmi Yazı'} oluşturuldu: "${data.subject}"`,
+            targetType: 'Audit',
+            targetId: auditId,
+        });
+
+        return result;
     }
 
     async updateCommunication(id: string, userId: string, data: any) {
-        return this.prisma.auditCommunication.update({
+        const result = await this.prisma.auditCommunication.update({
             where: { id },
             data: {
                 subject: data.subject,
@@ -55,12 +69,35 @@ export class CommunicationService {
                 sentAt: data.status === 'Gönderildi' ? new Date() : undefined,
             }
         });
+
+        await this.auditLogService.createLog({
+            user: userId || 'SYSTEM',
+            action: 'Resmi Yazışma Güncellendi',
+            details: `Yazışma ${id} güncellendi — Durum: ${data.status}`,
+            targetType: 'Audit',
+            targetId: result.auditId,
+        });
+
+        return result;
     }
 
     async deleteCommunication(id: string) {
-        return this.prisma.auditCommunication.delete({
+        const comm = await this.prisma.auditCommunication.findUnique({ where: { id } });
+        const result = await this.prisma.auditCommunication.delete({
             where: { id }
         });
+
+        if (comm) {
+            await this.auditLogService.createLog({
+                user: 'SYSTEM',
+                action: 'Resmi Yazışma Silindi',
+                details: `Yazışma ${id} (${comm.subject}) silindi`,
+                targetType: 'Audit',
+                targetId: comm.auditId,
+            });
+        }
+
+        return result;
     }
 
     // ===========================
@@ -74,7 +111,7 @@ export class CommunicationService {
     }
 
     async createMeeting(auditId: string, data: any) {
-        return this.prisma.auditMeeting.create({
+        const result = await this.prisma.auditMeeting.create({
             data: {
                 auditId,
                 type: data.type,
@@ -87,10 +124,20 @@ export class CommunicationService {
                 status: data.status || 'Planlandı'
             }
         });
+
+        await this.auditLogService.createLog({
+            user: 'SYSTEM',
+            action: 'Toplantı Kaydı Oluşturuldu',
+            details: `Denetim ${auditId} için ${data.type || 'Toplantı'} kaydı eklendi: "${data.title}"`,
+            targetType: 'Audit',
+            targetId: auditId,
+        });
+
+        return result;
     }
 
     async updateMeeting(id: string, data: any) {
-        return this.prisma.auditMeeting.update({
+        const result = await this.prisma.auditMeeting.update({
             where: { id },
             data: {
                 type: data.type,
@@ -103,11 +150,34 @@ export class CommunicationService {
                 status: data.status,
             }
         });
+
+        await this.auditLogService.createLog({
+            user: 'SYSTEM',
+            action: 'Toplantı Kaydı Güncellendi',
+            details: `Toplantı ${id} tutanağı/durumu güncellendi`,
+            targetType: 'Audit',
+            targetId: result.auditId,
+        });
+
+        return result;
     }
 
     async deleteMeeting(id: string) {
-        return this.prisma.auditMeeting.delete({
+        const meeting = await this.prisma.auditMeeting.findUnique({ where: { id } });
+        const result = await this.prisma.auditMeeting.delete({
             where: { id }
         });
+
+        if (meeting) {
+            await this.auditLogService.createLog({
+                user: 'SYSTEM',
+                action: 'Toplantı Kaydı Silindi',
+                details: `Toplantı ${id} (${meeting.title}) silindi`,
+                targetType: 'Audit',
+                targetId: meeting.auditId,
+            });
+        }
+
+        return result;
     }
 }

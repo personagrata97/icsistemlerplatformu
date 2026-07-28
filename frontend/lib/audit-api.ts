@@ -2278,6 +2278,75 @@ export const auditApi = {
         });
         return handleResponse(res);
     },
+
+    // FOLLOW-UP & CONCILIATION (ADIM 1)
+    getFollowUpActions: async (filters?: { durum?: string; sorumluId?: string; findingId?: string }) => {
+        const params = new URLSearchParams(filters as any);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/follow-up?${params.toString()}`, { headers: getHeaders() });
+        return handleResponse(res);
+    },
+    createFollowUpAction: async (data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/follow-up`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+    updateFollowUpStatus: async (actionId: string, durum: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/follow-up/${actionId}/status`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify({ durum })
+        });
+        return handleResponse(res);
+    },
+    uploadFollowUpEvidence: async (actionId: string, data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/follow-up/${actionId}/evidence`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+    approveFollowUpEvidence: async (evidenceId: string, data: { onayDurumu: 'ONAYLANDI' | 'REDDEDILDI'; redGerekce?: string }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/follow-up/evidence/${evidenceId}/approve`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
+    getConciliationObjections: async (filters?: { durum?: string; findingId?: string }) => {
+        const params = new URLSearchParams(filters as any);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/conciliation?${params.toString()}`, { headers: getHeaders() });
+        return handleResponse(res);
+    },
+    createConciliationObjection: async (data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/conciliation`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+    addConciliationOpinion: async (objectionId: string, mufettisGorusu: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/conciliation/${objectionId}/opinion`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify({ mufettisGorusu })
+        });
+        return handleResponse(res);
+    },
+    decideConciliationObjection: async (objectionId: string, data: { durum: 'KABUL_EDILDI' | 'REDDEDILDI'; kararGerekce: string }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/conciliation/${objectionId}/decide`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
 };
 
 

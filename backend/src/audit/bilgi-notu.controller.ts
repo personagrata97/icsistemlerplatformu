@@ -2,12 +2,17 @@ import { Controller, Post, Body, Res, UseGuards, Req } from '@nestjs/common';
 import { BilgiNotuService } from './bilgi-notu.service';
 import { Response, Request } from 'express';
 import * as path from 'path';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
+import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 
 @Controller('api/audit/bilgi-notu')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class BilgiNotuController {
     constructor(private bilgiNotuService: BilgiNotuService) {}
 
     @Post('generate')
+    @RequirePermissions({ module: 'AUDIT', action: 'MANAGE' })
     async generate(
         @Body() body: {
             konu: string;
