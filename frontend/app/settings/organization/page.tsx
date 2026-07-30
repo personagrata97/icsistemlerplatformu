@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import { useState, useEffect } from 'react';
 import { Settings, Save, Plus, Edit2, Trash2, Home, Network, ChevronRight, ChevronDown } from 'lucide-react';
@@ -27,7 +29,7 @@ interface OrgNode {
     children?: OrgNode[];
 }
 
-export default function OrganizationSettingsPage() {
+function OrganizationSettingsPageContent() {
     const { showToast } = useToast();
 
     const [hierarchy, setHierarchy] = useState<OrgNode[]>([]);
@@ -419,5 +421,14 @@ export default function OrganizationSettingsPage() {
             />
 
         </div>
+    );
+}
+
+
+export default function OrganizationSettingsPage() {
+    return (
+        <RequireRole allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
+            <OrganizationSettingsPageContent />
+        </RequireRole>
     );
 }

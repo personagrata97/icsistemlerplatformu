@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { Shield, Users, Save, Plus, ChevronRight, Trash2, RotateCcw, Clock, AlertTriangle } from 'lucide-react';
@@ -78,7 +80,7 @@ interface UserRecord {
 // --- Helper ---
 const getPermissionLabel = (p: Permission) => `${p.module} modülünde ${p.action} yetkisi`;
 
-export default function SettingsPage() {
+function SettingsPageContent() {
     const { user } = useAuth();
     const { showToast } = useToast();
 
@@ -798,5 +800,14 @@ export default function SettingsPage() {
                 isLoading={restoring}
             />
         </div>
+    );
+}
+
+
+export default function SettingsPage() {
+    return (
+        <RequireRole allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
+            <SettingsPageContent />
+        </RequireRole>
     );
 }
