@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import StatCard from '@/components/ui/StatCard';
@@ -13,7 +15,7 @@ import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 import { TERMS } from '@/lib/terminology';
 
-export default function SanctionSettingsPage() {
+function SanctionSettingsPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedParam, setSelectedParam] = useState<any>(null);
@@ -176,5 +178,14 @@ export default function SanctionSettingsPage() {
                 isLoading={submitting}
             />
         </div>
+    );
+}
+
+
+export default function SanctionSettingsPage() {
+    return (
+        <RequireRole allowedRoles={['UYUM_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <SanctionSettingsPageContent />
+        </RequireRole>
     );
 }

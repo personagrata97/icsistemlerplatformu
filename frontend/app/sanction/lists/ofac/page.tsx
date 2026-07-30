@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
@@ -11,7 +13,7 @@ import { useState } from 'react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 
-export default function OfacListPage() {
+function OfacListPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [programFilter, setProgramFilter] = useState('ALL');
@@ -165,5 +167,14 @@ export default function OfacListPage() {
                 rowKey="id"
             />
         </div>
+    );
+}
+
+
+export default function OfacListPage() {
+    return (
+        <RequireRole allowedRoles={['UYUM_GOREVLISI', 'UYUM_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <OfacListPageContent />
+        </RequireRole>
     );
 }

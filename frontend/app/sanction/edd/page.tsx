@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import StatCard from '@/components/ui/StatCard';
@@ -14,7 +16,7 @@ import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 import { TERMS } from '@/lib/terminology';
 
-export default function EnhancedDueDiligencePage() {
+function EnhancedDueDiligencePageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSignal, setSelectedSignal] = useState<any>(null);
@@ -372,5 +374,14 @@ export default function EnhancedDueDiligencePage() {
                 isLoading={submitting}
             />
         </div>
+    );
+}
+
+
+export default function EnhancedDueDiligencePage() {
+    return (
+        <RequireRole allowedRoles={['UYUM_GOREVLISI', 'UYUM_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <EnhancedDueDiligencePageContent />
+        </RequireRole>
     );
 }

@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
@@ -10,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { sanctionApi } from '@/lib/sanction-api';
 
-export default function SanctionHistoryPage() {
+function SanctionHistoryPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [triggerFilter, setTriggerFilter] = useState('ALL');
@@ -149,5 +151,14 @@ export default function SanctionHistoryPage() {
                 rowKey="id"
             />
         </div>
+    );
+}
+
+
+export default function SanctionHistoryPage() {
+    return (
+        <RequireRole allowedRoles={['UYUM_GOREVLISI', 'UYUM_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <SanctionHistoryPageContent />
+        </RequireRole>
     );
 }

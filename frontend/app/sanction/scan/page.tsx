@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import { useState } from 'react';
 import PageToolbar from '@/components/ui/PageToolbar';
@@ -12,7 +14,7 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import Link from 'next/link';
 import { sanctionApi } from '@/lib/sanction-api';
 
-export default function SanctionScanPage() {
+function SanctionScanPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [scanType, setScanType] = useState('ANLIK');
@@ -167,5 +169,14 @@ export default function SanctionScanPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+
+export default function SanctionScanPage() {
+    return (
+        <RequireRole allowedRoles={['UYUM_GOREVLISI', 'UYUM_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <SanctionScanPageContent />
+        </RequireRole>
     );
 }

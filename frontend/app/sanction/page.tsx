@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import { useState, useEffect } from 'react';
 import PageHeader from '@/components/audit/PageHeader';
@@ -14,7 +16,7 @@ import { useToast } from '@/components/Toast';
 import { sanctionApi } from '@/lib/sanction-api';
 import Link from 'next/link';
 
-export default function SanctionDashboardPage() {
+function SanctionDashboardPageContent() {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -159,5 +161,14 @@ export default function SanctionDashboardPage() {
                 rowKey="id"
             />
         </div>
+    );
+}
+
+
+export default function SanctionDashboardPage() {
+    return (
+        <RequireRole allowedRoles={['UYUM_GOREVLISI', 'UYUM_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <SanctionDashboardPageContent />
+        </RequireRole>
     );
 }

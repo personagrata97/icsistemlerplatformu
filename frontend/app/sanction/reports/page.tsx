@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
@@ -10,7 +12,7 @@ import { Download, FileText, Calendar, User } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/components/Toast';
 
-export default function SanctionReportsPage() {
+function SanctionReportsPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState('ALL');
@@ -127,5 +129,14 @@ export default function SanctionReportsPage() {
                 rowKey="id"
             />
         </div>
+    );
+}
+
+
+export default function SanctionReportsPage() {
+    return (
+        <RequireRole allowedRoles={['UYUM_GOREVLISI', 'UYUM_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <SanctionReportsPageContent />
+        </RequireRole>
     );
 }

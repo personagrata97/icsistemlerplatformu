@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import { useState, useEffect } from 'react';
 import PageToolbar from '@/components/ui/PageToolbar';
@@ -13,7 +15,7 @@ import Modal from '@/components/ui/Modal';
 import { sanctionApi } from '@/lib/sanction-api';
 import { formatDate } from '@/lib/audit-utils';
 
-export default function SanctionResultsPage() {
+function SanctionResultsPageContent() {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -208,5 +210,14 @@ export default function SanctionResultsPage() {
                 </Modal>
             )}
         </div>
+    );
+}
+
+
+export default function SanctionResultsPage() {
+    return (
+        <RequireRole allowedRoles={['UYUM_GOREVLISI', 'UYUM_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <SanctionResultsPageContent />
+        </RequireRole>
     );
 }

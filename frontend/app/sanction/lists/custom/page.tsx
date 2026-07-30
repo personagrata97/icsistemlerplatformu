@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
@@ -13,7 +15,7 @@ import Modal from '@/components/ui/Modal';
 import { sanctionApi } from '@/lib/sanction-api';
 import { formatDate } from '@/lib/audit-utils';
 
-export default function CustomListPage() {
+function CustomListPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState('ALL');
@@ -222,5 +224,14 @@ export default function CustomListPage() {
                 </Modal>
             )}
         </div>
+    );
+}
+
+
+export default function CustomListPage() {
+    return (
+        <RequireRole allowedRoles={['UYUM_GOREVLISI', 'UYUM_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <CustomListPageContent />
+        </RequireRole>
     );
 }
