@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import StaffTabs from '@/components/audit/staff/StaffTabs';
@@ -20,7 +22,7 @@ import Tooltip from '@/components/ui/Tooltip';
 import EntityIcon from '@/components/ui/EntityIcon';
 import ProgressBar from '@/components/ui/ProgressBar';
 
-export default function CalendarPage() {
+function CalendarPageContent() {
     const [loading, setLoading] = useState(true);
     const [staffList, setStaffList] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -323,5 +325,14 @@ export default function CalendarPage() {
                 </div>
             </Modal>
         </div>
+    );
+}
+
+
+export default function CalendarPage() {
+    return (
+        <RequireRole allowedRoles={['GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <CalendarPageContent />
+        </RequireRole>
     );
 }

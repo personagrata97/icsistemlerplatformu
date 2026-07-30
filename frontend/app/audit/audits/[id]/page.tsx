@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
@@ -100,7 +102,7 @@ const opinionOptions = [
     { value: "Görüş Bildirilemedi", label: "Görüş Bildirilemedi", subtitle: "Kapsam kısıtlaması veya yetersiz kanıt", className: "text-gray-700 bg-gray-50" }
 ];
 
-export default function AuditDetailPage({ params }: { params: { id: string } }) {
+function AuditDetailPageContent({ params }: { params: { id: string } }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { showToast } = useToast();
@@ -1614,5 +1616,14 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
                 />
             )}
         </div>
+    );
+}
+
+
+export default function AuditDetailPage(props: any) {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <AuditDetailPageContent {...props} />
+        </RequireRole>
     );
 }

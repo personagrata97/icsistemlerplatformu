@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState, useEffect, useRef } from 'react';
 import useOnClickOutside from '@/hooks/useOnClickOutside';
 import {
@@ -42,7 +44,7 @@ export interface AuditLog {
     ipAddress?: string; // Enhanced logging
 }
 
-export default function AuditLogsPage() {
+function AuditLogsPageContent() {
     const { setTitle, setSubtitle } = useAuditTitle();
     const { showToast } = useToast();
     const { hasRole } = useAuth();
@@ -318,5 +320,14 @@ export default function AuditLogsPage() {
 
             {selectedLog && <DetailModal log={selectedLog} onClose={() => setSelectedLog(null)} />}
         </div>
+    );
+}
+
+
+export default function AuditLogsPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <AuditLogsPageContent />
+        </RequireRole>
     );
 }

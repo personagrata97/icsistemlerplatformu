@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import { useState, useEffect } from 'react';
 import { Trash2, RotateCcw, AlertTriangle, Loader2, FileText, AlertCircle, X, ShieldX, Calendar, Search, Filter, RefreshCw, ChevronDown, User, Eye } from 'lucide-react';
@@ -36,7 +38,7 @@ interface DeletedItems {
 
 type TabType = 'all' | 'audits' | 'findings' | 'documents' | 'ethics' | 'plans';
 
-export default function TrashPage() {
+function TrashPageContent() {
     const { showToast } = useToast();
     const { user, hasRole } = useAuth();
     const [loading, setLoading] = useState(true);
@@ -711,5 +713,14 @@ export default function TrashPage() {
                 type="danger"
             />
         </div >
+    );
+}
+
+
+export default function TrashPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <TrashPageContent />
+        </RequireRole>
     );
 }

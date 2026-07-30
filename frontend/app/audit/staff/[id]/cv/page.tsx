@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -34,7 +36,7 @@ const getPhotoUrl = (url?: string) => {
     return `${origin}${url}`;
 };
 
-export default function StaffOzgecmisLegacyPage() {
+function StaffOzgecmisLegacyPageContent() {
     const { id } = useParams();
     const router = useRouter();
     const { showToast } = useToast();
@@ -361,5 +363,14 @@ export default function StaffOzgecmisLegacyPage() {
                 }
             `}</style>
         </div>
+    );
+}
+
+
+export default function StaffOzgecmisLegacyPage() {
+    return (
+        <RequireRole allowedRoles={['GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <StaffOzgecmisLegacyPageContent />
+        </RequireRole>
     );
 }

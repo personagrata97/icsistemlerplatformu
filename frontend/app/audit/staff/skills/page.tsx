@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { auditApi, AuditStaff } from '@/lib/audit-api';
@@ -100,7 +102,7 @@ const SKILL_LEVELS = [
     { value: 4, label: 'Uzman Düzey' }
 ];
 
-export default function SkillsMatrixPage() {
+function SkillsMatrixPageContent() {
     const { user, hasRole } = useAuth();
     const canManage = hasRole ? checkRole(hasRole, ROLES.STAFF_MANAGER) : false;
     const { showToast } = useToast();
@@ -688,5 +690,14 @@ export default function SkillsMatrixPage() {
                 </div>
             </Modal>
         </div>
+    );
+}
+
+
+export default function SkillsMatrixPage() {
+    return (
+        <RequireRole allowedRoles={['GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <SkillsMatrixPageContent />
+        </RequireRole>
     );
 }

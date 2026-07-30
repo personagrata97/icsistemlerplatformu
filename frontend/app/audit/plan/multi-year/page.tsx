@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import LoadingState from '@/components/ui/LoadingState';
 import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
@@ -17,7 +19,7 @@ import DataTable from '@/components/ui/DataTable';
 import { clsx } from 'clsx';
 import ConfirmModal from '@/components/ConfirmModal';
 
-export default function MultiYearPlanPage() {
+function MultiYearPlanPageContent() {
     const { showToast } = useToast();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -393,5 +395,14 @@ export default function MultiYearPlanPage() {
                 type="success"
             />
         </div>
+    );
+}
+
+
+export default function MultiYearPlanPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <MultiYearPlanPageContent />
+        </RequireRole>
     );
 }

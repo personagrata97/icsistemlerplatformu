@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState, useEffect, useMemo } from 'react';
 import {
     Shield, CheckCircle, AlertTriangle, BarChart3, Calendar,
@@ -119,7 +121,7 @@ import { AccessDenied } from '@/components/audit/AuditLogComponents';
 
 // ======================== COMPONENT ========================
 
-export default function QualityAssurancePage() {
+function QualityAssurancePageContent() {
     const { hasRole } = useAuth();
     const isManager = checkRole(hasRole, ROLES.BASIC_MANAGER);
     const isInspector = hasRole('AUDIT_INSPECTOR');
@@ -1033,5 +1035,14 @@ export default function QualityAssurancePage() {
                 onClose={() => setDeleteConfirm(null)}
             />
         </div>
+    );
+}
+
+
+export default function QualityAssurancePage() {
+    return (
+        <RequireRole allowedRoles={['GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <QualityAssurancePageContent />
+        </RequireRole>
     );
 }

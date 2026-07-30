@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -15,7 +17,7 @@ import { useRouter } from 'next/navigation';
 
 import EmptyState from '@/components/ui/EmptyState';
 
-export default function UnitPortalPage() {
+function UnitPortalPageContent() {
     const { user } = useAuth();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -162,5 +164,14 @@ export default function UnitPortalPage() {
                 </DashboardWidget>
             </div>
         </div>
+    );
+}
+
+
+export default function UnitPortalPage() {
+    return (
+        <RequireRole allowedRoles={['BIRIM_KULLANICISI', 'MUFETTIS', 'GOZETIM_SORUMLUSU', 'ADMIN', 'SUPER_ADMIN']}>
+            <UnitPortalPageContent />
+        </RequireRole>
     );
 }

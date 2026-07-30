@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -94,7 +96,7 @@ const IconMap: Record<string, any> = {
     PlayCircle, FileSearch, Eye, History
 };
 
-export default function FindingDetailPage() {
+function FindingDetailPageContent() {
     const params = useParams();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -1162,5 +1164,14 @@ export default function FindingDetailPage() {
                 type="danger"
             />
         </>
+    );
+}
+
+
+export default function FindingDetailPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <FindingDetailPageContent />
+        </RequireRole>
     );
 }

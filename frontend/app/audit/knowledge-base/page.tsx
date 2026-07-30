@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState } from 'react';
 import { DateDisplay } from '@/components/ui/DateDisplay';
 import Button from '@/components/ui/Button';
@@ -29,7 +31,7 @@ interface Document {
     size: string;
 }
 
-export default function KnowledgeBasePage() {
+function KnowledgeBasePageContent() {
     const { showToast } = useToast();
     const [documents, setDocuments] = useState<any[]>([]);
     const [staff, setStaff] = useState<any[]>([]);
@@ -318,5 +320,14 @@ export default function KnowledgeBasePage() {
                 type="danger"
             />
         </div>
+    );
+}
+
+
+export default function KnowledgeBasePage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <KnowledgeBasePageContent />
+        </RequireRole>
     );
 }

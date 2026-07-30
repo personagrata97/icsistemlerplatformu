@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { SearchInput } from '@/components/ui/SearchInput';
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import {
@@ -28,7 +30,7 @@ import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
 import { getStatusBadgeClass } from '@/lib/audit-utils';
 
-function AuditsPageContent() {
+function AuditsPageInner() {
     const router = useRouter();
     const { showToast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
@@ -468,11 +470,20 @@ function AuditsPageContent() {
     );
 }
 
-export default function AuditsPage() {
+function AuditsPageContent() {
     return (
         <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="animate-spin text-primary" size={32} /></div>}>
-            <AuditsPageContent />
+            <AuditsPageInner />
         </Suspense>
     );
 }
 
+
+
+export default function AuditsPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <AuditsPageContent />
+        </RequireRole>
+    );
+}

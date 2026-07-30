@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -357,7 +359,7 @@ const getRiskCardClass = (riskLevel: string) => {
 
 import { AccessDenied } from '@/components/audit/AuditLogComponents';
 
-export default function AuditUniversePage() {
+function AuditUniversePageContent() {
     const router = useRouter();
     const { showToast } = useToast();
     const { hasRole } = useAuth();
@@ -2095,5 +2097,14 @@ export default function AuditUniversePage() {
                 />
             )}
         </div>
+    );
+}
+
+
+export default function AuditUniversePage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <AuditUniversePageContent />
+        </RequireRole>
     );
 }

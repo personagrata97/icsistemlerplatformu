@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -185,7 +187,7 @@ const PROCESS_TEMPLATES = [
     }
 ];
 
-export default function UnitRcmPage() {
+function UnitRcmPageContent() {
     const params = useParams();
     const router = useRouter();
     const { showToast } = useToast();
@@ -1042,5 +1044,14 @@ export default function UnitRcmPage() {
                 </div>
             </Modal>
         </div>
+    );
+}
+
+
+export default function UnitRcmPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <UnitRcmPageContent />
+        </RequireRole>
     );
 }

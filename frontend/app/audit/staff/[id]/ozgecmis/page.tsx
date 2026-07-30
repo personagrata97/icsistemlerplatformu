@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -31,7 +33,7 @@ const getPhotoUrl = (url?: string) => {
     return `${origin}${url}`;
 };
 
-export default function StaffProfilePage() {
+function StaffProfilePageContent() {
     const { id } = useParams();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -652,5 +654,14 @@ export default function StaffProfilePage() {
                 }
             `}</style>
         </div>
+    );
+}
+
+
+export default function StaffProfilePage() {
+    return (
+        <RequireRole allowedRoles={['GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <StaffProfilePageContent />
+        </RequireRole>
     );
 }

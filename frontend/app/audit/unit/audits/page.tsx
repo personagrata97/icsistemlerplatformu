@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import PageHeader from '@/components/audit/PageHeader';
@@ -11,7 +13,7 @@ import { Download } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 
-export default function UnitAuditsPage() {
+function UnitAuditsPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -126,3 +128,12 @@ export default function UnitAuditsPage() {
     );
 }
 
+
+
+export default function UnitAuditsPage() {
+    return (
+        <RequireRole allowedRoles={['BIRIM_KULLANICISI', 'MUFETTIS', 'GOZETIM_SORUMLUSU', 'ADMIN', 'SUPER_ADMIN']}>
+            <UnitAuditsPageContent />
+        </RequireRole>
+    );
+}

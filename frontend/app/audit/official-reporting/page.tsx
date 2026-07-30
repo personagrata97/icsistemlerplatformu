@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState, useEffect } from 'react';
 import {
     FileBarChart, Download, Calendar, Filter, RefreshCw, CheckCircle,
@@ -86,7 +88,7 @@ import { useAuth } from '@/context/AuthContext';
 import { checkRole, ROLES } from '@/lib/auth-constants';
 import { AccessDenied } from '@/components/audit/AuditLogComponents';
 
-export default function OfficialReportingPage() {
+function OfficialReportingPageContent() {
     const router = useRouter();
     const { showToast } = useToast();
     const { hasRole } = useAuth();
@@ -401,5 +403,14 @@ export default function OfficialReportingPage() {
                 type="danger"
             />
         </div>
+    );
+}
+
+
+export default function OfficialReportingPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <OfficialReportingPageContent />
+        </RequireRole>
     );
 }

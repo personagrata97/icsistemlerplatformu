@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, FolderOpen, Activity as ActivityIcon } from 'lucide-react';
@@ -61,7 +63,7 @@ interface ActivityLog {
     details?: string;
 }
 
-export default function AuditDashboard() {
+function AuditDashboardContent() {
     const router = useRouter();
     const { showToast } = useToast();
     const { hasRole, user } = useAuth();
@@ -564,5 +566,14 @@ export default function AuditDashboard() {
                 </div>
             </Modal>
         </>
+    );
+}
+
+
+export default function AuditDashboard() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <AuditDashboardContent />
+        </RequireRole>
     );
 }

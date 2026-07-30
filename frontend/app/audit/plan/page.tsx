@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -43,7 +45,7 @@ const STATUS_OPTIONS = ['Taslak', 'Onay Bekliyor', 'Onaylandı', 'İptal'] as co
 
 import { AccessDenied } from '@/components/audit/AuditLogComponents';
 
-export default function AuditPlanPage() {
+function AuditPlanPageContent() {
     const pathname = usePathname();
     const router = useRouter();
     const { showToast } = useToast();
@@ -641,5 +643,14 @@ export default function AuditPlanPage() {
                 type="danger"
             />
         </>
+    );
+}
+
+
+export default function AuditPlanPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <AuditPlanPageContent />
+        </RequireRole>
     );
 }

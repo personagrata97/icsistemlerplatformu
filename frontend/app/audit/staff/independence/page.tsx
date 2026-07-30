@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import StaffTabs from '@/components/audit/staff/StaffTabs';
@@ -18,7 +20,7 @@ import { Shield } from 'lucide-react';
 import { auditApi } from '@/lib/audit-api';
 import LoadingState from '@/components/ui/LoadingState';
 
-export default function IndependencePage() {
+function IndependencePageContent() {
     const [loading, setLoading] = useState(true);
     const [staffList, setStaffList] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -297,5 +299,14 @@ export default function IndependencePage() {
                 )}
             </Modal>
         </div>
+    );
+}
+
+
+export default function IndependencePage() {
+    return (
+        <RequireRole allowedRoles={['GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <IndependencePageContent />
+        </RequireRole>
     );
 }

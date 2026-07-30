@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { Suspense } from 'react';
@@ -43,7 +45,7 @@ interface ActionPlanItem {
     dueDate: string;
 }
 
-function FastTrackPageContent() {
+function FastTrackPageInner() {
     const searchParams = useSearchParams();
     const findingId = searchParams.get('findingId');
     const token = searchParams.get('token');
@@ -676,10 +678,19 @@ function FastTrackPageContent() {
 }
 
 
-export default function FastTrackPage() {
+function FastTrackPageContent() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingState message="Sayfa Yükleniyor..." /></div>}>
-      <FastTrackPageContent />
+      <FastTrackPageInner />
     </Suspense>
   );
+}
+
+
+export default function FastTrackPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <FastTrackPageContent />
+        </RequireRole>
+    );
 }

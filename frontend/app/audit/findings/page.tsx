@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Suspense } from 'react';
@@ -48,7 +50,7 @@ import Modal from '@/components/ui/Modal';
 
 import { isAuditManagerRole, isAuditInspectorRole } from '@/lib/permissions-map';
 
-function FindingsPageContent() {
+function FindingsPageInner() {
     const { user, hasPermission, hasRole } = useAuth();
     const isAuditor = isAuditManagerRole(hasRole) || isAuditInspectorRole(hasRole) || hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_MANAGER') || hasRole('AUDIT_SUPERVISOR');
     const isUnit = !isAuditor && checkRole(hasRole, ROLES.UNIT);
@@ -1018,10 +1020,19 @@ function FindingsPageContent() {
 }
 
 
-export default function FindingsPage() {
+function FindingsPageContent() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingState message="Sayfa Yükleniyor..." /></div>}>
-      <FindingsPageContent />
+      <FindingsPageInner />
     </Suspense>
   );
+}
+
+
+export default function FindingsPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <FindingsPageContent />
+        </RequireRole>
+    );
 }

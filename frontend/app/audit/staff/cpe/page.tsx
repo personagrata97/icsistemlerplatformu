@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { auditApi } from '@/lib/audit-api';
@@ -38,7 +40,7 @@ const TITLES = [
     'Teftiş Kurulu Müdürü'
 ];
 
-export default function CpePage() {
+function CpePageContent() {
     const { user, hasRole } = useAuth();
     const canManage = hasRole ? checkRole(hasRole, ROLES.STAFF_MANAGER) : false;
 
@@ -414,5 +416,14 @@ export default function CpePage() {
                 )}
             </Modal>
         </div>
+    );
+}
+
+
+export default function CpePage() {
+    return (
+        <RequireRole allowedRoles={['GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <CpePageContent />
+        </RequireRole>
     );
 }

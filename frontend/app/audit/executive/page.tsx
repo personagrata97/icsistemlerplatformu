@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { Briefcase, CheckCircle, Users, CheckSquare, XCircle, Clock, Calendar, AlertTriangle } from 'lucide-react';
@@ -25,7 +27,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import { useExecutiveCalculations } from '@/hooks/useExecutiveCalculations';
 import { AccessDenied } from '@/components/audit/AuditLogComponents';
 
-export default function ExecutiveDashboard() {
+function ExecutiveDashboardContent() {
     const router = useRouter();
     const { showToast } = useToast();
     const { hasRole } = useAuth();
@@ -195,5 +197,14 @@ export default function ExecutiveDashboard() {
                 onReject={handleRejectDelete}
             />
         </>
+    );
+}
+
+
+export default function ExecutiveDashboard() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ExecutiveDashboardContent />
+        </RequireRole>
     );
 }

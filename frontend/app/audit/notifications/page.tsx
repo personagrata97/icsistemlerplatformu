@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { Bell, Check, Clock, AlertTriangle, Info, Search, Filter, ArrowLeft, CheckCheck, RefreshCw } from 'lucide-react';
@@ -26,7 +28,7 @@ interface Notification {
 
 const ITEMS_PER_PAGE = 20;
 
-export default function NotificationsPage() {
+function NotificationsPageContent() {
     const { setTitle, setSubtitle } = useAuditTitle();
     const { showToast } = useToast();
     const [filter, setFilter] = useState('all');
@@ -188,5 +190,14 @@ export default function NotificationsPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+
+export default function NotificationsPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <NotificationsPageContent />
+        </RequireRole>
     );
 }

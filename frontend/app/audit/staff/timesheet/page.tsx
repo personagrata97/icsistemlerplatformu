@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import StaffTabs from '@/components/audit/staff/StaffTabs';
@@ -17,7 +19,7 @@ import { getPhotoUrl } from '@/lib/audit-utils';
 import { Clock } from 'lucide-react';
 import { auditApi } from '@/lib/audit-api';
 
-export default function TimesheetPage() {
+function TimesheetPageContent() {
     const [loading, setLoading] = useState(true);
     const [staffList, setStaffList] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -272,5 +274,14 @@ export default function TimesheetPage() {
                 )}
             </Modal>
         </div>
+    );
+}
+
+
+export default function TimesheetPage() {
+    return (
+        <RequireRole allowedRoles={['GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <TimesheetPageContent />
+        </RequireRole>
     );
 }

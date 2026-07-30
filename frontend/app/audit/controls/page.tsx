@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/audit/PageHeader';
@@ -9,7 +11,7 @@ import { auditApi, Control } from '@/lib/audit-api';
 import { Shield, Target, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
-export default function ControlsPage() {
+function ControlsPageContent() {
     const [controls, setControls] = useState<Control[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -80,5 +82,14 @@ export default function ControlsPage() {
                 ]}
             />
         </div>
+    );
+}
+
+
+export default function ControlsPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlsPageContent />
+        </RequireRole>
     );
 }

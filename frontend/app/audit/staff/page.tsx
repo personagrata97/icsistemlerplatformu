@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -95,7 +97,7 @@ const getNestedDepartmentOptions = () => {
 
 import { AccessDenied } from '@/components/audit/AuditLogComponents';
 
-export default function AuditStaffPage() {
+function AuditStaffPageContent() {
     const router = useRouter();
     const { hasRole, user } = useAuth();
     const isManager = checkRole(hasRole, ROLES.STAFF_MANAGER);
@@ -2705,3 +2707,12 @@ export default function AuditStaffPage() {
 }
 
 
+
+
+export default function AuditStaffPage() {
+    return (
+        <RequireRole allowedRoles={['GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <AuditStaffPageContent />
+        </RequireRole>
+    );
+}

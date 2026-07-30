@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState, useEffect, useRef } from 'react';
 import {
     Layers, Calculator, Plus, Search, Download, RefreshCw, Eye,
@@ -73,7 +75,7 @@ import { useAuth } from '@/context/AuthContext';
 import { checkRole, ROLES } from '@/lib/auth-constants';
 import { AccessDenied } from '@/components/audit/AuditLogComponents';
 
-export default function SamplingPage() {
+function SamplingPageContent() {
     const { hasRole } = useAuth();
     const isInspector = hasRole('AUDIT_INSPECTOR');
     const isSupervisor = hasRole('AUDIT_SUPERVISOR');
@@ -1103,5 +1105,14 @@ export default function SamplingPage() {
                 }}
             />
         </div >
+    );
+}
+
+
+export default function SamplingPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <SamplingPageContent />
+        </RequireRole>
     );
 }

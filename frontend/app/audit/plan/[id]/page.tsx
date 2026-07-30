@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState, useEffect, useRef } from 'react';
 import { formatDate } from '@/lib/audit-utils';
 import {
@@ -42,7 +44,7 @@ const STATUS_COLORS: Record<string, string> = {
     'İptal': 'bg-red-100 text-red-800 border-red-200',
 };
 
-export default function AuditPlanDetailPage() {
+function AuditPlanDetailPageContent() {
     const params = useParams();
     const router = useRouter();
     const id = params?.id;
@@ -589,5 +591,14 @@ export default function AuditPlanDetailPage() {
                 type="danger"
             />
         </div>
+    );
+}
+
+
+export default function AuditPlanDetailPage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <AuditPlanDetailPageContent />
+        </RequireRole>
     );
 }
