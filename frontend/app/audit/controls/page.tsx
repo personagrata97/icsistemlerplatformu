@@ -15,20 +15,26 @@ function ControlsPageContent() {
     const [controls, setControls] = useState<Control[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
     const { showToast } = useToast();
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [page]);
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = await auditApi.getAllControls();
-            setControls(data || []);
+            const data = await auditApi.getAllControls({ page, pageSize: 20 });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setControls(items);
+            setTotalItems(data?.total ?? items.length);
         } catch (error) {
             console.error('Kontroller yüklenirken hata oluştu:', error);
             showToast('Kontroller yüklenirken bir hata oluştu.', 'error');
+            setControls([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -41,7 +47,7 @@ function ControlsPageContent() {
     );
 
     const stats = {
-        total: controls.length,
+        total: totalItems || controls.length,
         preventive: controls.filter(c => c.type === 'Önleyici').length,
         detective: controls.filter(c => c.type === 'Tespit Edici').length,
         corrective: controls.filter(c => c.type === 'Düzeltici').length,
@@ -73,6 +79,12 @@ function ControlsPageContent() {
                 data={filteredControls}
                 loading={loading}
                 rowKey="id"
+                paginated={true}
+                manualPagination={true}
+                currentPage={page}
+                totalItems={totalItems}
+                onPageChange={setPage}
+                itemsPerPage={20}
                 columns={[
                     { key: 'code', header: 'Kontrol Kodu', render: (row: any) => <span className="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">{row.code || '-'}</span> },
                     { key: 'name', header: 'Kontrol Adı', render: (row: any) => <span className="font-medium text-gray-800">{row.name}</span> },

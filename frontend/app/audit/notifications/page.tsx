@@ -37,13 +37,19 @@ function NotificationsPageContent() {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
 
+    const [totalItems, setTotalItems] = useState(0);
+
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = await auditApi.getNotifications();
-            setNotifications(data || []);
+            const data = await auditApi.getNotifications({ page: currentPage, pageSize: ITEMS_PER_PAGE });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setNotifications(items);
+            setTotalItems(data?.total ?? items.length);
         } catch (error: any) {
             showToast(error.message || 'Bildirimler yüklenemedi', 'error');
+            setNotifications([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -53,7 +59,7 @@ function NotificationsPageContent() {
         setTitle('Bildirimler');
         setSubtitle('Sistem bildirimleri ve uyarılar');
         loadData();
-    }, [setTitle, setSubtitle]);
+    }, [setTitle, setSubtitle, currentPage]);
 
     const markAllAsRead = async () => {
         try {
@@ -170,15 +176,13 @@ function NotificationsPageContent() {
                         </div>
 
                         {/* Merkezi Pagination */}
-                        {totalPages > 1 && (
-                            <Pagination
-                                currentPage={currentPage}
-                                totalItems={filteredNotifications.length}
-                                itemsPerPage={ITEMS_PER_PAGE}
-                                onPageChange={setCurrentPage}
-                                itemUnit="bildirim"
-                            />
-                        )}
+                        <Pagination
+                            currentPage={currentPage}
+                            totalItems={totalItems || filteredNotifications.length}
+                            itemsPerPage={ITEMS_PER_PAGE}
+                            onPageChange={setCurrentPage}
+                            itemUnit="bildirim"
+                        />
                     </>
                 ) : (
                     <div className="flex-1 flex items-center justify-center">

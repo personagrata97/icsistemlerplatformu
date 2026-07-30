@@ -96,6 +96,7 @@ function FindingsPageInner() {
 
     // Sayfalama durumu
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
     const itemsPerPage = 10;
 
 
@@ -103,7 +104,7 @@ function FindingsPageInner() {
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [currentPage]);
 
     const searchParams = useSearchParams();
     const linkedId = searchParams.get('id');
@@ -138,15 +139,19 @@ function FindingsPageInner() {
     useEffect(() => {
         try {
             const samplingDataStr = sessionStorage.getItem('newFindingFromSampling');
-            if (samplingDataStr && audits.length > 0) {
+            if (samplingDataStr) {
                 const data = JSON.parse(samplingDataStr);
                 
                 // Oluşturma modalını aç ve ön doldur
                 setSelectedFinding({
                     auditId: data.auditId || '',
                     title: `Örneklem Hatası: ${data.title}`,
-                    description: `Sistem üzerinden yapılan örnekleme sonucunda tespit edilen hatalar (${data.deviations} sapma). \nLütfen detayları ve kanıtları ekleyiniz.`,
+                    description: `Sistem üzerinden yapılan örnekleme sonucunda tespit edilen hatalar (${data.deviations} sapma) bulguya dönüştürülmüştür. Örneklem ID: ${data.sampleId}`,
                     riskLevel: 'Orta',
+                    category: 'Operasyonel Risk',
+                    assignedUserId: '',
+                    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    departmentResponse: '',
                     id: undefined // Yeni bulgu olarak işlenecek
                 } as any);
                 setIsCreateModalOpen(true);
@@ -163,21 +168,28 @@ function FindingsPageInner() {
         try {
             if (showOverlay) setLoading(true);
             const [findingsData, auditsData, staffData] = await Promise.all([
-                auditApi.getFindings(),
+                auditApi.getFindings({ page: currentPage, pageSize: itemsPerPage }),
                 auditApi.getAudits(),
                 auditApi.getStaff()
             ]);
             
-            const mappedFindings = findingsData.map((f: any) => ({
+            const rawFindings = findingsData?.items || (Array.isArray(findingsData) ? findingsData : []);
+            const total = findingsData?.total ?? rawFindings.length;
+
+            const rawAudits = auditsData?.items || (Array.isArray(auditsData) ? auditsData : []);
+            const rawStaff = staffData?.items || (Array.isArray(staffData) ? staffData : []);
+
+            const mappedFindings = rawFindings.map((f: any) => ({
                 ...f,
                 riskLevel: f.riskLevel || f.risk,
-                assignedUser: f.assignedUser || (f.assignedUserId ? staffData.find((s:any) => String(s.id) === String(f.assignedUserId)) : null),
-                audit: f.audit || (f.auditId ? auditsData.find((a:any) => String(a.id) === String(f.auditId)) : null)
+                assignedUser: f.assignedUser || (f.assignedUserId ? rawStaff.find((s:any) => String(s.id) === String(f.assignedUserId)) : null),
+                audit: f.audit || (f.auditId ? rawAudits.find((a:any) => String(a.id) === String(f.auditId)) : null)
             }));
 
             setFindings(mappedFindings);
-            setAudits(auditsData);
-            setStaffList(staffData);
+            setTotalItems(total);
+            setAudits(rawAudits);
+            setStaffList(rawStaff);
         } catch (err: any) {
             console.error('Veri yükleme hatası:', err);
             setError('Veriler yüklenirken bir hata oluştu. Lütfen bağlantınızı kontrol edin.');
@@ -823,7 +835,7 @@ function FindingsPageInner() {
             {/* Pagination */}
             <Pagination
                 currentPage={currentPage}
-                totalItems={filteredFindings.length}
+                totalItems={totalItems || filteredFindings.length}
                 itemsPerPage={itemsPerPage}
                 onPageChange={setCurrentPage}
             />

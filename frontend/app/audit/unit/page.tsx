@@ -33,8 +33,8 @@ function UnitPortalPageContent() {
                     auditApi.getFindings()
                 ]);
                 
-                setAudits(Array.isArray(auditsData) ? auditsData : []);
-                setFindings(Array.isArray(findingsData) ? findingsData : []);
+                setAudits(auditsData?.items || (Array.isArray(auditsData) ? auditsData : []));
+                setFindings(findingsData?.items || (Array.isArray(findingsData) ? findingsData : []));
             } catch (err) {
                 console.error('Birim portal verisi yükleme hatası:', err);
                 setAudits([]);

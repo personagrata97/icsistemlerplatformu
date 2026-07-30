@@ -111,17 +111,24 @@ function OfficialReportingPageContent() {
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
     const [deleteReportId, setDeleteReportId] = useState<string | null>(null);
 
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
     useEffect(() => {
         loadStats(true);
         loadReportHistory();
-    }, []);
+    }, [page]);
 
     const loadReportHistory = async () => {
         try {
-            const data = await auditApi.getGeneratedReports();
-            setReportHistory(data);
+            const data = await auditApi.getGeneratedReports({ page, pageSize: 10 });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setReportHistory(items);
+            setTotalItems(data?.total ?? items.length);
         } catch (error) {
             console.error('Rapor geçmişi yükleme hatası:', error);
+            setReportHistory([]);
+            setTotalItems(0);
         }
     };
 
@@ -381,6 +388,12 @@ function OfficialReportingPageContent() {
                             )
                         }
                     ]}
+                    paginated={true}
+                    manualPagination={true}
+                    currentPage={page}
+                    totalItems={totalItems}
+                    onPageChange={setPage}
+                    itemsPerPage={10}
                     className="border-none shadow-none"
                 />
 

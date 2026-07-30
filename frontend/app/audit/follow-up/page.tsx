@@ -26,16 +26,21 @@ function FollowUpPageContent() {
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
     const [actions, setActions] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
 
     const fetchActions = async () => {
         setLoading(true);
         try {
-            const data = await auditApi.getFollowUpActions();
-            setActions(Array.isArray(data) ? data : []);
+            const data = await auditApi.getFollowUpActions({ page, pageSize: 20 });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setActions(items);
+            setTotalItems(data?.total ?? items.length);
         } catch (error) {
             console.error('Aksiyonlar çekilemedi:', error);
             showToast('Aksiyon takibi verileri yüklenemedi', 'error');
             setActions([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -43,7 +48,7 @@ function FollowUpPageContent() {
 
     useEffect(() => {
         fetchActions();
-    }, []);
+    }, [page]);
 
     const handleApproveClosing = async () => {
         if (!selectedAction) return;
@@ -235,6 +240,10 @@ function FollowUpPageContent() {
                     onClearFilters={() => setSearchTerm('')}
                     rowKey="id"
                     paginated={true}
+                    manualPagination={true}
+                    currentPage={page}
+                    totalItems={totalItems}
+                    onPageChange={setPage}
                     itemsPerPage={20}
                 />
             )}

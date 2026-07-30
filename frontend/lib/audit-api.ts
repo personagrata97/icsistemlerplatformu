@@ -445,12 +445,23 @@ export const getWorkpaperUrl = (auditId: string, filename: string) => {
     return `${API_BASE_URL}/audit/audits/${auditId}/workpapers/${encodeURIComponent(filename)}`;
 };
 
-// LocalStorage Helper REMOVED - STRICT SERVER MODE
+export const buildQueryString = (params?: Record<string, any>): string => {
+    if (!params) return '';
+    const query = new URLSearchParams();
+    Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+            query.append(key, String(params[key]));
+        }
+    });
+    const str = query.toString();
+    return str ? `?${str}` : '';
+};
 
 export const auditApi = {
     // LOGS
-    getLogs: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/logs`, {
+    getLogs: async (params?: any) => {
+        const query = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/logs${query}`, {
             headers: getHeaders(),
         });
         return handleResponse(res);
@@ -480,8 +491,9 @@ export const auditApi = {
         return handleResponse(res);
     },
 
-    getNotifications: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/notifications`, {
+    getNotifications: async (params?: any) => {
+        const query = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/notifications${query}`, {
             headers: getHeaders(),
         });
         return handleResponse(res);
@@ -511,8 +523,9 @@ export const auditApi = {
     },
 
     // STAFF
-    getStaff: async (): Promise<AuditStaff[]> => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/staff`, { headers: getHeaders() });
+    getStaff: async (params?: any): Promise<any> => {
+        const query = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/staff${query}`, { headers: getHeaders() });
         return handleResponse(res);
     },
 
@@ -719,8 +732,9 @@ export const auditApi = {
     },
 
     // AUDITS
-    getAudits: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/audits`, { headers: getHeaders() });
+    getAudits: async (params?: any) => {
+        const query = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/audits${query}`, { headers: getHeaders() });
         return handleResponse(res);
     },
 
@@ -958,8 +972,9 @@ export const auditApi = {
         });
         return handleResponse(res);
     },
-    getGeneratedReports: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/reports/history`, { headers: getHeaders() });
+    getGeneratedReports: async (params?: any) => {
+        const queryString = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/reports/history${queryString}`, { headers: getHeaders() });
         return handleResponse(res);
     },
     downloadReport: async (id: string) => {
@@ -976,8 +991,9 @@ export const auditApi = {
     },
 
     // ALL CONTROLS (for controls library page)
-    getAllControls: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/controls`, { headers: getHeaders() });
+    getAllControls: async (params?: any) => {
+        const query = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/controls${query}`, { headers: getHeaders() });
         return handleResponse(res);
     },
 
@@ -987,14 +1003,16 @@ export const auditApi = {
         return { id: Date.now().toString(), ...data };
     },
 
-    getFindings: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/findings`, { headers: getHeaders() });
+    getFindings: async (params?: any) => {
+        const query = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/findings${query}`, { headers: getHeaders() });
         return handleResponse(res);
     },
 
     // MULTI-YEAR PLAN
-    getMultiYearPlans: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/multi-year-plans`, { headers: getHeaders() });
+    getMultiYearPlans: async (params?: any) => {
+        const query = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/multi-year-plans${query}`, { headers: getHeaders() });
         return handleResponse(res);
     },
     getMultiYearPlanById: async (id: string) => {
@@ -1807,11 +1825,13 @@ export const auditApi = {
 
     // ==================== SAMPLING ====================
 
-    getSamples: async (filters?: { auditId?: string; method?: string; status?: string }) => {
+    getSamples: async (filters?: { auditId?: string; method?: string; status?: string; page?: number; pageSize?: number }) => {
         const params = new URLSearchParams();
         if (filters?.auditId) params.append('auditId', filters.auditId);
         if (filters?.method) params.append('method', filters.method);
         if (filters?.status) params.append('status', filters.status);
+        if (filters?.page) params.append('page', String(filters.page));
+        if (filters?.pageSize) params.append('pageSize', String(filters.pageSize));
         const queryString = params.toString() ? `?${params.toString()}` : '';
         const res = await fetchWithTimeout(`${API_BASE_URL}/audit/sampling${queryString}`, {
             headers: getHeaders()
@@ -1984,9 +2004,9 @@ export const auditApi = {
         });
         return handleResponse(res);
     },
-    getDocuments: async (category?: string) => {
-        const url = category ? `${API_BASE_URL}/documents?category=${category}` : `${API_BASE_URL}/documents`;
-        const res = await fetchWithTimeout(url, { headers: getHeaders() });
+    getDocuments: async (category?: string, params?: any) => {
+        const query = buildQueryString({ category, ...params });
+        const res = await fetchWithTimeout(`${API_BASE_URL}/documents${query}`, { headers: getHeaders() });
         return handleResponse(res);
     },
     deleteDocument: async (id: string) => {
@@ -2160,8 +2180,9 @@ export const auditApi = {
     },
 
     // PLANS
-    getPlans: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/plans`, { headers: getHeaders() });
+    getPlans: async (params?: any) => {
+        const queryString = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/plans${queryString}`, { headers: getHeaders() });
         return handleResponse(res);
     },
     getPlan: async (id: string) => {
@@ -2280,7 +2301,7 @@ export const auditApi = {
     },
 
     // FOLLOW-UP & CONCILIATION (ADIM 1)
-    getFollowUpActions: async (filters?: { durum?: string; sorumluId?: string; findingId?: string }) => {
+    getFollowUpActions: async (filters?: { durum?: string; sorumluId?: string; findingId?: string; page?: number; pageSize?: number }) => {
         const params = new URLSearchParams(filters as any);
         const res = await fetchWithTimeout(`${API_BASE_URL}/audit/follow-up?${params.toString()}`, { headers: getHeaders() });
         return handleResponse(res);
@@ -2318,7 +2339,7 @@ export const auditApi = {
         return handleResponse(res);
     },
 
-    getConciliationObjections: async (filters?: { durum?: string; findingId?: string }) => {
+    getConciliationObjections: async (filters?: { durum?: string; findingId?: string; page?: number; pageSize?: number }) => {
         const params = new URLSearchParams(filters as any);
         const res = await fetchWithTimeout(`${API_BASE_URL}/audit/conciliation?${params.toString()}`, { headers: getHeaders() });
         return handleResponse(res);

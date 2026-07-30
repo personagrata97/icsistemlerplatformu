@@ -106,11 +106,11 @@ function TrashPageContent() {
             ]);
 
             setDeletedItems({
-                audits: Array.isArray(audits) ? audits : [],
-                findings: Array.isArray(findings) ? findings : [],
-                plans: Array.isArray(plans) ? plans : [],
-                ethics: Array.isArray(ethics) ? ethics : [],
-                documents: Array.isArray(documents) ? documents : []
+                audits: audits?.items || (Array.isArray(audits) ? audits : []),
+                findings: findings?.items || (Array.isArray(findings) ? findings : []),
+                plans: plans?.items || (Array.isArray(plans) ? plans : []),
+                ethics: ethics?.items || (Array.isArray(ethics) ? ethics : []),
+                documents: documents?.items || (Array.isArray(documents) ? documents : [])
             });
         } catch (error) {
             console.error('Çöp kutusu yükleme hatası:', error);

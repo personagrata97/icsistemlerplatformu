@@ -59,6 +59,9 @@ function AuditLogsPageContent() {
     const [integrityLoading, setIntegrityLoading] = useState(false);
     const [logFilterMode, setLogFilterMode] = useState<'all' | 'today' | 'critical'>('all');
 
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
     const isAdmin = checkRole(hasRole, ROLES.LOGS_ADMIN);
 
     useEffect(() => {
@@ -66,22 +69,28 @@ function AuditLogsPageContent() {
         setSubtitle('Sistemdeki tüm kullanıcı işlemleri ve değişiklik kayıtları.');
         if (isAdmin) loadData();
         else setLoading(false);
-    }, [isAdmin]);
+    }, [isAdmin, page]);
 
     const loadData = async (showOverlay = true) => {
         if (showOverlay) setLoading(true);
         try {
-            const data = await auditApi.getLogs?.() || [];
-            const enrichedData = Array.isArray(data) ? data.map((l: any) => ({
+            const data = await auditApi.getLogs?.({ page, pageSize: 10 }) || [];
+            const rawItems = data?.items || (Array.isArray(data) ? data : []);
+            const total = data?.total ?? rawItems.length;
+
+            const enrichedData = rawItems.map((l: any) => ({
                 ...l,
                 date: l.date || l.createdAt || l.created_at,
                 type: l.type || (l.action.includes('Giriş') || l.action.includes('Çıkış') ? 'login' : l.action.includes('Sil') ? 'delete' : l.action.includes('Güncel') ? 'update' : 'create')
-            })) : [];
+            }));
             setLogs(enrichedData);
+            setTotalItems(total);
             if (!showOverlay) showToast('Denetim izleri güncellendi', 'success');
         } catch (error) {
             console.error('Logs error:', error);
             showToast('Denetim izleri yüklenemedi', 'error');
+            setLogs([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -309,6 +318,10 @@ function AuditLogsPageContent() {
                 loading={loading}
                 rowKey="id"
                 paginated={true}
+                manualPagination={true}
+                currentPage={page}
+                totalItems={totalItems}
+                onPageChange={setPage}
                 itemsPerPage={10}
                 className="shadow-sm border border-gray-100"
                 searchTerm={searchTerm}

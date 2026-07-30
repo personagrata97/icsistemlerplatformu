@@ -206,9 +206,14 @@ function QualityAssurancePageContent() {
                 auditApi.getQualityActions().catch(() => []),
                 auditApi.getQualityStats().catch(() => null)
             ]);
-            setMetrics([...(autoMetricsData || []), ...(metricsData || [])]);
-            setAssessments(assessmentsData || []);
-            setActions(actionsData || []);
+            const rawMetrics = metricsData?.items || (Array.isArray(metricsData) ? metricsData : []);
+            const rawAutoMetrics = autoMetricsData?.items || (Array.isArray(autoMetricsData) ? autoMetricsData : []);
+            const rawAssessments = assessmentsData?.items || (Array.isArray(assessmentsData) ? assessmentsData : []);
+            const rawActions = actionsData?.items || (Array.isArray(actionsData) ? actionsData : []);
+
+            setMetrics([...rawAutoMetrics, ...rawMetrics]);
+            setAssessments(rawAssessments);
+            setActions(rawActions);
             setStats(statsData);
         } catch (error) {
             console.error('Kalite verisi yükleme hatası:', error);

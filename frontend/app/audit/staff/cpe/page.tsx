@@ -80,7 +80,7 @@ function CpePageContent() {
         setLoading(true);
         try {
             const data = await auditApi.getCpeStats(parseInt(selectedYear));
-            setStats(Array.isArray(data) ? data : []);
+            setStats(data?.items || (Array.isArray(data) ? data : []));
         } catch (error) {
             console.error('Eğitim verisi yüklenemedi:', error);
             showToast('Eğitim verileri alınırken bir hata oluştu.', 'error');

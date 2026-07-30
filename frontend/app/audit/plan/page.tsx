@@ -96,6 +96,9 @@ function AuditPlanPageContent() {
         id: null
     });
 
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
     useEffect(() => {
         // Ana sayfaya gelindiğinde veya route değiştiğinde filtreleri varsayılana döndür
         setSearchTerm('');
@@ -103,25 +106,28 @@ function AuditPlanPageContent() {
         setFilterStatus([]);
         setSelectedYear([]);
         loadData();
-    }, [pathname]);
+    }, [pathname, page]);
 
     const loadData = async (showOverlay = true) => {
         if (showOverlay) setLoading(true);
         try {
             const [data, statsData, staffData] = await Promise.all([
-                auditApi.getPlans(),
+                auditApi.getPlans({ page, pageSize: 10 }),
                 auditApi.getExecutiveStats(),
                 auditApi.getStaff().catch(() => [])
             ]);
-            // Tüm planları yükle (yıl filtresi client-side yapılacak)
-            const allPlans = (Array.isArray(data) ? data : []).map((p: any) => ({
+            const rawPlans = data?.items || (Array.isArray(data) ? data : []);
+            const total = data?.total ?? rawPlans.length;
+
+            const allPlans = rawPlans.map((p: any) => ({
                 ...p,
                 planType: p.planType || p.type || 'Yıllık Plan'
             }));
             setPlans(allPlans);
+            setTotalItems(total);
 
             // Kapasite Hesabı (Adam/Gün) — Gerçek personel sayısı staff API'den
-            const staffList = Array.isArray(staffData) ? staffData : [];
+            const staffList = staffData?.items || (Array.isArray(staffData) ? staffData : []);
             const totalAuditorCount = staffList.length > 0 ? staffList.length : 1;
             const tCapacity = totalAuditorCount * 220;
             setTotalCapacity(tCapacity);
@@ -131,6 +137,7 @@ function AuditPlanPageContent() {
         } catch (error) {
             console.error('Plan listesi yükleme hatası:', error);
             setPlans([]);
+            setTotalItems(0);
             showToast('Planlar yüklenirken hata oluştu', 'error');
         } finally {
             setLoading(false);

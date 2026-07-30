@@ -54,20 +54,27 @@ function KnowledgeBasePageContent() {
         loadStaff();
     }, []);
 
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
     // Sekme değiştiğinde dokümanları yeniden yükle
     useEffect(() => {
         loadDocuments();
-    }, [activeTab]);
+    }, [activeTab, page]);
 
     const loadDocuments = async (showOverlay = true) => {
         try {
             if (showOverlay) setLoading(true);
             // Kategoriye göre yükle
-            const data = await auditApi.getDocuments(activeTab);
-            setDocuments(Array.isArray(data) ? data : []);
+            const data = await auditApi.getDocuments(activeTab, { page, pageSize: 10 });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setDocuments(items);
+            setTotalItems(data?.total ?? items.length);
         } catch (error: any) {
             console.error('Doküman yükleme hatası:', error);
             showToast('Dokümanlar yüklenirken hata oluştu: ' + error.message, 'error');
+            setDocuments([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -80,7 +87,8 @@ function KnowledgeBasePageContent() {
     const loadStaff = async () => {
         try {
             const data = await auditApi.getStaff();
-            setStaff(Array.isArray(data) ? data : []);
+            const staffItems = data?.items || (Array.isArray(data) ? data : []);
+            setStaff(staffItems);
         } catch (error) {
             console.error('Personel listesi yükleme hatası:', error);
         }
@@ -239,6 +247,10 @@ function KnowledgeBasePageContent() {
                 data={filteredDocs}
                 loading={loading}
                 paginated={true}
+                manualPagination={true}
+                currentPage={page}
+                totalItems={totalItems}
+                onPageChange={setPage}
                 itemsPerPage={10}
                 columns={[
                     {

@@ -38,7 +38,7 @@ function IndependencePageContent() {
         setLoading(true);
         try {
             const data = await auditApi.getStaff();
-            setStaffList(Array.isArray(data) ? data : []);
+            setStaffList(data?.items || (Array.isArray(data) ? data : []));
         } catch (error) {
             console.error(error);
         } finally {

@@ -135,9 +135,11 @@ function AuditStaffPageContent() {
             if (showOverlay) setLoading(true);
             const data = await auditApi.getStaff();
             
+            const rawStaff = data?.items || (Array.isArray(data) ? data : []);
+
             // Dinamik Durum (İzinli) Hesaplaması
             const now = new Date();
-            const processedData = (Array.isArray(data) ? data : []).map(staff => {
+            const processedData = rawStaff.map((staff: any) => {
                 let currentStatus = staff.status || 'Aktif';
                 
                 // Sadece aktif olan personel izne ayrılabilir. (Pasifler pasif kalır)
@@ -146,13 +148,11 @@ function AuditStaffPageContent() {
                         if (leave.status === 'İptal Edildi') return false;
                         const sDate = new Date(leave.startDate);
                         const eDate = new Date(leave.endDate);
-                        // Start of day vs End of day logic could be applied, but direct Date comparison works for standard cases
                         return now >= sDate && now <= eDate;
                     });
                     if (isActiveLeave) {
                         currentStatus = 'İzinli';
                     } else if (currentStatus === 'İzinli') {
-                        // Eğer eskiden manuel "İzinli" kalmış ama aktif izni yoksa, Aktife çek
                         currentStatus = 'Aktif';
                     }
                 }

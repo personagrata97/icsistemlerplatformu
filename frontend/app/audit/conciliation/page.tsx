@@ -25,16 +25,21 @@ function ConciliationPageContent() {
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
     const [objections, setObjections] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
 
     const fetchObjections = async () => {
         setLoading(true);
         try {
-            const data = await auditApi.getConciliationObjections();
-            setObjections(Array.isArray(data) ? data : []);
+            const data = await auditApi.getConciliationObjections({ page, pageSize: 20 });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setObjections(items);
+            setTotalItems(data?.total ?? items.length);
         } catch (error) {
             console.error('İtirazlar çekilemedi:', error);
             showToast('İtiraz ve uzlaşma verileri yüklenemedi', 'error');
             setObjections([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -42,7 +47,7 @@ function ConciliationPageContent() {
 
     useEffect(() => {
         fetchObjections();
-    }, []);
+    }, [page]);
 
     const handleConfirmDecision = async (decisionType: 'KABUL_EDILDI' | 'REDDEDILDI') => {
         if (!selectedObjection) return;
@@ -191,6 +196,10 @@ function ConciliationPageContent() {
                     onClearFilters={() => setSearchTerm('')}
                     rowKey="id"
                     paginated={true}
+                    manualPagination={true}
+                    currentPage={page}
+                    totalItems={totalItems}
+                    onPageChange={setPage}
                     itemsPerPage={20}
                 />
             )}

@@ -48,6 +48,8 @@ function ReportsPageContent() {
     const [isPartialModalOpen, setIsPartialModalOpen] = useState(false);
     const [sortColumn, setSortColumn] = useState<string>('generatedAt');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
     const itemsPerPage = 10;
 
     const REPORT_TYPE_LABELS: Record<string, string> = {
@@ -95,17 +97,19 @@ function ReportsPageContent() {
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [page]);
 
     const loadData = async () => {
         setLoading(true);
         try {
             const [reports, statsData] = await Promise.all([
-                auditApi.getGeneratedReports(),
+                auditApi.getGeneratedReports({ page, pageSize: itemsPerPage }),
                 auditApi.getExecutiveStats()
             ]);
 
-            setGeneratedReports(Array.isArray(reports) ? reports : []);
+            const items = reports?.items || (Array.isArray(reports) ? reports : []);
+            setGeneratedReports(items);
+            setTotalItems(reports?.total ?? items.length);
 
             setStats({
                 totalAudits: statsData.totalAudits || 0,
@@ -119,6 +123,8 @@ function ReportsPageContent() {
         } catch (error) {
             console.error('Rapor verisi yükleme hatası:', error);
             showToast('Veriler yüklenirken hata oluştu', 'error');
+            setGeneratedReports([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -289,6 +295,12 @@ function ReportsPageContent() {
                 loading={loading}
                 searchTerm={searchTerm}
                 rowKey="id"
+                paginated={true}
+                manualPagination={true}
+                currentPage={page}
+                totalItems={totalItems}
+                onPageChange={setPage}
+                itemsPerPage={itemsPerPage}
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
                 onSort={handleSort}

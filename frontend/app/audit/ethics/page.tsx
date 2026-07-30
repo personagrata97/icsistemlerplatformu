@@ -90,6 +90,7 @@ function EthicsPageContent() {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
     const itemsPerPage = 10;
 
     const [items, setItems] = useState<any[]>([]);
@@ -99,7 +100,7 @@ function EthicsPageContent() {
         setTitle('Etik Bildirim Hattı');
         setSubtitle('Etik ihlal bildirimleri ve inceleme süreçleri');
         loadData();
-    }, []);
+    }, [currentPage]);
 
     // URL parametrelerini doğrudan bağlantı için işle
     const searchParams = useSearchParams();
@@ -124,13 +125,17 @@ function EthicsPageContent() {
         try {
             if (showOverlay) setLoading(true);
             const [reportsData, statsData] = await Promise.all([
-                auditApi.getEthicsReports(),
+                auditApi.getEthicsReports({ page: currentPage, pageSize: itemsPerPage }),
                 auditApi.getEthicsStats()
             ]);
-            setItems(reportsData);
+            const reportItems = reportsData?.items || (Array.isArray(reportsData) ? reportsData : []);
+            setItems(reportItems);
+            setTotalItems(reportsData?.total ?? reportItems.length);
             setStats(statsData);
         } catch (error) {
             showToast(error instanceof Error ? error.message : 'Veriler yüklenirken hata oluştu', 'error');
+            setItems([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -467,6 +472,10 @@ function EthicsPageContent() {
                         loading={loading}
                         rowKey="id"
                         paginated={true}
+                        manualPagination={true}
+                        currentPage={currentPage}
+                        totalItems={totalItems}
+                        onPageChange={setCurrentPage}
                         itemsPerPage={itemsPerPage}
                         itemUnit="bildirim"
                         emptyIcon={MessageSquare}

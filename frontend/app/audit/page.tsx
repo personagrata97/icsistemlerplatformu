@@ -135,8 +135,8 @@ function AuditDashboardContent() {
                     auditApi.getFindings()
                 ]);
                 
-                setAudits(Array.isArray(auditsData) ? auditsData : []);
-                setFindings(Array.isArray(findingsData) ? findingsData : []);
+                setAudits(auditsData?.items || (Array.isArray(auditsData) ? auditsData : []));
+                setFindings(findingsData?.items || (Array.isArray(findingsData) ? findingsData : []));
             } else {
                 // Müfettiş veya Yönetici: Tüm paneli besleyecek dataları Server-Side'dan çek (Data Leakage Fix)
                 const [execStats, unitsData] = await Promise.all([
@@ -145,7 +145,7 @@ function AuditDashboardContent() {
                 ]);
                 
                 setStats(execStats);
-                setUnits(Array.isArray(unitsData) ? unitsData : []);
+                setUnits(unitsData?.items || (Array.isArray(unitsData) ? unitsData : []));
                 if (execStats.recentLogs) {
                     setActivities(execStats.recentLogs.map((log: any) => ({
                         id: log.id,

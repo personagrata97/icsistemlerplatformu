@@ -83,25 +83,32 @@ function AuditsPageInner() {
     });
 
     const [editingId, setEditingId] = useState<number | string | null>(null);
+    const [totalItems, setTotalItems] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         loadAudits(true);
         loadStaff(); // Sayfa yüklenirken personel listesini al
-    }, []);
+    }, [currentPage]);
 
     const loadAudits = async (showOverlay = true) => {
         if (showOverlay) setIsLoading(true);
         try {
-            const data = await auditApi.getAudits();
-            const mappedData = Array.isArray(data) ? data.map((audit: any) => ({
+            const data = await auditApi.getAudits({ page: currentPage, pageSize: itemsPerPage });
+            const rawItems = data?.items || (Array.isArray(data) ? data : []);
+            const total = data?.total ?? rawItems.length;
+            const mappedData = rawItems.map((audit: any) => ({
                 ...audit,
                 code: audit.auditCode || `D-${audit.id}`
-            })) : [];
+            }));
             setAudits(mappedData);
+            setTotalItems(total);
         } catch (error) {
             console.error('Denetimler yüklenirken hata:', error);
             showToast('Veriler yüklenemedi. Backend bağlantısını kontrol edin.', 'error');
             setAudits([]);
+            setTotalItems(0);
         } finally {
             setIsLoading(false);
         }
@@ -110,11 +117,8 @@ function AuditsPageInner() {
     const loadStaff = async () => {
         try {
             const data = await auditApi.getStaff();
-            if (Array.isArray(data)) {
-                setStaffList(data);
-            } else {
-                setStaffList([]);
-            }
+            const staffItems = data?.items || (Array.isArray(data) ? data : []);
+            setStaffList(staffItems);
         } catch (error) {
             console.error('Personel listesi yükleme hatası:', error);
             setStaffList([]);
@@ -183,10 +187,6 @@ function AuditsPageInner() {
             setDeleteConfirm({ isOpen: false, id: null });
         }
     };
-
-    // SAYFALAMA MANTIĞI
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
 
     // Filtre değiştiğinde sayfayı sıfırla
     useEffect(() => {
@@ -434,6 +434,10 @@ function AuditsPageInner() {
                 onRowClick={(item) => router.push(`/audit/audits/${item.id}`)}
                 className="shadow-sm border border-gray-100"
                 paginated={true}
+                manualPagination={true}
+                currentPage={currentPage}
+                totalItems={totalItems}
+                onPageChange={setCurrentPage}
                 itemsPerPage={itemsPerPage}
                 itemUnit="denetim"
                 searchTerm={searchTerm}

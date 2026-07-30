@@ -37,17 +37,24 @@ function MultiYearPlanPageContent() {
         description: ''
     });
 
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
     useEffect(() => {
         loadPlans();
-    }, []);
+    }, [page]);
 
     const loadPlans = async () => {
         try {
             setLoading(true);
-            const data = await auditApi.getMultiYearPlans();
-            setPlans(Array.isArray(data) ? data : []);
+            const data = await auditApi.getMultiYearPlans({ page, pageSize: 10 });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setPlans(items);
+            setTotalItems(data?.total ?? items.length);
         } catch (error) {
             showToast('Planlar yüklenemedi', 'error');
+            setPlans([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }

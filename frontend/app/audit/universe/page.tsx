@@ -512,8 +512,8 @@ function AuditUniversePageContent() {
                 auditApi.getAuditableUnits(),
                 auditApi.getStaff()
             ]);
-            setUnits(Array.isArray(data) ? data : []);
-            setStaffList(Array.isArray(staffData) ? staffData : []);
+            setUnits(data?.items || (Array.isArray(data) ? data : []));
+            setStaffList(staffData?.items || (Array.isArray(staffData) ? staffData : []));
         } catch (error) {
             console.error('Birim listesi yükleme hatası:', error);
             setUnits([]);

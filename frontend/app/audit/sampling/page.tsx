@@ -207,20 +207,27 @@ function SamplingPageContent() {
     const [calcTolerableError, setCalcTolerableError] = useState<number>(5);
     const [calcExpectedError, setCalcExpectedError] = useState<number>(1);
 
+    const [totalItems, setTotalItems] = useState(0);
+
     useEffect(() => {
         loadData();
-    }, []);
+    }, [currentPage]);
 
     const loadData = async (showOverlay = true) => {
         try {
             if (showOverlay) setLoading(true);
             const [data, auditList] = await Promise.all([
-                auditApi.getSamples(),
+                auditApi.getSamples({ page: currentPage, pageSize: itemsPerPage }),
                 auditApi.getAudits().catch(() => [])
             ]);
-            setAudits(auditList || []);
+            const rawAudits = auditList?.items || (Array.isArray(auditList) ? auditList : []);
+            setAudits(rawAudits);
+            
+            const rawSamples = data?.items || (Array.isArray(data) ? data : []);
+            const total = data?.total ?? rawSamples.length;
+
             // Backend verisini frontend arayüz yapısına dönüştür
-            const transformedPlans = (data || []).map((sample: any) => ({
+            const transformedPlans = rawSamples.map((sample: any) => ({
                 ...sample,
                 auditName: sample.audit?.title || 'Bilinmeyen Denetim',
                 // Orijinal alanları koru, arayüz için varlıklarını garanti et
@@ -231,9 +238,12 @@ function SamplingPageContent() {
                 status: sample.status || 'Planlandı',
             }));
             setPlans(transformedPlans);
+            setTotalItems(total);
         } catch (error) {
             console.error('Örnekleme planları yükleme hatası:', error);
             showToast('Veriler yüklenirken hata oluştu.', 'error');
+            setPlans([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
