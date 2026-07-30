@@ -232,10 +232,10 @@ function FastTrackPageInner() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 p-6">
-                <RotateCw className="w-12 h-12 text-[#c9a84c] animate-spin mb-4" />
-                <p className="text-sm font-semibold tracking-wider text-slate-400">TASARRUF FİNANSMAN A.Ş. HIZLI MUTABAKAT PORTALİ</p>
-                <p className="text-xs text-slate-500 mt-2">Güvenli veriler yükleniyor, lütfen bekleyin...</p>
+            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-slate-700 p-6">
+                <RotateCw className="w-12 h-12 text-primary animate-spin mb-4" />
+                <p className="text-sm font-semibold tracking-wider text-slate-600">TASARRUF FİNANSMAN A.Ş. HIZLI MUTABAKAT PORTALİ</p>
+                <p className="text-xs text-slate-400 mt-2">Güvenli veriler yükleniyor, lütfen bekleyin...</p>
             </div>
         );
     }
@@ -627,25 +627,25 @@ function FastTrackPageInner() {
                 {/* Step 3: Success and Immutable PDF Download */}
                 {signSuccess && (
                     <div className="p-10 md:p-14 text-center flex flex-col items-center">
-                        <div className="w-20 h-20 bg-emerald-500/10 rounded-full border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6 shadow-lg shadow-emerald-500/5">
+                        <div className="w-20 h-20 bg-emerald-50 rounded-full border border-emerald-200 flex items-center justify-center text-emerald-600 mb-6 shadow-lg shadow-emerald-500/5">
                             <CheckCircle className="w-12 h-12 animate-bounce" />
                         </div>
 
-                        <h2 className="text-2xl font-bold text-slate-100 mb-3">Hızlı Mutabakat Tamamlandı</h2>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-3">Hızlı Mutabakat Tamamlandı</h2>
                         
-                        <p className="text-sm text-slate-400 max-w-md mb-8 leading-relaxed">
+                        <p className="text-sm text-slate-500 max-w-md mb-8 leading-relaxed">
                             Bulguya ilişkin yönetim katılım beyanınız kurumsal Active Directory kimliğinizle dijital olarak imzalanmış ve
                             Teftiş Kurulu veri tabanında mühürlenerek arşivlenmiştir.
                         </p>
 
                         {/* Interactive Receipt details */}
-                        <div className="w-full max-w-md bg-slate-950 border border-slate-800/80 rounded-2xl p-5 mb-8 text-left space-y-2.5">
-                            <div className="flex justify-between text-xs"><span className="text-slate-500">Mühürleyen Yetkili:</span><span className="font-bold text-slate-300">{managerProfile.displayName}</span></div>
-                            <div className="flex justify-between text-xs"><span className="text-slate-500">Sicil / Kullanıcı:</span><span className="font-bold text-slate-300">{adUsername}</span></div>
-                            <div className="flex justify-between text-xs"><span className="text-slate-500">İşlem IP Adresi:</span><span className="font-bold text-slate-300">127.0.0.1 (Doğrulanmış)</span></div>
-                            <div className="flex justify-between text-xs"><span className="text-slate-500">Durum / Beyan:</span><span className="font-bold text-emerald-400">{isAgreed ? 'MUTABIK KALINDI' : 'BULGU RED'}</span></div>
-                            <div className="border-t border-slate-900 pt-2.5 mt-2.5">
-                                <span className="block text-[9px] font-extrabold text-[#c9a84c] mb-1">DİJİTAL SHA-256 SERTİFİKA İMZASI</span>
+                        <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-8 text-left space-y-2.5">
+                            <div className="flex justify-between text-xs"><span className="text-slate-500">Mühürleyen Yetkili:</span><span className="font-bold text-slate-700">{managerProfile.displayName}</span></div>
+                            <div className="flex justify-between text-xs"><span className="text-slate-500">Sicil / Kullanıcı:</span><span className="font-bold text-slate-700">{adUsername}</span></div>
+                            <div className="flex justify-between text-xs"><span className="text-slate-500">İşlem IP Adresi:</span><span className="font-bold text-slate-700">127.0.0.1 (Doğrulanmış)</span></div>
+                            <div className="flex justify-between text-xs"><span className="text-slate-500">Durum / Beyan:</span><span className="font-bold text-emerald-600">{isAgreed ? 'MUTABIK KALINDI' : 'BULGU RED'}</span></div>
+                            <div className="border-t border-slate-200 pt-2.5 mt-2.5">
+                                <span className="block text-[9px] font-extrabold text-primary mb-1">DİJİTAL SHA-256 SERTİFİKA İMZASI</span>
                                 <span className="font-mono text-[10px] text-slate-500 break-all select-all">{currentSeal}</span>
                             </div>
                         </div>
@@ -655,14 +655,14 @@ function FastTrackPageInner() {
                             <a 
                                 href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/audit/findings/${findingId}/fast-track-download/${pdfDownloadPath.split('/').pop()}?token=${token}`}
                                 download
-                                className="px-8 py-3.5 bg-gradient-to-r from-[#c9a84c] to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-slate-950 font-extrabold text-sm rounded-xl transition-all duration-300 shadow-xl shadow-[#c9a84c]/10 flex items-center justify-center gap-2 border border-[#b8953f]"
+                                className="px-8 py-3.5 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white font-extrabold text-sm rounded-xl transition-all duration-300 shadow-xl shadow-primary/10 flex items-center justify-center gap-2 border border-primary"
                             >
                                 <Download className="w-4.5 h-4.5" />
                                 <span>Resmi Mutabakat Zaptını İndir (PDF)</span>
                             </a>
                         )}
 
-                        <p className="text-[10px] text-slate-600 mt-6">
+                        <p className="text-[10px] text-slate-500 mt-6">
                             Mutabakat belgesi aynı zamanda bulgunun kanıt ekleri (evidence) arasına resmi olarak eklenmiştir.
                         </p>
                     </div>

@@ -672,7 +672,7 @@ function TrashPageContent() {
                                     Tüm Ham Veri (Sistem Kaydı)
                                 </summary>
                                 <div className="mt-3">
-                                    <pre className="text-[10px] p-4 bg-gray-900 text-green-400 rounded-xl overflow-x-auto max-h-[300px] shadow-inner thin-scrollbar">
+                                    <pre className="text-[10px] p-4 bg-slate-50 text-slate-700 rounded-xl overflow-x-auto max-h-[300px] shadow-inner thin-scrollbar border border-slate-200">
                                         {JSON.stringify(selectedItem, null, 2)}
                                     </pre>
                                 </div>
