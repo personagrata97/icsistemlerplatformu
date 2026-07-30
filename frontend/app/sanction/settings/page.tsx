@@ -15,23 +15,37 @@ import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 import { TERMS } from '@/lib/terminology';
 
+import { useEffect } from 'react';
+import { sanctionApi } from '@/lib/sanction-api';
+import EmptyState from '@/components/ui/EmptyState';
+import LoadingState from '@/components/ui/LoadingState';
+
 function SanctionSettingsPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedParam, setSelectedParam] = useState<any>(null);
     const [newValue, setNewValue] = useState('');
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [parameters, setParameters] = useState<any[]>([]);
 
-    const [parameters, setParameters] = useState([
-        { kod: 'yuksekTutarEsigi', ad: 'Yüksek Tutar Fesih Eşiği', deger: '500000', birim: 'TL', varsayilan: '500000', aciklama: 'Erken fesih ve yüksek tutarlı işlemlerde uyarı tetikleme eşiği', guncelleyen: 'Selim KAYA', tarih: '2026-07-20' },
-        { kod: 'erkenFesihOrani', ad: 'Erken Fesih Süre Oranı', deger: '33', birim: 'YUZDE', varsayilan: '33', aciklama: 'Sözleşme süresinin ilk kaçlığında yapılan fesihlerin erken fesih sayılacağı', guncelleyen: 'Selim KAYA', tarih: '2026-07-20' },
-        { kod: 'hizliDevirGunSayisi', ad: 'Hızlı Devir Gün Sayısı', deger: '60', birim: 'GUN', varsayilan: '60', aciklama: 'Tesis tarihinden itibaren kaç gün içindeki devirlerin şüpheli sayılacağı', guncelleyen: 'Selim KAYA', tarih: '2026-07-20' },
-        { kod: 'bolmeAdetEsigi', ad: 'Structuring (Bölme) Adet Eşiği', deger: '3', birim: 'ADET', varsayilan: '3', aciklama: 'Eşiğin altında kalarak yapılan tekrarlı sözleşme adedi', guncelleyen: 'Selim KAYA', tarih: '2026-07-20' },
-        { kod: 'eslesmeKesinEsigi', ad: 'Kesin Eşleşme Skoru', deger: '95', birim: 'PUAN', varsayilan: '95', aciklama: 'Yaptırım listelerinde otomatik dondurma sürecini tetikleyen skor', guncelleyen: 'Selim KAYA', tarih: '2026-07-20' },
-        { kod: 'eslesmeSupheliEsigi', ad: 'Şüpheli Eşleşme Alt Eşiği', deger: '85', birim: 'PUAN', varsayilan: '85', aciklama: 'İnceleme kuyruğuna düşen minimum bulanık eşleşme skoru', guncelleyen: 'Selim KAYA', tarih: '2026-07-20' },
-        { kod: 'listeEskimeUyariGun', ad: 'Liste Güncellik Uyarı Süresi', deger: '7', birim: 'GUN', varsayilan: '7', aciklama: 'Yaptırım listesi güncellenmediğinde uyarı üretilecek maksimum gün', guncelleyen: 'Selim KAYA', tarih: '2026-07-20' }
-    ]);
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const data = await sanctionApi.getParameters();
+            setParameters(Array.isArray(data) ? data : []);
+        } catch (e) {
+            showToast('Parametreler yüklenemedi', 'error');
+            setParameters([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, []);
 
     const handleEditParam = (param: any) => {
         setSelectedParam(param);
@@ -39,13 +53,19 @@ function SanctionSettingsPageContent() {
     };
 
     const handleSaveConfirm = async () => {
+        if (!selectedParam) return;
         setSubmitting(true);
-        await new Promise(r => setTimeout(r, 500));
-        setParameters(prev => prev.map(p => p.kod === selectedParam.kod ? { ...p, deger: newValue, tarih: '2026-07-22' } : p));
-        setSubmitting(false);
-        setIsConfirmOpen(false);
-        setSelectedParam(null);
-        showToast('Parametre değeri güncellendi. Tüm yaptırım motoruna anında uygulandı.', 'success');
+        try {
+            await sanctionApi.updateParameter(selectedParam.id || selectedParam.kod, newValue);
+            showToast('Parametre değeri güncellendi. Tüm yaptırım motoruna anında uygulanacak ve değişiklik kaydedildi.', 'success');
+            await loadData();
+            setIsConfirmOpen(false);
+            setSelectedParam(null);
+        } catch (e: any) {
+            showToast(e.message || 'Parametre güncellenirken hata oluştu', 'error');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const filteredParams = parameters.filter(p =>

@@ -89,6 +89,48 @@ export const sanctionApi = {
         const res = await fetch(`${API_BASE_URL}/sanction/reports`, { headers: getHeaders() });
         if (!res.ok) return [];
         return res.json();
+    },
+
+    async getParameters() {
+        const res = await fetch(`${API_BASE_URL}/sanction/parameters`, { headers: getHeaders() });
+        if (!res.ok) return [];
+        return res.json();
+    },
+
+    async updateParameter(id: string, deger: string) {
+        const res = await fetch(`${API_BASE_URL}/sanction/parameters/${id}`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ deger }),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.message || 'Parametre güncellenemedi');
+        }
+        return res.json();
+    },
+
+    async getEDDRecords() {
+        const res = await fetch(`${API_BASE_URL}/sanction/edd`, { headers: getHeaders() });
+        if (!res.ok) return [];
+        return res.json();
+    },
+
+    async createEDDRecord(data: any) {
+        const res = await fetch(`${API_BASE_URL}/sanction/edd`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error('EDD kaydı oluşturulamadı');
+        return res.json();
+    },
+
+    async getSignals(musteriId?: string) {
+        const query = musteriId ? `?musteriId=${encodeURIComponent(musteriId)}` : '';
+        const res = await fetch(`${API_BASE_URL}/sanction/reputation/signals${query}`, { headers: getHeaders() });
+        if (!res.ok) return [];
+        return res.json();
     }
 };
 

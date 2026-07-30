@@ -91,6 +91,17 @@ export class SanctionController {
         return this.sanctionService.getReports();
     }
 
+    @Get('parameters')
+    async getParameters() {
+        return this.sanctionService.getParameters();
+    }
+
+    @Post('parameters/:id')
+    async updateParameter(@Param('id') id: string, @Body() body: any, @Req() req: any) {
+        const username = req.user?.displayName || req.user?.username || 'Sistem Yöneticisi';
+        return this.sanctionService.updateParameter(id, body.deger, username);
+    }
+
     @Get('logs')
     async getLogs() {
         return this.sanctionService.getLogs();

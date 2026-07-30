@@ -16,12 +16,21 @@ import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 import { TERMS } from '@/lib/terminology';
 
+import { useEffect } from 'react';
+import { sanctionApi } from '@/lib/sanction-api';
+import EmptyState from '@/components/ui/EmptyState';
+import LoadingState from '@/components/ui/LoadingState';
+
 function EnhancedDueDiligencePageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSignal, setSelectedSignal] = useState<any>(null);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+
+    const [signals, setSignals] = useState<any[]>([]);
+    const [eddRecords, setEddRecords] = useState<any[]>([]);
 
     // Form States
     const [iddiaTuru, setIddiaTuru] = useState('KARAPARA');
@@ -43,50 +52,27 @@ function EnhancedDueDiligencePageContent() {
     const [kararGerekcesi, setKararGerekcesi] = useState('');
     const [kanitDosya, setKanitDosya] = useState<string | null>('edd_araştırma_raporu_2026.pdf');
 
-    const signals = [
-        {
-            id: 'SIG-2026-01',
-            musteriId: 'M-10928',
-            musteriAd: 'Atlas İnşaat Otomotiv A.Ş.',
-            tcknVkn: '8120394812',
-            kuralKodu: 'KURAL_1',
-            kuralAd: 'Tüzel Kişi Hesabından Gerçek Kişiye Ödeme Yönlendirme',
-            riskPuani: 90,
-            onemDuzeyi: 'YÜKSEK',
-            islemTuru: 'Sözleşme Feshi & Bedel İadesi (850.000 TL)',
-            sebeb: 'Fesih bedelinin şirket hesabı yerine yönetim kurulu üyesinin şahsi IBAN hesabına ödenmesi talebi.',
-            durum: 'ACIK',
-            tarih: '2026-07-22'
-        },
-        {
-            id: 'SIG-2026-02',
-            musteriId: 'M-10442',
-            musteriAd: 'Mehmet Demir',
-            tcknVkn: '10928172640',
-            kuralKodu: 'KURAL_3',
-            kuralAd: 'Erken Fesih ve Yüksek Tutar Örüntüsü',
-            riskPuani: 75,
-            onemDuzeyi: 'ORTA',
-            islemTuru: 'Erken Erken Ayrılma Talebi (1.200.000 TL)',
-            sebeb: 'Sözleşme tesisinden 45 gün sonra yüksek tutarlı peşin fesih talebi.',
-            durum: 'ACIK',
-            tarih: '2026-07-21'
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const [sigData, eddData] = await Promise.all([
+                sanctionApi.getSignals(),
+                sanctionApi.getEDDRecords()
+            ]);
+            setSignals(Array.isArray(sigData) ? sigData : []);
+            setEddRecords(Array.isArray(eddData) ? eddData : []);
+        } catch (e) {
+            showToast('EDD verileri yüklenemedi', 'error');
+            setSignals([]);
+            setEddRecords([]);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
 
-    const eddRecords = [
-        {
-            id: 'EDD-2026-88',
-            musteriAd: 'Zelımkhan YANDARBIEV',
-            iddiaTuru: 'TEROR_FINANSMANI',
-            iddiaAsamasi: 'KESINLESMIS_KARAR',
-            kaynak: 'MASAK & Resmî Gazete 6415 S.K. Kararı',
-            karar: 'ISLEMI_REDDET_SIB',
-            ustOnay: 'ONAYLANDI',
-            inceleyen: 'Uyum Görevlisi (Ahmet KAYA)',
-            tarih: '2026-07-19'
-        }
-    ];
+    useEffect(() => {
+        loadData();
+    }, []);
 
     const handleOpenEDD = (sig: any) => {
         setSelectedSignal(sig);
@@ -102,12 +88,36 @@ function EnhancedDueDiligencePageContent() {
     };
 
     const handleConfirmSubmit = async () => {
+        if (!selectedSignal) return;
         setSubmitting(true);
-        await new Promise(r => setTimeout(r, 600));
-        setSubmitting(false);
-        setIsConfirmOpen(false);
-        setSelectedSignal(null);
-        showToast('Genişletilmiş Durum Tespiti (EDD) kararı denetim izine kaydoldu.', 'success');
+        try {
+            await sanctionApi.createEDDRecord({
+                musteriId: selectedSignal.musteriId || selectedSignal.id,
+                signalId: selectedSignal.id,
+                iddiaTuru,
+                iddiaAsamasi,
+                kaynakAd,
+                kaynakTarih,
+                guvenilirlikSkoru,
+                ticaretSicilKontrol: ticaretSicil,
+                resmiGazeteKontrol: resmiGazete,
+                tmsfKontrol: tmsfListesi,
+                acikKaynakKontrol: acikKaynak,
+                kurumIciKontrol: kurumIci,
+                kanitDosyaUrl: kanitDosya,
+                kaynakBaglantisi,
+                karar,
+                kararGerekcesi,
+            });
+            showToast('Genişletilmiş Durum Tespiti (EDD) kararı veritabanına ve denetim izine kaydoldu.', 'success');
+            await loadData();
+            setIsConfirmOpen(false);
+            setSelectedSignal(null);
+        } catch (e: any) {
+            showToast(e.message || 'EDD kaydı oluşturulurken hata oluştu', 'error');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (

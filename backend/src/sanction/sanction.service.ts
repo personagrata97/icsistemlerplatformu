@@ -424,6 +424,66 @@ export class SanctionService {
         return reports;
     }
 
+    async getParameters() {
+        const existing = await this.prisma.sanctionParameter.findMany({
+            orderBy: { created_at: 'asc' }
+        });
+
+        if (existing.length === 0) {
+            const defaults = [
+                { kod: 'eslesmeKesinEsigi', ad: 'Kesin Eşleşme Skoru', deger: '95', birim: 'PUAN', minVal: 50, maxVal: 100, varsayilan: '95', aciklama: 'Yaptırım listelerinde otomatik dondurma sürecini tetikleyen skor', guncelleyen: 'Sistem Yöneticisi' },
+                { kod: 'eslesmeSupheliEsigi', ad: 'Şüpheli Eşleşme Alt Eşiği', deger: '85', birim: 'PUAN', minVal: 50, maxVal: 100, varsayilan: '85', aciklama: 'İnceleme kuyruğuna düşen minimum bulanık eşleşme skoru', guncelleyen: 'Sistem Yöneticisi' },
+                { kod: 'yuksekTutarEsigi', ad: 'Yüksek Tutar Fesih Eşiği', deger: '500000', birim: 'TL', minVal: 10000, maxVal: 100000000, varsayilan: '500000', aciklama: 'Erken fesih ve yüksek tutarlı işlemlerde uyarı tetikleme eşiği', guncelleyen: 'Sistem Yöneticisi' },
+                { kod: 'listeEskimeUyariGun', ad: 'Liste Güncellik Uyarı Süresi', deger: '7', birim: 'GUN', minVal: 1, maxVal: 30, varsayilan: '7', aciklama: 'Yaptırım listesi güncellenmediğinde uyarı üretilecek maksimum gün', guncelleyen: 'Sistem Yöneticisi' },
+            ];
+
+            for (const item of defaults) {
+                await this.prisma.sanctionParameter.upsert({
+                    where: { kod: item.kod },
+                    create: item,
+                    update: {}
+                });
+            }
+            return this.prisma.sanctionParameter.findMany({ orderBy: { created_at: 'asc' } });
+        }
+
+        return existing;
+    }
+
+    async updateParameter(id: string, newDeger: string, username: string = 'Sistem Yöneticisi') {
+        const param = await this.prisma.sanctionParameter.findFirst({
+            where: { OR: [{ id }, { kod: id }] }
+        });
+        if (!param) throw new NotFoundException('Parametre bulunamadı');
+
+        const numVal = parseFloat(newDeger);
+        if (!isNaN(numVal)) {
+            if (param.minVal !== null && numVal < param.minVal) {
+                throw new Error(`Parametre değeri minimum sınır olan ${param.minVal} alt küçüğünde olamaz.`);
+            }
+            if (param.maxVal !== null && numVal > param.maxVal) {
+                throw new Error(`Parametre değeri maksimum sınır olan ${param.maxVal} üstünde olamaz.`);
+            }
+        }
+
+        const updated = await this.prisma.sanctionParameter.update({
+            where: { id: param.id },
+            data: {
+                deger: newDeger,
+                guncelleyen: username,
+            }
+        });
+
+        await this.createLog({
+            user: username,
+            category: 'PARAMETRE_GUNCELLE',
+            action: 'UPDATE',
+            details: `Sanction parametresi güncellendi (${param.ad} / ${param.kod}): ${param.deger} -> ${newDeger}`
+        });
+
+        return updated;
+    }
+
     async createLog(data: any) {
         return this.prisma.sanctionLog.create({
             data: {

@@ -1779,6 +1779,23 @@ model EnhancedDueDiligence {
   @@map("enhanced_due_diligence")
 }
 
+model SanctionParameter {
+  id          String   @id @default(cuid())
+  kod         String   @unique
+  ad          String
+  deger       String
+  birim       String
+  minVal      Float?
+  maxVal      Float?
+  varsayilan  String
+  aciklama    String?
+  guncelleyen String   @default("Sistem Yöneticisi")
+  updated_at  DateTime @updatedAt
+  created_at  DateTime @default(now())
+
+  @@map("sanction_parameter")
+}
+
 // ============================================================================
 // ADIM 1 — İzleme ve Uzlaşma Tabloları (PHAROS AUDIT Son Denetim A1)
 // ============================================================================
