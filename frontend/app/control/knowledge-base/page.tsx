@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import StatCard from '@/components/ui/StatCard';
@@ -23,7 +25,7 @@ const TAB_LABELS: Record<DocCategory, string> = {
     EGITIM: 'Eğitim Materyalleri'
 };
 
-export default function ControlKnowledgeBasePage() {
+function ControlKnowledgeBasePageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<string>('IC_MERKEZ');
@@ -200,5 +202,14 @@ export default function ControlKnowledgeBasePage() {
                 </Modal>
             )}
         </div>
+    );
+}
+
+
+export default function ControlKnowledgeBasePage() {
+    return (
+        <RequireRole allowedRoles={['DENETCI', 'KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlKnowledgeBasePageContent />
+        </RequireRole>
     );
 }

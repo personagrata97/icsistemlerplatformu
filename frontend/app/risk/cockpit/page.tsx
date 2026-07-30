@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, TrendingUp, Download, ShieldCheck, Upload, Activity, Database, Info, ArrowRight, FileText, BarChart3 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
@@ -49,7 +51,7 @@ const KPI_TOOLTIPS: Record<string, string> = {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
-export default function RiskCockpitPage() {
+function RiskCockpitPageContent() {
     const { showToast } = useToast();
     const [riskData, setRiskData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -392,5 +394,14 @@ export default function RiskCockpitPage() {
                 onSuccess={loadData}
             />
         </div>
+    );
+}
+
+
+export default function RiskCockpitPage() {
+    return (
+        <RequireRole allowedRoles={['RISK_UZMANI', 'RISK_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <RiskCockpitPageContent />
+        </RequireRole>
     );
 }

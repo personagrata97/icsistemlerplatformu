@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';
@@ -44,7 +46,7 @@ const TYPE_COLORS: Record<string, string> = {
     system: 'bg-slate-100 text-slate-800'
 };
 
-export default function ControlLogsPage() {
+function ControlLogsPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<string[]>([]);
@@ -252,5 +254,14 @@ export default function ControlLogsPage() {
                 </Modal>
             )}
         </div>
+    );
+}
+
+
+export default function ControlLogsPage() {
+    return (
+        <RequireRole allowedRoles={['DENETCI', 'KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlLogsPageContent />
+        </RequireRole>
     );
 }

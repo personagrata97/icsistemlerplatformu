@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import ControlStaffTabs from '@/components/control/ControlStaffTabs';
@@ -15,7 +17,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import { Calendar, Users, Eye, Clock } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
-export default function ControlStaffCalendarPage() {
+function ControlStaffCalendarPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string[]>([]);
@@ -108,5 +110,14 @@ export default function ControlStaffCalendarPage() {
                 </Modal>
             )}
         </div>
+    );
+}
+
+
+export default function ControlStaffCalendarPage() {
+    return (
+        <RequireRole allowedRoles={['KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlStaffCalendarPageContent />
+        </RequireRole>
     );
 }

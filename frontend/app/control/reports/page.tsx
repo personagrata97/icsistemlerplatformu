@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';
@@ -14,7 +16,7 @@ import { FileBarChart, CheckCircle2, Download, Plus, Eye, Trash2, Send, FileText
 import { useToast } from '@/components/Toast';
 import { DEPARTMENTS } from '@/lib/organization-constants';
 
-export default function ControlReportsPage() {
+function ControlReportsPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -182,5 +184,14 @@ export default function ControlReportsPage() {
                 </form>
             </Modal>
         </div>
+    );
+}
+
+
+export default function ControlReportsPage() {
+    return (
+        <RequireRole allowedRoles={['DENETCI', 'KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlReportsPageContent />
+        </RequireRole>
     );
 }

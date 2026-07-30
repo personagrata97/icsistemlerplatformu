@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import PageToolbar from '@/components/ui/PageToolbar';
@@ -14,7 +16,7 @@ import { Target, Shield, Users, BarChart3, CheckCircle2, AlertTriangle, Clock, A
 import { formatDateTime } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';
 
-export default function ControlExecutiveDashboard() {
+function ControlExecutiveDashboardContent() {
     const { showToast } = useToast();
     const [activeTab, setActiveTab] = useState<'overview' | 'quality' | 'team'>('overview');
     const [selectedYear, setSelectedYear] = useState('Tümü');
@@ -232,5 +234,14 @@ export default function ControlExecutiveDashboard() {
                 </div>
             )}
         </div>
+    );
+}
+
+
+export default function ControlExecutiveDashboard() {
+    return (
+        <RequireRole allowedRoles={['DENETCI', 'KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlExecutiveDashboardContent />
+        </RequireRole>
     );
 }

@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';
@@ -15,7 +17,7 @@ import { BookOpen, Award, Users, Plus, Eye, Calendar, CheckCircle2, Clock, User 
 import { useToast } from '@/components/Toast';
 import ControlStaffTabs from '@/components/control/ControlStaffTabs';
 
-export default function ControlTrainingPage() {
+function ControlTrainingPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<string>('catalog');
@@ -291,5 +293,14 @@ export default function ControlTrainingPage() {
                 </form>
             </Modal>
         </div>
+    );
+}
+
+
+export default function ControlTrainingPage() {
+    return (
+        <RequireRole allowedRoles={['KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlTrainingPageContent />
+        </RequireRole>
     );
 }

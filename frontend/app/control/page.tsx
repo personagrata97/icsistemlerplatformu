@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import StatCard from '@/components/ui/StatCard';
@@ -22,7 +24,7 @@ import { useToast } from '@/components/Toast';
 import { formatDateTime } from '@/lib/audit-utils';
 import { useRouter } from 'next/navigation';
 
-export default function PharosControlDashboard() {
+function PharosControlDashboardContent() {
     const router = useRouter();
     const { showToast } = useToast();
     const [selectedYear, setSelectedYear] = useState('Tümü');
@@ -202,5 +204,14 @@ export default function PharosControlDashboard() {
                 </DashboardWidget>
             </div>
         </div>
+    );
+}
+
+
+export default function PharosControlDashboard() {
+    return (
+        <RequireRole allowedRoles={['DENETCI', 'KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <PharosControlDashboardContent />
+        </RequireRole>
     );
 }

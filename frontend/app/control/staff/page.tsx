@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -71,7 +73,7 @@ interface ControlStaffMember {
 const CONTROL_TITLES = ['İç Kontrol Müdürü', 'Başdenetçi', 'Denetçi', 'Yetkili Denetçi Yardımcısı', 'Denetçi Yardımcısı', 'Birim Kontrol Sorumlusu (BKS)'];
 const CONTROL_ROLES = ['İç Kontrol Müdürü', 'Başdenetçi', 'Denetçi', 'Birim Kontrol Sorumlusu (BKS)'];
 
-export default function ControlStaffPage() {
+function ControlStaffPageContent() {
     const router = useRouter();
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
@@ -690,5 +692,14 @@ export default function ControlStaffPage() {
                 type="danger"
             />
         </div>
+    );
+}
+
+
+export default function ControlStaffPage() {
+    return (
+        <RequireRole allowedRoles={['KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlStaffPageContent />
+        </RequireRole>
     );
 }

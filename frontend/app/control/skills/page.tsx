@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';
@@ -60,7 +62,7 @@ interface StaffSkill {
     notes?: string;
 }
 
-export default function ControlSkillsPage() {
+function ControlSkillsPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [titleFilter, setTitleFilter] = useState<string[]>([]);
@@ -288,5 +290,14 @@ export default function ControlSkillsPage() {
                 </Modal>
             )}
         </div>
+    );
+}
+
+
+export default function ControlSkillsPage() {
+    return (
+        <RequireRole allowedRoles={['KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlSkillsPageContent />
+        </RequireRole>
     );
 }

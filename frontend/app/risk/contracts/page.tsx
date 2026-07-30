@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { Search, FileText, Eye, Clock, Wallet, MapPin, User, Calendar, AlertCircle, CheckCircle } from 'lucide-react';
@@ -15,7 +17,7 @@ import ActionMenu from '@/components/ui/ActionMenu';
 import PageToolbar from '@/components/ui/PageToolbar';
 import PageHeader from '@/components/audit/PageHeader';
 
-export default function ContractsPage() {
+function ContractsPageContent() {
     const [contracts, setContracts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('');
@@ -298,5 +300,14 @@ export default function ContractsPage() {
                 )}
             </Modal>
         </div>
+    );
+}
+
+
+export default function ContractsPage() {
+    return (
+        <RequireRole allowedRoles={['RISK_UZMANI', 'RISK_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ContractsPageContent />
+        </RequireRole>
     );
 }

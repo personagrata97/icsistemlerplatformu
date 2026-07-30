@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';
@@ -12,7 +14,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import { FileCheck, CheckCircle2, Clock, Plus } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
-export default function ControlRCSAPage() {
+function ControlRCSAPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -136,5 +138,14 @@ export default function ControlRCSAPage() {
                 </form>
             </Modal>
         </div>
+    );
+}
+
+
+export default function ControlRCSAPage() {
+    return (
+        <RequireRole allowedRoles={['DENETCI', 'KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlRCSAPageContent />
+        </RequireRole>
     );
 }

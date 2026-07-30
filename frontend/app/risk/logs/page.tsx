@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 import { useState, useEffect } from 'react';
 import { RiskLogger, LogEntry } from '@/lib/risk-logger';
 import { FileText, Download, Clock, User, Activity, AlertCircle, CheckCircle, Search, Filter, ChevronRight, X, Eye, RefreshCw, ArrowRight } from 'lucide-react';
@@ -15,7 +17,7 @@ import ActionMenu from '@/components/ui/ActionMenu';
 import PageToolbar from '@/components/ui/PageToolbar';
 import PageHeader from '@/components/audit/PageHeader';
 
-export default function RiskLogsPage() {
+function RiskLogsPageContent() {
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -227,3 +229,12 @@ export default function RiskLogsPage() {
     );
 }
 
+
+
+export default function RiskLogsPage() {
+    return (
+        <RequireRole allowedRoles={['RISK_UZMANI', 'RISK_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <RiskLogsPageContent />
+        </RequireRole>
+    );
+}

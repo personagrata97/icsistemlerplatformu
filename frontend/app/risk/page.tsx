@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import StatCard from '@/components/ui/StatCard';
@@ -13,7 +15,7 @@ import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 import { TERMS } from '@/lib/terminology';
 
-export default function RiskDashboardPage() {
+function RiskDashboardPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [levelFilter, setLevelFilter] = useState('ALL');
@@ -175,5 +177,14 @@ export default function RiskDashboardPage() {
                 rowKey="id"
             />
         </div>
+    );
+}
+
+
+export default function RiskDashboardPage() {
+    return (
+        <RequireRole allowedRoles={['RISK_UZMANI', 'RISK_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <RiskDashboardPageContent />
+        </RequireRole>
     );
 }

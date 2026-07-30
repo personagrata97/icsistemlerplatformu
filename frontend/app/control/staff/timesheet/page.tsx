@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import ControlStaffTabs from '@/components/control/ControlStaffTabs';
@@ -14,7 +16,7 @@ import Button from '@/components/ui/Button';
 import { Clock, Users, CheckCircle2, AlertTriangle, Eye } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
-export default function ControlStaffTimesheetPage() {
+function ControlStaffTimesheetPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string[]>([]);
@@ -110,5 +112,14 @@ export default function ControlStaffTimesheetPage() {
                 </Modal>
             )}
         </div>
+    );
+}
+
+
+export default function ControlStaffTimesheetPage() {
+    return (
+        <RequireRole allowedRoles={['KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlStaffTimesheetPageContent />
+        </RequireRole>
     );
 }

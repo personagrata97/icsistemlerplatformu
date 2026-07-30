@@ -1,4 +1,6 @@
 'use client';
+import RequireRole from '@/components/auth/RequireRole';
+
 
 import React, { useState } from 'react';
 import ControlStaffTabs from '@/components/control/ControlStaffTabs';
@@ -14,7 +16,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import { ShieldCheck, CheckCircle2, AlertTriangle, Eye, Shield } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
-export default function ControlStaffIndependencePage() {
+function ControlStaffIndependencePageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string[]>([]);
@@ -105,5 +107,14 @@ export default function ControlStaffIndependencePage() {
                 </Modal>
             )}
         </div>
+    );
+}
+
+
+export default function ControlStaffIndependencePage() {
+    return (
+        <RequireRole allowedRoles={['KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+            <ControlStaffIndependencePageContent />
+        </RequireRole>
     );
 }
