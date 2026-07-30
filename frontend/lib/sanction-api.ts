@@ -83,6 +83,12 @@ export const sanctionApi = {
         const res = await fetch(`${API_BASE_URL}/sanction/history`, { headers: getHeaders() });
         if (!res.ok) return [];
         return res.json();
+    },
+
+    async getReports() {
+        const res = await fetch(`${API_BASE_URL}/sanction/reports`, { headers: getHeaders() });
+        if (!res.ok) return [];
+        return res.json();
     }
 };
 

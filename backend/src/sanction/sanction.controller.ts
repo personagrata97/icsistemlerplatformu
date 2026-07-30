@@ -86,6 +86,11 @@ export class SanctionController {
         return this.sanctionService.getHistory();
     }
 
+    @Get('reports')
+    async getReports() {
+        return this.sanctionService.getReports();
+    }
+
     @Get('logs')
     async getLogs() {
         return this.sanctionService.getLogs();

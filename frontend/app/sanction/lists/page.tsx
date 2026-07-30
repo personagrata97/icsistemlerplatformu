@@ -25,19 +25,10 @@ function SanctionListsOverviewPageContent() {
         setLoading(true);
         try {
             const data = await sanctionApi.getLists();
-            if (data && data.length > 0) {
-                setLists(data);
-            } else {
-                setLists([
-                    { id: 'masak', kod: 'MASAK_5549_6415_7262', ad: 'MASAK & Resmî Gazete Malvarlığı Dondurma Listesi', kaynak: 'Resmî Gazete / MASAK API', kayitSayisi: 1420, sonGuncelleme: '2026-07-22 06:00', durum: 'AKTIF' },
-                    { id: 'ofac', kod: 'OFAC_SDN', ad: 'ABD Hazine Bakanlığı OFAC SDN Listesi', kaynak: 'US Treasury XML', kayitSayisi: 12450, sonGuncelleme: '2026-07-22 05:30', durum: 'AKTIF' },
-                    { id: 'un', kod: 'UN_SECURITY_COUNCIL', ad: 'Birleşmiş Milletler Güvenlik Konseyi Konsolide Listesi', kaynak: 'UN Security Council XML', kayitSayisi: 890, sonGuncelleme: '2026-07-21 23:00', durum: 'AKTIF' },
-                    { id: 'eu', kod: 'EU_CONSOLIDATED', ad: 'Avrupa Birliği Konsolide Yaptırım Listesi', kaynak: 'EU Financial Sanctions XML', kayitSayisi: 3200, sonGuncelleme: '2026-07-22 04:15', durum: 'AKTIF' },
-                    { id: 'custom', kod: 'INTERNAL_BLACK_LIST', ad: 'Kurum İçi Özel Kara Liste', kaynak: 'Emlak Katılım Teftiş / Uyum', kayitSayisi: 42, sonGuncelleme: '2026-07-20 14:10', durum: 'AKTIF' },
-                ]);
-            }
+            setLists(Array.isArray(data) ? data : []);
         } catch (e) {
             showToast('Yaptırım listeleri yüklenemedi', 'error');
+            setLists([]);
         } finally {
             setLoading(false);
         }

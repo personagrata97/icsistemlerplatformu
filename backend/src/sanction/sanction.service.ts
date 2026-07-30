@@ -397,6 +397,33 @@ export class SanctionService {
         }));
     }
 
+    async getReports() {
+        const reports = await this.prisma.generatedReport.findMany({
+            orderBy: { generatedAt: 'desc' },
+            take: 50
+        });
+
+        if (reports.length === 0) {
+            const screenings = await this.prisma.sanctionScreening.findMany({
+                orderBy: { baslangic: 'desc' },
+                take: 10
+            });
+            return screenings.map(s => ({
+                id: s.id,
+                title: `${s.tetikleyici} Yaptırım Taraması Raporu`,
+                code: `RAP-SAN-${s.id.slice(-6).toUpperCase()}`,
+                type: 'Yaptırım ve MASAK Uyum Raporu',
+                period: s.baslangic.toISOString().slice(0, 10),
+                matchesCount: s.eslesmeSayisi,
+                screenedCount: s.tarananKayitSayisi,
+                status: 'YAYINLANDI',
+                generatedAt: s.baslangic.toISOString()
+            }));
+        }
+
+        return reports;
+    }
+
     async createLog(data: any) {
         return this.prisma.sanctionLog.create({
             data: {

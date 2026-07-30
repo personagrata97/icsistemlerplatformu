@@ -9,22 +9,43 @@ import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { ShieldAlert, RefreshCw, Calendar, User, Building2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
+import { sanctionApi } from '@/lib/sanction-api';
 
 function MasakListPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [lawFilter, setLawFilter] = useState('ALL');
     const [typeFilter, setTypeFilter] = useState('ALL');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [records, setRecords] = useState<any[]>([]);
 
-    const [records, setRecords] = useState<any[]>([
-        { id: '1', adSoyad: 'Zelımkhan YANDARBIEV', tur: 'GERCEK', kararNo: '2026/12', RGNo: '33102', kanun: '6415 S.K. m.5', tarih: '2026-07-15' },
-        { id: '2', adSoyad: 'Al-Furqan Medya Vakfı', tur: 'TUZEL', kararNo: '2026/44', RGNo: '33088', kanun: '7262 S.K. m.3', tarih: '2026-06-22' },
-        { id: '3', adSoyad: 'Tariq Anwar AL-SAYED', tur: 'GERCEK', kararNo: '2026/08', RGNo: '33010', kanun: '5549 S.K. m.19', tarih: '2026-05-10' },
-    ]);
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const data = await sanctionApi.getListEntities('MASAK_6415_7262', searchTerm);
+            setRecords(Array.isArray(data) ? data.map((d: any) => ({
+                id: d.id,
+                adSoyad: d.adSoyad,
+                tur: d.tur || 'GERCEK',
+                kararNo: d.externalId || '2026/01',
+                RGNo: d.kimlikNo || '33100',
+                kanun: d.aciklama || 'MASAK 6415 S.K.',
+                tarih: d.created_at ? new Date(d.created_at).toISOString().split('T')[0] : formatDate(new Date())
+            })) : []);
+        } catch (e) {
+            showToast('MASAK verileri yüklenemedi', 'error');
+            setRecords([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, [searchTerm]);
 
     const filteredRecords = records.filter(r => {
         if (lawFilter !== 'ALL' && !r.kanun.includes(lawFilter)) return false;
@@ -43,21 +64,15 @@ function MasakListPageContent() {
 
     const handleRefresh = async () => {
         setLoading(true);
-        showToast('Resmî Gazete & MASAK API canlı sorgulanıyor...', 'info');
-        await new Promise(res => setTimeout(res, 800));
-
-        const freshRecord = {
-            id: String(Date.now()),
-            adSoyad: 'Karar No: 2026/89 Yaptırımlı Şahıs / Kurum',
-            tur: 'GERCEK',
-            kararNo: '2026/89',
-            RGNo: '33140',
-            kanun: '6415 S.K. m.6',
-            tarih: '2026-07-22',
-        };
-        setRecords(prev => [freshRecord, ...prev]);
-        setLoading(false);
-        showToast('Resmî Gazete API üzerinden 1 yeni malvarlığı dondurma kararı aktarıldı.', 'success');
+        try {
+            await sanctionApi.syncList('MASAK_6415_7262');
+            await loadData();
+            showToast('MASAK ve Resmî Gazete verileri güncellendi.', 'success');
+        } catch (e) {
+            showToast('Senkronizasyon başarısız', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

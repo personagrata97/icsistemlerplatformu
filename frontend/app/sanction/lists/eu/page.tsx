@@ -6,42 +6,60 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
 import { RefreshCw, Calendar, Building2, User } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
+import { sanctionApi } from '@/lib/sanction-api';
+import EmptyState from '@/components/ui/EmptyState';
+import LoadingState from '@/components/ui/LoadingState';
 
 function EuListPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [records, setRecords] = useState<any[]>([]);
 
-    const [records, setRecords] = useState<any[]>([
-        { id: '1', euId: 'EU.8841', adSoyad: 'CONSOLIDATED LIST OF FINANCIAL SANCTIONS TARGETS', tur: 'TUZEL', reg: 'EU 2024/771', tarih: '2026-05-01' },
-        { id: '2', euId: 'EU.9102', adSoyad: 'Sergei Vladimirovich KOROLEV', tur: 'GERCEK', reg: 'EU 2024/890', tarih: '2026-06-12' },
-    ]);
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const data = await sanctionApi.getListEntities('EU_CONSOLIDATED', searchTerm);
+            setRecords(Array.isArray(data) ? data.map((d: any) => ({
+                id: d.id,
+                euId: d.externalId || d.id,
+                adSoyad: d.adSoyad,
+                tur: d.tur || 'GERCEK',
+                reg: d.aciklama || 'EU CONSOLIDATED',
+                tarih: d.created_at ? new Date(d.created_at).toISOString().split('T')[0] : formatDate(new Date())
+            })) : []);
+        } catch (e) {
+            showToast('AB listesi verileri yüklenemedi', 'error');
+            setRecords([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, [searchTerm]);
 
     const filteredRecords = records.filter(r =>
-        r.adSoyad.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.euId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.reg.toLowerCase().includes(searchTerm.toLowerCase())
+        (r.adSoyad || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (r.euId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (r.reg || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleRefresh = async () => {
         setLoading(true);
-        showToast('AB Konsolide Yaptırım Listesi canlı senkronize ediliyor...', 'info');
-        await new Promise(res => setTimeout(res, 800));
-
-        const freshRecord = {
-            id: String(Date.now()),
-            euId: `EU.${Math.floor(9000 + Math.random() * 1000)}`,
-            adSoyad: 'NEWLY ADDED SANCTIONED ENTITY (EU 2026/1044)',
-            tur: 'TUZEL',
-            reg: 'EU 2026/1044',
-            tarih: '2026-07-22',
-        };
-        setRecords(prev => [freshRecord, ...prev]);
-        setLoading(false);
-        showToast('AB Listesi başarıyla güncellendi (1 yeni kayıt eklendi).', 'success');
+        try {
+            await sanctionApi.syncList('EU_CONSOLIDATED');
+            await loadData();
+            showToast('AB Konsolide Yaptırım Listesi güncellendi.', 'success');
+        } catch (e) {
+            showToast('Senkronizasyon başarısız', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

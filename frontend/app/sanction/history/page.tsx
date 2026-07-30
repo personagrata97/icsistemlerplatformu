@@ -23,17 +23,10 @@ function SanctionHistoryPageContent() {
         setLoading(true);
         try {
             const data = await sanctionApi.getHistory();
-            if (data && data.length > 0) {
-                setHistory(data);
-            } else {
-                setHistory([
-                    { id: '1', tetikleyici: 'PERİYODİK (OTOMATİK)', taranan: 14250, eslesme: 2, baslangic: '2026-07-22 06:00', sure: '3.4s', calistiran: 'Sistem Cron' },
-                    { id: '2', tetikleyici: 'YENİ MÜŞTERİ KAYDI', taranan: 1, eslesme: 0, baslangic: '2026-07-22 09:12', sure: '0.12s', calistiran: 'Gişe Entegrasyonu' },
-                    { id: '3', tetikleyici: 'ANLIK MANUEL TARAMA', taranan: 1, eslesme: 1, baslangic: '2026-07-22 10:45', sure: '0.08s', calistiran: 'Selim KAYA' },
-                ]);
-            }
+            setHistory(Array.isArray(data) ? data : []);
         } catch (e) {
             showToast('Geçmiş verileri yüklenemedi', 'error');
+            setHistory([]);
         } finally {
             setLoading(false);
         }

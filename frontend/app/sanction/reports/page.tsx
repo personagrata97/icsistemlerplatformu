@@ -9,33 +9,45 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { Download, FileText, Calendar, User } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
+import { sanctionApi } from '@/lib/sanction-api';
 
 function SanctionReportsPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState('ALL');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [reports, setReports] = useState<any[]>([]);
 
-    const reports = [
-        { id: '1', ad: 'MASAK Yıllık Uyum Denetim Raporu 2026', tur: 'MASAK UYUM', tarih: '2026-07-01', olusturan: 'Sistem' },
-        { id: '2', ad: 'Aylık Yaptırım Taraması İstatistik Raporu', tur: 'İSTATİSTİK', tarih: '2026-07-15', olusturan: 'Selim KAYA' },
-        { id: '3', ad: 'OFAC & BM Karaliste Taramaları Özeti', tur: 'YAPTIRIM', tarih: '2026-07-20', olusturan: 'Taha TURUNÇ' },
-    ];
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const data = await sanctionApi.getReports();
+            setReports(Array.isArray(data) ? data : []);
+        } catch (e) {
+            showToast('Raporlar yüklenemedi', 'error');
+            setReports([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, []);
 
     const filteredReports = reports.filter(r => {
-        if (typeFilter !== 'ALL' && r.tur !== typeFilter) return false;
-        if (searchTerm && !r.ad.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+        const ad = r.ad || r.title || '';
+        const tur = r.tur || r.type || '';
+        if (typeFilter !== 'ALL' && !tur.includes(typeFilter)) return false;
+        if (searchTerm && !ad.toLowerCase().includes(searchTerm.toLowerCase())) return false;
         return true;
     });
 
     const handleRefresh = async () => {
-        setLoading(true);
-        showToast('Yaptırım raporları güncelleniyor...', 'info');
-        await new Promise(res => setTimeout(res, 500));
-        setLoading(false);
-        showToast('Rapor listesi tazeledi.', 'success');
+        await loadData();
+        showToast('Rapor listesi tazelendi.', 'success');
     };
 
     return (

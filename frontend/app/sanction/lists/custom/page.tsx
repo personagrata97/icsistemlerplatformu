@@ -33,24 +33,18 @@ function CustomListPageContent() {
         setLoading(true);
         try {
             const data = await sanctionApi.getListEntities('INTERNAL_BLACK_LIST', searchTerm);
-            if (data && data.length > 0) {
-                setRecords(data.map((d: any) => ({
-                    id: d.id,
-                    musteriAd: d.adSoyad,
-                    tur: d.tur || 'GERCEK',
-                    tckn: d.kimlikNo || 'Bilinmiyor',
-                    gerekce: d.aciklama || 'Teftiş Kararı',
-                    ekleyen: 'Selim KAYA',
-                    tarih: d.created_at ? new Date(d.created_at).toISOString().split('T')[0] : '2026-07-22'
-                })));
-            } else {
-                setRecords([
-                    { id: '1', musteriAd: 'Sahte Belge Düzenleyen A.Ş.', tur: 'TUZEL', tckn: '9982341201', gerekce: 'Teftiş Kurulu Soruşturma Raporu İSR.2.2026', ekleyen: 'Selim KAYA', tarih: '2026-07-15' },
-                    { id: '2', musteriAd: 'Ahmet Karadağ', tur: 'GERCEK', tckn: '10928374652', gerekce: 'İç Kontrol Suç Gelirleri Şüpheli İşlem Kararı', ekleyen: 'Taha TURUNÇ', tarih: '2026-07-20' },
-                ]);
-            }
+            setRecords(Array.isArray(data) ? data.map((d: any) => ({
+                id: d.id,
+                musteriAd: d.adSoyad,
+                tur: d.tur || 'GERCEK',
+                tckn: d.kimlikNo || 'Bilinmiyor',
+                gerekce: d.aciklama || 'Teftiş Kararı',
+                ekleyen: 'Sistem Yöneticisi',
+                tarih: d.created_at ? new Date(d.created_at).toISOString().split('T')[0] : formatDate(new Date())
+            })) : []);
         } catch (e) {
-            showToast('Liste yüklenemedi', 'error');
+            showToast('Dahili kara liste yüklenemedi', 'error');
+            setRecords([]);
         } finally {
             setLoading(false);
         }

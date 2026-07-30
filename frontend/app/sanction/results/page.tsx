@@ -28,25 +28,18 @@ function SanctionResultsPageContent() {
         setLoading(true);
         try {
             const data = await sanctionApi.getMatches({ search: searchTerm, status: statusFilter });
-            if (data && data.length > 0) {
-                setMatches(data.map((m: any) => ({
-                    id: m.id,
-                    musteriAd: m.musteriAd || m.musteri?.ad_soyad || 'Müşteri Kaydı',
-                    tckn: m.musteri?.tckn ? `${String(m.musteri.tckn).substring(0, 3)}*****${String(m.musteri.tckn).slice(-2)}` : '***8812',
-                    liste: m.liste || m.entity?.list?.ad || 'MASAK / OFAC Listesi',
-                    skor: m.skor || 95,
-                    durum: m.durum || 'ACIK',
-                    tarih: m.created_at ? new Date(m.created_at).toISOString().split('T')[0] : '2026-07-22'
-                })));
-            } else {
-                setMatches([
-                    { id: '1', musteriAd: 'Zelımkhan YANDARBIEV', tckn: '***8812', liste: 'MASAK 6415 (Terörün Finansmanı)', skor: 100, durum: 'ACIK', tarih: '2026-07-22' },
-                    { id: '2', musteriAd: 'Viktor BOUT', tckn: '***4421', liste: 'OFAC SDN Listesi', skor: 96, durum: 'INCELEMEDE', tarih: '2026-07-21' },
-                    { id: '3', musteriAd: 'Mehmet Yılmaz', tckn: '***1102', liste: 'BM Güvenlik Konseyi', skor: 86, durum: 'YANLIS_ESLESME', tarih: '2026-07-20' },
-                ]);
-            }
+            setMatches(Array.isArray(data) ? data.map((m: any) => ({
+                id: m.id,
+                musteriAd: m.musteriAd || m.musteri?.ad_soyad || 'Müşteri Kaydı',
+                tckn: m.musteri?.tckn ? `${String(m.musteri.tckn).substring(0, 3)}*****${String(m.musteri.tckn).slice(-2)}` : '***8812',
+                liste: m.liste || m.entity?.list?.ad || 'MASAK / OFAC Listesi',
+                skor: m.skor || 95,
+                durum: m.durum || 'ACIK',
+                tarih: m.created_at ? new Date(m.created_at).toISOString().split('T')[0] : formatDate(new Date())
+            })) : []);
         } catch (e) {
             showToast('Eşleşmeler yüklenirken hata oluştu', 'error');
+            setMatches([]);
         } finally {
             setLoading(false);
         }

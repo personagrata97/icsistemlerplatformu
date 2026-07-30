@@ -9,22 +9,43 @@ import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { Globe, RefreshCw, Calendar, User, Building2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
+import { sanctionApi } from '@/lib/sanction-api';
 
 function OfacListPageContent() {
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [programFilter, setProgramFilter] = useState('ALL');
     const [typeFilter, setTypeFilter] = useState('ALL');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [records, setRecords] = useState<any[]>([]);
 
-    const [records, setRecords] = useState<any[]>([
-        { id: '1', sdnId: '9841', adSoyad: 'Viktor Anatolyevich BOUT', tur: 'GERCEK', program: 'SDGT (Terör)', pasaportNo: 'RU-992144', tarih: '2026-06-15' },
-        { id: '2', sdnId: '12401', adSoyad: 'Rosneft Trading S.A.', tur: 'TUZEL', program: 'VENEZUELA', pasaportNo: '-', tarih: '2026-05-20' },
-        { id: '3', sdnId: '14802', adSoyad: 'Evgeny Viktorovich PRIGOZHIN', tur: 'GERCEK', program: 'RUSSIA-EO14024', pasaportNo: 'RU-102938', tarih: '2026-07-01' },
-    ]);
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const data = await sanctionApi.getListEntities('OFAC_SDN', searchTerm);
+            setRecords(Array.isArray(data) ? data.map((d: any) => ({
+                id: d.id,
+                sdnId: d.externalId || d.id,
+                adSoyad: d.adSoyad,
+                tur: d.tur || 'GERCEK',
+                program: d.aciklama || 'OFAC SDN',
+                pasaportNo: d.kimlikNo || '-',
+                tarih: d.created_at ? new Date(d.created_at).toISOString().split('T')[0] : formatDate(new Date())
+            })) : []);
+        } catch (e) {
+            showToast('OFAC verileri yüklenemedi', 'error');
+            setRecords([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, [searchTerm]);
 
     const filteredRecords = records.filter(r => {
         if (programFilter !== 'ALL' && !r.program.includes(programFilter)) return false;
@@ -37,21 +58,15 @@ function OfacListPageContent() {
 
     const handleRefresh = async () => {
         setLoading(true);
-        showToast('ABD OFAC SDN Listesi XML canlı senkronize ediliyor...', 'info');
-        await new Promise(res => setTimeout(res, 800));
-
-        const freshRecord = {
-            id: String(Date.now()),
-            sdnId: String(Math.floor(15000 + Math.random() * 1000)),
-            adSoyad: 'NEWLY ADDED OFAC SDN ENTITY',
-            tur: 'GERCEK',
-            program: 'SDGT (Terör)',
-            pasaportNo: 'US-991203',
-            tarih: '2026-07-22',
-        };
-        setRecords(prev => [freshRecord, ...prev]);
-        setLoading(false);
-        showToast('OFAC SDN XML üzerinden 1 yeni yaptırım kaydı eklendi.', 'success');
+        try {
+            await sanctionApi.syncList('OFAC_SDN');
+            await loadData();
+            showToast('OFAC SDN Listesi güncellendi.', 'success');
+        } catch (e) {
+            showToast('Senkronizasyon başarısız', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
