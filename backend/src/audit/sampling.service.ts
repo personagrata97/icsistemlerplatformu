@@ -7,6 +7,8 @@ import { WorkpaperService } from './workpaper.service';
 import { NotificationService } from '../common/notification/notification.service';
 import { AuditLogService } from './audit-log.service';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class SamplingService {
     private readonly logger = new Logger(SamplingService.name);
@@ -19,25 +21,32 @@ export class SamplingService {
     ) { }
 
     // Get all samples
-    async getAll(filters?: { auditId?: string; method?: string; status?: string }) {
+    async getAll(filters?: PaginationParams & { auditId?: string; method?: string; status?: string }) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(filters);
         const where: Prisma.AuditSampleWhereInput = {};
         if (filters?.auditId) where.auditId = filters.auditId;
         if (filters?.method) where.method = filters.method;
         if (filters?.status) where.status = filters.status;
 
-        return this.prisma.auditSample.findMany({
-            where,
-            include: {
-                audit: {
-                    select: {
-                        id: true,
-                        title: true,
-                        auditCode: true,
+        const [items, total] = await Promise.all([
+            this.prisma.auditSample.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    audit: {
+                        select: {
+                            id: true,
+                            title: true,
+                            auditCode: true,
+                        },
                     },
                 },
-            },
-            orderBy: { created_at: 'desc' },
-        });
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' },
+            }),
+            this.prisma.auditSample.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async getById(id: string) {

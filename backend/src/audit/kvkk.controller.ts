@@ -15,8 +15,18 @@ export class KvkkController {
 
     @Get('retention-policies')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getRetentionPolicies() {
-        return this.kvkkService.getRetentionPolicies();
+    async getRetentionPolicies(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.kvkkService.getRetentionPolicies({
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Post('retention-policies')
@@ -37,8 +47,20 @@ export class KvkkController {
 
     @Get('data-subject-requests')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getDataSubjectRequests(@Query('status') status?: string) {
-        return this.kvkkService.getDataSubjectRequests({ status });
+    async getDataSubjectRequests(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+        @Query('status') status?: string,
+    ) {
+        return this.kvkkService.getDataSubjectRequests({
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+            status,
+        });
     }
 
     @Get('data-subject-requests/stats')

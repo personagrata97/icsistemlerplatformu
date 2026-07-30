@@ -2,6 +2,8 @@ import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nest
 import { PrismaService } from '../common/prisma.service';
 import { AuditLogService } from './audit-log.service';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class FollowUpService {
     private readonly logger = new Logger(FollowUpService.name);
@@ -12,45 +14,60 @@ export class FollowUpService {
     ) {}
 
     // ─── Aksiyon Listeleme ───────────────────────────────────────────────
-    async getActionsByFinding(findingId: string) {
-        return this.prisma.findingAction.findMany({
-            where: { findingId },
-            include: {
-                sorumlu: { select: { id: true, displayName: true, title: true, department: true } },
-                olusturan: { select: { id: true, displayName: true } },
-                evidences: {
-                    include: {
-                        yukleyen: { select: { id: true, displayName: true } },
-                        onaylayan: { select: { id: true, displayName: true } },
+    async getActionsByFinding(findingId: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { findingId };
+        const [items, total] = await Promise.all([
+            this.prisma.findingAction.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    sorumlu: { select: { id: true, displayName: true, title: true, department: true } },
+                    olusturan: { select: { id: true, displayName: true } },
+                    evidences: {
+                        include: {
+                            yukleyen: { select: { id: true, displayName: true } },
+                            onaylayan: { select: { id: true, displayName: true } },
+                        },
+                        orderBy: { yuklemeTarihi: 'desc' },
                     },
-                    orderBy: { yuklemeTarihi: 'desc' },
                 },
-            },
-            orderBy: { created_at: 'desc' },
-        });
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' },
+            }),
+            this.prisma.findingAction.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     // Tüm aksiyonları listele (follow-up dashboard için)
-    async getAllActions(filters?: { durum?: string; sorumluId?: string; findingId?: string }) {
+    async getAllActions(filters?: PaginationParams & { durum?: string; sorumluId?: string; findingId?: string }) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(filters);
         const where: any = {};
         if (filters?.durum) where.durum = filters.durum;
         if (filters?.sorumluId) where.sorumluId = filters.sorumluId;
         if (filters?.findingId) where.findingId = filters.findingId;
 
-        return this.prisma.findingAction.findMany({
-            where,
-            include: {
-                finding: {
-                    select: { id: true, code: true, title: true, risk: true, status: true, auditId: true },
+        const [items, total] = await Promise.all([
+            this.prisma.findingAction.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    finding: {
+                        select: { id: true, code: true, title: true, risk: true, status: true, auditId: true },
+                    },
+                    sorumlu: { select: { id: true, displayName: true, title: true, department: true } },
+                    olusturan: { select: { id: true, displayName: true } },
+                    evidences: {
+                        select: { id: true, onayDurumu: true, dosyaAdi: true },
+                    },
                 },
-                sorumlu: { select: { id: true, displayName: true, title: true, department: true } },
-                olusturan: { select: { id: true, displayName: true } },
-                evidences: {
-                    select: { id: true, onayDurumu: true, dosyaAdi: true },
-                },
-            },
-            orderBy: { terminTarihi: 'asc' },
-        });
+                orderBy: sortBy ? { [sortBy]: sortDir } : { terminTarihi: 'asc' },
+            }),
+            this.prisma.findingAction.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     // ─── Aksiyon Oluşturma ──────────────────────────────────────────────

@@ -29,11 +29,23 @@ export class SamplingController {
     @Get()
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
     getAll(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
         @Query('auditId') auditId?: string,
         @Query('method') method?: string,
         @Query('status') status?: string,
     ) {
-        return this.samplingService.getAll({ auditId, method, status });
+        return this.samplingService.getAll({
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+            auditId,
+            method,
+            status
+        });
     }
 
     // Get sample by ID

@@ -8,6 +8,7 @@ const mockPrismaService = {
     auditLog: {
         findMany: jest.fn(),
         findFirst: jest.fn(),
+        count: jest.fn(),
         create: jest.fn().mockImplementation((args) => Promise.resolve({ ...args.data, hash: 'a'.repeat(64), previousHash: '0' })),
     },
     user: {
@@ -40,11 +41,13 @@ describe('AuditLogService', () => {
             const dateObj = new Date('2026-01-01T00:00:00.000Z');
             const mockLogs = [{ id: '1', action: 'Test', date: dateObj, user: 'u1' }];
             mockPrismaService.auditLog.findMany.mockResolvedValue(mockLogs);
+            mockPrismaService.auditLog.count.mockResolvedValue(1);
 
             const result = await service.getLogs();
-            expect(result).toHaveLength(1);
-            expect(result[0].action).toBe('Test');
-            expect(result[0].date).toBe(dateObj.toISOString());
+            expect(result.items).toHaveLength(1);
+            expect(result.items[0].action).toBe('Test');
+            expect(result.items[0].date).toBe(dateObj.toISOString());
+            expect(result.total).toBe(1);
         });
     });
 

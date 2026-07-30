@@ -29,11 +29,19 @@ export class IndependenceController {
     @Get()
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
     getAll(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
         @Query('status') status?: string,
         @Query('year') year?: string,
         @Query('userId') userId?: string,
     ) {
         return this.independenceService.getAll({
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
             status,
             year: year ? parseInt(year) : undefined,
             userId,
@@ -43,15 +51,36 @@ export class IndependenceController {
     // Get current user's declarations
     @Get('my')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    getMyDeclarations(@Request() req: any) {
-        return this.independenceService.getMyDeclarations(req.user.userId);
+    getMyDeclarations(
+        @Request() req: any,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.independenceService.getMyDeclarations(req.user.userId, {
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     // Get pending declarations (admin review queue)
     @Get('pending')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    getPending() {
-        return this.independenceService.getPending();
+    getPending(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.independenceService.getPending({
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     // Get stats

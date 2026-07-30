@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { WorkpaperTemplateService } from './workpaper-template.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
@@ -11,8 +11,18 @@ export class WorkpaperTemplateController {
 
     @Get()
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    findAll() {
-        return this.templateService.findAll();
+    findAll(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.templateService.findAll({
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Get(':id')

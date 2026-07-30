@@ -3,6 +3,8 @@ import { PrismaService } from '../common/prisma.service';
 import { Prisma } from '@prisma/client';
 import { AuditLogService } from './audit-log.service';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class QualityService {
     constructor(
@@ -12,15 +14,22 @@ export class QualityService {
 
     // ==================== METRICS ====================
 
-    async getMetrics(period?: string) {
+    async getMetrics(period?: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
         const where: Prisma.QualityMetricWhereInput = { isDeleted: false };
         if (period) {
             where.period = period;
         }
-        return this.prisma.qualityMetric.findMany({
-            where,
-            orderBy: { created_at: 'desc' },
-        });
+        const [items, total] = await Promise.all([
+            this.prisma.qualityMetric.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' },
+            }),
+            this.prisma.qualityMetric.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async getMetricById(id: string) {
@@ -115,18 +124,25 @@ export class QualityService {
 
     // ==================== ASSESSMENTS ====================
 
-    async getAssessments(type?: string) {
+    async getAssessments(type?: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
         const where: Prisma.QualityAssessmentWhereInput = { isDeleted: false };
         if (type) {
             where.type = type;
         }
-        return this.prisma.qualityAssessment.findMany({
-            where,
-            include: {
-                actions: true,
-            },
-            orderBy: { date: 'desc' },
-        });
+        const [items, total] = await Promise.all([
+            this.prisma.qualityAssessment.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    actions: true,
+                },
+                orderBy: sortBy ? { [sortBy]: sortDir } : { date: 'desc' },
+            }),
+            this.prisma.qualityAssessment.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async getAssessmentById(id: string) {
@@ -197,7 +213,8 @@ export class QualityService {
 
     // ==================== ACTIONS ====================
 
-    async getActions(assessmentId?: string, status?: string) {
+    async getActions(assessmentId?: string, status?: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
         const where: Prisma.QualityActionWhereInput = { isDeleted: false };
         if (assessmentId) {
             where.assessmentId = assessmentId;
@@ -205,11 +222,17 @@ export class QualityService {
         if (status) {
             where.status = status;
         }
-        return this.prisma.qualityAction.findMany({
-            where,
-            include: { assessment: true },
-            orderBy: { dueDate: 'asc' },
-        });
+        const [items, total] = await Promise.all([
+            this.prisma.qualityAction.findMany({
+                where,
+                skip,
+                take,
+                include: { assessment: true },
+                orderBy: sortBy ? { [sortBy]: sortDir } : { dueDate: 'asc' },
+            }),
+            this.prisma.qualityAction.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async getActionById(id: string) {

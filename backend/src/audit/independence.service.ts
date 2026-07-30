@@ -1,87 +1,113 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { Prisma } from '@prisma/client';
 import { AuditLogService } from './audit-log.service';
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class IndependenceService {
+    private readonly logger = new Logger(IndependenceService.name);
+
     constructor(
         private prisma: PrismaService,
         private auditLogService: AuditLogService
     ) { }
 
     // Get all declarations (for admin)
-    async getAll(filters?: { status?: string; year?: number; userId?: string }) {
+    async getAll(filters?: PaginationParams & { status?: string; year?: number; userId?: string }) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(filters);
         const where: Prisma.IndependenceDeclarationWhereInput = {};
         if (filters?.status) where.status = filters.status;
         if (filters?.year) where.year = filters.year;
         if (filters?.userId) where.userId = filters.userId;
 
-        return this.prisma.independenceDeclaration.findMany({
-            where,
-            include: {
-                user: {
-                    select: {
-                        id: true,
-                        displayName: true,
-                        email: true,
-                        title: true,
-                        department: true,
+        const [items, total] = await Promise.all([
+            this.prisma.independenceDeclaration.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            displayName: true,
+                            email: true,
+                            title: true,
+                            department: true,
+                        },
+                    },
+                    audit: {
+                        select: {
+                            id: true,
+                            title: true,
+                            auditCode: true,
+                        },
                     },
                 },
-                audit: {
-                    select: {
-                        id: true,
-                        title: true,
-                        auditCode: true,
-                    },
-                },
-            },
-            orderBy: { created_at: 'desc' },
-        });
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' },
+            }),
+            this.prisma.independenceDeclaration.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     // Get declarations for current user
-    async getMyDeclarations(userId: string) {
-        return this.prisma.independenceDeclaration.findMany({
-            where: { userId },
-            include: {
-                audit: {
-                    select: {
-                        id: true,
-                        title: true,
-                        auditCode: true,
+    async getMyDeclarations(userId: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { userId };
+        const [items, total] = await Promise.all([
+            this.prisma.independenceDeclaration.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    audit: {
+                        select: {
+                            id: true,
+                            title: true,
+                            auditCode: true,
+                        },
                     },
                 },
-            },
-            orderBy: { created_at: 'desc' },
-        });
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' },
+            }),
+            this.prisma.independenceDeclaration.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     // Get pending declarations (for admin review)
-    async getPending() {
-        return this.prisma.independenceDeclaration.findMany({
-            where: { status: 'Bekliyor' },
-            include: {
-                user: {
-                    select: {
-                        id: true,
-                        displayName: true,
-                        email: true,
-                        title: true,
-                        department: true,
+    async getPending(params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { status: 'Bekliyor' };
+        const [items, total] = await Promise.all([
+            this.prisma.independenceDeclaration.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            displayName: true,
+                            email: true,
+                            title: true,
+                            department: true,
+                        },
+                    },
+                    audit: {
+                        select: {
+                            id: true,
+                            title: true,
+                            auditCode: true,
+                        },
                     },
                 },
-                audit: {
-                    select: {
-                        id: true,
-                        title: true,
-                        auditCode: true,
-                    },
-                },
-            },
-            orderBy: { created_at: 'asc' },
-        });
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'asc' },
+            }),
+            this.prisma.independenceDeclaration.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async getById(id: string) {

@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { AuditLogService } from './audit-log.service';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class AuditTrashService {
     private readonly logger = new Logger(AuditTrashService.name);
@@ -11,18 +13,34 @@ export class AuditTrashService {
         private auditLogService: AuditLogService
     ) { }
 
-    async getDeletedAudits() {
-        return this.prisma.audit.findMany({
-            where: { isDeleted: true },
-            orderBy: { deletedAt: 'desc' }
-        });
+    async getDeletedAudits(params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { isDeleted: true };
+        const [items, total] = await Promise.all([
+            this.prisma.audit.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { deletedAt: 'desc' }
+            }),
+            this.prisma.audit.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
-    async getDeletedFindings() {
-        return this.prisma.finding.findMany({
-            where: { isDeleted: true },
-            orderBy: { deletedAt: 'desc' }
-        });
+    async getDeletedFindings(params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { isDeleted: true };
+        const [items, total] = await Promise.all([
+            this.prisma.finding.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { deletedAt: 'desc' }
+            }),
+            this.prisma.finding.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async restoreAudit(id: string) {

@@ -5,19 +5,28 @@ import * as ExcelJS from 'exceljs';
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class MultiYearPlanService {
     constructor(private prisma: PrismaService) { }
 
-    async findAll(): Promise<MultiYearPlan[]> {
-        return this.prisma.multiYearPlan.findMany({
-            include: {
-                _count: {
-                    select: { items: true }
-                }
-            },
-            orderBy: { created_at: 'desc' }
-        });
+    async findAll(params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const [items, total] = await Promise.all([
+            this.prisma.multiYearPlan.findMany({
+                skip,
+                take,
+                include: {
+                    _count: {
+                        select: { items: true }
+                    }
+                },
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' }
+            }),
+            this.prisma.multiYearPlan.count()
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async findOne(id: string): Promise<MultiYearPlan & { items: (MultiYearPlanItem & { unit: { name: string; riskLevel: string } })[] }> {

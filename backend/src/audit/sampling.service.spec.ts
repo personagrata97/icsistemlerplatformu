@@ -13,6 +13,7 @@ describe('SamplingService', () => {
             findMany: jest.fn().mockResolvedValue([]),
             findUnique: jest.fn().mockResolvedValue({ id: 's1', name: 'Örneklem 1' }),
             create: jest.fn().mockResolvedValue({ id: 's1', name: 'Örneklem 1' }),
+            count: jest.fn().mockResolvedValue(0),
         },
         sozlesme: {
             findMany: jest.fn().mockResolvedValue([]),
@@ -46,7 +47,7 @@ describe('SamplingService', () => {
     describe('getAll', () => {
         it('should return list of samples', async () => {
             const list = await service.getAll();
-            expect(list).toEqual([]);
+            expect(list.items).toEqual([]);
         });
     });
 });

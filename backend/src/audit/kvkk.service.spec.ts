@@ -11,6 +11,7 @@ describe('KvkkService', () => {
             findMany: jest.fn().mockResolvedValue([
                 { id: '1', dataCategory: 'Kişisel Veri', dataDescription: 'Personel TC No', retentionPeriod: 120, status: 'Aktif' },
             ]),
+            count: jest.fn().mockResolvedValue(1),
             create: jest.fn().mockResolvedValue({ id: '2', dataCategory: 'Denetim Verisi', retentionPeriod: 60 }),
             findUnique: jest.fn().mockResolvedValue({ id: '1', status: 'Aktif' }),
             update: jest.fn().mockResolvedValue({ id: '1', status: 'Güncellendi' }),
@@ -48,7 +49,7 @@ describe('KvkkService', () => {
         it('should return list of retention policies', async () => {
             const policies = await service.getRetentionPolicies();
             expect(policies).toBeDefined();
-            expect(Array.isArray(policies)).toBe(true);
+            expect(Array.isArray(policies.items)).toBe(true);
             expect(mockPrismaService.dataRetentionPolicy.findMany).toHaveBeenCalled();
         });
     });

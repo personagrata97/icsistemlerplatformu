@@ -10,6 +10,7 @@ import { NotificationService } from '../common/notification/notification.service
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class AuditService {
@@ -45,7 +46,7 @@ export class AuditService {
 
     // Risk hesaplama: Sistem, Açık Bulgular/Risk Skoruna (RCM) göre Denetim Evrenini otomatik günceller
     // Risk hesaplama mantığı AuditRiskService'e taşındı.
-    async getAllAudits(user: any, options?: { page?: number; limit?: number; search?: string; status?: string }) {
+    async getAllAudits(user: any, options?: PaginationParams & { limit?: number; search?: string; status?: string }) {
         try {
             const uploadsDir = path.join(process.cwd(), 'uploads');
             const workpapersDir = path.join(uploadsDir, 'workpapers');
@@ -85,7 +86,7 @@ export class AuditService {
                 } else if (scope === 'DEPARTMENT') {
                     if (!safeUser.department) {
                         this.logger.warn('AuditService.getAllAudits: User has DEPARTMENT scope but no department defined. Returning empty list.');
-                        return options?.page ? { data: [], total: 0, page: 1, limit: 50, totalPages: 0 } : [];
+                        return buildPaginatedResponse([], 0, 1, 50);
                     }
                     where.department = safeUser.department;
                 }
@@ -100,18 +101,19 @@ export class AuditService {
                 ];
             }
 
+            const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams({
+                ...options,
+                pageSize: options?.pageSize || options?.limit
+            });
+
             const fullWhere = { ...where, isDeleted: false };
             const total = await this.prisma.audit.count({ where: fullWhere });
 
-            const page = options?.page ? Math.max(1, Number(options.page)) : 1;
-            const limit = options?.limit ? Math.min(200, Math.max(1, Number(options.limit))) : (options?.page ? 50 : undefined);
-            const skip = limit ? (page - 1) * limit : undefined;
-
             const results = await this.prisma.audit.findMany({
                 where: fullWhere,
-                orderBy: { created_at: 'desc' },
-                take: limit,
-                skip: skip,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' },
+                take,
+                skip,
                 include: {
                     findings: {
                         where: { isDeleted: false }
@@ -142,18 +144,7 @@ export class AuditService {
             });
 
             this.logger.log(`AuditService.getAllAudits: Found ${results.length} audits (Total: ${total}).`);
-
-            if (options?.page || options?.limit) {
-                return {
-                    data: mappedResults,
-                    total,
-                    page,
-                    limit: limit || 50,
-                    totalPages: Math.ceil(total / (limit || 50))
-                };
-            }
-
-            return mappedResults;
+            return buildPaginatedResponse(mappedResults, total, page, pageSize);
 
         } catch (error) {
             this.logger.error('AuditService.getAllAudits CRITICAL ERROR:', error);
@@ -3248,21 +3239,28 @@ export class AuditService {
      * Tüm denetim süresi uzatma taleplerini listeler.
      * Yönetici tüm talepleri, diğerleri kendi oluşturduklarını görür.
      */
-    async getAuditExtensions(user: any) {
+    async getAuditExtensions(user: any, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
         const where: any = {};
         if (!this.isAdmin(user)) {
             where.requestedById = user.id;
         }
 
-        return this.prisma.auditExtensionRequest.findMany({
-            where,
-            orderBy: { createdAt: 'desc' },
-            include: {
-                audit: { select: { id: true, title: true, auditCode: true } },
-                requestedBy: { select: { id: true, displayName: true } },
-                reviewedBy: { select: { id: true, displayName: true } }
-            }
-        });
+        const [items, total] = await Promise.all([
+            this.prisma.auditExtensionRequest.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { createdAt: 'desc' },
+                include: {
+                    audit: { select: { id: true, title: true, auditCode: true } },
+                    requestedBy: { select: { id: true, displayName: true } },
+                    reviewedBy: { select: { id: true, displayName: true } }
+                }
+            }),
+            this.prisma.auditExtensionRequest.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     /**

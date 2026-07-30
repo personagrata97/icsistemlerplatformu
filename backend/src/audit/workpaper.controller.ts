@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Request, UseGuards, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, Request, UseGuards, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { WorkpaperService } from './workpaper.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -12,8 +12,19 @@ export class WorkpaperController {
 
     @Get(':auditId')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getWorkpapers(@Param('auditId') auditId: string) {
-        return this.service.getWorkpapers(auditId);
+    async getWorkpapers(
+        @Param('auditId') auditId: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.service.getWorkpapers(auditId, {
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Post(':auditId')

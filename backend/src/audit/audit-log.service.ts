@@ -2,40 +2,57 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import * as crypto from 'crypto';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class AuditLogService {
     private readonly logger = new Logger(AuditLogService.name);
 
     constructor(private prisma: PrismaService) { }
 
-    async getLogs() {
-        const logs = await this.prisma.auditLog.findMany({
-            orderBy: { date: 'desc' },
-            take: 100
-        });
+    async getLogs(params?: PaginationParams & { user?: string; category?: string; action?: string }) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where: any = {};
+        if (params?.user) where.user = { contains: params.user, mode: 'insensitive' };
+        if (params?.category) where.targetType = params.category;
+        if (params?.action) where.action = params.action;
 
-        // Tüm kullanıcıları alarak bir eşleme (ID -> İsim) oluştur
+        const [logs, total] = await Promise.all([
+            this.prisma.auditLog.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { date: 'desc' }
+            }),
+            this.prisma.auditLog.count({ where })
+        ]);
+
         const users = await this.prisma.user.findMany({
             select: { id: true, displayName: true, username: true }
         });
         const userMap = new Map(users.map(u => [u.id, u.displayName || u.username]));
         
-        // Transform dates and resolve user names
-        return logs.map(log => ({
+        const items = logs.map(log => ({
             ...log,
-            user: userMap.get(log.user) || log.user, // ID varsa resolves, yoksa (eski log ise) olduğu gibi kalır
+            user: userMap.get(log.user) || log.user,
             date: log.date ? log.date.toISOString() : null
         }));
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
-    async getNotifications() {
+    async getNotifications(params?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(params);
         try {
-            const logs = await this.prisma.auditLog.findMany({
-                orderBy: { date: 'desc' },
-                take: 20
-            });
+            const [logs, total] = await Promise.all([
+                this.prisma.auditLog.findMany({
+                    orderBy: { date: 'desc' },
+                    skip,
+                    take
+                }),
+                this.prisma.auditLog.count()
+            ]);
 
-            // Kategori eşleme tablosu
             const categoryMap: { [key: string]: string } = {
                 'STAFF': 'PERSONEL',
                 'AUTH': 'GİRİŞ',
@@ -47,7 +64,6 @@ export class AuditLogService {
                 'SYSTEM': 'SİSTEM'
             };
 
-            // Eylem/Başlık eşleme tablosu
             const actionMap: { [key: string]: string } = {
                 'ETHICS_VIEWED': 'Etik Bildirim İncelendi',
                 'LOGIN_SUCCESS': 'Sisteme Giriş Başarılı',
@@ -59,20 +75,22 @@ export class AuditLogService {
                 'AUDIT_UPDATED': 'Denetim Güncellendi'
             };
 
-            return logs.map(log => ({
+            const items = logs.map(log => ({
                 id: log.id.toString(),
                 title: actionMap[log.action || ''] || log.action || 'Sistem Aksiyonu',
                 description: log.details || `${log.user} tarafından ${categoryMap[log.targetType?.toUpperCase()] || log.targetType} üzerinde işlem yapıldı.`,
                 type: (log.action?.includes('SİL') || log.action?.includes('DELETE') || log.action?.includes('FAILURE')) ? 'warning' : 
                       (log.action?.includes('GÜNCELLE') || log.action?.includes('UPDATE') || log.action?.includes('VIEWED')) ? 'info' : 'success',
                 time: log.date,
-                date: log.date.toISOString().split('T')[0],
+                date: log.date ? log.date.toISOString().split('T')[0] : '',
                 isRead: false,
                 category: categoryMap[log.targetType?.toUpperCase()] || log.targetType || 'GENEL'
             }));
+
+            return buildPaginatedResponse(items, total, page, pageSize);
         } catch (e) {
             this.logger.error('Bildirimler alinamadi', e);
-            return [];
+            return buildPaginatedResponse([], 0, page, pageSize);
         }
     }
 

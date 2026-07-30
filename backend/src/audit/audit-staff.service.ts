@@ -5,6 +5,8 @@ import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class AuditStaffService {
     private readonly logger = new Logger(AuditStaffService.name);
@@ -18,36 +20,51 @@ export class AuditStaffService {
         return user?.roles?.includes('ADMIN') || user?.roles?.includes('SYSTEM_ADMIN') || user?.roles?.includes('AUDIT_MANAGER') || user?.roles?.includes('AUDIT_ADMIN') || user?.roles?.includes('BOARD') || user?.roles?.includes('AUDIT_SUPERVISOR');
     }
 
-    async getStaff() {
+    async getStaff(params?: PaginationParams & { search?: string }) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
         try {
-            // Fetch users who have audit-related roles or are in the Audit department
-            const users = await this.prisma.user.findMany({
-                where: {
-                    isDeleted: false, // Only active staff
+            const where: any = {
+                isDeleted: false,
+                OR: [
+                    { department: 'Teftiş Kurulu' },
+                    { department: 'İç Denetim' },
+                    { roles: { some: { role: { code: { in: ['AUDIT_ADMIN', 'AUDIT_INSPECTOR', 'AUDIT_UNIT', 'ADMIN', 'AUDIT_VIEWER', 'AUDIT_SUPERVISOR'] } } } } }
+                ]
+            };
+
+            if (params?.search) {
+                where.AND = {
                     OR: [
-                        { department: 'Teftiş Kurulu' },
-                        { department: 'İç Denetim' },
-                        { roles: { some: { role: { code: { in: ['AUDIT_ADMIN', 'AUDIT_INSPECTOR', 'AUDIT_UNIT', 'ADMIN', 'AUDIT_VIEWER', 'AUDIT_SUPERVISOR'] } } } } }
+                        { displayName: { contains: params.search, mode: 'insensitive' } },
+                        { username: { contains: params.search, mode: 'insensitive' } },
+                        { email: { contains: params.search, mode: 'insensitive' } }
                     ]
-                },
-                include: {
-                    roles: {
-                        include: {
-                            role: true
+                };
+            }
+
+            const [users, total] = await Promise.all([
+                this.prisma.user.findMany({
+                    where,
+                    skip,
+                    take,
+                    include: {
+                        roles: {
+                            include: {
+                                role: true
+                            }
+                        },
+                        promotions: {
+                            orderBy: { promotionDate: 'desc' }
                         }
                     },
-                    promotions: {
-                        orderBy: { promotionDate: 'desc' }
-                    }
-                },
-                orderBy: { displayName: 'asc' }
-            });
+                    orderBy: sortBy ? { [sortBy]: sortDir } : { displayName: 'asc' }
+                }),
+                this.prisma.user.count({ where })
+            ]);
 
-            // Map to frontend-friendly format
-            return users.map(user => {
-                // Determine primary role for display
+            const items = users.map(user => {
                 const roleObj = user.roles?.find((r: any) => r.role?.code.startsWith('AUDIT_')) || user.roles?.[0];
-                let roleName = 'Müfettiş'; // Default
+                let roleName = 'Müfettiş';
                 if (roleObj && roleObj.role) {
                     if (roleObj.role.code === 'AUDIT_ADMIN') roleName = 'Teftiş Kurulu Müdürü';
                     else if (roleObj.role.code === 'ADMIN') roleName = 'Sistem Yöneticisi';
@@ -58,44 +75,33 @@ export class AuditStaffService {
                 let certs = [];
                 try {
                     if (user.certifications) {
-                        // Handle case where it might be double stringified or just a string
-                        if (typeof user.certifications === 'string') {
-                            if (user.certifications.startsWith('[')) {
-                                certs = JSON.parse(user.certifications);
-                            } else {
-                                // Assume simplified comma separated or single value if not JSON array
-                                certs = [user.certifications];
-                            }
-                        }
+                        certs = JSON.parse(user.certifications);
                     }
                 } catch (e) {
-                    this.logger.warn(`Failed to parse certifications for user ${user.username}: ${e}`);
                     certs = [];
                 }
 
                 return {
                     id: user.id,
-                    firstName: user.displayName ? user.displayName.split(' ')[0] : '',
-                    lastName: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
-                    name: user.displayName || user.username,
-                    title: user.title || '',
-                    employeeId: user.registerNumber || user.username,
-                    hireDate: user.jobStartDate || '',
-                    email: user.email || '',
-                    username: user.username, // Added for frontend filtering
-                    phone: user.phoneNumber || '',
-                    department: user.department || '',
-                    status: user.isActive ? 'Aktif' : 'Pasif',
-                    certifications: certs,
+                    username: user.username,
+                    displayName: user.displayName || user.username,
+                    email: user.email,
+                    title: user.title || roleName,
                     role: roleName,
-                    photoUrl: user.photoUrl,
-                    jobDescription: user.jobDescription || '',
+                    roleCode: roleObj?.role?.code || 'AUDIT_INSPECTOR',
+                    department: user.department || 'Teftiş Kurulu',
+                    avatarUrl: user.photoUrl,
+                    phone: user.phoneNumber,
+                    certifications: certs,
+                    active: user.isActive !== false,
+                    joinedAt: user.createdAt,
                     promotions: user.promotions || []
                 };
             });
+
         } catch (error) {
             this.logger.error('Failed to get staff list:', error);
-            throw new Error('Personel listesi alınırken bir hata oluştu');
+            return buildPaginatedResponse([], 0, page, pageSize);
         }
     }
 

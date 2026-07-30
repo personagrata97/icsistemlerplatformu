@@ -9,6 +9,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { PdfReportService } from './pdf-report.service';
 import { BRAND_COLORS, EMAIL_COLORS } from '../common/brand-colors';
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 const PDFDocument = require('pdfkit');
 
 @Injectable()
@@ -30,7 +31,8 @@ export class FindingService {
         return roleCodes.includes('ADMIN') || roleCodes.includes('AUDIT_ADMIN') || roleCodes.includes('AUDIT_MANAGER');
     }
 
-    async getAllFindings(user: any, options?: { page?: number; limit?: number; search?: string; status?: string; risk?: string }) {
+    async getAllFindings(user: any, options?: PaginationParams & { search?: string; status?: string; risk?: string }) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(options);
         const where: any = {};
         if (!this.isAdmin(user)) {
             const auditViewPerm = user.permissions?.find((p: any) =>
@@ -53,7 +55,7 @@ export class FindingService {
                 if (user.username) orConditions.push({ audit: { supervisor: user.username } });
                 where.OR = orConditions;
             } else if (scope === 'DEPARTMENT') {
-                if (!user.department) return options?.page ? { data: [], total: 0, page: 1, limit: 50, totalPages: 0 } : [];
+                if (!user.department) return buildPaginatedResponse([], 0, page, pageSize);
                 where.department = user.department;
             }
         }
@@ -75,19 +77,15 @@ export class FindingService {
         const fullWhere = { ...where, isDeleted: false };
         const total = await this.prisma.finding.count({ where: fullWhere });
 
-        const page = options?.page ? Math.max(1, Number(options.page)) : 1;
-        const limit = options?.limit ? Math.min(200, Math.max(1, Number(options.limit))) : (options?.page ? 50 : undefined);
-        const skip = limit ? (page - 1) * limit : undefined;
-
         const findings = await this.prisma.finding.findMany({
             where: fullWhere,
-            orderBy: { created_at: 'desc' },
-            take: limit,
-            skip: skip,
+            orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' },
+            take,
+            skip,
             include: { audit: { include: { AuditableUnit: true } }, auditTest: true, followUps: true, extensionRequests: true, assignedUser: { select: { id: true, displayName: true, title: true, department: true, photoUrl: true } }, notes: { include: { author: true }, orderBy: { created_at: 'desc' } } }
         });
 
-        const mapped = await Promise.all(findings.map(async (finding) => {
+        const items = await Promise.all(findings.map(async (finding) => {
             const logs = await this.prisma.auditLog.findMany({
                 where: { targetType: 'Finding', targetId: finding.id },
                 orderBy: { date: 'desc' },
@@ -106,17 +104,7 @@ export class FindingService {
             };
         }));
 
-        if (options?.page || options?.limit) {
-            return {
-                data: mapped,
-                total,
-                page,
-                limit: limit || 50,
-                totalPages: Math.ceil(total / (limit || 50))
-            };
-        }
-
-        return mapped;
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async getFinding(id: string, user: any) {

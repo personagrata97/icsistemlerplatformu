@@ -16,6 +16,7 @@ const COLORS = BRAND_COLORS;
 
 import { PdfReportService } from './pdf-report.service';
 import { REPORT_TYPES, generateReportNumber } from '../common/report-types';
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class ReportGeneratorService {
@@ -36,15 +37,33 @@ export class ReportGeneratorService {
     // PUBLIC API
     // ============================================================
 
-    async getTemplates() {
-        return this.prisma.reportTemplate.findMany({ where: { isActive: true } });
+    async getTemplates(params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { isActive: true };
+        const [items, total] = await Promise.all([
+            this.prisma.reportTemplate.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' }
+            }),
+            this.prisma.reportTemplate.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
-    async getGeneratedReports() {
-        return this.prisma.generatedReport.findMany({
-            orderBy: { generatedAt: 'desc' },
-            include: { template: true }
-        });
+    async getGeneratedReports(params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const [items, total] = await Promise.all([
+            this.prisma.generatedReport.findMany({
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { generatedAt: 'desc' },
+                include: { template: true }
+            }),
+            this.prisma.generatedReport.count()
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async generateReport(type: string, period: string, templateId?: string, user?: any, includeWatermark: boolean = true) {

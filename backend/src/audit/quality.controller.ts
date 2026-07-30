@@ -24,8 +24,19 @@ export class QualityController {
 
     @Get('metrics')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    getMetrics(@Query('period') period?: string) {
-        return this.qualityService.getMetrics(period);
+    getMetrics(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+        @Query('period') period?: string,
+    ) {
+        return this.qualityService.getMetrics(period, {
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Get('metrics/:id')
@@ -56,8 +67,19 @@ export class QualityController {
 
     @Get('assessments')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    getAssessments(@Query('type') type?: string) {
-        return this.qualityService.getAssessments(type);
+    getAssessments(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+        @Query('type') type?: string,
+    ) {
+        return this.qualityService.getAssessments(type, {
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Get('assessments/:id')
@@ -89,10 +111,19 @@ export class QualityController {
     @Get('actions')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
     getActions(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
         @Query('assessmentId') assessmentId?: string,
         @Query('status') status?: string,
     ) {
-        return this.qualityService.getActions(assessmentId, status);
+        return this.qualityService.getActions(assessmentId, status, {
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Get('actions/:id')

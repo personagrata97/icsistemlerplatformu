@@ -87,12 +87,13 @@ describe('FindingService', () => {
     describe('getAllFindings', () => {
         it('should return findings with history for admin', async () => {
             mockPrisma.finding.findMany.mockResolvedValue([{ id: 'f1' }]);
+            mockPrisma.finding.count.mockResolvedValue(1);
             mockPrisma.auditLog.findMany.mockResolvedValue([{ action: 'Test' }]);
             
             const admin = { roles: ['ADMIN'] };
             const result = await service.getAllFindings(admin);
             
-            expect(result[0].history).toBeDefined();
+            expect(result.items[0].history).toBeDefined();
             expect(mockPrisma.finding.findMany).toHaveBeenCalled();
         });
     });

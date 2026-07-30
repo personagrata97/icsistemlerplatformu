@@ -37,14 +37,20 @@ export class AuditController {
     async getAudits(
         @Request() req: any,
         @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
         @Query('limit') limit?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
         @Query('search') search?: string,
         @Query('status') status?: string,
     ) {
         this.logger.log(`Denetim listesi istendi. Kullanıcı: ${req.user?.username}`);
+        const effectiveSize = pageSize || limit;
         return this.auditService.getAllAudits(req.user, {
-            page: page ? parseInt(page) : undefined,
-            limit: limit ? parseInt(limit) : undefined,
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: effectiveSize ? parseInt(effectiveSize, 10) : undefined,
+            sortBy,
+            sortDir,
             search,
             status,
         });
@@ -151,14 +157,20 @@ export class AuditController {
     async getFindings(
         @Request() req: any,
         @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
         @Query('limit') limit?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
         @Query('search') search?: string,
         @Query('status') status?: string,
         @Query('risk') risk?: string,
     ) {
+        const effectiveSize = pageSize || limit;
         return this.findingService.getAllFindings(req.user, {
-            page: page ? parseInt(page) : undefined,
-            limit: limit ? parseInt(limit) : undefined,
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: effectiveSize ? parseInt(effectiveSize, 10) : undefined,
+            sortBy,
+            sortDir,
             search,
             status,
             risk,

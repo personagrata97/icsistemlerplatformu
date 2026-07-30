@@ -23,18 +23,41 @@ export class FollowUpController {
     @Get()
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
     getAllActions(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
         @Query('durum') durum?: string,
         @Query('sorumluId') sorumluId?: string,
         @Query('findingId') findingId?: string,
     ) {
-        return this.followUpService.getAllActions({ durum, sorumluId, findingId });
+        return this.followUpService.getAllActions({
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+            durum,
+            sorumluId,
+            findingId
+        });
     }
 
     // Bir bulguya ait aksiyonlar
     @Get('finding/:findingId')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    getActionsByFinding(@Param('findingId') findingId: string) {
-        return this.followUpService.getActionsByFinding(findingId);
+    getActionsByFinding(
+        @Param('findingId') findingId: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.followUpService.getActionsByFinding(findingId, {
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     // Yeni aksiyon oluştur

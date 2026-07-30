@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { AuditLogService } from './audit-log.service';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class CommunicationService {
     private readonly logger = new Logger(CommunicationService.name);
@@ -14,14 +16,22 @@ export class CommunicationService {
     // ===========================
     // COMMUNICATIONS (Mektuplar vs)
     // ===========================
-    async getCommunications(auditId: string) {
-        return this.prisma.auditCommunication.findMany({
-            where: { auditId },
-            include: {
-                sentBy: { select: { id: true, displayName: true, title: true } }
-            },
-            orderBy: { created_at: 'desc' }
-        });
+    async getCommunications(auditId: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { auditId };
+        const [items, total] = await Promise.all([
+            this.prisma.auditCommunication.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    sentBy: { select: { id: true, displayName: true, title: true } }
+                },
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' }
+            }),
+            this.prisma.auditCommunication.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async getCommunicationById(id: string) {
@@ -103,11 +113,19 @@ export class CommunicationService {
     // ===========================
     // MEETINGS (Açılış/Kapanış)
     // ===========================
-    async getMeetings(auditId: string) {
-        return this.prisma.auditMeeting.findMany({
-            where: { auditId },
-            orderBy: { meetingDate: 'asc' }
-        });
+    async getMeetings(auditId: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { auditId };
+        const [items, total] = await Promise.all([
+            this.prisma.auditMeeting.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { meetingDate: 'asc' }
+            }),
+            this.prisma.auditMeeting.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async createMeeting(auditId: string, data: any) {

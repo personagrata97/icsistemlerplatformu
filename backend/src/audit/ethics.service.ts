@@ -5,6 +5,7 @@ import { PrismaService } from '../common/prisma.service';
 import { EmailService } from '../email/email.service';
 import { NotificationService } from '../common/notification/notification.service';
 import * as crypto from 'crypto';
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class EthicsService {
@@ -234,27 +235,40 @@ export class EthicsService {
     }
 
     async getReports(filters: any) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(filters);
         const where: any = {};
-        if (filters.status) where.status = filters.status;
-        if (filters.priority) where.priority = filters.priority;
+        if (filters?.status) where.status = filters.status;
+        if (filters?.priority) where.priority = filters.priority;
+        if (filters?.search) {
+            where.OR = [
+                { trackingCode: { contains: filters.search } },
+                { title: { contains: filters.search } },
+            ];
+        }
 
-        const reports = await this.prisma.ethicsReport.findMany({
-            where,
-            orderBy: { created_at: 'desc' },
-            include: {
-                reporter: { select: { id: true, displayName: true } },
-                assignee: { select: { id: true, displayName: true, title: true } }
-            }
-        });
+        const [reports, total] = await Promise.all([
+            this.prisma.ethicsReport.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' },
+                include: {
+                    reporter: { select: { id: true, displayName: true } },
+                    assignee: { select: { id: true, displayName: true, title: true } }
+                }
+            }),
+            this.prisma.ethicsReport.count({ where })
+        ]);
 
-        // Decrypt KVKK fields
-        return reports.map(r => ({
+        const items = reports.map(r => ({
             ...r,
             name: this.decrypt(r.name),
             email: this.decrypt(r.email),
             phone: this.decrypt(r.phone),
             description: this.decrypt(r.description)
         }));
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async getReportStats() {

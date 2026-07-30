@@ -4,6 +4,8 @@ import { AuditLogService } from './audit-log.service';
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class WorkpaperService {
     constructor(
@@ -11,18 +13,25 @@ export class WorkpaperService {
         private auditLogService: AuditLogService
     ) { }
 
-    async getWorkpapers(auditId: string) {
-        const wps = await this.prisma.auditWorkpaper.findMany({
-            where: { auditId, isDeleted: false },
-            include: {
-                preparer: { select: { id: true, displayName: true, title: true } },
-                reviewer: { select: { id: true, displayName: true, title: true } },
-                lockedBy: { select: { id: true, displayName: true } }
-            },
-            orderBy: { created_at: 'desc' }
-        });
+    async getWorkpapers(auditId: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { auditId, isDeleted: false };
+        const [wps, total] = await Promise.all([
+            this.prisma.auditWorkpaper.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    preparer: { select: { id: true, displayName: true, title: true } },
+                    reviewer: { select: { id: true, displayName: true, title: true } },
+                    lockedBy: { select: { id: true, displayName: true } }
+                },
+                orderBy: sortBy ? { [sortBy]: sortDir } : { created_at: 'desc' }
+            }),
+            this.prisma.auditWorkpaper.count({ where })
+        ]);
 
-        return Promise.all(wps.map(async (wp) => {
+        const items = await Promise.all(wps.map(async (wp) => {
             let size = 0;
             try {
                 const filePath = await this.getWorkpaperAbsolutePath(wp);
@@ -35,6 +44,8 @@ export class WorkpaperService {
             const plainWp = JSON.parse(JSON.stringify(wp));
             return { ...plainWp, size };
         }));
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async createWorkpaper(auditId: string, userId: string, data: any) {

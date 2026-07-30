@@ -2,15 +2,11 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { AuditLogService } from './audit-log.service';
-
-// Not: Prisma client'ı PostgreSQL migrasyonu sonrası yeniden üretilene kadar
-// yeni modeller için 'any' tipi kullanılmaktadır.
-// `npx prisma generate` çalıştırıldığında bu tip kısıtları otomatik çözülecektir.
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class KvkkService {
     private readonly logger = new Logger(KvkkService.name);
-    // PostgreSQL migrasyonu sonrası Prisma client yenilenene kadar geçici tip
     private get db(): any { return this.prisma; }
 
     constructor(
@@ -22,10 +18,17 @@ export class KvkkService {
     // VERİ SAKLAMA POLİTİKALARI (Data Retention)
     // ============================================================
 
-    async getRetentionPolicies() {
-        return this.db.dataRetentionPolicy.findMany({
-            orderBy: { dataCategory: 'asc' },
-        });
+    async getRetentionPolicies(params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const [items, total] = await Promise.all([
+            this.db.dataRetentionPolicy.findMany({
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { dataCategory: 'asc' },
+            }),
+            this.db.dataRetentionPolicy.count()
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async createRetentionPolicy(data: any, user: any) {
@@ -119,14 +122,22 @@ export class KvkkService {
     // VERİ SAHİBİ BAŞVURU TAKİP (KVKK Madde 11)
     // ============================================================
 
-    async getDataSubjectRequests(filters?: { status?: string }) {
+    async getDataSubjectRequests(filters?: PaginationParams & { status?: string }) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(filters);
         const where: any = {};
         if (filters?.status) where.status = filters.status;
 
-        return this.db.dataSubjectRequest.findMany({
-            where,
-            orderBy: { receivedDate: 'desc' },
-        });
+        const [items, total] = await Promise.all([
+            this.db.dataSubjectRequest.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { receivedDate: 'desc' },
+            }),
+            this.db.dataSubjectRequest.count({ where })
+        ]);
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async createDataSubjectRequest(data: any, user: any) {

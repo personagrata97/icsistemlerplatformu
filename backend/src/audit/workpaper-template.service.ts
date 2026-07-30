@@ -2,15 +2,25 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { WorkpaperTemplate } from '@prisma/client';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class WorkpaperTemplateService {
     constructor(private prisma: PrismaService) { }
 
-    async findAll(): Promise<WorkpaperTemplate[]> {
-        return this.prisma.workpaperTemplate.findMany({
-            where: { isActive: true },
-            orderBy: { name: 'asc' }
-        });
+    async findAll(params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { isActive: true };
+        const [items, total] = await Promise.all([
+            this.prisma.workpaperTemplate.findMany({
+                where,
+                skip,
+                take,
+                orderBy: sortBy ? { [sortBy]: sortDir } : { name: 'asc' }
+            }),
+            this.prisma.workpaperTemplate.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async findOne(id: string): Promise<WorkpaperTemplate> {

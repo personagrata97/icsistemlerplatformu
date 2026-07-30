@@ -2,6 +2,8 @@ import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nest
 import { PrismaService } from '../common/prisma.service';
 import { AuditLogService } from './audit-log.service';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class ConciliationService {
     private readonly logger = new Logger(ConciliationService.name);
@@ -12,34 +14,49 @@ export class ConciliationService {
     ) {}
 
     // ─── İtiraz Listeleme ───────────────────────────────────────────────
-    async getObjectionsByFinding(findingId: string) {
-        return this.prisma.findingObjection.findMany({
-            where: { findingId },
-            include: {
-                itirazEden: { select: { id: true, displayName: true, title: true, department: true } },
-                kararVeren: { select: { id: true, displayName: true, title: true } },
-            },
-            orderBy: { itirazTarihi: 'desc' },
-        });
+    async getObjectionsByFinding(findingId: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { findingId };
+        const [items, total] = await Promise.all([
+            this.prisma.findingObjection.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    itirazEden: { select: { id: true, displayName: true, title: true, department: true } },
+                    kararVeren: { select: { id: true, displayName: true, title: true } },
+                },
+                orderBy: sortBy ? { [sortBy]: sortDir } : { itirazTarihi: 'desc' },
+            }),
+            this.prisma.findingObjection.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     // Tüm itirazları listele (uzlaşma dashboard)
-    async getAllObjections(filters?: { durum?: string; findingId?: string }) {
+    async getAllObjections(filters?: PaginationParams & { durum?: string; findingId?: string }) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(filters);
         const where: any = {};
         if (filters?.durum) where.durum = filters.durum;
         if (filters?.findingId) where.findingId = filters.findingId;
 
-        return this.prisma.findingObjection.findMany({
-            where,
-            include: {
-                finding: {
-                    select: { id: true, code: true, title: true, risk: true, status: true, auditId: true },
+        const [items, total] = await Promise.all([
+            this.prisma.findingObjection.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    finding: {
+                        select: { id: true, code: true, title: true, risk: true, status: true, auditId: true },
+                    },
+                    itirazEden: { select: { id: true, displayName: true, title: true, department: true } },
+                    kararVeren: { select: { id: true, displayName: true, title: true } },
                 },
-                itirazEden: { select: { id: true, displayName: true, title: true, department: true } },
-                kararVeren: { select: { id: true, displayName: true, title: true } },
-            },
-            orderBy: { itirazTarihi: 'desc' },
-        });
+                orderBy: sortBy ? { [sortBy]: sortDir } : { itirazTarihi: 'desc' },
+            }),
+            this.prisma.findingObjection.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     // ─── İtiraz Oluşturma ───────────────────────────────────────────────

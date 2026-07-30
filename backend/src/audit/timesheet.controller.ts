@@ -17,8 +17,20 @@ export class TimesheetController {
 
     @Get()
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getMyTimesheets(@Request() req, @Query('week') week?: string) {
-        return this.timesheetService.getTimesheets(req.user.userId, week);
+    async getMyTimesheets(
+        @Request() req,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+        @Query('week') week?: string,
+    ) {
+        return this.timesheetService.getTimesheets(req.user.userId, week, {
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Get('stats')
@@ -30,8 +42,18 @@ export class TimesheetController {
     // Yönetici: Onay bekleyen tüm girişler
     @Get('pending-approvals')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getPendingApprovals() {
-        return this.timesheetService.getPendingApprovals();
+    async getPendingApprovals(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.timesheetService.getPendingApprovals({
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     // IIA Std 2030: Denetim bazlı efor özeti
@@ -44,8 +66,19 @@ export class TimesheetController {
     // Denetim bazlı ham efor listesi
     @Get('audit/:auditId')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
-    async getAuditTimesheets(@Param('auditId') auditId: string) {
-        return this.timesheetService.getAuditTimesheets(auditId);
+    async getAuditTimesheets(
+        @Param('auditId') auditId: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.timesheetService.getAuditTimesheets(auditId, {
+            page: page ? parseInt(page, 10) : undefined,
+            pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Post()

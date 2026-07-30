@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { AuditLogService } from './audit-log.service';
 
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
+
 @Injectable()
 export class TimesheetService {
     private readonly logger = new Logger(TimesheetService.name);
@@ -11,7 +13,8 @@ export class TimesheetService {
         private auditLogService: AuditLogService
     ) { }
 
-    async getTimesheets(userId: string, weekStart?: string) {
+    async getTimesheets(userId: string, weekStart?: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
         let dateFilter: any = {};
 
         if (weekStart) {
@@ -31,21 +34,29 @@ export class TimesheetService {
             };
         }
 
-        return this.prisma.auditTimesheet.findMany({
-            where: {
-                userId: userId,
-                date: dateFilter
-            },
-            include: {
-                audit: {
-                    select: { title: true, auditCode: true }
+        const where = {
+            userId: userId,
+            date: dateFilter
+        };
+
+        const [items, total] = await Promise.all([
+            this.prisma.auditTimesheet.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    audit: {
+                        select: { title: true, auditCode: true }
+                    },
+                    user: {
+                        select: { id: true, displayName: true }
+                    }
                 },
-                user: {
-                    select: { id: true, displayName: true }
-                }
-            },
-            orderBy: { date: 'desc' }
-        });
+                orderBy: sortBy ? { [sortBy]: sortDir } : { date: 'desc' }
+            }),
+            this.prisma.auditTimesheet.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async logTime(userId: string, data: any, userObj?: any) {
@@ -243,17 +254,23 @@ export class TimesheetService {
     /**
      * Yönetici: Onay bekleyen tüm girişleri görüntüler.
      */
-    async getPendingApprovals() {
-        return this.prisma.auditTimesheet.findMany({
-            where: {
-                status: 'Onay Bekliyor'
-            },
-            include: {
-                user: { select: { id: true, displayName: true, department: true } },
-                audit: { select: { title: true, auditCode: true } }
-            },
-            orderBy: { date: 'desc' }
-        });
+    async getPendingApprovals(params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { status: 'Onay Bekliyor' };
+        const [items, total] = await Promise.all([
+            this.prisma.auditTimesheet.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    user: { select: { id: true, displayName: true, department: true } },
+                    audit: { select: { title: true, auditCode: true } }
+                },
+                orderBy: sortBy ? { [sortBy]: sortDir } : { date: 'desc' }
+            }),
+            this.prisma.auditTimesheet.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async getStats(userId: string) {
@@ -288,14 +305,22 @@ export class TimesheetService {
     /**
      * Get specific timesheets for an audit.
      */
-    async getAuditTimesheets(auditId: string) {
-        return this.prisma.auditTimesheet.findMany({
-            where: { auditId },
-            include: {
-                user: { select: { id: true, displayName: true } }
-            },
-            orderBy: { date: 'desc' }
-        });
+    async getAuditTimesheets(auditId: string, params?: PaginationParams) {
+        const { page, pageSize, skip, take, sortBy, sortDir } = parsePaginationParams(params);
+        const where = { auditId };
+        const [items, total] = await Promise.all([
+            this.prisma.auditTimesheet.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    user: { select: { id: true, displayName: true } }
+                },
+                orderBy: sortBy ? { [sortBy]: sortDir } : { date: 'desc' }
+            }),
+            this.prisma.auditTimesheet.count({ where })
+        ]);
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     /**
