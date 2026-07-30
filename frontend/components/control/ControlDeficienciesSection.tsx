@@ -9,6 +9,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
 import LoadingState from '@/components/ui/LoadingState';
+import Pagination from '@/components/ui/Pagination';
 import { AlertOctagon, CheckCircle2, Clock, Plus, Eye, Sliders, RefreshCw } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { controlApi } from '@/lib/control-api';
@@ -22,16 +23,21 @@ export default function ControlDeficienciesSection() {
     const [deficienciesList, setDeficienciesList] = useState<any[]>([]);
     const [selectedDeficiency, setSelectedDeficiency] = useState<any>(null);
     const [actionPlanInput, setActionPlanInput] = useState('');
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     const loadDeficiencies = async () => {
         setLoading(true);
         try {
-            const data = await controlApi.getDeficiencies();
-            setDeficienciesList(Array.isArray(data) ? data : []);
+            const data = await controlApi.getDeficiencies({ page, pageSize });
+            setDeficienciesList(data.items || (Array.isArray(data) ? data : []));
+            setTotal(data.total || 0);
         } catch (error) {
             console.error('Kontrol eksiklikleri yükleme hatası:', error);
             showToast('Kontrol eksiklikleri yüklenirken hata oluştu', 'error');
             setDeficienciesList([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -39,7 +45,7 @@ export default function ControlDeficienciesSection() {
 
     useEffect(() => {
         loadDeficiencies();
-    }, []);
+    }, [page, pageSize]);
 
     const handleUpdateStatus = async (status: string) => {
         if (!selectedDeficiency) return;
@@ -131,6 +137,13 @@ export default function ControlDeficienciesSection() {
                     itemsPerPage={20}
                 />
             )}
+
+            <Pagination
+                currentPage={page}
+                totalItems={total}
+                itemsPerPage={pageSize}
+                onPageChange={setPage}
+            />
 
             {selectedDeficiency && (
                 <Modal

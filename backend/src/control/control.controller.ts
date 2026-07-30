@@ -31,6 +31,9 @@ export class ControlController {
     @RequirePermissions({ module: 'CONTROL', action: 'VIEW' })
     async getInventory(
         @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
         @Query('limit') limit?: string,
         @Query('search') search?: string,
         @Query('status') status?: string,
@@ -38,7 +41,9 @@ export class ControlController {
     ) {
         return this.controlService.getControlInventory({
             page: page ? parseInt(page) : undefined,
-            limit: limit ? parseInt(limit) : undefined,
+            pageSize: pageSize ? parseInt(pageSize) : (limit ? parseInt(limit) : undefined),
+            sortBy,
+            sortDir,
             search,
             status,
             department,
@@ -56,8 +61,19 @@ export class ControlController {
     // Kontrol Testleri Listeleme
     @Get('tests')
     @RequirePermissions({ module: 'CONTROL', action: 'VIEW' })
-    async getControlTests(@Query('controlId') controlId?: string) {
-        return this.controlService.getControlTests(controlId);
+    async getControlTests(
+        @Query('controlId') controlId?: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.controlService.getControlTests(controlId, {
+            page: page ? parseInt(page) : undefined,
+            pageSize: pageSize ? parseInt(pageSize) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     // Kontrol Testi Kaydetme (Sonuç Etkin Değilse Otomatik Eksiklik Oluşur)
@@ -75,8 +91,20 @@ export class ControlController {
         @Query('status') status?: string,
         @Query('severity') severity?: string,
         @Query('department') department?: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
     ) {
-        return this.controlService.getControlDeficiencies({ status, severity, department });
+        return this.controlService.getControlDeficiencies(
+            { status, severity, department },
+            {
+                page: page ? parseInt(page) : undefined,
+                pageSize: pageSize ? parseInt(pageSize) : undefined,
+                sortBy,
+                sortDir,
+            }
+        );
     }
 
     // Kontrol Eksikliği Durum Güncelleme
@@ -164,8 +192,19 @@ export class ControlController {
     // Birim Öz Değerlendirme Listeleme
     @Get('self-assessment')
     @RequirePermissions({ module: 'CONTROL', action: 'VIEW' })
-    async getSelfAssessments(@Query('department') department?: string) {
-        return this.controlService.getSelfAssessments(department);
+    async getSelfAssessments(
+        @Query('department') department?: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.controlService.getSelfAssessments(department, {
+            page: page ? parseInt(page) : undefined,
+            pageSize: pageSize ? parseInt(pageSize) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     // Birim Öz Değerlendirme Girişi

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class ReputationSignalService {
@@ -120,12 +121,18 @@ export class ReputationSignalService {
         });
     }
 
-    async getSignals(musteriId?: string) {
+    async getSignals(musteriId?: string, query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
         const where = musteriId ? { musteriId } : {};
-        return this.prisma.reputationSignal.findMany({
+        const total = await this.prisma.reputationSignal.count({ where });
+        const items = await this.prisma.reputationSignal.findMany({
             where,
-            orderBy: { created_at: 'desc' }
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { created_at: 'desc' },
+            skip,
+            take,
         });
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     // Genişletilmiş Durum Tespiti (EDD) Kaydı Oluşturma
@@ -183,9 +190,15 @@ export class ReputationSignalService {
         return edd;
     }
 
-    async getEDDRecords() {
-        return this.prisma.enhancedDueDiligence.findMany({
-            orderBy: { created_at: 'desc' }
+    async getEDDRecords(query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
+        const total = await this.prisma.enhancedDueDiligence.count();
+        const items = await this.prisma.enhancedDueDiligence.findMany({
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { created_at: 'desc' },
+            skip,
+            take,
         });
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 }

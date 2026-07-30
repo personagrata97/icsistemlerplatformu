@@ -7,14 +7,16 @@ export const sanctionApi = {
         return res.json();
     },
 
-    async getMatches(params?: { search?: string; status?: string; list?: string }) {
+    async getMatches(params?: { search?: string; status?: string; list?: string; page?: number; pageSize?: number }) {
         const query = new URLSearchParams();
         if (params?.search) query.append('search', params.search);
         if (params?.status) query.append('status', params.status);
         if (params?.list) query.append('list', params.list);
+        if (params?.page) query.append('page', String(params.page));
+        if (params?.pageSize) query.append('pageSize', String(params.pageSize));
 
         const res = await fetch(`${API_BASE_URL}/sanction/matches?${query.toString()}`, { headers: getHeaders() });
-        if (!res.ok) return [];
+        if (!res.ok) return null;
         return res.json();
     },
 
@@ -62,10 +64,14 @@ export const sanctionApi = {
         return res.json();
     },
 
-    async getListEntities(kod: string, search?: string) {
-        const query = search ? `?search=${encodeURIComponent(search)}` : '';
-        const res = await fetch(`${API_BASE_URL}/sanction/lists/${kod}/entities${query}`, { headers: getHeaders() });
-        if (!res.ok) return [];
+    async getListEntities(kod: string, search?: string, params?: { page?: number; pageSize?: number }) {
+        const query = new URLSearchParams();
+        if (search) query.append('search', search);
+        if (params?.page) query.append('page', String(params.page));
+        if (params?.pageSize) query.append('pageSize', String(params.pageSize));
+
+        const res = await fetch(`${API_BASE_URL}/sanction/lists/${kod}/entities?${query.toString()}`, { headers: getHeaders() });
+        if (!res.ok) return null;
         return res.json();
     },
 
@@ -79,9 +85,12 @@ export const sanctionApi = {
         return res.json();
     },
 
-    async getHistory() {
-        const res = await fetch(`${API_BASE_URL}/sanction/history`, { headers: getHeaders() });
-        if (!res.ok) return [];
+    async getHistory(params?: { page?: number; pageSize?: number }) {
+        const query = new URLSearchParams();
+        if (params?.page) query.append('page', String(params.page));
+        if (params?.pageSize) query.append('pageSize', String(params.pageSize));
+        const res = await fetch(`${API_BASE_URL}/sanction/history?${query.toString()}`, { headers: getHeaders() });
+        if (!res.ok) return null;
         return res.json();
     },
 
@@ -110,9 +119,12 @@ export const sanctionApi = {
         return res.json();
     },
 
-    async getEDDRecords() {
-        const res = await fetch(`${API_BASE_URL}/sanction/edd`, { headers: getHeaders() });
-        if (!res.ok) return [];
+    async getEDDRecords(params?: { page?: number; pageSize?: number }) {
+        const query = new URLSearchParams();
+        if (params?.page) query.append('page', String(params.page));
+        if (params?.pageSize) query.append('pageSize', String(params.pageSize));
+        const res = await fetch(`${API_BASE_URL}/sanction/edd?${query.toString()}`, { headers: getHeaders() });
+        if (!res.ok) return null;
         return res.json();
     },
 
@@ -126,10 +138,13 @@ export const sanctionApi = {
         return res.json();
     },
 
-    async getSignals(musteriId?: string) {
-        const query = musteriId ? `?musteriId=${encodeURIComponent(musteriId)}` : '';
-        const res = await fetch(`${API_BASE_URL}/sanction/reputation/signals${query}`, { headers: getHeaders() });
-        if (!res.ok) return [];
+    async getSignals(musteriId?: string, params?: { page?: number; pageSize?: number }) {
+        const query = new URLSearchParams();
+        if (musteriId) query.append('musteriId', musteriId);
+        if (params?.page) query.append('page', String(params.page));
+        if (params?.pageSize) query.append('pageSize', String(params.pageSize));
+        const res = await fetch(`${API_BASE_URL}/sanction/reputation/signals?${query.toString()}`, { headers: getHeaders() });
+        if (!res.ok) return null;
         return res.json();
     }
 };

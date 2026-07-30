@@ -28,8 +28,15 @@ export class SanctionController {
         @Query('search') search?: string,
         @Query('status') status?: string,
         @Query('list') list?: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
     ) {
-        return this.sanctionService.getMatches({ search, status, list });
+        return this.sanctionService.getMatches(
+            { search, status, list },
+            { page: page ? parseInt(page) : undefined, pageSize: pageSize ? parseInt(pageSize) : undefined, sortBy, sortDir }
+        );
     }
 
     @Post('scan')
@@ -61,8 +68,19 @@ export class SanctionController {
     }
 
     @Get('lists/:kod/entities')
-    async getListEntities(@Param('kod') kod: string, @Query('search') search?: string) {
-        return this.sanctionService.getListEntities(kod, search);
+    async getListEntities(
+        @Param('kod') kod: string,
+        @Query('search') search?: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.sanctionService.getListEntities(
+            kod,
+            search,
+            { page: page ? parseInt(page) : undefined, pageSize: pageSize ? parseInt(pageSize) : undefined, sortBy, sortDir }
+        );
     }
 
     @Post('lists/custom/entities')
@@ -82,8 +100,18 @@ export class SanctionController {
     }
 
     @Get('history')
-    async getHistory() {
-        return this.sanctionService.getHistory();
+    async getHistory(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.sanctionService.getHistory({
+            page: page ? parseInt(page) : undefined,
+            pageSize: pageSize ? parseInt(pageSize) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Get('reports')
@@ -103,8 +131,18 @@ export class SanctionController {
     }
 
     @Get('logs')
-    async getLogs() {
-        return this.sanctionService.getLogs();
+    async getLogs(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.sanctionService.getLogs({
+            page: page ? parseInt(page) : undefined,
+            pageSize: pageSize ? parseInt(pageSize) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 
     @Post('logs')
@@ -127,8 +165,17 @@ export class SanctionController {
     }
 
     @Get('reputation/signals')
-    async getSignals(@Query('musteriId') musteriId?: string) {
-        return this.signalService.getSignals(musteriId);
+    async getSignals(
+        @Query('musteriId') musteriId?: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.signalService.getSignals(
+            musteriId,
+            { page: page ? parseInt(page) : undefined, pageSize: pageSize ? parseInt(pageSize) : undefined, sortBy, sortDir }
+        );
     }
 
     @Post('edd')
@@ -138,7 +185,17 @@ export class SanctionController {
     }
 
     @Get('edd')
-    async getEDDRecords() {
-        return this.signalService.getEDDRecords();
+    async getEDDRecords(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        return this.signalService.getEDDRecords({
+            page: page ? parseInt(page) : undefined,
+            pageSize: pageSize ? parseInt(pageSize) : undefined,
+            sortBy,
+            sortDir,
+        });
     }
 }

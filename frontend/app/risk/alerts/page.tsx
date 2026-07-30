@@ -6,6 +6,7 @@ import { AlertTriangle, CheckCircle, X, Clock, RefreshCw, MessageSquare } from '
 import RefreshButton from '@/components/ui/RefreshButton';
 import LoadingState from '@/components/ui/LoadingState';
 import Button from '@/components/ui/Button';
+import Pagination from '@/components/ui/Pagination';
 
 import StatusBadge from '@/components/ui/StatusBadge';
 import DataTable from '@/components/ui/DataTable';
@@ -22,21 +23,26 @@ function AlertsPageContent() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('OPEN');
     const [confirmCloseId, setConfirmCloseId] = useState<string | null>(null);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         loadAlerts();
-    }, [filter]);
+    }, [filter, page, pageSize]);
 
     const loadAlerts = async () => {
         try {
             setLoading(true);
             const data = await apiClient.getAlerts(
-                filter === 'ALL' ? undefined : { durum: filter }
+                filter === 'ALL' ? { page, pageSize } : { durum: filter, page, pageSize }
             );
-            setAlerts(Array.isArray(data) ? data : []);
+            setAlerts(data.items || (Array.isArray(data) ? data : []));
+            setTotal(data.total || 0);
         } catch (error) {
             console.error('Uyarılar yüklenemedi:', error);
             setAlerts([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -120,6 +126,13 @@ function AlertsPageContent() {
                     rowKey="id"
                 />
             )}
+
+            <Pagination
+                currentPage={page}
+                totalItems={total}
+                itemsPerPage={pageSize}
+                onPageChange={setPage}
+            />
 
             <ConfirmModal
                 isOpen={!!confirmCloseId}

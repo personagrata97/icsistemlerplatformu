@@ -1,5 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class SanctionService {
@@ -226,7 +227,8 @@ export class SanctionService {
         };
     }
 
-    async getMatches(params?: { search?: string; status?: string; list?: string }) {
+    async getMatches(params?: { search?: string; status?: string; list?: string }, query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
         const where: any = {};
         if (params?.status && params.status !== 'ALL') {
             where.durum = params.status;
@@ -237,17 +239,19 @@ export class SanctionService {
             };
         }
 
+        const total = await this.prisma.sanctionMatch.count({ where });
         const matches = await this.prisma.sanctionMatch.findMany({
             where,
             include: {
                 musteri: true,
                 entity: { include: { list: true } }
             },
-            orderBy: { created_at: 'desc' },
-            take: 100
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { created_at: 'desc' },
+            skip,
+            take,
         });
 
-        return matches.map(m => ({
+        const formatted = matches.map(m => ({
             id: m.id,
             musteriId: m.musteriId,
             musteriAd: m.musteri?.ad_soyad || 'Bilinmeyen Müşteri',
@@ -258,6 +262,8 @@ export class SanctionService {
             durum: m.durum,
             tarih: m.created_at.toISOString().split('T')[0],
         }));
+
+        return buildPaginatedResponse(formatted, total, page, pageSize);
     }
 
     async decideMatch(id: string, decision: 'YANLIS_ESLESME' | 'DOGRULANDI', reason?: string, username: string = 'Sistem') {
@@ -352,29 +358,37 @@ export class SanctionService {
         return entity;
     }
 
-    async getListEntities(kod: string, search?: string) {
+    async getListEntities(kod: string, search?: string, query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
         const list = await this.prisma.sanctionList.findUnique({ where: { kod } });
-        if (!list) return [];
+        if (!list) return buildPaginatedResponse([], 0, page, pageSize);
 
         const where: any = { listId: list.id };
         if (search) {
             where.adSoyad = { contains: search, mode: 'insensitive' };
         }
 
-        return this.prisma.sanctionEntity.findMany({
+        const total = await this.prisma.sanctionEntity.count({ where });
+        const items = await this.prisma.sanctionEntity.findMany({
             where,
-            orderBy: { created_at: 'desc' },
-            take: 100
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { created_at: 'desc' },
+            skip,
+            take,
         });
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
-    async getHistory() {
+    async getHistory(query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
+        const total = await this.prisma.sanctionScreening.count();
         const screenings = await this.prisma.sanctionScreening.findMany({
-            orderBy: { baslangic: 'desc' },
-            take: 100
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { baslangic: 'desc' },
+            skip,
+            take,
         });
 
-        return screenings.map(s => ({
+        const formatted = screenings.map(s => ({
             id: s.id,
             tetikleyici: s.tetikleyici,
             taranan: s.tarananKayitSayisi,
@@ -383,18 +397,25 @@ export class SanctionService {
             sure: s.bitis ? `${((s.bitis.getTime() - s.baslangic.getTime()) / 1000).toFixed(2)}s` : 'Çalışıyor',
             calistiran: s.calistiran,
         }));
+
+        return buildPaginatedResponse(formatted, total, page, pageSize);
     }
 
-    async getLogs() {
+    async getLogs(query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
+        const total = await this.prisma.sanctionLog.count();
         const logs = await this.prisma.sanctionLog.findMany({
-            orderBy: { timestamp: 'desc' },
-            take: 100
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { timestamp: 'desc' },
+            skip,
+            take,
         });
 
-        return logs.map((log: any) => ({
+        const formatted = logs.map((log: any) => ({
             ...log,
             details: this.decrypt(log.details)
         }));
+
+        return buildPaginatedResponse(formatted, total, page, pageSize);
     }
 
     async getReports() {

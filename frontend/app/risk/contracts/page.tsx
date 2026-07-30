@@ -6,6 +6,7 @@ import { apiClient } from '@/lib/api-client';
 import { Search, FileText, Eye, Clock, Wallet, MapPin, User, Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 import RefreshButton from '@/components/ui/RefreshButton';
 import Button from '@/components/ui/Button';
+import Pagination from '@/components/ui/Pagination';
 
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -23,17 +24,21 @@ function ContractsPageContent() {
     const [filterStatus, setFilterStatus] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedContract, setSelectedContract] = useState<any | null>(null);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         loadContracts();
-    }, [filterStatus]);
+    }, [filterStatus, page, pageSize]);
 
     const loadContracts = async () => {
         try {
             setLoading(true);
-            const data = await apiClient.getContracts(filterStatus || undefined);
+            const data = await apiClient.getContracts(filterStatus || undefined, { page, pageSize });
+            const items = data.items || (Array.isArray(data) ? data : []);
             // Sıralamanın doğru çalışabilmesi için ilişkisel tabloları düzleştiriyoruz
-            const flattened = data.map((c: any) => ({
+            const flattened = items.map((c: any) => ({
                 ...c,
                 musteri_ad_soyad: c.musteri?.ad_soyad || '',
                 musteri_segment: c.musteri?.segment || '',
@@ -41,8 +46,11 @@ function ContractsPageContent() {
                 sube: c.musteri?.sube || '',
             }));
             setContracts(flattened);
+            setTotal(data.total || 0);
         } catch (error) {
             console.error('Sözleşmeler yüklenemedi:', error);
+            setContracts([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -201,6 +209,14 @@ function ContractsPageContent() {
                 emptyDescription="Kriterlere uygun veya sistemde kayıtlı bir sözleşme analizi bulunmamaktadır."
                 className="shadow-sm border border-gray-100"
                 onRowClick={(contract) => setSelectedContract(contract)}
+            />
+
+            <Pagination
+                currentPage={page}
+                totalItems={total}
+                itemsPerPage={pageSize}
+                onPageChange={setPage}
+                itemUnit="sözleşme"
             />
 
             {/* Sözleşme Detay Modalı */}

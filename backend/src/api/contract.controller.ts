@@ -2,6 +2,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
+import { parsePaginationParams, buildPaginatedResponse } from '../common/pagination.util';
 
 @Controller('contracts')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
@@ -13,12 +14,25 @@ export class ContractController {
      * Sözleşmeleri listele (drill-down için)
      */
     @Get()
-    async getContracts(@Query('durum') durum?: string) {
-        const where: any = {};
+    async getContracts(
+        @Query('durum') durum?: string,
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        const { page: p, pageSize: ps, skip, take } = parsePaginationParams({
+            page: page ? parseInt(page) : undefined,
+            pageSize: pageSize ? parseInt(pageSize) : undefined,
+            sortBy,
+            sortDir,
+        });
 
+        const where: any = {};
         if (durum) where.durum = durum;
 
-        const sozlesmeler = await this.prisma.sozlesme.findMany({
+        const total = await this.prisma.sozlesme.count({ where });
+        const items = await this.prisma.sozlesme.findMany({
             where,
             include: {
                 musteri: true,
@@ -27,11 +41,12 @@ export class ContractController {
                     take: 5,
                 },
             },
-            orderBy: { created_at: 'desc' },
-            take: 100,
+            orderBy: sortBy ? { [sortBy]: sortDir || 'desc' } : { created_at: 'desc' },
+            skip,
+            take,
         });
 
-        return sozlesmeler;
+        return buildPaginatedResponse(items, total, p, ps);
     }
 
     /**

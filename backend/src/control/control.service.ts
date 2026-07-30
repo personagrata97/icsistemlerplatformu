@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { AuditLogService } from '../audit/audit-log.service';
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class ControlService {
@@ -12,10 +13,8 @@ export class ControlService {
     ) {}
 
     // ─── KONTROL ENVANTERİ ──────────────────────────────────────────────
-    async getControlInventory(options?: { page?: number; limit?: number; search?: string; status?: string; department?: string }) {
-        const page = options?.page ? Math.max(1, Number(options.page)) : 1;
-        const limit = options?.limit ? Math.min(200, Math.max(1, Number(options.limit))) : 50;
-        const skip = (page - 1) * limit;
+    async getControlInventory(options?: PaginationParams & { search?: string; status?: string; department?: string }) {
+        const { page, pageSize, skip, take } = parsePaginationParams(options);
 
         const where: any = { isDeleted: false };
         if (options?.status && options.status !== 'ALL') where.status = options.status;
@@ -39,38 +38,34 @@ export class ControlService {
 
         const items = await this.prisma.controlItem.findMany({
             where,
-            orderBy: { created_at: 'desc' },
-            take: limit,
-            skip: skip,
+            orderBy: options?.sortBy ? { [options.sortBy]: options.sortDir || 'desc' } : { created_at: 'desc' },
+            take,
+            skip,
             include: {
                 tests: { orderBy: { testDate: 'desc' }, take: 1 },
                 deficiencies: { where: { isDeleted: false } }
             }
         });
 
-        return {
-            data: items.map(c => ({
-                id: c.id,
-                kod: c.code,
-                ad: c.title,
-                aciklama: c.description,
-                surec: c.processName || 'Belirtilmedi',
-                dayandigiRisk: c.riskTitle || 'Genel Süreç Riski',
-                tur: c.type,
-                yontem: c.method,
-                siklik: c.frequency,
-                sahip: c.owner || c.department,
-                birim: c.department,
-                durum: c.status,
-                sonTestTarihi: c.tests[0]?.testDate ? c.tests[0].testDate.toISOString().split('T')[0] : null,
-                sonTestSonucu: c.tests[0]?.result || 'Test Edilmedi',
-                eksiklikSayisi: c.deficiencies.filter(d => d.status !== 'Kapalı').length,
-            })),
-            total,
-            page,
-            limit,
-            totalPages: Math.ceil(total / limit)
-        };
+        const formatted = items.map(c => ({
+            id: c.id,
+            kod: c.code,
+            ad: c.title,
+            aciklama: c.description,
+            surec: c.processName || 'Belirtilmedi',
+            dayandigiRisk: c.riskTitle || 'Genel Süreç Riski',
+            tur: c.type,
+            yontem: c.method,
+            siklik: c.frequency,
+            sahip: c.owner || c.department,
+            birim: c.department,
+            durum: c.status,
+            sonTestTarihi: c.tests[0]?.testDate ? c.tests[0].testDate.toISOString().split('T')[0] : null,
+            sonTestSonucu: c.tests[0]?.result || 'Test Edilmedi',
+            eksiklikSayisi: c.deficiencies.filter(d => d.status !== 'Kapalı').length,
+        }));
+
+        return buildPaginatedResponse(formatted, total, page, pageSize);
     }
 
     async getControlStats() {
@@ -127,18 +122,24 @@ export class ControlService {
     }
 
     // ─── KONTROL TESTLERİ (OTOMATİK EKSİKLİK OLUŞTURMA) ────────────────
-    async getControlTests(controlId?: string) {
+    async getControlTests(controlId?: string, query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
         const where: any = { isDeleted: false };
         if (controlId) where.controlId = controlId;
 
-        return this.prisma.controlTest.findMany({
+        const total = await this.prisma.controlTest.count({ where });
+        const items = await this.prisma.controlTest.findMany({
             where,
-            orderBy: { testDate: 'desc' },
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { testDate: 'desc' },
+            skip,
+            take,
             include: {
                 control: { select: { id: true, code: true, title: true, department: true } },
                 deficiencies: true
             }
         });
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async createControlTest(data: {
@@ -211,21 +212,27 @@ export class ControlService {
     }
 
     // ─── KONTROL EKSİKLİKLERİ ──────────────────────────────────────────
-    async getControlDeficiencies(filters?: { status?: string; severity?: string; department?: string }) {
+    async getControlDeficiencies(filters?: { status?: string; severity?: string; department?: string }, query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
         const where: any = { isDeleted: false };
         if (filters?.status && filters.status !== 'ALL') where.status = filters.status;
         if (filters?.severity && filters.severity !== 'ALL') where.severity = filters.severity;
         if (filters?.department && filters.department !== 'ALL') where.responsibleUnit = filters.department;
 
-        return this.prisma.controlDeficiency.findMany({
+        const total = await this.prisma.controlDeficiency.count({ where });
+        const items = await this.prisma.controlDeficiency.findMany({
             where,
-            orderBy: { created_at: 'desc' },
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { created_at: 'desc' },
+            skip,
+            take,
             include: {
                 control: { select: { id: true, code: true, title: true, department: true } },
                 test: true,
                 evidences: true
             }
         });
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     // ─── MUTABAKAT & TEBLİĞ İŞ AKIŞI ─────────────────────────────────────
@@ -411,17 +418,23 @@ export class ControlService {
     }
 
     // ─── ÖZ DEĞERLENDİRME (SELF ASSESSMENT) ────────────────────────────
-    async getSelfAssessments(department?: string) {
+    async getSelfAssessments(department?: string, query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
         const where: any = { isDeleted: false };
         if (department) where.department = department;
 
-        return this.prisma.controlSelfAssessment.findMany({
+        const total = await this.prisma.controlSelfAssessment.count({ where });
+        const items = await this.prisma.controlSelfAssessment.findMany({
             where,
-            orderBy: { created_at: 'desc' },
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { created_at: 'desc' },
+            skip,
+            take,
             include: {
                 control: { select: { id: true, code: true, title: true } }
             }
         });
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 
     async createSelfAssessment(data: {

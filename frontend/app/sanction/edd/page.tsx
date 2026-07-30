@@ -20,6 +20,7 @@ import { useEffect } from 'react';
 import { sanctionApi } from '@/lib/sanction-api';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingState from '@/components/ui/LoadingState';
+import Pagination from '@/components/ui/Pagination';
 
 function EnhancedDueDiligencePageContent() {
     const { showToast } = useToast();
@@ -31,6 +32,9 @@ function EnhancedDueDiligencePageContent() {
 
     const [signals, setSignals] = useState<any[]>([]);
     const [eddRecords, setEddRecords] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     // Form States
     const [iddiaTuru, setIddiaTuru] = useState('KARAPARA');
@@ -56,15 +60,18 @@ function EnhancedDueDiligencePageContent() {
         setLoading(true);
         try {
             const [sigData, eddData] = await Promise.all([
-                sanctionApi.getSignals(),
+                sanctionApi.getSignals(undefined, { page, pageSize }),
                 sanctionApi.getEDDRecords()
             ]);
-            setSignals(Array.isArray(sigData) ? sigData : []);
+            const sigItems = sigData?.items || (Array.isArray(sigData) ? sigData : []);
+            setSignals(sigItems);
+            setTotal(sigData?.total || sigItems.length || 0);
             setEddRecords(Array.isArray(eddData) ? eddData : []);
         } catch (e) {
             showToast('EDD verileri yüklenemedi', 'error');
             setSignals([]);
             setEddRecords([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -72,7 +79,7 @@ function EnhancedDueDiligencePageContent() {
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [page]);
 
     const handleOpenEDD = (sig: any) => {
         setSelectedSignal(sig);
@@ -229,6 +236,12 @@ function EnhancedDueDiligencePageContent() {
                     searchTerm={searchTerm}
                     onClearFilters={() => setSearchTerm('')}
                     rowKey="id"
+                />
+                <Pagination
+                    currentPage={page}
+                    totalItems={total || signals.length}
+                    itemsPerPage={pageSize}
+                    onPageChange={setPage}
                 />
             </div>
 

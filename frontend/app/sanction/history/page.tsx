@@ -11,6 +11,7 @@ import { Clock, Activity, ShieldCheck, ShieldAlert, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { sanctionApi } from '@/lib/sanction-api';
+import Pagination from '@/components/ui/Pagination';
 
 function SanctionHistoryPageContent() {
     const { showToast } = useToast();
@@ -18,15 +19,21 @@ function SanctionHistoryPageContent() {
     const [triggerFilter, setTriggerFilter] = useState('ALL');
     const [loading, setLoading] = useState(false);
     const [history, setHistory] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = await sanctionApi.getHistory();
-            setHistory(Array.isArray(data) ? data : []);
+            const data = await sanctionApi.getHistory({ page, pageSize });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setHistory(items);
+            setTotal(data?.total || items.length || 0);
         } catch (e) {
             showToast('Geçmiş verileri yüklenemedi', 'error');
             setHistory([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -34,7 +41,7 @@ function SanctionHistoryPageContent() {
 
     useEffect(() => {
         loadData();
-    }, [searchTerm, triggerFilter]);
+    }, [searchTerm, triggerFilter, page]);
 
     const filteredHistory = history.filter(h => {
         if (triggerFilter !== 'ALL' && !h.tetikleyici.includes(triggerFilter)) return false;
@@ -142,6 +149,12 @@ function SanctionHistoryPageContent() {
                 ]}
                 data={filteredHistory}
                 rowKey="id"
+            />
+            <Pagination
+                currentPage={page}
+                totalItems={total || filteredHistory.length}
+                itemsPerPage={pageSize}
+                onPageChange={setPage}
             />
         </div>
     );

@@ -14,6 +14,7 @@ import { useToast } from '@/components/Toast';
 import Modal from '@/components/ui/Modal';
 import { sanctionApi } from '@/lib/sanction-api';
 import { formatDate } from '@/lib/audit-utils';
+import Pagination from '@/components/ui/Pagination';
 
 function SanctionResultsPageContent() {
     const { showToast } = useToast();
@@ -23,12 +24,17 @@ function SanctionResultsPageContent() {
     const [selectedMatch, setSelectedMatch] = useState<any>(null);
     const [reason, setReason] = useState('');
     const [matches, setMatches] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = await sanctionApi.getMatches({ search: searchTerm, status: statusFilter });
-            setMatches(Array.isArray(data) ? data.map((m: any) => ({
+            const data = await sanctionApi.getMatches({ search: searchTerm, status: statusFilter, page, pageSize });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setTotal(data?.total || items.length || 0);
+            setMatches(items.map((m: any) => ({
                 id: m.id,
                 musteriAd: m.musteriAd || m.musteri?.ad_soyad || 'Müşteri Kaydı',
                 tckn: m.musteri?.tckn ? `${String(m.musteri.tckn).substring(0, 3)}*****${String(m.musteri.tckn).slice(-2)}` : '***8812',
@@ -36,10 +42,11 @@ function SanctionResultsPageContent() {
                 skor: m.skor || 95,
                 durum: m.durum || 'ACIK',
                 tarih: m.created_at ? new Date(m.created_at).toISOString().split('T')[0] : formatDate(new Date())
-            })) : []);
+            })));
         } catch (e) {
             showToast('Eşleşmeler yüklenirken hata oluştu', 'error');
             setMatches([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -47,7 +54,7 @@ function SanctionResultsPageContent() {
 
     useEffect(() => {
         loadData();
-    }, [searchTerm, statusFilter]);
+    }, [searchTerm, statusFilter, page]);
 
     const handleDecide = async (status: 'YANLIS_ESLESME' | 'DOGRULANDI') => {
         if (!selectedMatch) return;
@@ -158,6 +165,12 @@ function SanctionResultsPageContent() {
                 searchTerm={searchTerm}
                 onClearFilters={handleClearAll}
                 rowKey="id"
+            />
+            <Pagination
+                currentPage={page}
+                totalItems={total || filteredMatches.length}
+                itemsPerPage={pageSize}
+                onPageChange={setPage}
             />
 
             {selectedMatch && (

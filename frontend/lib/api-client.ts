@@ -36,10 +36,12 @@ export const apiClient = {
         return res.json();
     },
 
-    async getAlerts(filters?: { durum?: string; risk_seviyesi?: string }) {
+    async getAlerts(filters?: { durum?: string; risk_seviyesi?: string; page?: number; pageSize?: number }) {
         const params = new URLSearchParams();
         if (filters?.durum) params.append('durum', filters.durum);
         if (filters?.risk_seviyesi) params.append('risk_seviyesi', filters.risk_seviyesi);
+        if (filters?.page) params.append('page', String(filters.page));
+        if (filters?.pageSize) params.append('pageSize', String(filters.pageSize));
 
         const res = await fetch(`${API_BASE_URL}/alerts?${params.toString()}`, {
             headers: getHeaders()
@@ -65,9 +67,13 @@ export const apiClient = {
         return res.json();
     },
 
-    async getContracts(durum?: string) {
-        const params = durum ? `?durum=${durum}` : '';
-        const res = await fetch(`${API_BASE_URL}/contracts${params}`, {
+    async getContracts(durum?: string, pagination?: { page?: number; pageSize?: number }) {
+        const params = new URLSearchParams();
+        if (durum) params.append('durum', durum);
+        if (pagination?.page) params.append('page', String(pagination.page));
+        if (pagination?.pageSize) params.append('pageSize', String(pagination.pageSize));
+        const queryStr = params.toString();
+        const res = await fetch(`${API_BASE_URL}/contracts${queryStr ? '?' + queryStr : ''}`, {
             headers: getHeaders()
         });
         if (!res.ok) throw new Error('Failed to fetch contracts');

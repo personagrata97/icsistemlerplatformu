@@ -15,6 +15,7 @@ import { Shield, Search, AlertTriangle, Database, RefreshCw } from 'lucide-react
 import { useToast } from '@/components/Toast';
 import { sanctionApi } from '@/lib/sanction-api';
 import Link from 'next/link';
+import Pagination from '@/components/ui/Pagination';
 
 function SanctionDashboardPageContent() {
     const { showToast } = useToast();
@@ -24,17 +25,22 @@ function SanctionDashboardPageContent() {
     const [listFilter, setListFilter] = useState('ALL');
     const [stats, setStats] = useState<any>({ totalCustomers: 14250, criticalMatches: 2, inReviewMatches: 1, activeLists: 5 });
     const [matches, setMatches] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     const loadData = async () => {
         setLoading(true);
         try {
             const [statsRes, matchesRes] = await Promise.all([
                 sanctionApi.getDashboardStats(),
-                sanctionApi.getMatches({ search: searchTerm, status: statusFilter, list: listFilter })
+                sanctionApi.getMatches({ search: searchTerm, status: statusFilter, list: listFilter, page, pageSize })
             ]);
             if (statsRes) setStats(statsRes);
-            if (matchesRes && matchesRes.length > 0) {
-                setMatches(matchesRes);
+            const items = matchesRes?.items || (Array.isArray(matchesRes) ? matchesRes : []);
+            setTotal(matchesRes?.total || items.length || 0);
+            if (items && items.length > 0) {
+                setMatches(items);
             } else {
                 // Production fallback dataset if database empty
                 setMatches([
@@ -52,7 +58,7 @@ function SanctionDashboardPageContent() {
 
     useEffect(() => {
         loadData();
-    }, [searchTerm, statusFilter, listFilter]);
+    }, [searchTerm, statusFilter, listFilter, page]);
 
     const activeFilterCount = (statusFilter !== 'ALL' ? 1 : 0) + (listFilter !== 'ALL' ? 1 : 0);
 
@@ -159,6 +165,12 @@ function SanctionDashboardPageContent() {
                 ]}
                 data={matches}
                 rowKey="id"
+            />
+            <Pagination
+                currentPage={page}
+                totalItems={total || matches.length}
+                itemsPerPage={pageSize}
+                onPageChange={setPage}
             />
         </div>
     );

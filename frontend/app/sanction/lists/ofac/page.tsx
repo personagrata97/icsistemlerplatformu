@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 import { sanctionApi } from '@/lib/sanction-api';
+import Pagination from '@/components/ui/Pagination';
 
 function OfacListPageContent() {
     const { showToast } = useToast();
@@ -21,12 +22,17 @@ function OfacListPageContent() {
     const [typeFilter, setTypeFilter] = useState('ALL');
     const [loading, setLoading] = useState(true);
     const [records, setRecords] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = await sanctionApi.getListEntities('OFAC_SDN', searchTerm);
-            setRecords(Array.isArray(data) ? data.map((d: any) => ({
+            const data = await sanctionApi.getListEntities('OFAC_SDN', searchTerm, { page, pageSize });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setTotal(data?.total || items.length || 0);
+            setRecords(items.map((d: any) => ({
                 id: d.id,
                 sdnId: d.externalId || d.id,
                 adSoyad: d.adSoyad,
@@ -34,10 +40,11 @@ function OfacListPageContent() {
                 program: d.aciklama || 'OFAC SDN',
                 pasaportNo: d.kimlikNo || '-',
                 tarih: d.created_at ? new Date(d.created_at).toISOString().split('T')[0] : formatDate(new Date())
-            })) : []);
+            })));
         } catch (e) {
             showToast('OFAC verileri yüklenemedi', 'error');
             setRecords([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -45,7 +52,7 @@ function OfacListPageContent() {
 
     useEffect(() => {
         loadData();
-    }, [searchTerm]);
+    }, [searchTerm, page]);
 
     const filteredRecords = records.filter(r => {
         if (programFilter !== 'ALL' && !r.program.includes(programFilter)) return false;
@@ -180,6 +187,12 @@ function OfacListPageContent() {
                 ]}
                 data={filteredRecords}
                 rowKey="id"
+            />
+            <Pagination
+                currentPage={page}
+                totalItems={total || filteredRecords.length}
+                itemsPerPage={pageSize}
+                onPageChange={setPage}
             />
         </div>
     );

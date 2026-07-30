@@ -8,6 +8,7 @@ import { BddkExportService } from '../risk-engine/bddk-export.service';
 import { DataIngestionService } from '../risk-engine/data-ingestion.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
+import { parsePaginationParams, buildPaginatedResponse } from '../common/pagination.util';
 
 @Controller('risk')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
@@ -148,17 +149,33 @@ export class RiskController {
     async getBddkNplExport() {
         return this.bddkService.generateMonthlyNplReport();
     }
-
     /**
      * GET /risk/limits
      * Risk limit listesini döner
      */
     @Get('limits')
-    async getLimits() {
-        return this.prisma.riskLimit.findMany({
-            include: { kpi: true },
-            orderBy: { kpi_kodu: 'asc' }
+    async getLimits(
+        @Query('page') page?: string,
+        @Query('pageSize') pageSize?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortDir') sortDir?: 'asc' | 'desc',
+    ) {
+        const { page: p, pageSize: ps, skip, take } = parsePaginationParams({
+            page: page ? parseInt(page) : undefined,
+            pageSize: pageSize ? parseInt(pageSize) : undefined,
+            sortBy,
+            sortDir,
         });
+
+        const total = await this.prisma.riskLimit.count();
+        const items = await this.prisma.riskLimit.findMany({
+            include: { kpi: true },
+            orderBy: sortBy ? { [sortBy]: sortDir || 'asc' } : { kpi_kodu: 'asc' },
+            skip,
+            take,
+        });
+
+        return buildPaginatedResponse(items, total, p, ps);
     }
 
     /**

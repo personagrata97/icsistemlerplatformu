@@ -11,6 +11,7 @@ import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Modal from '@/components/ui/Modal';
 import LoadingState from '@/components/ui/LoadingState';
+import Pagination from '@/components/ui/Pagination';
 import { Layers, CheckCircle2, Sliders, Activity, Plus, RefreshCw } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { controlApi } from '@/lib/control-api';
@@ -24,6 +25,9 @@ function ControlInventoryPageContent() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [controlsList, setControlsList] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     const [newControl, setNewControl] = useState({
         title: '',
@@ -40,12 +44,14 @@ function ControlInventoryPageContent() {
     const loadControls = async () => {
         setLoading(true);
         try {
-            const res = await controlApi.getInventory({ status: statusFilter, search: searchTerm });
-            setControlsList(res.data || []);
+            const res = await controlApi.getInventory({ status: statusFilter, search: searchTerm, page, pageSize });
+            setControlsList(res.items || res.data || []);
+            setTotal(res.total || 0);
         } catch (error) {
             console.error('Kontrol envanteri yükleme hatası:', error);
             showToast('Kontrol envanteri yüklenirken hata oluştu', 'error');
             setControlsList([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -53,7 +59,7 @@ function ControlInventoryPageContent() {
 
     useEffect(() => {
         loadControls();
-    }, [statusFilter]);
+    }, [statusFilter, page, pageSize, searchTerm]);
 
     const handleAddControl = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -204,6 +210,15 @@ function ControlInventoryPageContent() {
                     itemsPerPage={20}
                 />
             )}
+
+            <div className="mt-4">
+                <Pagination
+                    currentPage={page}
+                    totalItems={total}
+                    itemsPerPage={pageSize}
+                    onPageChange={setPage}
+                />
+            </div>
 
             {/* Modal: Yeni Kontrol Tanımla */}
             <Modal

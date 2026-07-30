@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 import { sanctionApi } from '@/lib/sanction-api';
+import Pagination from '@/components/ui/Pagination';
 
 function UnListPageContent() {
     const { showToast } = useToast();
@@ -21,22 +22,28 @@ function UnListPageContent() {
     const [typeFilter, setTypeFilter] = useState('ALL');
     const [loading, setLoading] = useState(true);
     const [records, setRecords] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = await sanctionApi.getListEntities('UN_SECURITY_COUNCIL', searchTerm);
-            setRecords(Array.isArray(data) ? data.map((d: any) => ({
+            const data = await sanctionApi.getListEntities('UN_SECURITY_COUNCIL', searchTerm, { page, pageSize });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setTotal(data?.total || items.length || 0);
+            setRecords(items.map((d: any) => ({
                 id: d.id,
                 unId: d.externalId || d.id,
                 adSoyad: d.adSoyad,
                 tur: d.tur || 'GERCEK',
                 organ: d.aciklama || 'UNSC 1267/1989/2253 Komitesi',
                 tarih: d.created_at ? new Date(d.created_at).toISOString().split('T')[0] : formatDate(new Date())
-            })) : []);
+            })));
         } catch (e) {
             showToast('BM verileri yüklenemedi', 'error');
             setRecords([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -44,7 +51,7 @@ function UnListPageContent() {
 
     useEffect(() => {
         loadData();
-    }, [searchTerm]);
+    }, [searchTerm, page]);
 
     const filteredRecords = records.filter(r => {
         if (committeeFilter !== 'ALL' && !r.organ.includes(committeeFilter)) return false;
@@ -169,6 +176,12 @@ function UnListPageContent() {
                 ]}
                 data={filteredRecords}
                 rowKey="id"
+            />
+            <Pagination
+                currentPage={page}
+                totalItems={total || filteredRecords.length}
+                itemsPerPage={pageSize}
+                onPageChange={setPage}
             />
         </div>
     );

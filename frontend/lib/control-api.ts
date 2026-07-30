@@ -22,10 +22,10 @@ export const controlApi = {
         return handleResponse(res);
     },
 
-    getInventory: async (filters?: { page?: number; limit?: number; search?: string; status?: string; department?: string }) => {
+    getInventory: async (filters?: { page?: number; pageSize?: number; limit?: number; search?: string; status?: string; department?: string }) => {
         const params = new URLSearchParams();
         if (filters?.page) params.append('page', String(filters.page));
-        if (filters?.limit) params.append('limit', String(filters.limit));
+        if (filters?.pageSize || filters?.limit) params.append('pageSize', String(filters?.pageSize || filters?.limit));
         if (filters?.search) params.append('search', filters.search);
         if (filters?.status) params.append('status', filters.status);
         if (filters?.department) params.append('department', filters.department);
@@ -43,9 +43,13 @@ export const controlApi = {
         return handleResponse(res);
     },
 
-    getTests: async (controlId?: string) => {
-        const url = controlId ? `${API_BASE_URL}/control/tests?controlId=${controlId}` : `${API_BASE_URL}/control/tests`;
-        const res = await fetch(url, { headers: getHeaders() });
+    getTests: async (controlId?: string, filters?: { page?: number; pageSize?: number }) => {
+        const params = new URLSearchParams();
+        if (controlId) params.append('controlId', controlId);
+        if (filters?.page) params.append('page', String(filters.page));
+        if (filters?.pageSize) params.append('pageSize', String(filters.pageSize));
+
+        const res = await fetch(`${API_BASE_URL}/control/tests?${params.toString()}`, { headers: getHeaders() });
         return handleResponse(res);
     },
 
@@ -58,8 +62,14 @@ export const controlApi = {
         return handleResponse(res);
     },
 
-    getDeficiencies: async (filters?: { status?: string; severity?: string; department?: string }) => {
-        const params = new URLSearchParams(filters as any);
+    getDeficiencies: async (filters?: { status?: string; severity?: string; department?: string; page?: number; pageSize?: number }) => {
+        const params = new URLSearchParams();
+        if (filters?.status) params.append('status', filters.status);
+        if (filters?.severity) params.append('severity', filters.severity);
+        if (filters?.department) params.append('department', filters.department);
+        if (filters?.page) params.append('page', String(filters.page));
+        if (filters?.pageSize) params.append('pageSize', String(filters.pageSize));
+
         const res = await fetch(`${API_BASE_URL}/control/deficiencies?${params.toString()}`, { headers: getHeaders() });
         return handleResponse(res);
     },
@@ -125,9 +135,13 @@ export const controlApi = {
         return handleResponse(res);
     },
 
-    getSelfAssessments: async (department?: string) => {
-        const url = department ? `${API_BASE_URL}/control/self-assessment?department=${department}` : `${API_BASE_URL}/control/self-assessment`;
-        const res = await fetch(url, { headers: getHeaders() });
+    getSelfAssessments: async (department?: string, filters?: { page?: number; pageSize?: number }) => {
+        const params = new URLSearchParams();
+        if (department) params.append('department', department);
+        if (filters?.page) params.append('page', String(filters.page));
+        if (filters?.pageSize) params.append('pageSize', String(filters.pageSize));
+
+        const res = await fetch(`${API_BASE_URL}/control/self-assessment?${params.toString()}`, { headers: getHeaders() });
         return handleResponse(res);
     },
 

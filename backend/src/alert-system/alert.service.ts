@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
+import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class AlertService {
@@ -127,19 +128,22 @@ export class AlertService {
     /**
      * Açık uyarıları listele
      */
-    async getOpenAlerts() {
+    async getOpenAlerts(query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
+        const where = { durum: 'OPEN' };
+        const total = await this.prisma.uyari.count({ where });
         const uyarilar = await this.prisma.uyari.findMany({
-            where: { durum: 'OPEN' },
+            where,
             include: {
                 kpi: true,
                 senaryo: true,
             },
-            orderBy: {
-                tarih: 'desc',
-            },
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { tarih: 'desc' },
+            skip,
+            take,
         });
 
-        return uyarilar;
+        return buildPaginatedResponse(uyarilar, total, page, pageSize);
     }
 
     /**
@@ -155,21 +159,25 @@ export class AlertService {
     /**
      * Tüm uyarıları listele (filtreleme ile)
      */
-    async getAllAlerts(filters?: { durum?: string; risk_seviyesi?: string }) {
+    async getAllAlerts(filters?: { durum?: string; risk_seviyesi?: string }, query?: PaginationParams) {
+        const { page, pageSize, skip, take } = parsePaginationParams(query);
         const where: any = {};
 
         if (filters?.durum) where.durum = filters.durum;
         if (filters?.risk_seviyesi) where.risk_seviyesi = filters.risk_seviyesi;
 
-        return this.prisma.uyari.findMany({
+        const total = await this.prisma.uyari.count({ where });
+        const items = await this.prisma.uyari.findMany({
             where,
             include: {
                 kpi: true,
                 senaryo: true,
             },
-            orderBy: {
-                tarih: 'desc',
-            },
+            orderBy: query?.sortBy ? { [query.sortBy]: query.sortDir || 'desc' } : { tarih: 'desc' },
+            skip,
+            take,
         });
+
+        return buildPaginatedResponse(items, total, page, pageSize);
     }
 }

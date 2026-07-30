@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { formatDate } from '@/lib/audit-utils';
 import { sanctionApi } from '@/lib/sanction-api';
+import Pagination from '@/components/ui/Pagination';
 
 function MasakListPageContent() {
     const { showToast } = useToast();
@@ -21,12 +22,17 @@ function MasakListPageContent() {
     const [typeFilter, setTypeFilter] = useState('ALL');
     const [loading, setLoading] = useState(true);
     const [records, setRecords] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [total, setTotal] = useState(0);
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = await sanctionApi.getListEntities('MASAK_6415_7262', searchTerm);
-            setRecords(Array.isArray(data) ? data.map((d: any) => ({
+            const data = await sanctionApi.getListEntities('MASAK_6415_7262', searchTerm, { page, pageSize });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setTotal(data?.total || items.length || 0);
+            setRecords(items.map((d: any) => ({
                 id: d.id,
                 adSoyad: d.adSoyad,
                 tur: d.tur || 'GERCEK',
@@ -34,10 +40,11 @@ function MasakListPageContent() {
                 RGNo: d.kimlikNo || '33100',
                 kanun: d.aciklama || 'MASAK 6415 S.K.',
                 tarih: d.created_at ? new Date(d.created_at).toISOString().split('T')[0] : formatDate(new Date())
-            })) : []);
+            })));
         } catch (e) {
             showToast('MASAK verileri yüklenemedi', 'error');
             setRecords([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -45,7 +52,7 @@ function MasakListPageContent() {
 
     useEffect(() => {
         loadData();
-    }, [searchTerm]);
+    }, [searchTerm, page]);
 
     const filteredRecords = records.filter(r => {
         if (lawFilter !== 'ALL' && !r.kanun.includes(lawFilter)) return false;
@@ -188,6 +195,12 @@ function MasakListPageContent() {
                 searchTerm={searchTerm}
                 onClearFilters={handleClearAll}
                 rowKey="id"
+            />
+            <Pagination
+                currentPage={page}
+                totalItems={total || filteredRecords.length}
+                itemsPerPage={pageSize}
+                onPageChange={setPage}
             />
         </div>
     );
