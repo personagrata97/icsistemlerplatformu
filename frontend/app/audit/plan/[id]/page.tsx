@@ -28,6 +28,7 @@ import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { clsx } from 'clsx';
 import EmptyState from '@/components/ui/EmptyState';
+import SegmentedTabs from '@/components/ui/SegmentedTabs';
 
 // Plan Türü Renkleri
 const PLAN_TYPE_COLORS: Record<string, string> = {
@@ -375,30 +376,16 @@ function AuditPlanDetailPageContent() {
 
             {/* Content Tabs */}
             <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div className="px-6 py-4 border-b bg-gray-50/30">
-                    <div className="tabs-container mb-0">
-                        <Button
-                            variant="ghost"
-                            onClick={() => setActiveTab('overview')}
-                            className={`tab-item ${activeTab === 'overview' ? 'tab-item-active' : ''} !rounded-none !h-auto py-2`}
-                        >
-                            Genel Bakış
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            onClick={() => setActiveTab('audits')}
-                            className={`tab-item ${activeTab === 'audits' ? 'tab-item-active' : ''} !rounded-none !h-auto py-2`}
-                        >
-                            Denetimler ({plan.audits?.length || 0})
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            onClick={() => setActiveTab('resources')}
-                            className={`tab-item ${activeTab === 'resources' ? 'tab-item-active' : ''} !rounded-none !h-auto py-2`}
-                        >
-                            Kaynak Planlaması ({plan.resources?.length || 0})
-                        </Button>
-                    </div>
+                <div className="p-4 border-b border-gray-100">
+                    <SegmentedTabs
+                        tabs={[
+                            { id: 'overview', label: 'Genel Bakış' },
+                            { id: 'audits', label: 'Denetimler', count: plan.audits?.length || 0 },
+                            { id: 'resources', label: 'Kaynak Planlaması', count: plan.resources?.length || 0 }
+                        ]}
+                        activeTab={activeTab}
+                        onChange={(id) => setActiveTab(id as any)}
+                    />
                 </div>
 
                 <div className="p-6">

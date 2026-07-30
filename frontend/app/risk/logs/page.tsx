@@ -214,8 +214,8 @@ function RiskLogsPageContent() {
                         {selectedLog.details && (
                             <div>
                                 <h5 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Teknik Detaylar (JSON)</h5>
-                                <div className="bg-gray-900 rounded-xl p-4 overflow-x-auto shadow-inner">
-                                    <pre className="text-xs text-green-400 font-medium whitespace-pre-wrap">
+                                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 overflow-x-auto">
+                                    <pre className="text-xs text-slate-700 font-mono whitespace-pre-wrap">
                                         {JSON.stringify(selectedLog.details, null, 2)}
                                     </pre>
                                 </div>

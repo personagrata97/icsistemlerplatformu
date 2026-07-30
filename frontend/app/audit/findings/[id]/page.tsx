@@ -27,6 +27,7 @@ import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
 import ConfirmModal from '@/components/ConfirmModal';
 import FormInput from "@/components/ui/FormInput";
+import SegmentedTabs from '@/components/ui/SegmentedTabs';
 
 interface Finding {
     id: string;
@@ -591,31 +592,16 @@ function FindingDetailPageContent() {
                 </div >
 
                 {/* Tabs */}
-                <div className="flex border-b mb-6 -mx-6 px-6 bg-gray-50/50">
-                    <button
-                        onClick={() => setActiveTab('details')}
-                        className={`px-6 py-3 text-sm font-medium border-b-2 transition-all ${activeTab === 'details' ? 'border-primary text-primary bg-white' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'}`}
-                    >
-                        <div className="flex items-center gap-2 text-sm">
-                            <FileText size={16} /> Detaylar
-                        </div>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('conciliation')}
-                        className={`px-6 py-3 text-sm font-medium border-b-2 transition-all ${activeTab === 'conciliation' ? 'border-primary text-primary bg-white' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'}`}
-                    >
-                        <div className="flex items-center gap-2 text-sm">
-                            <MessageSquare size={16} /> Mutabakat & Yanıt
-                        </div>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('history')}
-                        className={`px-6 py-3 text-sm font-medium border-b-2 transition-all ${activeTab === 'history' ? 'border-primary text-primary bg-white' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'}`}
-                    >
-                        <div className="flex items-center gap-2 text-sm">
-                            <History size={16} /> Ekler & Geçmiş
-                        </div>
-                    </button>
+                <div className="mb-6">
+                    <SegmentedTabs
+                        tabs={[
+                            { id: 'details', label: 'Detaylar', icon: FileText },
+                            { id: 'conciliation', label: 'Mutabakat & Yanıt', icon: MessageSquare },
+                            { id: 'history', label: 'Ekler & Geçmiş', icon: History }
+                        ]}
+                        activeTab={activeTab}
+                        onChange={(id) => setActiveTab(id as any)}
+                    />
                 </div>
 
                 {activeTab === 'details' && (

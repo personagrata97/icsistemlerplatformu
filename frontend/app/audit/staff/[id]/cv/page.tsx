@@ -95,48 +95,46 @@ function StaffOzgecmisLegacyPageContent() {
             <div className="max-w-5xl mx-auto mt-8 bg-white shadow-xl min-h-[1122px] overflow-hidden print:mt-0 print:shadow-none print:w-full">
 
                 {/* Başlık / Kişisel Bilgi */}
-                <div className="bg-slate-900 text-white p-12 flex flex-col md:flex-row gap-8 items-center md:items-start relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-
+                <div className="bg-white border-b border-gray-100 p-8 flex flex-col md:flex-row gap-8 items-center md:items-start relative overflow-hidden">
                     <div className="relative z-10">
                         {staff.photoUrl ? (
                             <img
                                 src={getPhotoUrl(staff.photoUrl)!}
                                 alt={staff.firstName}
-                                className="w-40 h-40 rounded-2xl object-cover border-4 border-white/20 shadow-2xl"
+                                className="w-36 h-36 rounded-2xl object-cover border-2 border-slate-200 shadow-sm"
                             />
                         ) : (
-                            <div className="w-40 h-40 rounded-2xl bg-slate-800 border-4 border-white/20 flex items-center justify-center shadow-2xl">
-                                <Users size={64} className="text-slate-600" />
+                            <div className="w-36 h-36 rounded-2xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center shadow-sm">
+                                <Users size={56} className="text-slate-400" />
                             </div>
                         )}
                     </div>
 
                     <div className="flex-1 text-center md:text-left relative z-10">
-                        <h1 className="text-4xl font-black tracking-tight">{staff.firstName} {staff.lastName}</h1>
-                        <p className="text-xl text-primary font-bold mt-2 uppercase tracking-widest">{staff.title}</p>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">{staff.firstName} {staff.lastName}</h1>
+                        <p className="text-lg text-primary font-bold mt-1 uppercase tracking-wider">{staff.title}</p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-                            <div className="flex items-center gap-3 text-slate-300">
-                                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                            <div className="flex items-center gap-3 text-slate-600">
+                                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                                     <Mail size={16} className="text-primary" />
                                 </div>
                                 <span className="text-sm font-medium">{staff.email}</span>
                             </div>
-                            <div className="flex items-center gap-3 text-slate-300">
-                                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                            <div className="flex items-center gap-3 text-slate-600">
+                                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                                     <Phone size={16} className="text-primary" />
                                 </div>
                                 <span className="text-sm font-medium">{staff.phone || '-'}</span>
                             </div>
-                            <div className="flex items-center gap-3 text-slate-300">
-                                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                            <div className="flex items-center gap-3 text-slate-600">
+                                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                                     <Calendar size={16} className="text-primary" />
                                 </div>
                                 <span className="text-sm font-medium">Sicil No: {staff.employeeId}</span>
                             </div>
-                            <div className="flex items-center gap-3 text-slate-300">
-                                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                            <div className="flex items-center gap-3 text-slate-600">
+                                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                                     <Shield size={16} className="text-primary" />
                                 </div>
                                 <span className="text-sm font-medium">İşe Giriş: {formatDate(staff.hireDate)}</span>
