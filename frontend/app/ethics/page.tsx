@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 
 import React, { useState } from 'react';
@@ -365,15 +366,15 @@ export default function PublicEthicsPortalPage() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 font-poppins">
                                                 <div className="space-y-2">
                                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest pl-1">Ad Soyad *</label>
-                                                    <input {...register('name', { required: !isAnonymous })} className="form-input font-bold" />
+                                                    <FormInput {...register('name', { required: !isAnonymous })} className="form-input font-bold" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest pl-1">E-posta *</label>
-                                                    <input {...register('email', { required: !isAnonymous })} type="email" className="form-input font-bold" />
+                                                    <FormInput {...register('email', { required: !isAnonymous })} type="email" className="form-input font-bold" />
                                                 </div>
                                                 <div className="md:col-span-2 space-y-2">
                                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest pl-1">Telefon Numarası</label>
-                                                    <input {...register('phone')} placeholder="05XX XXX XX XX" className="form-input font-bold" />
+                                                    <FormInput {...register('phone')} placeholder="05XX XXX XX XX" className="form-input font-bold" />
                                                 </div>
                                             </div>
                                         </motion.div>
@@ -483,7 +484,7 @@ export default function PublicEthicsPortalPage() {
                         <form onSubmit={handleQuery} className="space-y-10">
                             <div className="space-y-3 text-left font-poppins">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] pl-4">Takip Kodunuz</label>
-                                <input
+                                <FormInput
                                     type="text"
                                     className="w-full h-14 text-center text-lg font-mono font-bold tracking-widest rounded-xl border-2 border-slate-200 focus:border-blue-600 outline-none uppercase text-slate-800 shadow-sm bg-slate-50 transition-all placeholder:text-slate-300"
                                     placeholder="XXXX-XXXX-XXXX"
@@ -658,7 +659,7 @@ export default function PublicEthicsPortalPage() {
                                 <div className="flex items-end gap-2 bg-slate-50 border border-slate-200 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 rounded-2xl p-2 transition-all shadow-inner">
                                     {/* Attachment button */}
                                     <div className="shrink-0">
-                                        <input
+                                        <FormInput
                                             type="file"
                                             id="chat-file-input"
                                             className="hidden"
@@ -677,7 +678,7 @@ export default function PublicEthicsPortalPage() {
 
                                     {/* Textarea */}
                                     <div className="flex-1">
-                                        <textarea
+                                        <FormTextarea
                                             className="w-full bg-transparent border-0 focus:ring-0 focus:outline-none placeholder:text-slate-400 text-xs font-semibold text-slate-700 py-2.5 px-2 resize-none max-h-20 min-h-[40px] custom-scrollbar leading-relaxed"
                                             rows={1}
                                             placeholder="Eklemek istediğiniz bir bilgi var mı..."

@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -176,7 +177,7 @@ function SanctionSettingsPageContent() {
 
                         <div>
                             <label className="form-label mb-1 block font-bold text-gray-900">Yeni Değer ({selectedParam.birim})</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input text-xs font-mono font-bold"
                                 value={newValue}

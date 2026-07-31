@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -771,7 +772,7 @@ function UnitRcmPageContent() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
-                        <textarea
+                        <FormTextarea
                             className="form-input"
                             rows={3}
                             value={formData.description || ''}
@@ -854,7 +855,7 @@ function UnitRcmPageContent() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
-                        <textarea
+                        <FormTextarea
                             className="form-input"
                             rows={3}
                             value={formData.description || ''}
@@ -969,7 +970,7 @@ function UnitRcmPageContent() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Kontrol Tanımı / Detayı</label>
-                        <textarea
+                        <FormTextarea
                             className="form-input"
                             rows={4}
                             value={formData.description || ''}

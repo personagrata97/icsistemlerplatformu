@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -323,7 +325,7 @@ function MultiYearPlanPageContent() {
                 <form onSubmit={handleCreate} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Plan Başlığı</label>
-                        <input
+                        <FormInput
                             required
                             type="text"
                             className="form-input w-full"
@@ -335,7 +337,7 @@ function MultiYearPlanPageContent() {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Başlangıç Yılı</label>
-                            <input
+                            <FormInput
                                 required
                                 type="number"
                                 className="form-input w-full"
@@ -345,7 +347,7 @@ function MultiYearPlanPageContent() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Bitiş Yılı</label>
-                            <input
+                            <FormInput
                                 required
                                 type="number"
                                 className="form-input w-full"
@@ -356,7 +358,7 @@ function MultiYearPlanPageContent() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
-                        <textarea
+                        <FormTextarea
                             className="form-input w-full"
                             rows={3}
                             value={newPlan.description}

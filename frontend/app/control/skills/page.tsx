@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -246,7 +247,7 @@ function ControlSkillsPageContent() {
                                                 <label className="block text-xs font-bold text-indigo-900 mb-1">
                                                     Puan Değişikliği Gerekçesi <span className="text-rose-500">*</span>
                                                 </label>
-                                                <textarea
+                                                <FormTextarea
                                                     className="w-full text-xs border border-indigo-200 rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
                                                     rows={2}
                                                     placeholder={`${skill.shortLabel} yetkinlik seviyesi değişikliği nedenini kısaca açıklayınız...`}

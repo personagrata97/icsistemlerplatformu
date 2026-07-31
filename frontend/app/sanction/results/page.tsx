@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -202,13 +203,13 @@ function SanctionResultsPageContent() {
 
                         <div>
                             <label className="form-label mb-1">Karar Gerekçesi (Zorunlu)</label>
-                            <textarea
+                            <FormTextarea
                                 className="form-input text-xs"
                                 rows={3}
                                 placeholder="Eşleşmenin doğrulama veya yanlış eşleşme gerekçesini giriniz..."
                                 value={reason}
                                 onChange={(e) => setReason(e.target.value)}
-                            ></textarea>
+                            ></FormTextarea>
                         </div>
                     </div>
                 </Modal>

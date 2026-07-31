@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -207,7 +209,7 @@ export default function AuditMeetingsTab({ auditId }: { auditId: string }) {
 
                     <div>
                         <label className="text-xs font-semibold text-gray-600 block mb-1">Başlık <span className="text-red-500">*</span></label>
-                        <input
+                        <FormInput
                             type="text"
                             required
                             className="w-full text-sm border border-gray-300 rounded-lg p-2 focus:border-primary focus:ring-1 focus:ring-primary"
@@ -222,7 +224,7 @@ export default function AuditMeetingsTab({ auditId }: { auditId: string }) {
                             <label className="text-xs font-semibold text-gray-600 block mb-1">Tarih</label>
                             <div className="relative">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><Calendar size={16} /></span>
-                                <input
+                                <FormInput
                                     type="date"
                                     className="w-full text-sm border border-gray-300 rounded-lg p-2 pl-9 focus:border-primary focus:ring-1 focus:ring-primary"
                                     value={form.meetingDate}
@@ -234,7 +236,7 @@ export default function AuditMeetingsTab({ auditId }: { auditId: string }) {
                             <label className="text-xs font-semibold text-gray-600 block mb-1">Lokasyon / Link</label>
                             <div className="relative">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><MapPin size={16} /></span>
-                                <input
+                                <FormInput
                                     type="text"
                                     className="w-full text-sm border border-gray-300 rounded-lg p-2 pl-9 focus:border-primary focus:ring-1 focus:ring-primary"
                                     value={form.location}
@@ -249,7 +251,7 @@ export default function AuditMeetingsTab({ auditId }: { auditId: string }) {
                         <label className="text-xs font-semibold text-gray-600 block mb-1">Katılımcılar</label>
                         <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-400"><Users size={16} /></span>
-                            <textarea
+                            <FormTextarea
                                 rows={2}
                                 className="w-full text-sm border border-gray-300 rounded-lg p-2 pl-9 focus:border-primary focus:ring-1 focus:ring-primary resize-none"
                                 value={form.attendees}
@@ -263,7 +265,7 @@ export default function AuditMeetingsTab({ auditId }: { auditId: string }) {
                         <label className="text-xs font-semibold text-gray-600 block mb-1">Gündem / Notlar</label>
                         <div className="relative">
                             <span className="absolute left-3 top-3 text-gray-400"><FileText size={16} /></span>
-                            <textarea
+                            <FormTextarea
                                 rows={3}
                                 className="w-full text-sm border border-gray-300 rounded-lg p-2 pl-9 focus:border-primary focus:ring-1 focus:ring-primary resize-none"
                                 value={form.agenda}

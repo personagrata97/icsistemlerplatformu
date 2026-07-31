@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React, { useState, useEffect } from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
@@ -69,7 +70,7 @@ export default function ResourcePlanningModal({
                 </div>
                 <div className="form-group">
                     <label className="form-label">Planlanan Süre (Adam/Gün)</label>
-                    <input
+                    <FormInput
                         type="number"
                         className="form-input w-full"
                         min="1"

@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -535,7 +537,7 @@ function SamplingPageContent() {
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Popülasyon Büyüklüğü (N)</label>
-                        <input
+                        <FormInput
                             type="number"
                             value={calcPopulation}
                             onChange={(e) => setCalcPopulation(parseInt(e.target.value) || 0)}
@@ -556,7 +558,7 @@ function SamplingPageContent() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Hata Payı %</label>
-                        <input
+                        <FormInput
                             type="number"
                             value={calcTolerableError}
                             onChange={(e) => setCalcTolerableError(parseFloat(e.target.value) || 0)}
@@ -566,7 +568,7 @@ function SamplingPageContent() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Beklenen Hata Oranı (%)</label>
-                        <input
+                        <FormInput
                             type="number"
                             value={calcExpectedError}
                             onChange={(e) => setCalcExpectedError(parseFloat(e.target.value) || 0)}
@@ -855,7 +857,7 @@ function SamplingPageContent() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="form-group">
                                                 <label className="form-label text-xs">Bulunan Sapma Sayısı</label>
-                                                <input
+                                                <FormInput
                                                     type="number"
                                                     min="0"
                                                     className="form-input text-sm"
@@ -881,7 +883,7 @@ function SamplingPageContent() {
 
                                         <div className="form-group">
                                             <label className="form-label text-xs">Test Değerlendirme Özeti ve Karar Gerekçesi</label>
-                                            <textarea
+                                            <FormTextarea
                                                 className="form-input min-h-[100px] text-sm resize-none"
                                                 placeholder="İnceleme sonuçlarını ve sapmaların nedenlerini buraya yazınız..."
                                                 value={selectedPlan.testResult || ''}
@@ -957,7 +959,7 @@ function SamplingPageContent() {
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Popülasyon Tanımı *</label>
-                                <input
+                                <FormInput
                                     type="text"
                                     className="form-input"
                                     placeholder="Örn: 2023 Yılı Satınalma Faturaları"
@@ -968,7 +970,7 @@ function SamplingPageContent() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="form-group">
                                     <label className="form-label">Popülasyon Büyüklüğü (N)</label>
-                                    <input
+                                    <FormInput
                                         type="number"
                                         className="form-input"
                                         value={editingPlan.populationSize || ''}
@@ -999,7 +1001,7 @@ function SamplingPageContent() {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Hata Payı %</label>
-                                    <input
+                                    <FormInput
                                         type="number"
                                         step="0.1"
                                         className="form-input text-sm"
@@ -1010,7 +1012,7 @@ function SamplingPageContent() {
                                 <div className="form-group">
                                     <label className="form-label text-xs uppercase font-bold text-primary">Örneklem (n)</label>
                                     <div className="flex gap-2">
-                                        <input
+                                        <FormInput
                                             type="number"
                                             className="form-input font-bold text-primary"
                                             value={editingPlan.sampleSize}

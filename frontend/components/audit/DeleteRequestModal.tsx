@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 import React, { useState } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
@@ -69,7 +70,7 @@ export default function DeleteRequestModal({ isOpen, onClose, onConfirm, title, 
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama (İsteğe Bağlı)</label>
-                    <textarea
+                    <FormTextarea
                         className="form-input min-h-[100px]"
                         placeholder="Ek açıklama giriniz..."
                         value={comment}

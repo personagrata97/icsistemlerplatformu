@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -391,7 +393,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                                         <div className="space-y-3">
                                             <div>
                                                 <label className="text-xs font-semibold text-gray-600">Test Prosedürü</label>
-                                                <textarea
+                                                <FormTextarea
                                                     className="form-input w-full h-20 text-sm"
                                                     placeholder="Testin nasıl yapıldığını açıklayın..."
                                                     value={testFormData.procedure || ''}
@@ -401,7 +403,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div>
                                                     <label className="text-xs font-semibold text-gray-600">Örneklem Büyüklüğü</label>
-                                                    <input
+                                                    <FormInput
                                                         type="number"
                                                         className="form-input w-full text-sm"
                                                         value={testFormData.sampleSize || ''}
@@ -741,7 +743,7 @@ export default function TestSteps({ auditId, unitId, onProgressUpdate }: TestSte
                                 <MessageSquare size={16} className="text-primary" />
                                 İnceleme Notu (Review Note)
                             </label>
-                            <textarea
+                            <FormTextarea
                                 className="form-input w-full h-28 text-sm resize-none"
                                 placeholder="Testle ilgili görüşünüz, eksik gördüğünüz noktalar veya düzeltme talepleriniz..."
                                 value={reviewNote}

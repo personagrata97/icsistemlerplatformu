@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React, { useState, useEffect } from 'react';
 import { auditApi, API_BASE_URL } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
@@ -290,7 +291,7 @@ export default function WorkpaperList({ auditId, currentUser }: WorkpaperListPro
                     >
                         Şablondan Ekle
                     </Button>
-                    <input
+                    <FormInput
                         type="file"
                         id="workpaper-upload"
                         className="hidden"

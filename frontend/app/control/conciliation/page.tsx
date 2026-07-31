@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -195,7 +196,7 @@ function ControlConciliationPageContent() {
                             {selectedDeficiency.status === 'Mutabakata Gönderildi' || selectedDeficiency.unitResponse === 'BEKLEMEDE' ? (
                                 <div className="space-y-2">
                                     <label className="font-bold text-gray-800">Birim Mutabakat Açıklaması:</label>
-                                    <textarea
+                                    <FormTextarea
                                         className="w-full p-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                         rows={2}
                                         placeholder="Birim olarak eksiklik tespitine ilişkin değerlendirmeniz..."

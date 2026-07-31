@@ -120,7 +120,7 @@ export default function MeetingMinutesModal({ isOpen, onClose, onSubmit, auditDe
                     </div>
                     <div className="form-group">
                         <label className="form-label">Tarih</label>
-                        <input
+                        <FormInput
                             type="datetime-local"
                             required
                             className="form-input"
@@ -133,7 +133,7 @@ export default function MeetingMinutesModal({ isOpen, onClose, onSubmit, auditDe
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="form-group">
                         <label className="form-label flex gap-2 items-center"><Users size={16} /> Katılımcılar (Özet)</label>
-                        <textarea
+                        <FormTextarea
                             className="form-textarea"
                             rows={2}
                             placeholder="Alp Yılmaz (Müfettiş), Kerem (Birim Müdürü)..."

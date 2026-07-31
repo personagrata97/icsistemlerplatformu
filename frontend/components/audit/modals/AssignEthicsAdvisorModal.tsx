@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 import React, { useState, useEffect } from 'react';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -130,7 +131,7 @@ export default function AssignEthicsAdvisorModal({
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Değişiklik Gerekçesi *
                             </label>
-                            <textarea
+                            <FormTextarea
                                 value={justification}
                                 onChange={(e) => setJustification(e.target.value)}
                                 placeholder="Görevi neden devrettiğinizi/değiştirdiğinizi açıklayınız..."

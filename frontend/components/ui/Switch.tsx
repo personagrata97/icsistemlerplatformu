@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React from 'react';
 
 interface SwitchProps {
@@ -20,7 +21,7 @@ export default function Switch({
     return (
         <label className={`flex items-center gap-3 cursor-pointer select-none ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}>
             <div className={`relative inline-flex items-center group`}>
-                <input
+                <FormInput
                     type="checkbox"
                     className="sr-only"
                     checked={checked}

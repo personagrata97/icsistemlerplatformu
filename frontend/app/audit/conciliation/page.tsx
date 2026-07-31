@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
@@ -235,7 +236,7 @@ function ConciliationPageContent() {
 
                         <div className="space-y-1">
                             <label className="font-bold text-gray-800">Müfettiş / Gözetim Değerlendirme Notu:</label>
-                            <textarea
+                            <FormTextarea
                                 className="w-full p-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 rows={3}
                                 placeholder="Gerekçe veya ek açıklama giriniz..."

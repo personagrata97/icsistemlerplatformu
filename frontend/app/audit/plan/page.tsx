@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -524,7 +526,7 @@ function AuditPlanPageContent() {
                     {/* Plan Başlığı */}
                     <div className="form-group">
                         <label className="form-label">Plan Başlığı *</label>
-                        <input
+                        <FormInput
                             type="text"
                             className="form-input w-full"
                             required
@@ -561,7 +563,7 @@ function AuditPlanPageContent() {
                     {/* Açıklama */}
                     <div className="form-group">
                         <label className="form-label">Açıklama</label>
-                        <textarea
+                        <FormTextarea
                             className="form-textarea w-full"
                             rows={3}
                             placeholder="Plan hakkında kısa açıklama..."
@@ -602,7 +604,7 @@ function AuditPlanPageContent() {
                             <p className="text-xs text-gray-500 mb-2">(Maks. 20MB)</p>
                         </>
                     )}
-                    <input
+                    <FormInput
                         type="file"
                         accept=".pdf"
                         className="hidden"

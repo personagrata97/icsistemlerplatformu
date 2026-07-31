@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -595,13 +596,13 @@ function SkillsMatrixPageContent() {
                                                     <label className="block text-xs font-bold text-indigo-800 mb-1.5">
                                                         Puan Değişikliği Gerekçesi <span className="text-red-500">*</span>
                                                     </label>
-                                                    <textarea
+                                                    <FormTextarea
                                                         className="w-full text-[13px] border border-indigo-200 rounded p-2 outline-none focus:ring-2 focus:ring-indigo-400 bg-white resize-none shadow-sm"
                                                         rows={2}
                                                         placeholder={`${skill.shortLabel} yetkinliğini güncellediniz. Nedenini kısaca belirtiniz.`}
                                                         value={justifications[key] || ''}
                                                         onChange={(e) => setJustifications({...justifications, [key]: e.target.value})}
-                                                    ></textarea>
+                                                    ></FormTextarea>
                                                 </div>
                                             </div>
                                         )}

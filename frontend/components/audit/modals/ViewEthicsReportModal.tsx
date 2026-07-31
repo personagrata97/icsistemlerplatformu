@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Modal from '@/components/ui/Modal';
@@ -773,7 +775,7 @@ export default function ViewEthicsReportModal({
                                 )}
                             </div>
                             <div className="flex gap-3 items-center bg-white p-1">
-                                <textarea
+                                <FormTextarea
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     onKeyDown={(e) => {
@@ -890,7 +892,7 @@ export default function ViewEthicsReportModal({
 
                             {/* Add New Note - Same style as Messages */}
                             <div className="flex gap-2 items-center">
-                                <textarea
+                                <FormTextarea
                                     id="investigation-notes"
                                     className="form-input flex-1 h-12 min-h-[48px] resize-none rounded-lg text-sm py-3"
                                     placeholder="Yeni not ekleyiniz..."
@@ -992,7 +994,7 @@ export default function ViewEthicsReportModal({
 
                                 <div>
                                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Kapanış Özeti *</label>
-                                    <textarea
+                                    <FormTextarea
                                         value={closingSummary}
                                         onChange={(e) => setClosingSummary(e.target.value)}
                                         className="form-input w-full h-24 resize-none text-sm"
@@ -1024,7 +1026,7 @@ export default function ViewEthicsReportModal({
                                                 />
                                                 <div>
                                                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Karar No / Referans</label>
-                                                    <input
+                                                    <FormInput
                                                         type="text"
                                                         value={disciplinaryActionDetails.split('|')[1] || ''}
                                                         onChange={(e) => {
@@ -1039,7 +1041,7 @@ export default function ViewEthicsReportModal({
                                             </div>
                                             <div>
                                                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Açıklama</label>
-                                                <textarea
+                                                <FormTextarea
                                                     value={disciplinaryActionDetails.split('|')[2] || ''}
                                                     onChange={(e) => {
                                                         const parts = disciplinaryActionDetails.split('|');

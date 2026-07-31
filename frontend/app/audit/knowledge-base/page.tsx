@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -234,7 +235,7 @@ function KnowledgeBasePageContent() {
                     </FilterDropdown>
                 }
             />
-            <input
+            <FormInput
                 type="file"
                 className="hidden"
                 ref={fileInputRef}

@@ -64,7 +64,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                                 {props.value || '-'}
                             </div>
                         ) : (
-                            <input
+                            <FormInput
                                 id={inputId}
                                 ref={ref}
                                 required={required}

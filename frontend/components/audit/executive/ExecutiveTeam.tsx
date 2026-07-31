@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 import React, { useState } from 'react';
 import DashboardWidget from '@/components/ui/DashboardWidget';
 import DashboardListItem from '@/components/ui/DashboardListItem';
@@ -416,7 +417,7 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                     </p>
                     <div className="form-group">
                         <label className="form-label">Ret Gerekçesi / Yönetici Notu <span className="text-red-500">*</span></label>
-                        <textarea
+                        <FormTextarea
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm min-h-[100px]"
                             placeholder="Örn: Bu tarihlerde Şube denetimindesin, 15-20 Ağustos arası takvimin boş. Bu tarihler için tekrar talep girebilirsin."
                             value={rejectReason}

@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React, { useState, useEffect, useRef } from 'react';
 import { Check, ChevronsUpDown, Loader2, Search, X } from 'lucide-react';
 import { auditApi, AuditStaff } from '@/lib/audit-api';
@@ -159,7 +160,7 @@ const StaffSelect: React.FC<StaffSelectProps> = ({
                     <div className="p-2 border-b border-gray-50">
                         <div className="relative">
                             <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input
+                            <FormInput
                                 type="text"
                                 className="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors"
                                 placeholder="Personel ara..."

@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -74,7 +75,7 @@ function SanctionScanPageContent() {
                     <div className="md:col-span-2">
                         <label className="form-label mb-1">Müşteri Ad Soyad veya TCKN / Vergi No</label>
                         <div className="relative">
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input pl-10"
                                 placeholder="Örn: Ahmet Yılmaz veya 10928374652"

@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React from 'react';
 import { Check } from 'lucide-react';
 
@@ -30,7 +31,7 @@ export default function Checkbox({
     return (
         <div className={`flex items-center gap-3 select-none ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${className}`}>
             <div className="relative flex items-center">
-                <input
+                <FormInput
                     type="checkbox"
                     id={inputId}
                     className="sr-only"

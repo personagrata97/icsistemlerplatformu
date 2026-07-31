@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -286,7 +288,7 @@ function FastTrackPageInner() {
                                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">AD Sicil / Kullanıcı Adı</label>
                                 <div className="relative">
                                     <User className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                                    <input 
+                                    <FormInput 
                                         type="text" 
                                         value={adUsername}
                                         onChange={(e) => setAdUsername(e.target.value)}
@@ -300,7 +302,7 @@ function FastTrackPageInner() {
                                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">AD Şifre</label>
                                 <div className="relative">
                                     <Key className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                                    <input 
+                                    <FormInput 
                                         type="password" 
                                         value={adPassword}
                                         onChange={(e) => setAdPassword(e.target.value)}
@@ -443,7 +445,7 @@ function FastTrackPageInner() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">Kök Neden Analizi</label>
-                                    <textarea 
+                                    <FormTextarea 
                                         rows={4}
                                         value={rootCause}
                                         onChange={(e) => setRootCause(e.target.value)}
@@ -456,7 +458,7 @@ function FastTrackPageInner() {
                                     <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">
                                         {isAgreed ? 'Birim Yönetim Görüşü' : 'Bulguya Katılmama Gerekçesi (Zorunlu)'}
                                     </label>
-                                    <textarea 
+                                    <FormTextarea 
                                         rows={4}
                                         value={response}
                                         onChange={(e) => setResponse(e.target.value)}
@@ -493,7 +495,7 @@ function FastTrackPageInner() {
                                             
                                             <div className="md:col-span-6 space-y-1">
                                                 <label className="block text-[10px] text-slate-500 font-semibold uppercase">Aksiyon Planı Açıklaması</label>
-                                                <input 
+                                                <FormInput 
                                                     type="text"
                                                     value={act.action}
                                                     onChange={(e) => updateActionRow(index, 'action', e.target.value)}
@@ -504,7 +506,7 @@ function FastTrackPageInner() {
 
                                             <div className="md:col-span-2 space-y-1">
                                                 <label className="block text-[10px] text-slate-500 font-semibold uppercase">Sorumlu Birim/Sicil</label>
-                                                <input 
+                                                <FormInput 
                                                     type="text"
                                                     value={act.responsible}
                                                     onChange={(e) => updateActionRow(index, 'responsible', e.target.value)}
@@ -515,7 +517,7 @@ function FastTrackPageInner() {
 
                                             <div className="md:col-span-2 space-y-1">
                                                 <label className="block text-[10px] text-slate-500 font-semibold uppercase">Vade Tarihi</label>
-                                                <input 
+                                                <FormInput 
                                                     type="date"
                                                     value={act.dueDate}
                                                     onChange={(e) => updateActionRow(index, 'dueDate', e.target.value)}

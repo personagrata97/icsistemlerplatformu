@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -302,7 +304,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                                     <DollarSign size={14} className="text-emerald-500" /> Finansal Etki / Zarar
                                 </label>
                                 <div className="flex gap-2">
-                                    <input
+                                    <FormInput
                                         type="number"
                                         placeholder="0.00"
                                         value={financialImpact}
@@ -349,7 +351,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                             <div className="p-4 border border-slate-100 rounded-2xl bg-slate-50/50">
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                                     <div className="md:col-span-1">
-                                        <input
+                                        <FormInput
                                             type="text"
                                             placeholder="Adı Soyadı"
                                             value={newSubject.name}
@@ -358,7 +360,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                                         />
                                     </div>
                                     <div className="md:col-span-1">
-                                        <input
+                                        <FormInput
                                             type="text"
                                             placeholder="Ünvan / Birim"
                                             value={newSubject.title}
@@ -443,7 +445,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                                 <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
                                     <Clipboard size={14} /> 1. OLAYLAR VE SAVLAR
                                 </label>
-                                <textarea
+                                <FormTextarea
                                     value={summary}
                                     onChange={(e) => setSummary(e.target.value)}
                                     placeholder="Soruşturmaya/İncelemeye konu olaylar ve savlar..."
@@ -455,7 +457,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                                 <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
                                     <PenTool size={14} /> 2. İNCELEME VE ÇÖZÜMLEMELER
                                 </label>
-                                <textarea
+                                <FormTextarea
                                     value={findings}
                                     onChange={(e) => setFindings(e.target.value)}
                                     placeholder="İnceleme yöntemi, elde edilen kanıtlar, yazılı ifadeler ve ulaşılan tespitler..."
@@ -467,7 +469,7 @@ const InvestigationReportSection: React.FC<InvestigationReportSectionProps> = ({
                                 <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
                                     <CheckCircle size={14} /> 3. SONUÇ VE KANAAT
                                 </label>
-                                <textarea
+                                <FormTextarea
                                     value={opinion}
                                     onChange={(e) => setOpinion(e.target.value)}
                                     placeholder="Müfettişin nihai kanaati ve sonuç bölümü..."

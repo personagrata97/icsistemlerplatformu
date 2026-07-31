@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import React, { useState } from 'react';
 import { AlertTriangle, Clock, AlertCircle, CheckCircle, User, Tag, FileText, Check, Shield, Activity, Calendar, History, Search, Send, PlayCircle, XCircle, FileSearch, Edit2, Trash2, X, Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -350,7 +352,7 @@ export default function FindingDetailModal({
                                             </h4>
                                             <div>
                                                 <label className="block text-xs font-semibold text-gray-700 mb-1">Aksiyon Planınız <span className="text-red-500">*</span></label>
-                                                <textarea
+                                                <FormTextarea
                                                     className="w-full form-input rounded-lg border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500/20 text-sm"
                                                     rows={4}
                                                     placeholder="Bulguya istinaden alınacak aksiyonları ve kök neden analizini detaylıca açıklayınız..."
@@ -361,7 +363,7 @@ export default function FindingDetailModal({
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-xs font-semibold text-gray-700 mb-1">Aksiyon Sorumlusu</label>
-                                                    <input
+                                                    <FormInput
                                                         type="text"
                                                         className="w-full form-input rounded-lg border-emerald-200 focus:border-emerald-500 text-sm"
                                                         placeholder="Örn: Ahmet Yılmaz (Kredi Tahsis)"
@@ -371,7 +373,7 @@ export default function FindingDetailModal({
                                                 </div>
                                                 <div>
                                                     <label className="block text-xs font-semibold text-gray-700 mb-1">Hedeflenen Termin (Vade)</label>
-                                                    <input
+                                                    <FormInput
                                                         type="date"
                                                         className="w-full form-input rounded-lg border-emerald-200 focus:border-emerald-500 text-sm"
                                                         value={targetDate}

@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 
 import React, { useState } from 'react';
@@ -164,11 +165,11 @@ export default function ControlTestingSection() {
                 <form onSubmit={handleSaveTest} className="space-y-4">
                     <div>
                         <label className="form-label mb-1 block text-xs font-bold text-slate-700">Test Kodu</label>
-                        <input type="text" className="form-input text-xs w-full bg-slate-100 font-mono" value={newTest.id} readOnly />
+                        <FormInput type="text" className="form-input text-xs w-full bg-slate-100 font-mono" value={newTest.id} readOnly />
                     </div>
                     <div>
                         <label className="form-label mb-1 block text-xs font-bold text-slate-700">Kontrol Test Tanımı (Zorunlu)</label>
-                        <input
+                        <FormInput
                             type="text"
                             className="form-input text-xs w-full"
                             placeholder="Örn: Kredi Limit Aşımlarının Otomatik Blokaj Kontrol Testi..."
@@ -180,7 +181,7 @@ export default function ControlTestingSection() {
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">İlgili Kontrol Kodu</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input text-xs w-full font-mono"
                                 value={newTest.kontrolKodu}
@@ -189,7 +190,7 @@ export default function ControlTestingSection() {
                         </div>
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Test Edilecek Birim</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input text-xs w-full"
                                 value={newTest.birim}
@@ -200,7 +201,7 @@ export default function ControlTestingSection() {
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Yürüten İç Kontrolör</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input text-xs w-full"
                                 value={newTest.yürüten}

@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 import React, { useState } from 'react';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -90,7 +91,7 @@ export default function IndependenceExceptionModal({ isOpen, onClose, onSubmit }
 
                 <div className="form-group mt-4">
                     <label className="form-label text-sm font-semibold">Detaylı Açıklama *</label>
-                    <textarea 
+                    <FormTextarea 
                         className="form-textarea min-h-[120px]" 
                         required 
                         placeholder="Lütfen istisna veya çıkar çatışması durumunuzu detaylandırınız. Bu bildirim ilgili yönetici/kalite güvencesi sorumlusunun incelemesine düşecektir."

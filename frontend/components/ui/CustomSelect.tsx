@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -315,7 +316,7 @@ export default function CustomSelect({
                             <div className="p-3 border-b border-slate-100 bg-slate-50/50">
                                 <div className="relative">
                                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input
+                                    <FormInput
                                         type="text"
                                         className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all bg-white"
                                         placeholder="Ara..."

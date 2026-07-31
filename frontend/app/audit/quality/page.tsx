@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -960,18 +961,18 @@ function QualityAssurancePageContent() {
                 <div className="space-y-4">
                     <div className="form-group">
                         <label className="form-label">Metrik Adı</label>
-                        <input type="text" className="form-input" value={metricForm.name} onChange={e => setMetricForm({ ...metricForm, name: e.target.value })} placeholder="Örn: Denetim Planına Uyum" />
+                        <FormInput type="text" className="form-input" value={metricForm.name} onChange={e => setMetricForm({ ...metricForm, name: e.target.value })} placeholder="Örn: Denetim Planına Uyum" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <CustomSelect label="Kategori" value={metricForm.category} onChange={(val) => setMetricForm({ ...metricForm, category: val as string })} options={[{ value: 'Performans', label: 'Performans' }, { value: 'Kalite', label: 'Kalite' }, { value: 'Uyum', label: 'Uyum' }, { value: 'Verimlilik', label: 'Verimlilik' }, { value: 'Etkinlik', label: 'Etkinlik' }, { value: 'Risk', label: 'Risk' }]} />
                         <div className="form-group">
                             <label className="form-label">Birim</label>
-                            <input type="text" className="form-input" value={metricForm.unit} onChange={e => setMetricForm({ ...metricForm, unit: e.target.value })} placeholder="%, Gün, Adet" />
+                            <FormInput type="text" className="form-input" value={metricForm.unit} onChange={e => setMetricForm({ ...metricForm, unit: e.target.value })} placeholder="%, Gün, Adet" />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="form-group"><label className="form-label">Hedef</label><input type="number" className="form-input" value={metricForm.target} onChange={e => setMetricForm({ ...metricForm, target: Number(e.target.value) })} /></div>
-                        <div className="form-group"><label className="form-label">Gerçekleşen</label><input type="number" className="form-input" value={metricForm.actual} onChange={e => setMetricForm({ ...metricForm, actual: Number(e.target.value) })} /></div>
+                        <div className="form-group"><label className="form-label">Hedef</label><FormInput type="number" className="form-input" value={metricForm.target} onChange={e => setMetricForm({ ...metricForm, target: Number(e.target.value) })} /></div>
+                        <div className="form-group"><label className="form-label">Gerçekleşen</label><FormInput type="number" className="form-input" value={metricForm.actual} onChange={e => setMetricForm({ ...metricForm, actual: Number(e.target.value) })} /></div>
                     </div>
                 </div>
             </Modal>
@@ -985,26 +986,26 @@ function QualityAssurancePageContent() {
                         <div className="form-group"><label className="form-label">Tarih</label><DatePicker value={assessmentForm.date} onChange={val => setAssessmentForm({ ...assessmentForm, date: val })} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="form-group"><label className="form-label">Değerlendirici Kişi/Kurum</label><input type="text" className="form-input" value={assessmentForm.assessor} onChange={e => setAssessmentForm({ ...assessmentForm, assessor: e.target.value })} placeholder="Örn: Denetim Komitesi / ABC Firması" /></div>
-                        <div className="form-group"><label className="form-label">Bağlı Olduğu Kurum (Varsa)</label><input type="text" className="form-input" value={assessmentForm.assessorOrg} onChange={e => setAssessmentForm({ ...assessmentForm, assessorOrg: e.target.value })} /></div>
+                        <div className="form-group"><label className="form-label">Değerlendirici Kişi/Kurum</label><FormInput type="text" className="form-input" value={assessmentForm.assessor} onChange={e => setAssessmentForm({ ...assessmentForm, assessor: e.target.value })} placeholder="Örn: Denetim Komitesi / ABC Firması" /></div>
+                        <div className="form-group"><label className="form-label">Bağlı Olduğu Kurum (Varsa)</label><FormInput type="text" className="form-input" value={assessmentForm.assessorOrg} onChange={e => setAssessmentForm({ ...assessmentForm, assessorOrg: e.target.value })} /></div>
                     </div>
 
                     {assessmentForm.type === 'Dış' && (
                         <div className="bg-purple-50 p-4 rounded-lg border border-purple-100 space-y-4 mb-4">
                             <h4 className="text-sm font-semibold text-purple-800">Dış Değerlendirici Yetkinlik Bilgileri</h4>
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="form-group"><label className="form-label">Ünvanı</label><input type="text" className="form-input" value={assessmentForm.assessorTitle} onChange={e => setAssessmentForm({ ...assessmentForm, assessorTitle: e.target.value })} /></div>
-                                <div className="form-group"><label className="form-label">Sertifikaları</label><input type="text" className="form-input" value={assessmentForm.assessorCertifications} onChange={e => setAssessmentForm({ ...assessmentForm, assessorCertifications: e.target.value })} placeholder="Örn: CIA, CISA, CRMA" /></div>
+                                <div className="form-group"><label className="form-label">Ünvanı</label><FormInput type="text" className="form-input" value={assessmentForm.assessorTitle} onChange={e => setAssessmentForm({ ...assessmentForm, assessorTitle: e.target.value })} /></div>
+                                <div className="form-group"><label className="form-label">Sertifikaları</label><FormInput type="text" className="form-input" value={assessmentForm.assessorCertifications} onChange={e => setAssessmentForm({ ...assessmentForm, assessorCertifications: e.target.value })} placeholder="Örn: CIA, CISA, CRMA" /></div>
                             </div>
-                            <div className="form-group"><label className="form-label">Mesleki Deneyim Özeti</label><textarea className="form-input h-16" value={assessmentForm.assessorExperience} onChange={e => setAssessmentForm({ ...assessmentForm, assessorExperience: e.target.value })} /></div>
+                            <div className="form-group"><label className="form-label">Mesleki Deneyim Özeti</label><FormTextarea className="form-input h-16" value={assessmentForm.assessorExperience} onChange={e => setAssessmentForm({ ...assessmentForm, assessorExperience: e.target.value })} /></div>
                         </div>
                     )}
 
                     <div className="grid grid-cols-2 gap-4">
                         <CustomSelect label="Sonuç" value={assessmentForm.result} onChange={(val) => setAssessmentForm({ ...assessmentForm, result: val as any })} options={[{ value: 'Uyumlu', label: 'Uyumlu' }, { value: 'Kısmen Uyumlu', label: 'Kısmen Uyumlu' }, { value: 'Uyumsuz', label: 'Uyumsuz' }]} />
-                        <div className="form-group"><label className="form-label">Puan (%)</label><input type="number" className="form-input" value={assessmentForm.score} onChange={e => setAssessmentForm({ ...assessmentForm, score: Number(e.target.value) })} /></div>
+                        <div className="form-group"><label className="form-label">Puan (%)</label><FormInput type="number" className="form-input" value={assessmentForm.score} onChange={e => setAssessmentForm({ ...assessmentForm, score: Number(e.target.value) })} /></div>
                     </div>
-                    <div className="form-group"><label className="form-label">Temel Bulgular</label><textarea className="form-input h-20" value={assessmentForm.findings} onChange={e => setAssessmentForm({ ...assessmentForm, findings: e.target.value })} /></div>
+                    <div className="form-group"><label className="form-label">Temel Bulgular</label><FormTextarea className="form-input h-20" value={assessmentForm.findings} onChange={e => setAssessmentForm({ ...assessmentForm, findings: e.target.value })} /></div>
                     <div className="form-group"><label className="form-label">Sonraki Planlanan Tarih</label><DatePicker value={assessmentForm.nextDueDate} onChange={val => setAssessmentForm({ ...assessmentForm, nextDueDate: val })} /></div>
                 </div>
             </Modal>
@@ -1013,10 +1014,10 @@ function QualityAssurancePageContent() {
             <Modal isOpen={showActionModal} onClose={() => setShowActionModal(false)} title={editingAction ? 'Aksiyon Güncelle' : 'Yeni İyileştirme Aksiyonu'}
                 footer={<div className="flex justify-end w-full"><Button onClick={handleSaveAction}>Kaydet</Button></div>}>
                 <div className="space-y-4">
-                    <div className="form-group"><label className="form-label">Aksiyon Başlığı</label><input type="text" className="form-input" value={actionForm.title} onChange={e => setActionForm({ ...actionForm, title: e.target.value })} placeholder="Örn: Denetim prosedürlerini güncelle" /></div>
-                    <div className="form-group"><label className="form-label">Açıklama</label><textarea className="form-input h-20" value={actionForm.description} onChange={e => setActionForm({ ...actionForm, description: e.target.value })} /></div>
+                    <div className="form-group"><label className="form-label">Aksiyon Başlığı</label><FormInput type="text" className="form-input" value={actionForm.title} onChange={e => setActionForm({ ...actionForm, title: e.target.value })} placeholder="Örn: Denetim prosedürlerini güncelle" /></div>
+                    <div className="form-group"><label className="form-label">Açıklama</label><FormTextarea className="form-input h-20" value={actionForm.description} onChange={e => setActionForm({ ...actionForm, description: e.target.value })} /></div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="form-group"><label className="form-label">Sorumlu</label><input type="text" className="form-input" value={actionForm.responsible} onChange={e => setActionForm({ ...actionForm, responsible: e.target.value })} /></div>
+                        <div className="form-group"><label className="form-label">Sorumlu</label><FormInput type="text" className="form-input" value={actionForm.responsible} onChange={e => setActionForm({ ...actionForm, responsible: e.target.value })} /></div>
                         <div className="form-group"><label className="form-label">Son Tarih</label><DatePicker value={actionForm.dueDate} onChange={val => setActionForm({ ...actionForm, dueDate: val })} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">

@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -1439,7 +1441,7 @@ function AuditDetailPageContent({ params }: { params: { id: string } }) {
                 <div className="space-y-6">
                     <div className="flex flex-col gap-2">
                         <label className="form-label">Dosya Adı / Başlık</label>
-                        <input
+                        <FormInput
                             type="text"
                             className="form-input"
                             placeholder="Örn: Açılış Tutanağı"
@@ -1450,7 +1452,7 @@ function AuditDetailPageContent({ params }: { params: { id: string } }) {
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="form-label">Açıklama</label>
-                        <textarea
+                        <FormTextarea
                             className="form-input resize-none"
                             rows={3}
                             placeholder="Dosya içeriği hakkında kısa bilgi..."
@@ -1509,7 +1511,7 @@ function AuditDetailPageContent({ params }: { params: { id: string } }) {
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="form-label">Açıklama</label>
-                        <textarea
+                        <FormTextarea
                             className="form-input resize-none"
                             rows={2}
                             placeholder="Ek hakkında kısa bilgi (opsiyonel)..."

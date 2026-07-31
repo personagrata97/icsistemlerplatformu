@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -183,7 +184,7 @@ export default function ControlDeficienciesSection() {
 
                         <div className="space-y-1">
                             <label className="font-bold text-gray-800">Düzeltici Aksiyon Planı:</label>
-                            <textarea
+                            <FormTextarea
                                 className="w-full p-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 rows={3}
                                 placeholder="Düzeltici aksiyon planı ve çözüm adımlarını giriniz..."

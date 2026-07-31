@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 import React from 'react';
 import { Trash2, AlertCircle, Info, RotateCcw } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
@@ -101,7 +102,7 @@ export default function ConfirmModal({
                         <label className="form-label mb-1 block text-xs font-semibold text-gray-700">
                             {reasonLabel}
                         </label>
-                        <textarea
+                        <FormTextarea
                             className="form-input text-xs w-full"
                             rows={3}
                             placeholder={reasonPlaceholder}

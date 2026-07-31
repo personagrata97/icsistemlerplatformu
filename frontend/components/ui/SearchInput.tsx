@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React from 'react';
 import { Search, X } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -27,7 +28,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
         return (
             <div className={clsx("relative", containerClassName)}>
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
+                <FormInput
                     ref={ref}
                     type="text"
                     value={value}

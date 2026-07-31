@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Search, X } from 'lucide-react';
 import useOnClickOutside from '@/hooks/useOnClickOutside';
@@ -62,7 +63,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
                     <div className="p-2 border-b bg-gray-50 sticky top-0">
                         <div className="relative">
                             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input
+                            <FormInput
                                 type="text"
                                 className="w-full pl-9 pr-3 py-1.5 text-sm border rounded-md focus:outline-none focus:border-blue-500"
                                 placeholder="Ara..."

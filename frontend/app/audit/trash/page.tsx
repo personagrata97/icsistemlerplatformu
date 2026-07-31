@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -438,7 +439,7 @@ function TrashPageContent() {
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <label className="text-xs font-medium text-gray-500 block mb-1">Başlangıç</label>
-                                <input
+                                <FormInput
                                     type="date"
                                     className="form-input text-sm w-full focus:ring-primary/20 focus:border-primary"
                                     value={startDate}
@@ -447,7 +448,7 @@ function TrashPageContent() {
                             </div>
                             <div>
                                 <label className="text-xs font-medium text-gray-500 block mb-1">Bitiş</label>
-                                <input
+                                <FormInput
                                     type="date"
                                     className="form-input text-sm w-full focus:ring-primary/20 focus:border-primary"
                                     value={endDate}

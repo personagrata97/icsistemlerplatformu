@@ -187,7 +187,7 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
             render: (row: any) => {
                 const isEditable = canManageTimesheet && (isManager || row.userId === user?.id || row.isNew);
                 return isEditable ? (
-                    <input type="text" className="form-input" 
+                    <FormInput type="text" className="form-input" 
                         placeholder="Görev veya harcanan efor detayı"
                         value={row.activityType || ''} 
                         onChange={(e) => handleUpdateEntry(row.id, 'activityType', e.target.value)} 
@@ -206,7 +206,7 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
             render: (row: any) => {
                 const isEditable = canManageTimesheet && (isManager || row.userId === user?.id || row.isNew);
                 return isEditable ? (
-                    <input type="number" min="0" step="0.5" className="form-input text-center" 
+                    <FormInput type="number" min="0" step="0.5" className="form-input text-center" 
                         value={row.hours} 
                         onChange={(e) => handleUpdateEntry(row.id, 'hours', e.target.value)} 
                     />

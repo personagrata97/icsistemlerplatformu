@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -329,7 +330,7 @@ function AuditPlanDetailPageContent() {
                             </div>
                             <div className="flex flex-col h-full">
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Onay Notu</label>
-                                <textarea className="form-textarea w-full h-[120px] resize-none flex-1" placeholder="Onay veya revizyon notları..." value={approvalNote} onChange={(e) => setApprovalNote(e.target.value)} />
+                                <FormTextarea className="form-textarea w-full h-[120px] resize-none flex-1" placeholder="Onay veya revizyon notları..." value={approvalNote} onChange={(e) => setApprovalNote(e.target.value)} />
                             </div>
                         </div>
                         <div className="pt-4 flex justify-end">

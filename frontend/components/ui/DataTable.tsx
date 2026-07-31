@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 
 import React from 'react';
@@ -392,7 +393,7 @@ export default function DataTable<T>({
                         <tr>
                             {selectable && (
                                 <th className="tbl-header w-12 !p-0">
-                                    <input
+                                    <FormInput
                                         type="checkbox"
                                         checked={allSelected}
                                         ref={(el) => {
@@ -447,7 +448,7 @@ export default function DataTable<T>({
                                 >
                                     {selectable && (
                                         <td className="!py-0">
-                                            <input
+                                            <FormInput
                                                 type="checkbox"
                                                 checked={isSelected}
                                                 onChange={() => handleSelectRow(key)}

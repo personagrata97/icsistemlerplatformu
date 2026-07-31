@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 
 import { useState } from 'react';
@@ -87,7 +88,7 @@ export default function LoginPage() {
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <User className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <FormInput
                                     type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
@@ -107,7 +108,7 @@ export default function LoginPage() {
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <FormInput
                                     type={showPassword ? "text" : "password"}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}

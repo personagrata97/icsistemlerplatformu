@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 
 import React, { useState } from 'react';
@@ -123,7 +124,7 @@ export default function ControlStaffSection() {
                 <form onSubmit={handleSaveStaff} className="space-y-4">
                     <div>
                         <label className="form-label mb-1 block text-xs font-bold text-slate-700">Personel Adı Soyadı (Zorunlu)</label>
-                        <input
+                        <FormInput
                             type="text"
                             className="form-input text-xs w-full"
                             placeholder="Örn: Selin Aksoy..."
@@ -135,7 +136,7 @@ export default function ControlStaffSection() {
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Ünvan</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input text-xs w-full"
                                 value={newStaff.unvan}
@@ -144,7 +145,7 @@ export default function ControlStaffSection() {
                         </div>
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Atandığı Birim</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input text-xs w-full"
                                 value={newStaff.birim}
@@ -166,7 +167,7 @@ export default function ControlStaffSection() {
                         </div>
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Uzmanlık Alanları</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input text-xs w-full"
                                 value={newStaff.uzmanlik}

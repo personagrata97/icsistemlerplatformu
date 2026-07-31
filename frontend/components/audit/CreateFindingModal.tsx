@@ -558,7 +558,7 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                         </div>
                         <div>
                             <label className="form-label">Bulgu Numarası</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="w-full border-gray-200 rounded-xl p-3 bg-gray-100/50 text-sm font-bold text-gray-700"
                                 value={form.findingCode}
@@ -584,7 +584,7 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="md:col-span-2 space-y-2 h-full flex flex-col">
                             <label className="form-label">Bulgu Başlığı *</label>
-                            <textarea
+                            <FormTextarea
                                 className="form-input min-h-[110px] h-full resize-none"
                                 placeholder="Bulgunun özeti (Örn: Yetkisiz Erişim Tespiti)"
                                 value={form.title}
@@ -609,7 +609,7 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                                     ))}
                                 </div>
                                 {form.categories.includes('Diğer') && (
-                                    <input
+                                    <FormInput
                                         type="text"
                                         className="form-input text-xs animate-in fade-in slide-in-from-top-1"
                                         placeholder="Diğer risk kategorisini belirtiniz..."
@@ -1046,7 +1046,7 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                             <h3 className="font-bold text-gray-700">Bulgu Kanıtı</h3>
                         </div>
                         <div>
-                            <input
+                            <FormInput
                                 type="file"
                                 className="form-input"
                                 multiple
@@ -1086,7 +1086,7 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                                 <div className="form-group">
                                     {/* Label removed to avoid redundancy with header */}
                                     <div className="relative">
-                                        <input
+                                        <FormInput
                                             type="date"
                                             className="w-full border-gray-200 rounded-xl p-4 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-bold text-gray-700 shadow-sm"
                                             value={form.dueDate}
@@ -1137,13 +1137,13 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-2 duration-300">
                                     <div className="md:col-span-2 space-y-2">
                                         <label className="form-label text-red-700">Bulguda Mutabık Olmama Gerekçesi</label>
-                                        <textarea
+                                        <FormTextarea
                                             className="w-full border-red-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-red-500/10 focus:border-red-400 transition-all bg-red-50/20"
                                             rows={4}
                                             placeholder="Konu hakkında mutabık olmama gerekçenizi ve dayanaklarınızı detaylı olarak açıklayınız..."
                                             value={form.disagreementReason}
                                             onChange={e => setForm({ ...form, disagreementReason: e.target.value })}
-                                        ></textarea>
+                                        ></FormTextarea>
                                     </div>
                                 </div>
                             )}
@@ -1152,13 +1152,13 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                                 <div className="space-y-8 animate-in slide-in-from-top-2 duration-300">
                                     <div>
                                         <label className="form-label text-green-700">Birim Cevabı</label>
-                                        <textarea
+                                        <FormTextarea
                                             className="w-full border-green-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-green-500/10 focus:border-green-400 transition-all bg-green-50/20"
                                             rows={3}
                                             placeholder="Bulguya ilişkin açıklamalarınız ve alınacak aksiyonlar..."
                                             value={form.actionPlan}
                                             onChange={e => setForm({ ...form, actionPlan: e.target.value })}
-                                        ></textarea>
+                                        ></FormTextarea>
                                     </div>
 
                                     <div className="space-y-4">
@@ -1177,7 +1177,7 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                                     <div className="space-y-4">
                                         <label className="form-label">Birim Kanıtları</label>
                                         <div className="form-group">
-                                            <input
+                                            <FormInput
                                                 type="file"
                                                 className="form-input"
                                                 multiple
@@ -1226,13 +1226,13 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                             <CheckCircle2 size={18} className="text-emerald-600" />
                             <h3 className="font-bold text-gray-700">Nihai Müfettiş Görüşü</h3>
                         </div>
-                        <textarea
+                        <FormTextarea
                             className="w-full border-gray-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all bg-emerald-50/10 min-h-[100px]"
                             rows={3}
                             placeholder="Birim yanıtlarının ve aksiyon planlarının yeterliliği hakkındaki nihai müfettiş görüşü..."
                             value={form.finalInspectorOpinion}
                             onChange={e => setForm({ ...form, finalInspectorOpinion: e.target.value })}
-                        ></textarea>
+                        ></FormTextarea>
                         <div className="flex items-start gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200 text-[11px] leading-relaxed text-gray-600">
                             <Info size={16} className="text-gray-400 shrink-0" />
                             <p className="font-medium">

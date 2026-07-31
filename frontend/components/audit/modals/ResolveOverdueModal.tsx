@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React, { useState } from 'react';
 import Modal from '@/components/ui/Modal';
 import { AlertTriangle, CheckCircle, X, Clock } from 'lucide-react';
@@ -141,7 +142,7 @@ export default function ResolveOverdueModal({
                                 </div>
 
                                 <div className="space-y-3">
-                                    <input
+                                    <FormInput
                                         type="date"
                                         className="form-input w-full h-11"
                                         value={postponeDate}

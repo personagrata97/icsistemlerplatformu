@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React, { useState } from 'react';
 import { FileText, Calendar, Layout, AlertTriangle, TrendingUp, PieChart, Clock } from 'lucide-react';
 import { useToast } from '@/components/Toast';
@@ -124,7 +125,7 @@ export default function ReportGenerationModal({ isOpen, onClose, onGenerate }: R
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <input 
+                    <FormInput 
                         type="checkbox" 
                         id="includeWatermark" 
                         checked={includeWatermark} 

@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import Modal from '@/components/ui/Modal';
@@ -366,7 +367,7 @@ export default function AdvancedSamplingModal({ isOpen, onClose, onGenerate, aud
                         </div>
                         <div className="form-group">
                             <label className="form-label">Popülasyon Adı (Hedef Kitle) *</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input"
                                 placeholder="Örn: 2026 1. Çeyrek Cayma Kayıtları vb."
@@ -480,7 +481,7 @@ export default function AdvancedSamplingModal({ isOpen, onClose, onGenerate, aud
                                                 <div className="flex-1">
                                                     {rule.operator === 'between' ? (
                                                         <div className="flex items-center gap-2">
-                                                            <input
+                                                            <FormInput
                                                                 type="text"
                                                                 className="form-input text-sm w-1/2"
                                                                 placeholder="Min..."
@@ -503,7 +504,7 @@ export default function AdvancedSamplingModal({ isOpen, onClose, onGenerate, aud
                                                                 }}
                                                             />
                                                             <span className="text-gray-400">-</span>
-                                                            <input
+                                                            <FormInput
                                                                 type="text"
                                                                 className="form-input text-sm w-1/2"
                                                                 placeholder="Max..."
@@ -536,7 +537,7 @@ export default function AdvancedSamplingModal({ isOpen, onClose, onGenerate, aud
                                                             isSearchable={true}
                                                         />
                                                     ) : (
-                                                        <input
+                                                        <FormInput
                                                             type="text"
                                                             className="form-input text-sm w-full"
                                                             placeholder="Değer..."
@@ -682,7 +683,7 @@ export default function AdvancedSamplingModal({ isOpen, onClose, onGenerate, aud
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Hata Payı %</label>
-                                    <input
+                                    <FormInput
                                         type="number"
                                         step="0.5"
                                         className="form-input"
@@ -695,7 +696,7 @@ export default function AdvancedSamplingModal({ isOpen, onClose, onGenerate, aud
                             <div className="form-group">
                                 <label className="form-label">Alınacak Örneklem Sayısı (n)</label>
                                 <div className="flex items-center gap-4">
-                                    <input
+                                    <FormInput
                                         type="range"
                                         min="5"
                                         max="1000"

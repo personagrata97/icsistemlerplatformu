@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import { Plus, Trash2, Calendar, User, AlertTriangle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
@@ -80,7 +81,7 @@ const ActionList: React.FC<ActionListProps> = ({ actions, onChange, readOnly = f
 
                             <div className="md:col-span-5 pl-2">
                                 <label className="text-[10px] font-bold text-gray-400 mb-1.5 block uppercase tracking-wider">Aksiyon Tanımı</label>
-                                <input
+                                <FormInput
                                     type="text"
                                     className="form-input text-xs bg-gray-50/30"
                                     value={action.action}
@@ -94,7 +95,7 @@ const ActionList: React.FC<ActionListProps> = ({ actions, onChange, readOnly = f
                                 <label className="text-[10px] font-bold text-gray-400 mb-1.5 block uppercase tracking-wider flex items-center gap-1">
                                     <Calendar size={14} /> Vade
                                 </label>
-                                <input
+                                <FormInput
                                     type="date"
                                     className="form-input text-xs bg-gray-50/30"
                                     value={action.dueDate}
@@ -107,7 +108,7 @@ const ActionList: React.FC<ActionListProps> = ({ actions, onChange, readOnly = f
                                 <label className="text-[10px] font-bold text-gray-400 mb-1.5 block uppercase tracking-wider flex items-center gap-1">
                                     <User size={14} /> Sorumlu
                                 </label>
-                                <input
+                                <FormInput
                                     type="text"
                                     className="form-input text-xs bg-gray-50/30"
                                     value={action.responsible}

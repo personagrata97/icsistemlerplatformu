@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -156,7 +157,7 @@ export default function RiskLimitsModal({ isOpen, onClose, onSuccess }: RiskLimi
                                             <td className="px-4 py-3.5 text-right font-bold text-slate-800">
                                                 {editingId === limit.id ? (
                                                     <div className="flex items-center justify-end gap-1.5">
-                                                        <input 
+                                                        <FormInput 
                                                             type="text" 
                                                             value={newValue}
                                                             onChange={(e) => setNewValue(e.target.value)}

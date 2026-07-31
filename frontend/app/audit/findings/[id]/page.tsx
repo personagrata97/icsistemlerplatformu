@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -547,7 +548,7 @@ function FindingDetailPageContent() {
                             <StatusBadge value={finding.status} type="status" />
                         </div>
                         {isEditing ? (
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input text-xl font-bold w-full"
                                 value={editForm.title}
@@ -611,7 +612,7 @@ function FindingDetailPageContent() {
                             <div>
                                 <h4 className="text-sm text-gray-500 mb-1">Kategori</h4>
                                 {isEditing ? (
-                                    <input type="text" className="form-input" value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })} />
+                                    <FormInput type="text" className="form-input" value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })} />
                                 ) : (
                                     <p className="font-medium">{finding.category || '-'}</p>
                                 )}
@@ -646,7 +647,7 @@ function FindingDetailPageContent() {
                             <div>
                                 <h4 className="text-sm text-gray-500 mb-1">Sorumlu</h4>
                                 {isEditing ? (
-                                    <input type="text" className="form-input" value={editForm.assignedTo} onChange={e => setEditForm({ ...editForm, assignedTo: e.target.value })} />
+                                    <FormInput type="text" className="form-input" value={editForm.assignedTo} onChange={e => setEditForm({ ...editForm, assignedTo: e.target.value })} />
                                 ) : (
                                     <p className="font-medium flex items-center gap-1">
                                         <User size={14} /> {finding.assignedTo || 'Atanmamış'}
@@ -679,7 +680,7 @@ function FindingDetailPageContent() {
                             </h4>
                             {
                                 isEditing ? (
-                                    <textarea
+                                    <FormTextarea
                                         className="form-input w-full"
                                         rows={4}
                                         value={editForm.description}
@@ -918,7 +919,7 @@ function FindingDetailPageContent() {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Açıklama / Not *</label>
-                                    <textarea
+                                    <FormTextarea
                                         className="form-input"
                                         rows={4}
                                         required
@@ -964,7 +965,7 @@ function FindingDetailPageContent() {
                             <div className="modal-body space-y-4">
                                 <div className="form-group">
                                     <label className="form-label">Aksiyon Planı / Birim Yanıtı</label>
-                                    <textarea
+                                    <FormTextarea
                                         className="form-input"
                                         rows={6}
                                         value={departmentResponse}
@@ -1009,7 +1010,7 @@ function FindingDetailPageContent() {
                                 <div className="modal-body space-y-4">
                                     <div className="form-group">
                                         <label className="form-label">Dosya Seç *</label>
-                                        <input
+                                        <FormInput
                                             type="file"
                                             className="form-input"
                                             required

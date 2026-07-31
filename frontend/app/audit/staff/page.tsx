@@ -1394,7 +1394,7 @@ function AuditStaffPageContent() {
                                             </div>
                                         )}
                                     </div>
-                                    <input
+                                    <FormInput
                                         type="file"
                                         ref={fileInputRef}
                                         className="hidden"
@@ -2566,7 +2566,7 @@ function AuditStaffPageContent() {
                         Bu izin talebini reddetmek üzeresiniz. Lütfen personele iletilmek üzere bir ret gerekçesi veya alternatif tarih önerisi yazın.
                     </p>
                     <FormField label="Ret Gerekçesi / Yönetici Notu" required>
-                        <textarea
+                        <FormTextarea
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm min-h-[100px]"
                             placeholder="Örn: Bu tarihlerde Şube denetimindesin, 15-20 Ağustos arası takvimin boş. Bu tarihler için tekrar talep girebilirsin."
                             value={rejectReason}

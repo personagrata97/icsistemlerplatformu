@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -167,7 +168,7 @@ export default function DataUploadModal({ isOpen, onClose, onSuccess }: DataUplo
                         <FileSpreadsheet className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-base font-medium text-gray-900">Excel Dosyası Seçin</h3>
                         <p className="text-sm text-gray-500 mt-1">Akıllı veri motoru sütunları otomatik eşleştirecektir.</p>
-                        <input 
+                        <FormInput 
                             type="file" 
                             className="hidden" 
                             accept=".xlsx,.xls,.csv" 

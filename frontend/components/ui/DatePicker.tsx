@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React, { useState, useEffect, useRef } from "react"
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format, addMonths, subMonths, isSameMonth, isSameDay, isToday } from "date-fns"
 import { tr } from "date-fns/locale"
@@ -115,7 +116,7 @@ export default function DatePicker({ value, onChange, placeholder = "Tarih seçi
   return (
     <div className="relative w-full" ref={containerRef}>
       {/* Hidden native input for required validation form submission */}
-      <input 
+      <FormInput 
         type="text" 
         id={id} 
         value={value || ''} 

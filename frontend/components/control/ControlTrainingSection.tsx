@@ -1,3 +1,5 @@
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 
 import React, { useState } from 'react';
@@ -154,11 +156,11 @@ export default function ControlTrainingSection() {
                 <form onSubmit={handleSaveTraining} className="space-y-4">
                     <div>
                         <label className="form-label mb-1 block text-xs font-bold text-slate-700">Eğitim Kodu</label>
-                        <input type="text" className="form-input text-xs w-full bg-slate-100 font-mono" value={newTraining.id} readOnly />
+                        <FormInput type="text" className="form-input text-xs w-full bg-slate-100 font-mono" value={newTraining.id} readOnly />
                     </div>
                     <div>
                         <label className="form-label mb-1 block text-xs font-bold text-slate-700">Eğitim Başlığı (Zorunlu)</label>
-                        <input
+                        <FormInput
                             type="text"
                             className="form-input text-xs w-full"
                             placeholder="Örn: Operasyonel Risk ve İç Kontrol Farkındalık Eğitimi..."
@@ -170,7 +172,7 @@ export default function ControlTrainingSection() {
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="form-label mb-1 block text-xs font-bold text-slate-700">Eğitmen</label>
-                            <input
+                            <FormInput
                                 type="text"
                                 className="form-input text-xs w-full"
                                 value={newTraining.egitmen}
@@ -192,7 +194,7 @@ export default function ControlTrainingSection() {
                     </div>
                     <div>
                         <label className="form-label mb-1 block text-xs font-bold text-slate-700">Eğitim İçeriği Özeti</label>
-                        <textarea
+                        <FormTextarea
                             className="form-input text-xs w-full"
                             rows={3}
                             placeholder="Eğitim müfredatı ve konu başlıkları..."

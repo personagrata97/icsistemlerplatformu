@@ -51,7 +51,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
                             {props.value || '-'}
                         </div>
                     ) : (
-                        <textarea
+                        <FormTextarea
                             id={textareaId}
                             ref={ref}
                             rows={rows}

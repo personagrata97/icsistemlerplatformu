@@ -1,3 +1,4 @@
+import FormTextarea from '@/components/ui/FormTextarea';
 import React, { useEffect, useState } from 'react';
 import { MessageSquare, FileText, Target, AlertCircle, Calendar, User, Search, CheckCircle, XCircle, Send } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
@@ -260,7 +261,7 @@ export default function ConciliationViewModal({ isOpen, onClose, selectedItem, o
                                 <h5 className="font-bold text-sm text-blue-900 flex items-center gap-2">
                                     <Send size={16} /> Birim Yanıtını Değerlendir
                                 </h5>
-                                <textarea
+                                <FormTextarea
                                     className="form-input resize-none"
                                     rows={3}
                                     placeholder="Yanıtı yeterli bulmadığınız durumlar için açıklama yazarak geri gönderebilirsiniz..."

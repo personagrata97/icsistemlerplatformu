@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -930,7 +931,7 @@ function FindingsPageInner() {
                         </div>
                         <div className="form-group">
                             <label className="form-label text-gray-700 font-semibold mb-2 block">Tebliğ Edilecek E-posta / Birim</label>
-                            <input
+                            <FormInput
                                 type="email"
                                 required
                                 className="form-input focus:ring-primary/20 focus:border-primary w-full"

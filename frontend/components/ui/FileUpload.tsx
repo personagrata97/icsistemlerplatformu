@@ -1,3 +1,4 @@
+import FormInput from '@/components/ui/FormInput';
 import React, { useState, useRef } from 'react';
 import { FileUp, X, File, AlertCircle } from 'lucide-react';
 
@@ -125,7 +126,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 onDrop={handleDrop}
                 onClick={() => inputRef.current?.click()}
             >
-                <input
+                <FormInput
                     ref={inputRef}
                     type="file"
                     className="hidden"
