@@ -5,38 +5,42 @@ import { MoreHorizontal, LucideIcon } from 'lucide-react';
 import Tooltip from '@/components/ui/Tooltip';
 import Button from '@/components/ui/Button';
 
-
 export type ActionMenuItem = {
     label: string;
-    icon: LucideIcon | React.ReactNode;
+    icon?: LucideIcon | React.ReactNode;
     onClick: () => void;
     variant?: 'default' | 'danger' | 'success' | 'warning';
     disabled?: boolean;
+    hidden?: boolean;
     type?: never;
 } | {
     type: 'divider';
+    hidden?: boolean;
 };
 
 interface ActionMenuProps {
     items: ActionMenuItem[];
     buttonSize?: number;
     variant?: 'default' | 'ghost' | 'outline';
+    className?: string;
 }
 
-export default function ActionMenu({ items, buttonSize = 20, variant = 'default' }: ActionMenuProps) {
+export default function ActionMenu({ items, buttonSize = 20, variant = 'default', className = '' }: ActionMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
     const buttonRef = useRef<HTMLButtonElement>(null);
 
+    const visibleItems = (items || []).filter(item => !item.hidden);
+
     const getButtonClasses = () => {
         const base = "flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-full";
         if (variant === 'ghost') {
-            return `${base} w-7 h-7 text-gray-400 hover:bg-gray-100 hover:text-gray-900 border-none shadow-none`;
+            return `${base} w-7 h-7 text-slate-400 hover:bg-slate-100 hover:text-slate-900 border-none shadow-none ${className}`;
         }
         if (variant === 'outline') {
-            return `${base} w-8 h-8 text-gray-500 bg-white hover:bg-gray-50 border border-gray-200 shadow-sm`;
+            return `${base} w-8 h-8 text-slate-500 bg-white hover:bg-slate-50 border border-slate-200 shadow-xs ${className}`;
         }
-        return `${base} w-8 h-8 text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-gray-900 border border-transparent hover:border-gray-200 shadow-sm`;
+        return `${base} w-8 h-8 text-slate-500 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 border border-transparent hover:border-slate-200 shadow-xs ${className}`;
     };
 
     useEffect(() => {
@@ -75,7 +79,7 @@ export default function ActionMenu({ items, buttonSize = 20, variant = 'default'
         if (!isOpen && buttonRef.current) {
             const rect = buttonRef.current.getBoundingClientRect();
             const spaceBelow = window.innerHeight - rect.bottom;
-            const estimatedHeight = (items?.length || 0) * 40 + 20;
+            const estimatedHeight = (visibleItems.length || 0) * 40 + 20;
             const isTop = spaceBelow < estimatedHeight && rect.top > estimatedHeight;
 
             setDropdownStyle({
@@ -88,8 +92,10 @@ export default function ActionMenu({ items, buttonSize = 20, variant = 'default'
         setIsOpen(!isOpen);
     };
 
-    if (items?.length === 1) {
-        const item = items[0];
+    if (visibleItems.length === 0) return null;
+
+    if (visibleItems.length === 1) {
+        const item = visibleItems[0];
         if (item.type === 'divider') return null;
         
         const Icon: any = item.icon;
@@ -100,12 +106,16 @@ export default function ActionMenu({ items, buttonSize = 20, variant = 'default'
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            item.onClick();
+                            if (!item.disabled) item.onClick();
                         }}
-                        className={`hover:scale-110 transition-transform p-2 rounded-lg flex items-center justify-center ${item.variant === 'danger' ? 'text-red-500 hover:bg-red-50' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}
+                        disabled={item.disabled}
+                        className={`hover:scale-110 transition-transform p-2 rounded-lg flex items-center justify-center ${
+                            item.disabled ? 'text-slate-300 cursor-not-allowed' :
+                            item.variant === 'danger' ? 'text-red-500 hover:bg-red-50' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                        } ${className}`}
                         type="button"
                     >
-                        {React.isValidElement(Icon) ? Icon : <Icon size={18} />}
+                        {Icon ? (React.isValidElement(Icon) ? Icon : <Icon size={18} />) : null}
                     </button>
                 </Tooltip>
             );
@@ -115,12 +125,13 @@ export default function ActionMenu({ items, buttonSize = 20, variant = 'default'
             <Button
                 variant={item.variant === 'danger' ? 'danger' : 'secondary'}
                 size="sm"
+                disabled={item.disabled}
                 onClick={(e) => {
                     e.stopPropagation();
-                    item.onClick();
+                    if (!item.disabled) item.onClick();
                 }}
-                leftIcon={React.isValidElement(Icon) ? Icon : <Icon size={16} strokeWidth={2} />}
-                className="shadow-sm hover:shadow-md transition-all whitespace-nowrap"
+                leftIcon={Icon ? (React.isValidElement(Icon) ? Icon : <Icon size={16} strokeWidth={2} />) : undefined}
+                className={`shadow-xs hover:shadow-md transition-all whitespace-nowrap ${className}`}
             >
                 {item.label}
             </Button>
@@ -145,13 +156,13 @@ export default function ActionMenu({ items, buttonSize = 20, variant = 'default'
                     style={dropdownStyle}
                 >
                     <div className="flex flex-col gap-0.5">
-                        {items?.map((item, index) => {
+                        {visibleItems.map((item, index) => {
                             if (item.type === 'divider') {
                                 return <div key={index} className="h-px bg-slate-200 my-1 mx-2" />;
                             }
                             const Icon: any = item.icon;
                             let baseClasses = "text-slate-700 hover:bg-slate-50 hover:text-slate-900";
-                            let iconContainerClasses = "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700 group-hover:shadow-sm";
+                            let iconContainerClasses = "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700 group-hover:shadow-xs";
 
                             if (item.variant === 'danger') {
                                 baseClasses = "text-rose-600 hover:bg-rose-50 hover:text-rose-700";
@@ -183,9 +194,11 @@ export default function ActionMenu({ items, buttonSize = 20, variant = 'default'
                                     }}
                                     className={`group flex items-center w-full px-2.5 py-2 text-[13px] font-medium rounded-lg transition-all duration-200 ${baseClasses}`}
                                 >
-                                    <div className={`p-1.5 rounded-md mr-2.5 transition-colors ${iconContainerClasses}`}>
-                                        {Icon ? (React.isValidElement(Icon) ? Icon : <Icon size={14} strokeWidth={2.5} />) : null}
-                                    </div>
+                                    {Icon && (
+                                        <div className={`p-1.5 rounded-md mr-2.5 transition-colors ${iconContainerClasses}`}>
+                                            {React.isValidElement(Icon) ? Icon : <Icon size={14} strokeWidth={2.5} />}
+                                        </div>
+                                    )}
                                     {item.label}
                                 </button>
                             );
@@ -197,3 +210,5 @@ export default function ActionMenu({ items, buttonSize = 20, variant = 'default'
         </>
     );
 }
+
+export const TableActions = ActionMenu;
