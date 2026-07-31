@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
+import { NotificationService } from '../common/notification/notification.service';
 import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class AlertService {
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService, private notificationService: NotificationService) { }
 
     /**
      * Risk limitlerini kontrol et ve uyarı oluştur
@@ -44,6 +45,22 @@ export class AlertService {
                         durum: 'OPEN',
                         mesaj: `${kpiCode} limiti aşıldı: ${value.toFixed(4)} (Eşik: ${esikDeger})`,
                     },
+                });
+
+                await this.notificationService.notifyByRole('Risk Uzmanı', {
+                    title: 'Risk Limiti Aşıldı',
+                    description: `${kpiCode} göstergesinde limit aşımı tespit edildi. Gerçekleşen: ${value.toFixed(4)}, Sınır: ${esikDeger}`,
+                    type: 'warning',
+                    module: 'risk',
+                    link: `/risk/alerts`
+                });
+
+                await this.notificationService.notifyByRole('Risk Yöneticisi', {
+                    title: 'Risk Limiti Aşıldı',
+                    description: `${kpiCode} göstergesinde limit aşımı tespit edildi. Gerçekleşen: ${value.toFixed(4)}, Sınır: ${esikDeger}`,
+                    type: 'warning',
+                    module: 'risk',
+                    link: `/risk/alerts`
                 });
 
                 // Eğer limit aşımı kritik veya yüksek seviyedeyse, otomatik teftiş bulgusu oluştur
@@ -115,6 +132,14 @@ export class AlertService {
                                     targetType: 'Finding',
                                     targetId: finding.id
                                 }
+                            });
+
+                            await this.notificationService.notifyByRole('Risk Yöneticisi', {
+                                title: 'Kritik KPI İhlali - Bulgu Oluşturuldu',
+                                description: `${kpiCode} göstergesi KRİTİK seviyede aşıldı ve otomatik bulgu (${findingCode}) oluşturuldu.`,
+                                type: 'error',
+                                module: 'risk',
+                                link: `/audit/findings/${finding.id}`
                             });
                         }
                     } catch (err) {

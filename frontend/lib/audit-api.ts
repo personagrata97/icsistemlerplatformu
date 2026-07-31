@@ -499,8 +499,9 @@ export const auditApi = {
         return handleResponse(res);
     },
 
-    getUnreadNotificationCount: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/notifications/unread-count`, {
+    getUnreadNotificationCount: async (params?: any) => {
+        const query = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/notifications/unread-count${query}`, {
             headers: getHeaders(),
         });
         return handleResponse(res);
@@ -514,8 +515,9 @@ export const auditApi = {
         return handleResponse(res);
     },
 
-    markAllNotificationsAsRead: async () => {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/notifications/read-all`, {
+    markAllNotificationsAsRead: async (params?: any) => {
+        const query = buildQueryString(params);
+        const res = await fetchWithTimeout(`${API_BASE_URL}/notifications/read-all${query}`, {
             method: 'PATCH',
             headers: getHeaders(),
         });

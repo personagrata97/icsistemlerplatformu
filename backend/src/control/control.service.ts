@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { AuditLogService } from '../audit/audit-log.service';
+import { NotificationService } from '../common/notification/notification.service';
 import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class ControlService {
     constructor(
         private prisma: PrismaService,
         private auditLogService: AuditLogService,
+        private notificationService: NotificationService,
     ) {}
 
     // ─── KONTROL ENVANTERİ ──────────────────────────────────────────────
@@ -198,6 +200,14 @@ export class ControlService {
                 targetType: 'Control',
                 targetId: control.id
             });
+
+            await this.notificationService.notifyByRole('Kontrol Yöneticisi', {
+                title: 'Kontrol Testi Başarısız',
+                description: `${control.code} numaralı kontrol testi "Etkin Değil" sonuçlandı ve otomatik eksiklik kaydı oluşturuldu.`,
+                type: 'error',
+                module: 'control',
+                link: `/control/deficiencies/${autoDeficiency.id}`
+            });
         }
 
         await this.auditLogService.createLog({
@@ -260,11 +270,19 @@ export class ControlService {
             targetId: def.controlId
         });
 
+        await this.notificationService.notifyByDepartment(def.responsibleUnit, {
+            title: 'Eksiklik Mutabakata Gönderildi',
+            description: `${def.code || def.id} numaralı kontrol eksikliği biriminize mutabakat için gönderildi.`,
+            type: 'warning',
+            module: 'control',
+            link: `/control/deficiencies/${def.id}`
+        });
+
         return updated;
     }
 
     async submitUnitResponse(deficiencyId: string, response: 'KATILIYOR' | 'KISMEN_KATILIYOR' | 'KATILMIYOR', reason: string, userId: string) {
-        const def = await this.prisma.controlDeficiency.findUnique({ where: { id: deficiencyId } });
+        const def = await this.prisma.controlDeficiency.findUnique({ where: { id: deficiencyId }, include: { test: true } });
         if (!def) throw new NotFoundException('Eksiklik kaydı bulunamadı');
 
         const updated = await this.prisma.controlDeficiency.update({
@@ -286,6 +304,17 @@ export class ControlService {
             targetType: 'Control',
             targetId: def.controlId
         });
+
+        if (def.test?.testerId) {
+            await this.notificationService.create({
+                userId: def.test.testerId,
+                title: 'Birim Yanıtı Geldi',
+                description: `${def.code || def.id} eksikliği için ${def.responsibleUnit} birimi yanıt verdi: ${response}`,
+                type: 'info',
+                module: 'control',
+                link: `/control/deficiencies/${def.id}`
+            });
+        }
 
         return updated;
     }
@@ -331,6 +360,14 @@ export class ControlService {
             details: `Eksiklik kaydı "${def.code || def.id}" birime resmen tebliğ edildi. Aksiyon süreci başladı.`,
             targetType: 'Control',
             targetId: def.controlId
+        });
+
+        await this.notificationService.notifyByDepartment(def.responsibleUnit, {
+            title: 'Eksiklik Tebliğ Edildi',
+            description: `${def.code || def.id} numaralı eksiklik biriminize tebliğ edilmiştir. Aksiyon süreci başlamıştır.`,
+            type: 'error',
+            module: 'control',
+            link: `/control/deficiencies/${def.id}`
         });
 
         return updated;

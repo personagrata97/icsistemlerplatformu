@@ -1,12 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
+import { NotificationService } from '../common/notification/notification.service';
 import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
 export class ReputationSignalService {
     private readonly logger = new Logger(ReputationSignalService.name);
 
-    constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService, private notificationService: NotificationService) { }
 
     // 8-Adımlı İç Sinyal Kural Motoru
     async evaluateSignalsForCustomer(musteriId: string): Promise<any[]> {
@@ -179,6 +180,16 @@ export class ReputationSignalService {
                 inceleyenUser: data.user,
             }
         });
+
+        if (ustOnayGerekli) {
+            await this.notificationService.notifyByRole('Uyum Görevlisi', {
+                title: 'EDD Kararı Bekliyor',
+                description: `Müşteri ${data.musteriId} için Genişletilmiş Durum Tespiti (EDD) üst onay kararı bekliyor.`,
+                type: 'warning',
+                module: 'sanction',
+                link: `/sanction/edd/${edd.id}`
+            });
+        }
 
         if (data.signalId) {
             await this.prisma.reputationSignal.update({

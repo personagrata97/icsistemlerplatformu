@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SanctionService } from './sanction.service';
 import { SanctionImportService } from './sanction-import.service';
+import { NotificationService } from '../common/notification/notification.service';
 
 @Injectable()
 export class SanctionCronService {
@@ -8,7 +9,8 @@ export class SanctionCronService {
 
     constructor(
         private readonly sanctionService: SanctionService,
-        private readonly importService: SanctionImportService
+        private readonly importService: SanctionImportService,
+        private readonly notificationService: NotificationService
     ) {}
 
     // Daily Cron Job execution (e.g. 06:00 AM)
@@ -24,6 +26,13 @@ export class SanctionCronService {
                 syncResults.push(res);
             } catch (e) {
                 this.logger.error(`${kod} listesi senkronize edilirken hata oluştu`, e);
+                await this.notificationService.notifyByRole('Uyum Görevlisi', {
+                    title: 'Yaptırım Listesi Güncellenemedi',
+                    description: `${kod} kodlu yaptırım listesi senkronize edilirken hata oluştu. Listeler güncel olmayabilir.`,
+                    type: 'error',
+                    module: 'sanction',
+                    link: `/sanction/lists`
+                });
             }
         }
 

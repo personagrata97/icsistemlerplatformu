@@ -36,12 +36,22 @@ export default function NotificationDropdown({
     
     useOnClickOutside(dropdownRef, () => setIsOpen(false));
 
+    const getModuleFromPath = (path: string) => {
+        if (path.startsWith('/audit')) return 'audit';
+        if (path.startsWith('/control')) return 'control';
+        if (path.startsWith('/risk')) return 'risk';
+        if (path.startsWith('/sanction')) return 'sanction';
+        return undefined; // All modules if not in a specific one
+    };
+
     const loadNotifications = async () => {
         setLoading(true);
         try {
-            const data = await auditApi.getNotifications();
+            const currentModule = getModuleFromPath(pathname);
+            const params = currentModule ? { module: currentModule } : {};
+            const data = await auditApi.getNotifications(params);
             setNotifications(data || []);
-            const unreadRes = await auditApi.getUnreadNotificationCount();
+            const unreadRes = await auditApi.getUnreadNotificationCount(params);
             setUnreadCount(unreadRes?.count || 0);
         } catch (error) {
             console.error('Bildirimler yüklenemedi:', error);
@@ -59,7 +69,9 @@ export default function NotificationDropdown({
 
     const markAllAsRead = async () => {
         try {
-            await auditApi.markAllNotificationsAsRead();
+            const currentModule = getModuleFromPath(pathname);
+            const params = currentModule ? { module: currentModule } : {};
+            await auditApi.markAllNotificationsAsRead(params);
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
             setUnreadCount(0);
         } catch (error) {

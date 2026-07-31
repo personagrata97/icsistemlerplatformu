@@ -6,8 +6,10 @@ import { SanctionImportService } from './sanction-import.service';
 import { SanctionCronService } from './sanction-cron.service';
 import { ReputationSignalService } from './reputation-signal.service';
 import { PrismaService } from '../common/prisma.service';
+import { NotificationModule } from '../common/notification/notification.module';
 
 @Module({
+    imports: [NotificationModule],
     controllers: [SanctionController],
     providers: [SanctionService, MasakService, SanctionImportService, SanctionCronService, ReputationSignalService, PrismaService],
     exports: [SanctionService, SanctionImportService, SanctionCronService, ReputationSignalService]

@@ -15,8 +15,11 @@ import { TenorLimitCalculator } from './tenor-limit.calculator';
 import { LotteryGroupCalculator } from './lottery-group.calculator';
 import { BddkExportService } from './bddk-export.service';
 import { DataIngestionService } from './data-ingestion.service';
+import { RiskCronService } from './risk-cron.service';
+import { NotificationModule } from '../common/notification/notification.module';
 
 @Module({
+    imports: [NotificationModule],
     providers: [
         PrismaService,
         RiskEngineService,
@@ -34,6 +37,7 @@ import { DataIngestionService } from './data-ingestion.service';
         LotteryGroupCalculator,
         BddkExportService,
         DataIngestionService,
+        RiskCronService,
     ],
     exports: [
         RiskEngineService,

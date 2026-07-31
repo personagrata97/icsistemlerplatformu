@@ -1,5 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
+import { NotificationService } from '../common/notification/notification.service';
 import { parsePaginationParams, buildPaginatedResponse, PaginationParams } from '../common/pagination.util';
 
 @Injectable()
@@ -7,7 +8,10 @@ export class SanctionService {
     private readonly IV_LENGTH = 16;
     private readonly logger = new Logger(SanctionService.name);
 
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService,
+        private notificationService: NotificationService
+    ) {}
 
     private getEncryptionKey(): string {
         const key = process.env.ENCRYPTION_KEY;
@@ -170,6 +174,31 @@ export class SanctionService {
                     }
                 });
                 matches.push(match);
+
+                if (score >= 95) {
+                    await this.notificationService.notifyByRole('Uyum Görevlisi', {
+                        title: 'Kesin Eşleşme Tespit Edildi',
+                        description: `Müşteri taramasında (Skor: ${score}) kesin eşleşme bulundu. İvedilikle inceleme gereklidir.`,
+                        type: 'error',
+                        module: 'sanction',
+                        link: `/sanction/matches`
+                    });
+                    await this.notificationService.notifyByRole('Uyum Yöneticisi', {
+                        title: 'Kesin Eşleşme Tespit Edildi',
+                        description: `Müşteri taramasında (Skor: ${score}) kesin eşleşme bulundu.`,
+                        type: 'error',
+                        module: 'sanction',
+                        link: `/sanction/matches`
+                    });
+                } else {
+                    await this.notificationService.notifyByRole('Uyum Görevlisi', {
+                        title: 'Yeni Eşleşme Bulundu',
+                        description: `Müşteri taramasında (Skor: ${score}) yeni eşleşme saptandı. İnceleme bekliyor.`,
+                        type: 'warning',
+                        module: 'sanction',
+                        link: `/sanction/matches`
+                    });
+                }
             }
         }
 

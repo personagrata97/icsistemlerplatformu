@@ -431,6 +431,7 @@ model Notification {
   description String
   type        String   @default("info")
   category    String   @default("Genel")
+  module      String   @default("audit")
   isRead      Boolean  @default(false)
   link        String?
   createdAt   DateTime @default(now())
