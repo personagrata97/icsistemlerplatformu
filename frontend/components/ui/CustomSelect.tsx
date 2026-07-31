@@ -1,5 +1,5 @@
-import FormInput from '@/components/ui/FormInput';
 'use client';
+import FormInput from '@/components/ui/FormInput';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';

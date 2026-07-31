@@ -1,5 +1,5 @@
-import PageHeader from '@/components/ui/PageHeader';
 'use client';
+import PageHeader from '@/components/ui/PageHeader';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';

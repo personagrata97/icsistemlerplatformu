@@ -151,11 +151,11 @@ export default function QualityMetrics() {
                     description={`Zorunlu 5 yıllık dış değerlendirme süresi ${eqaInfo.daysLeft} gün önce dolmuştur.`}
                 />
             )}
-            <DurationText days={eqaInfo.status === 'APPROACHING' && (
+            {eqaInfo.status === 'APPROACHING' && (
                 <Alert
                     variant="warning"
                     title="Dış Değerlendirme Yaklaşıyor"
-                    description={`Bir sonraki zorunlu dış değerlendirmeye ${eqaInfo.daysLeft} mode="remaining" />.`}
+                    description={`Bir sonraki zorunlu dış değerlendirmeye ${eqaInfo.daysLeft} gün kaldı.`}
                     icon={<Clock size={24} className="text-orange-600" />}
                 />
             )}

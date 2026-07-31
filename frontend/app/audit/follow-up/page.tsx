@@ -1,10 +1,11 @@
-import PageHeader from '@/components/ui/PageHeader';
 'use client';
+import PageHeader from '@/components/ui/PageHeader';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
+import DurationText from '@/components/ui/DurationText';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
@@ -213,7 +214,7 @@ function FollowUpPageContent() {
                                     <div className="text-xs text-gray-700 font-mono">
                                         <div>{formatDate(item.terminTarihi)}</div>
                                         <div className={`text-[10px] font-bold ${diffDays < 0 ? 'text-red-600' : 'text-emerald-700'}`}>
-                                            <DurationText days={-(diffDays < 0 ? `${Math.abs(diffDays))} mode="remaining" />` : `$<DurationText days={diffDays} mode="remaining" />`}
+                                            <DurationText days={Math.abs(diffDays)} mode="remaining" />
                                         </div>
                                     </div>
                                 );

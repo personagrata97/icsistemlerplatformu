@@ -1,5 +1,5 @@
-import FormInput from '@/components/ui/FormInput';
 'use client';
+import FormInput from '@/components/ui/FormInput';
 
 import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';

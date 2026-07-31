@@ -1,5 +1,5 @@
-import FormInput from '@/components/ui/FormInput';
 'use client';
+import FormInput from '@/components/ui/FormInput';
 
 import React from 'react';
 import LoadingSpinner from './LoadingSpinner';

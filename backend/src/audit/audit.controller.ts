@@ -32,6 +32,12 @@ export class AuditController {
 
     private readonly logger = new Logger(AuditController.name);
 
+    @Get('risky-units')
+    @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
+    async getRiskyUnits() {
+        return this.auditService.getRiskyUnits();
+    }
+
     @Get('audits')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
     async getAudits(

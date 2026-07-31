@@ -573,4 +573,16 @@ export class ControlService {
             await this.prisma.controlItem.create({ data: c });
         }
     }
+
+    async getFailedTestsByDepartment(department: string) {
+        return this.prisma.controlTest.findMany({
+            where: {
+                isDeleted: false,
+                result: 'ETKIN_DEGIL',
+                control: {
+                    department: department
+                }
+            }
+        });
+    }
 }

@@ -1,6 +1,6 @@
+'use client';
 import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
-'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';

@@ -1,6 +1,6 @@
+'use client';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
-'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
 import LoadingState from '@/components/ui/LoadingState';

@@ -1,10 +1,4 @@
-import UnitBadge from '@/components/ui/UnitBadge';
-import PageHeader from '@/components/ui/PageHeader';
-import FormInput from '@/components/ui/FormInput';
-import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
-import RequireRole from '@/components/auth/RequireRole';
-
 
 import React, { useState, useEffect } from 'react';
 import { Suspense } from 'react';
@@ -49,7 +43,7 @@ interface ActionPlanItem {
     dueDate: string;
 }
 
-function FastTrackPageInner() {
+function FastTrackPageContent() {
     const searchParams = useSearchParams();
     const findingId = searchParams.get('findingId');
     const token = searchParams.get('token');
@@ -139,8 +133,7 @@ function FastTrackPageInner() {
         }
         
         updateSeal();
-        return () =>
-            <PageHeader title="Hızlı Denetim (Fast-Track)" subtitle="Acil ve kritik konularda hızlı denetim görevi oluşturma ve yürütme" /> { activeTimer = false; };
+        return () => { activeTimer = false; };
     }, [findingDetails, isAuthenticated, managerProfile, adUsername, timestamp, isAgreed, response, rootCause, actions]);
 
     // Periodically update timestamp to show dynamic seal live-sync
@@ -237,22 +230,22 @@ function FastTrackPageInner() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-slate-700 p-6">
-                <RotateCw className="w-12 h-12 text-primary animate-spin mb-4" />
-                <p className="text-sm font-semibold tracking-wider text-slate-600">TASARRUF FİNANSMAN A.Ş. HIZLI MUTABAKAT PORTALİ</p>
-                <p className="text-xs text-slate-400 mt-2">Güvenli veriler yükleniyor, lütfen bekleyin...</p>
+            <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 p-6">
+                <RotateCw className="w-12 h-12 text-[#c9a84c] animate-spin mb-4" />
+                <p className="text-sm font-semibold tracking-wider text-slate-400">TASARRUF FİNANSMAN A.Ş. HIZLI MUTABAKAT PORTALİ</p>
+                <p className="text-xs text-slate-500 mt-2">Güvenli veriler yükleniyor, lütfen bekleyin...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-slate-800 p-6">
-                <div className="bg-white border border-red-200 p-8 rounded-2xl max-w-md w-full text-center shadow-lg">
+            <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 p-6">
+                <div className="bg-slate-900 border border-red-500/30 p-8 rounded-2xl max-w-md w-full text-center shadow-2xl">
                     <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                    <h2 className="text-xl font-bold text-slate-900 mb-2">Erişim Engellendi</h2>
-                    <p className="text-sm text-slate-600 mb-6">{error}</p>
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-600 text-left">
+                    <h2 className="text-xl font-bold text-slate-100 mb-2">Erişim Engellendi</h2>
+                    <p className="text-sm text-slate-400 mb-6">{error}</p>
+                    <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-slate-500 text-left">
                         <strong>Yardım:</strong> Bu portal sadece yetkili yöneticilere gönderilen özel e-posta bağlantıları üzerinden çalışmaktadır. Lütfen bağlantınızı kontrol edin veya Teftiş Kurulu AMS yöneticisi ile irtibata geçin.
                     </div>
                 </div>
@@ -261,62 +254,62 @@ function FastTrackPageInner() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-800 p-4 md:p-8 flex flex-col items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 p-4 md:p-8 flex flex-col items-center justify-center">
             
             {/* Elegant Header */}
             <div className="w-full max-w-4xl text-center mb-8">
-                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mb-1">
-                    ICSİSTEMLER PLATFORMU <span className="text-[#0A7A4B]">A.Ş.</span>
+                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-1">
+                    TASARRUF FİNANSMAN <span className="text-[#c9a84c]">A.Ş.</span>
                 </h1>
-                <p className="text-xs uppercase tracking-widest text-[#0A7A4B] font-semibold">Teftiş Kurulu Müdürlüğü • Dijital Mutabakat Sistemi (AMS)</p>
+                <p className="text-xs uppercase tracking-widest text-[#c9a84c] font-semibold">Teftiş Kurulu Müdürlüğü • Dijital Mutabakat Sistemi (AMS)</p>
             </div>
 
             {/* Portal Card */}
-            <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden transition-all duration-300">
+            <div className="w-full max-w-4xl bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300">
                 
                 {/* Step 1: SSO Authentication Gate */}
                 {!isAuthenticated && (
                     <div className="p-8 md:p-12 flex flex-col items-center">
-                        <div className="bg-[#0A7A4B]/10 p-4 rounded-full border border-[#0A7A4B]/30 mb-6 animate-pulse">
-                            <Lock className="w-10 h-10 text-[#0A7A4B]" />
+                        <div className="bg-[#0A7A4B]/20 p-4 rounded-full border border-[#0A7A4B]/40 mb-6 animate-pulse">
+                            <Lock className="w-10 h-10 text-[#c9a84c]" />
                         </div>
                         
-                        <h2 className="text-xl font-bold text-center text-slate-900 mb-2">Kurumsal SSO Doğrulama Gate</h2>
-                        <p className="text-sm text-slate-600 text-center max-w-md mb-8">
+                        <h2 className="text-xl font-bold text-center text-white mb-2">Kurumsal SSO Doğrulama Gate</h2>
+                        <p className="text-sm text-slate-400 text-center max-w-md mb-8">
                             Hassas bulgu detaylarına erişmek ve dijital imza sürecini başlatmak için kurumsal AD (Active Directory) kimlik bilgilerinizi doğrulamanız gerekmektedir.
                         </p>
 
                         <form onSubmit={handleAuth} className="w-full max-w-sm space-y-4">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">AD Sicil / Kullanıcı Adı</label>
+                                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">AD Sicil / Kullanıcı Adı</label>
                                 <div className="relative">
-                                    <User className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                                    <FormInput 
+                                    <User className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
+                                    <input 
                                         type="text" 
                                         value={adUsername}
                                         onChange={(e) => setAdUsername(e.target.value)}
                                         placeholder="ornek.kullanici"
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0A7A4B] transition-all"
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-[#0A7A4B] transition-all"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">AD Şifre</label>
+                                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">AD Şifre</label>
                                 <div className="relative">
-                                    <Key className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                                    <FormInput 
+                                    <Key className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
+                                    <input 
                                         type="password" 
                                         value={adPassword}
                                         onChange={(e) => setAdPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0A7A4B] transition-all"
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-[#0A7A4B] transition-all"
                                     />
                                 </div>
                             </div>
 
                             {authError && (
-                                <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs rounded-xl flex items-start gap-2">
+                                <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl flex items-start gap-2">
                                     <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                                     <span>{authError}</span>
                                 </div>
@@ -331,8 +324,8 @@ function FastTrackPageInner() {
                             </button>
                         </form>
 
-                        <div className="mt-8 text-center text-[10px] text-slate-500 flex items-center gap-1.5 justify-center">
-                            <ShieldCheck className="w-3.5 h-3.5 text-[#0A7A4B]" />
+                        <div className="mt-8 text-center text-[10px] text-slate-600 flex items-center gap-1.5 justify-center">
+                            <ShieldCheck className="w-3.5 h-3.5 text-[#c9a84c]" />
                             <span>SHA-256 Dijital Mühür Güvenceli Platform</span>
                         </div>
                     </div>
@@ -343,69 +336,69 @@ function FastTrackPageInner() {
                     <div className="p-6 md:p-8 space-y-8">
                         
                         {/* Upper Active Profile Ribbon */}
-                        <div className="bg-[#0A7A4B]/5 border border-[#0A7A4B]/20 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="bg-[#0A7A4B]/10 border border-[#0A7A4B]/20 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
-                                <div className="bg-emerald-100 p-2.5 rounded-xl border border-emerald-200">
-                                    <ShieldCheck className="w-5 h-5 text-[#0A7A4B]" />
+                                <div className="bg-[#c9a84c]/20 p-2.5 rounded-xl border border-[#c9a84c]/40">
+                                    <ShieldCheck className="w-5 h-5 text-[#c9a84c]" />
                                 </div>
                                 <div>
                                     <div className="text-xs text-slate-500 font-medium">Doğrulanmış SSO Kimliği</div>
-                                    <div className="text-sm font-bold text-slate-900">{managerProfile.displayName} ({managerProfile.username})</div>
+                                    <div className="text-sm font-bold text-slate-200">{managerProfile.displayName} ({managerProfile.username})</div>
                                 </div>
                             </div>
-                            <div className="text-xs font-semibold px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-slate-700">
-                                Rol: <span className="text-[#0A7A4B]">Birim Yöneticisi</span>
+                            <div className="text-xs font-semibold px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-400">
+                                Rol: <span className="text-[#c9a84c]">Birim Yöneticisi</span>
                             </div>
                         </div>
 
                         {/* Bulgu Detayları Section */}
                         <div className="space-y-4">
-                            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-[#0A7A4B]" />
+                            <h3 className="text-base font-bold text-slate-200 flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-[#c9a84c]" />
                                 1. Tebliğ Edilen Bulgu Bilgileri
                             </h3>
                             
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
                                     <span className="block text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1">Bulgu Kodu & Risk</span>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-sm font-bold text-[#0A7A4B]">{findingDetails.code}</span>
+                                        <span className="text-sm font-bold text-[#c9a84c]">{findingDetails.code}</span>
                                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
                                             findingDetails.risk === 'Kritik' || findingDetails.risk === 'Yüksek' 
-                                                ? 'bg-red-100 text-red-700 border border-red-200' 
-                                                : 'bg-emerald-100 text-[#0A7A4B] border border-emerald-200'
+                                                ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
+                                                : 'bg-[#0A7A4B]/20 text-[#0A7A4B] border border-[#0A7A4B]/30'
                                         }`}>
                                             {findingDetails.risk}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
                                     <span className="block text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1">İlgili Denetim</span>
-                                    <div className="text-xs font-bold text-slate-800 truncate">{findingDetails.auditCode} - {findingDetails.auditTitle}</div>
+                                    <div className="text-xs font-bold text-slate-300 truncate">{findingDetails.auditCode} - {findingDetails.auditTitle}</div>
                                 </div>
 
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
                                     <span className="block text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1">Birim / Departman</span>
-                                    <div className="text-xs font-bold text-slate-800"><UnitBadge name={findingDetails.department} /></div>
+                                    <div className="text-xs font-bold text-slate-300">{findingDetails.department}</div>
                                 </div>
                             </div>
 
-                            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800/80 space-y-3">
                                 <div>
-                                    <h4 className="text-xs font-bold text-slate-500 mb-1">Bulgu Başlığı</h4>
-                                    <p className="text-sm font-semibold text-slate-900">{findingDetails.title}</p>
+                                    <h4 className="text-xs font-bold text-slate-400 mb-1">Bulgu Başlığı</h4>
+                                    <p className="text-sm font-semibold text-slate-200">{findingDetails.title}</p>
                                 </div>
                                 
-                                <div className="border-t border-slate-200 pt-3">
-                                    <h4 className="text-xs font-bold text-slate-500 mb-1">Bulgu Tanımı & Kriter</h4>
-                                    <p className="text-xs text-slate-700 leading-relaxed max-h-32 overflow-y-auto pr-2">{findingDetails.description}</p>
+                                <div className="border-t border-slate-900 pt-3">
+                                    <h4 className="text-xs font-bold text-slate-400 mb-1">Bulgu Tanımı & Kriter</h4>
+                                    <p className="text-xs text-slate-400 leading-relaxed max-h-32 overflow-y-auto pr-2">{findingDetails.description}</p>
                                 </div>
 
                                 {findingDetails.criteria && (
-                                    <div className="border-t border-slate-200 pt-3">
-                                        <h4 className="text-xs font-bold text-slate-500 mb-1">Kriter & Mevzuat</h4>
-                                        <p className="text-xs text-slate-600 italic">{findingDetails.criteria}</p>
+                                    <div className="border-t border-slate-900 pt-3">
+                                        <h4 className="text-xs font-bold text-slate-400 mb-1">Kriter & Mevzuat</h4>
+                                        <p className="text-xs text-slate-500 italic">{findingDetails.criteria}</p>
                                     </div>
                                 )}
                             </div>
@@ -413,20 +406,20 @@ function FastTrackPageInner() {
 
                         {/* Interactive Form Response & Agreement */}
                         <div className="space-y-4">
-                            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                <Info className="w-4 h-4 text-[#0A7A4B]" />
+                            <h3 className="text-base font-bold text-slate-200 flex items-center gap-2">
+                                <Info className="w-4 h-4 text-[#c9a84c]" />
                                 2. Birim Katılım Beyanı ve Yanıt Girişi
                             </h3>
 
                             {/* Segmented Control for Agreement */}
-                            <div className="grid grid-cols-2 p-1.5 bg-slate-100 border border-slate-200 rounded-2xl">
+                            <div className="grid grid-cols-2 p-1.5 bg-slate-950 border border-slate-800 rounded-2xl">
                                 <button 
                                     type="button"
                                     onClick={() => setIsAgreed(true)}
                                     className={`py-3 text-sm font-bold rounded-xl transition-all ${
                                         isAgreed 
-                                            ? 'bg-white text-[#0A7A4B] shadow-sm border border-slate-200' 
-                                            : 'text-slate-500 hover:text-slate-700'
+                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                                            : 'text-slate-500 hover:text-slate-300'
                                     }`}
                                 >
                                     Mutabıkım (Aksiyon Planı Girişi)
@@ -436,8 +429,8 @@ function FastTrackPageInner() {
                                     onClick={() => setIsAgreed(false)}
                                     className={`py-3 text-sm font-bold rounded-xl transition-all ${
                                         !isAgreed 
-                                            ? 'bg-white text-amber-700 shadow-sm border border-slate-200' 
-                                            : 'text-slate-500 hover:text-slate-700'
+                                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                                            : 'text-slate-500 hover:text-slate-300'
                                     }`}
                                 >
                                     Mutabık Değilim (Gerekçeli Yanıt Girişi)
@@ -447,26 +440,26 @@ function FastTrackPageInner() {
                             {/* Response Fields */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">Kök Neden Analizi</label>
-                                    <FormTextarea 
+                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Kök Neden Analizi</label>
+                                    <textarea 
                                         rows={4}
                                         value={rootCause}
                                         onChange={(e) => setRootCause(e.target.value)}
                                         placeholder="Bulgunun ortaya çıkmasına zemin hazırlayan kök nedeni analiz ederek buraya yazınız..."
-                                        className="w-full p-4 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-900 focus:outline-none focus:border-[#0A7A4B] transition-all resize-none"
+                                        className="w-full p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-200 focus:outline-none focus:border-[#0A7A4B] transition-all resize-none"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                         {isAgreed ? 'Birim Yönetim Görüşü' : 'Bulguya Katılmama Gerekçesi (Zorunlu)'}
                                     </label>
-                                    <FormTextarea 
+                                    <textarea 
                                         rows={4}
                                         value={response}
                                         onChange={(e) => setResponse(e.target.value)}
                                         placeholder={isAgreed ? "Bulguya ve aksiyon planına ilişkin yönetim görüşünüzü buraya yazınız..." : "Bulguya katılmama gerekçenizi mevzuat, süreç veya fiili durum açıklamaları ile detaylıca giriniz..."}
-                                        className="w-full p-4 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-900 focus:outline-none focus:border-[#0A7A4B] transition-all resize-none"
+                                        className="w-full p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-200 focus:outline-none focus:border-[#0A7A4B] transition-all resize-none"
                                     />
                                 </div>
                             </div>
@@ -476,14 +469,14 @@ function FastTrackPageInner() {
                         {isAgreed && (
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                        <Briefcase className="w-4 h-4 text-[#0A7A4B]" />
+                                    <h3 className="text-base font-bold text-slate-200 flex items-center gap-2">
+                                        <Briefcase className="w-4 h-4 text-[#c9a84c]" />
                                         3. Düzeltici / Önleyici Aksiyon Planları
                                     </h3>
                                     <button 
                                         type="button" 
                                         onClick={addActionRow}
-                                        className="px-3 py-1.5 bg-[#0A7A4B]/10 hover:bg-[#0A7A4B]/20 text-xs font-bold text-[#0A7A4B] border border-[#0A7A4B]/30 rounded-xl flex items-center gap-1.5 transition-all"
+                                        className="px-3 py-1.5 bg-[#0A7A4B]/20 hover:bg-[#0A7A4B]/30 text-xs font-bold text-[#c9a84c] border border-[#0A7A4B]/40 rounded-xl flex items-center gap-1.5 transition-all"
                                     >
                                         <Plus className="w-3.5 h-3.5" /> Aksiyon Ekle
                                     </button>
@@ -491,40 +484,40 @@ function FastTrackPageInner() {
 
                                 <div className="space-y-3">
                                     {actions.map((act, index) => (
-                                        <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 items-end">
-                                            <div className="md:col-span-1 text-center font-bold text-xs text-slate-500 pb-3 md:pb-0">
+                                        <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800/80 items-end">
+                                            <div className="md:col-span-1 text-center font-bold text-xs text-slate-600 pb-3 md:pb-0">
                                                 No: {index + 1}
                                             </div>
                                             
                                             <div className="md:col-span-6 space-y-1">
                                                 <label className="block text-[10px] text-slate-500 font-semibold uppercase">Aksiyon Planı Açıklaması</label>
-                                                <FormInput 
+                                                <input 
                                                     type="text"
                                                     value={act.action}
                                                     onChange={(e) => updateActionRow(index, 'action', e.target.value)}
                                                     placeholder="Alınacak aksiyon veya düzeltici işlem..."
-                                                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-[#0A7A4B]"
+                                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-[#0A7A4B]"
                                                 />
                                             </div>
 
                                             <div className="md:col-span-2 space-y-1">
                                                 <label className="block text-[10px] text-slate-500 font-semibold uppercase">Sorumlu Birim/Sicil</label>
-                                                <FormInput 
+                                                <input 
                                                     type="text"
                                                     value={act.responsible}
                                                     onChange={(e) => updateActionRow(index, 'responsible', e.target.value)}
                                                     placeholder="Sorumlu Yetkili..."
-                                                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none"
+                                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none"
                                                 />
                                             </div>
 
                                             <div className="md:col-span-2 space-y-1">
                                                 <label className="block text-[10px] text-slate-500 font-semibold uppercase">Vade Tarihi</label>
-                                                <FormInput 
+                                                <input 
                                                     type="date"
                                                     value={act.dueDate}
                                                     onChange={(e) => updateActionRow(index, 'dueDate', e.target.value)}
-                                                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none"
+                                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none"
                                                 />
                                             </div>
 
@@ -533,7 +526,7 @@ function FastTrackPageInner() {
                                                     type="button"
                                                     disabled={actions.length === 1}
                                                     onClick={() => removeActionRow(index)}
-                                                    className="p-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 rounded-lg disabled:opacity-30 disabled:pointer-events-none transition-all"
+                                                    className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded-lg disabled:opacity-30 disabled:pointer-events-none transition-all"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -545,13 +538,13 @@ function FastTrackPageInner() {
                         )}
 
                         {/* Interactive Digital Signature / SHA-256 Box */}
-                        <div className="space-y-4 pt-4 border-t border-slate-200">
-                            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                <Fingerprint className="w-4 h-4 text-[#0A7A4B]" />
+                        <div className="space-y-4 pt-4 border-t border-slate-800">
+                            <h3 className="text-base font-bold text-slate-200 flex items-center gap-2">
+                                <Fingerprint className="w-4 h-4 text-[#c9a84c]" />
                                 4. Kriptografik Güvenlik Mührü ve Dijital İmzalama
                             </h3>
 
-                            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-slate-900 shadow-sm">
+                            <div className="bg-[#faf8f4] border border-[#c9a84c] rounded-2xl p-6 text-slate-900 shadow-md">
                                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                                     <div className="space-y-3 max-w-xl">
                                         <div className="inline-block bg-emerald-100 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
@@ -577,9 +570,9 @@ function FastTrackPageInner() {
 
                                     {/* Circular Stamp on Right */}
                                     <div className="shrink-0 flex items-center justify-center">
-                                        <div className="w-32 h-32 rounded-full border-4 border-dashed border-[#0A7A4B] flex flex-col items-center justify-center bg-white shadow-md p-2 text-center">
+                                        <div className="w-32 h-32 rounded-full border-4 border-dashed border-[#c9a84c] flex flex-col items-center justify-center bg-white shadow-lg p-2 text-center animate-spin-slow">
                                             <ShieldCheck className="w-8 h-8 text-emerald-600 mb-1" />
-                                            <span className="text-[8px] font-extrabold text-[#0A7A4B] uppercase tracking-wider">ICSİSTEMLER PLATFORMU</span>
+                                            <span className="text-[8px] font-extrabold text-[#0A7A4B] uppercase tracking-wider">TASARRUF FİNANSMAN</span>
                                             <span className="text-[9px] font-extrabold text-emerald-600 uppercase tracking-widest">{isAgreed ? 'MUTABIK' : 'RED'}</span>
                                             <span className="text-[6px] font-bold text-slate-400 mt-1">AMS INTEGRITY</span>
                                         </div>
@@ -587,15 +580,15 @@ function FastTrackPageInner() {
                                 </div>
 
                                 {/* Active live hash */}
-                                <div className="mt-6 bg-white p-4 rounded-xl border border-slate-200">
+                                <div className="mt-6 bg-slate-950 p-4 rounded-xl border border-[#c9a84c]/20">
                                     <div className="flex items-center justify-between mb-2">
-                                        <span className="text-[9px] font-extrabold text-[#0A7A4B] tracking-widest uppercase">SHA-256 DİJİTAL GÜVENLİK MÜHRÜ (REAL-TIME)</span>
-                                        <span className="inline-flex items-center gap-1 text-[8px] text-emerald-600 font-semibold">
+                                        <span className="text-[9px] font-extrabold text-[#c9a84c] tracking-widest uppercase">SHA-256 DİJİTAL GÜVENLİK MÜHRÜ (REAL-TIME)</span>
+                                        <span className="inline-flex items-center gap-1 text-[8px] text-emerald-400 font-semibold">
                                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                                             Korumalı
                                         </span>
                                     </div>
-                                    <div className="font-mono text-xs text-slate-800 break-all select-all leading-normal bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                    <div className="font-mono text-xs text-slate-300 break-all select-all leading-normal bg-slate-900 p-2.5 rounded-lg border border-slate-800">
                                         {currentSeal || 'HESAPLANIYOR...'}
                                     </div>
                                 </div>
@@ -632,25 +625,25 @@ function FastTrackPageInner() {
                 {/* Step 3: Success and Immutable PDF Download */}
                 {signSuccess && (
                     <div className="p-10 md:p-14 text-center flex flex-col items-center">
-                        <div className="w-20 h-20 bg-emerald-50 rounded-full border border-emerald-200 flex items-center justify-center text-emerald-600 mb-6 shadow-lg shadow-emerald-500/5">
+                        <div className="w-20 h-20 bg-emerald-500/10 rounded-full border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6 shadow-lg shadow-emerald-500/5">
                             <CheckCircle className="w-12 h-12 animate-bounce" />
                         </div>
 
-                        <h2 className="text-2xl font-bold text-slate-800 mb-3">Hızlı Mutabakat Tamamlandı</h2>
+                        <h2 className="text-2xl font-bold text-slate-100 mb-3">Hızlı Mutabakat Tamamlandı</h2>
                         
-                        <p className="text-sm text-slate-500 max-w-md mb-8 leading-relaxed">
+                        <p className="text-sm text-slate-400 max-w-md mb-8 leading-relaxed">
                             Bulguya ilişkin yönetim katılım beyanınız kurumsal Active Directory kimliğinizle dijital olarak imzalanmış ve
                             Teftiş Kurulu veri tabanında mühürlenerek arşivlenmiştir.
                         </p>
 
                         {/* Interactive Receipt details */}
-                        <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-8 text-left space-y-2.5">
-                            <div className="flex justify-between text-xs"><span className="text-slate-500">Mühürleyen Yetkili:</span><span className="font-bold text-slate-700">{managerProfile.displayName}</span></div>
-                            <div className="flex justify-between text-xs"><span className="text-slate-500">Sicil / Kullanıcı:</span><span className="font-bold text-slate-700">{adUsername}</span></div>
-                            <div className="flex justify-between text-xs"><span className="text-slate-500">İşlem IP Adresi:</span><span className="font-bold text-slate-700">127.0.0.1 (Doğrulanmış)</span></div>
-                            <div className="flex justify-between text-xs"><span className="text-slate-500">Durum / Beyan:</span><span className="font-bold text-emerald-600">{isAgreed ? 'MUTABIK KALINDI' : 'BULGU RED'}</span></div>
-                            <div className="border-t border-slate-200 pt-2.5 mt-2.5">
-                                <span className="block text-[9px] font-extrabold text-primary mb-1">DİJİTAL SHA-256 SERTİFİKA İMZASI</span>
+                        <div className="w-full max-w-md bg-slate-950 border border-slate-800/80 rounded-2xl p-5 mb-8 text-left space-y-2.5">
+                            <div className="flex justify-between text-xs"><span className="text-slate-500">Mühürleyen Yetkili:</span><span className="font-bold text-slate-300">{managerProfile.displayName}</span></div>
+                            <div className="flex justify-between text-xs"><span className="text-slate-500">Sicil / Kullanıcı:</span><span className="font-bold text-slate-300">{adUsername}</span></div>
+                            <div className="flex justify-between text-xs"><span className="text-slate-500">İşlem IP Adresi:</span><span className="font-bold text-slate-300">127.0.0.1 (Doğrulanmış)</span></div>
+                            <div className="flex justify-between text-xs"><span className="text-slate-500">Durum / Beyan:</span><span className="font-bold text-emerald-400">{isAgreed ? 'MUTABIK KALINDI' : 'BULGU RED'}</span></div>
+                            <div className="border-t border-slate-900 pt-2.5 mt-2.5">
+                                <span className="block text-[9px] font-extrabold text-[#c9a84c] mb-1">DİJİTAL SHA-256 SERTİFİKA İMZASI</span>
                                 <span className="font-mono text-[10px] text-slate-500 break-all select-all">{currentSeal}</span>
                             </div>
                         </div>
@@ -660,14 +653,14 @@ function FastTrackPageInner() {
                             <a 
                                 href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/audit/findings/${findingId}/fast-track-download/${pdfDownloadPath.split('/').pop()}?token=${token}`}
                                 download
-                                className="px-8 py-3.5 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white font-extrabold text-sm rounded-xl transition-all duration-300 shadow-xl shadow-primary/10 flex items-center justify-center gap-2 border border-primary"
+                                className="px-8 py-3.5 bg-gradient-to-r from-[#c9a84c] to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-slate-950 font-extrabold text-sm rounded-xl transition-all duration-300 shadow-xl shadow-[#c9a84c]/10 flex items-center justify-center gap-2 border border-[#b8953f]"
                             >
                                 <Download className="w-4.5 h-4.5" />
                                 <span>Resmi Mutabakat Zaptını İndir (PDF)</span>
                             </a>
                         )}
 
-                        <p className="text-[10px] text-slate-500 mt-6">
+                        <p className="text-[10px] text-slate-600 mt-6">
                             Mutabakat belgesi aynı zamanda bulgunun kanıt ekleri (evidence) arasına resmi olarak eklenmiştir.
                         </p>
                     </div>
@@ -683,19 +676,10 @@ function FastTrackPageInner() {
 }
 
 
-function FastTrackPageContent() {
+export default function FastTrackPage() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingState message="Sayfa Yükleniyor..." /></div>}>
-      <FastTrackPageInner />
+      <FastTrackPageContent />
     </Suspense>
   );
-}
-
-
-export default function FastTrackPage() {
-    return (
-        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
-            <FastTrackPageContent />
-        </RequireRole>
-    );
 }

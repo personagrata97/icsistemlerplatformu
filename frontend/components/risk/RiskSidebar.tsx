@@ -16,8 +16,6 @@ export default function RiskSidebar() {
     const pathname = usePathname();
     const isActive = (path: string) => pathname === path || (path !== '/risk' && pathname.startsWith(path));
 
-    const isActive = (path: string) => pathname === path || (path !== '/risk' && pathname.startsWith(path));
-
     return (
         <aside className="sidebar flex flex-col h-screen overflow-hidden bg-white border-r shadow-sm z-50">
             <div className="h-[64px] flex items-center justify-center bg-gray-50 border-b border-gray-200 shrink-0">

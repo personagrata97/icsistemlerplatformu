@@ -1,6 +1,6 @@
+'use client';
 import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
-'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
 

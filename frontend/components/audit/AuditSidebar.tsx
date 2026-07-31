@@ -39,6 +39,66 @@ import { useAuth } from '@/context/AuthContext';
 import { useAuditTitle } from '@/context/AuditTitleContext';
 import { isAuditManagerRole, isAuditInspectorRole, isAuditUnitRole } from '@/lib/permissions-map';
 
+// Path to Title/Subtitle mapping
+const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
+    '/audit': { title: 'Ana Panel', subtitle: 'Teftiş Kurulu genel performans göstergeleri ve anlık durum takibi' },
+    '/audit/executive': { title: 'Yönetici Paneli', subtitle: 'Üst yönetim özet göstergeleri ve stratejik denetim metriklerinin takibi' },
+    '/audit/plan': { title: 'Denetim Planı', subtitle: 'Risk odaklı yıllık denetim planlarının oluşturulması ve takibi' },
+    '/audit/universe': { title: 'Denetim Evreni', subtitle: 'Denetlenebilir birimlerin risk skorlaması ve evren bileşenlerinin yönetimi' },
+    '/audit/sampling': { title: 'Örnekleme', subtitle: 'Denetim sahası için istatistiksel ve yöntem bazlı örnekleme hesaplamaları' },
+    '/audit/audits': { title: 'Denetimler', subtitle: 'Tüm aktif ve planlanmış denetim faaliyetlerinin merkezi takibi' },
+    '/audit/findings': { title: 'Bulgular & Aksiyonlar', subtitle: 'Tespitlerden mutabakat ve aksiyon takibine kadar tüm bulgu süreçlerinin yönetimi' },
+    '/audit/reports': { title: 'Raporlar', subtitle: 'Tamamlanan denetim raporlarının hazırlanması, dağıtımı ve analizi' },
+    '/audit/quality': { title: 'Kalite Güvence', subtitle: 'İç denetim faaliyetlerinin kalite güvence ve geliştirme programı metriklerinin takibi' },
+    '/audit/staff': { title: 'Denetim Ekibi', subtitle: 'Denetim ekibinin görev dağılımları ve kaynak yönetimi' },
+    '/audit/staff/cpe': { title: 'Sürekli Mesleki Eğitim (CPE)', subtitle: 'Denetim ekibinin mesleki eğitim saatleri ve sertifikasyon takibi' },
+    '/audit/staff/skills': { title: 'Yetkinlik Matrisi', subtitle: 'Denetçilerin uzmanlık alanları ve yetkinlik matrislerinin yönetimi' },
+    '/audit/knowledge-base': { title: 'Bilgi Bankası', subtitle: 'Denetim rehberleri, çalışma kağıtları ve standart dokümanların yönetimi' },
+    '/audit/ethics/submit': { title: 'Bildirim Yap', subtitle: 'İç denetim ve etik ihlal bildirimlerinin güvenli şekilde iletilmesi' },
+    '/audit/ethics': { title: 'Gelen Bildirimler', subtitle: 'İletilen etik ve iç denetim bildirimlerinin inceleme ve takip süreçleri' },
+    '/audit/ethics/reports': { title: 'Etik Raporları', subtitle: 'Etik ihlal bildirimlerinin dönemsel istatistikleri ve raporlaması' },
+    '/audit/logs': { title: 'Denetim İzi', subtitle: 'Sistem işlem geçmişi ve güvenlik denetim izlerinin takibi' },
+    '/audit/trash': { title: 'Silinen Kayıtlar', subtitle: 'Geri dönüştürülebilir silinmiş denetim ve bulgu kayıtlarının takibi' },
+    '/audit/conciliation': { title: 'Tebliğ ve Mutabakat', subtitle: 'Tebliğ edilen bulguların birim mutabakat süreçleri ve yanıtlarının takibi' },
+    '/audit/follow-up': { title: 'Aksiyon Takip', subtitle: 'Mutabık kalınan bulguların aksiyon planları ve kanıt yükleme süreçlerinin takibi' },
+    '/audit/official-reporting': { title: 'Resmi Raporlama', subtitle: 'Mevzuat uyumlu resmi denetim raporlarının hazırlanması ve merkezi takibi' },
+    '/audit/notifications': { title: 'Bildirimler', subtitle: 'Denetim süreçlerine ait anlık görev ve sistem bildirimlerinin takibi' },
+};
+
+export default function AuditSidebar() {
+    const pathname = usePathname();
+    const { user, hasRole, hasPermission } = useAuth();
+    const { setTitle, setSubtitle, trashCount } = useAuditTitle();
+    const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({
+        ethics: false
+    });
+
+    const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
+
+    // Centralized RBAC Role Checks
+    const isManager = isAuditManagerRole(hasRole);
+    const isInspector = isAuditInspectorRole(hasRole);
+    const isAuditor = isManager || isInspector || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_MANAGER');
+    const isUnit = isAuditUnitRole(hasRole);
+    const isStandardEmployee = !isAuditor && !isUnit && !hasRole('SYSTEM_ADMIN');
+
+    useEffect(() => {
+        let pageInfo = PAGE_TITLES[pathname];
+        
+        if (!pageInfo) {
+            const pathParts = pathname.split('/');
+            if (pathParts.length > 2) {
+                const parentPath = pathParts.slice(0, 3).join('/');
+                pageInfo = PAGE_TITLES[parentPath];
+            }
+        }
+
+        if (pageInfo) {
+            setTitle(pageInfo.title);
+            setSubtitle(pageInfo.subtitle || '');
+        }
+    }, [pathname, setTitle, setSubtitle]);
+
     const toggleSubmenu = (key: string) => {
         setOpenSubmenus(prev => ({ ...prev, [key]: !prev[key] }));
     };

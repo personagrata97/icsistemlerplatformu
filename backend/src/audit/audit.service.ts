@@ -46,6 +46,36 @@ export class AuditService {
 
     // Risk hesaplama: Sistem, Açık Bulgular/Risk Skoruna (RCM) göre Denetim Evrenini otomatik günceller
     // Risk hesaplama mantığı AuditRiskService'e taşındı.
+    async getRiskyUnits() {
+        const units = await this.prisma.auditableUnit.findMany({
+            select: { id: true, name: true, type: true }
+        });
+
+        const riskyUnits = [];
+        for (const unit of units) {
+            // Failed control tests
+            const failedControls = await this.prisma.controlTest.count({
+                where: { isDeleted: false, result: 'ETKIN_DEGIL', control: { department: unit.name } }
+            });
+
+            // Red KPIs
+            const redKpis = await this.prisma.uyari.count({
+                where: { durum: 'OPEN', risk_seviyesi: { in: ['KRITIK', 'YUKSEK', 'RED'] }, kpi: { birim: unit.name } }
+            });
+
+            if (failedControls > 0 || redKpis > 0) {
+                riskyUnits.push({
+                    id: unit.id,
+                    name: unit.name,
+                    type: unit.type,
+                    failedControlCount: failedControls,
+                    redKpiCount: redKpis
+                });
+            }
+        }
+        return riskyUnits;
+    }
+
     async getAllAudits(user: any, options?: PaginationParams & { limit?: number; search?: string; status?: string }) {
         try {
             const uploadsDir = path.join(process.cwd(), 'uploads');

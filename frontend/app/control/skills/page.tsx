@@ -1,7 +1,7 @@
+'use client';
 import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
-'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
 

@@ -1,5 +1,5 @@
-import FormInput from '@/components/ui/FormInput';
 'use client';
+import FormInput from '@/components/ui/FormInput';
 
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, X, Save, Edit3, Info, Check } from 'lucide-react';

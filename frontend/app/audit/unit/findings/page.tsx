@@ -1,5 +1,5 @@
-import PageHeader from '@/components/ui/PageHeader';
 'use client';
+import PageHeader from '@/components/ui/PageHeader';
 import RequireRole from '@/components/auth/RequireRole';
 
 
@@ -9,8 +9,12 @@ import FindingsPage from '@/app/audit/findings/page';
 
 function UnitFindingsPageContent() {
     return (
-        <Suspense fallback={<LoadingState message="Bulgular ve Aksiyon Takip Yükleniyor..." />
-            <PageHeader title="Birim Bulguları" subtitle="Biriminizin sorumluluğundaki aktif bulgular ve aksiyon durumları" />}>
+        <Suspense fallback={
+            <>
+                <LoadingState message="Bulgular ve Aksiyon Takip Yükleniyor..." />
+            </>
+        }>
+            <PageHeader title="Birim Bulguları" subtitle="Biriminizin sorumluluğundaki aktif bulgular ve aksiyon durumları" />
             <FindingsPage />
         </Suspense>
     );

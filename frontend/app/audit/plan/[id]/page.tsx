@@ -1,7 +1,7 @@
+'use client';
 import PersonCell from '@/components/ui/PersonCell';
 import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
-'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
 import { useState, useEffect, useRef } from 'react';

@@ -1,6 +1,6 @@
+'use client';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
-'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
 import { useState, useEffect } from 'react';
@@ -66,6 +66,7 @@ function AuditPlanPageContent() {
 
     const [loading, setLoading] = useState(true);
     const [plans, setPlans] = useState<AuditPlanItem[]>([]);
+    const [riskyUnits, setRiskyUnits] = useState<any[]>([]);
     const currentYear = new Date().getFullYear().toString();
 
     // Kapasite Stateleri
@@ -113,13 +114,15 @@ function AuditPlanPageContent() {
     const loadData = async (showOverlay = true) => {
         if (showOverlay) setLoading(true);
         try {
-            const [data, statsData, staffData] = await Promise.all([
+            const [data, statsData, staffData, riskyData] = await Promise.all([
                 auditApi.getPlans({ page, pageSize: 10 }),
                 auditApi.getExecutiveStats(),
-                auditApi.getStaff().catch(() => [])
+                auditApi.getStaff().catch(() => []),
+                auditApi.getRiskyUnits().catch(() => [])
             ]);
             const rawPlans = data?.items || (Array.isArray(data) ? data : []);
             const total = data?.total ?? rawPlans.length;
+            setRiskyUnits(riskyData || []);
 
             const allPlans = rawPlans.map((p: any) => ({
                 ...p,
@@ -296,6 +299,24 @@ function AuditPlanPageContent() {
                     className={`transition-all hover:scale-[1.02] ${filterStatus.includes('Onay Bekliyor') ? 'ring-2 ring-orange-500 scale-[1.02] bg-orange-50/10' : ''}`}
                 />
             </div>
+
+            
+            {/* Risky Units Warning */}
+            {riskyUnits.length > 0 && (
+                <div className="mb-6 space-y-3">
+                    {riskyUnits.map(unit => (
+                        <div key={unit.id} className="bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm flex items-start gap-3">
+                            <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={20} />
+                            <div>
+                                <h4 className="text-red-800 font-medium">Denetim Önceliği Yükseldi: {unit.name}</h4>
+                                <p className="text-sm text-red-700 mt-1">
+                                    Bu birimde <strong>{unit.failedControlCount}</strong> başarısız kontrol testi ve <strong>{unit.redKpiCount}</strong> kırmızı risk göstergesi var.
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {/* Capacity Analysis */}
             <div className="card mb-6 border-l-4 border-l-indigo-500 hover:shadow-md transition-shadow">

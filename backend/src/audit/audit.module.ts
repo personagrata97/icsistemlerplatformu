@@ -45,9 +45,10 @@ import { FollowUpService } from './follow-up.service';
 import { FollowUpController } from './follow-up.controller';
 import { ConciliationService } from './conciliation-new.service';
 import { ConciliationNewController } from './conciliation-new.controller';
+import { ControlModule } from '../control/control.module';
 
 @Module({
-    imports: [EmailModule, PharosModule, RiskEngineModule, NotificationModule],
+    imports: [EmailModule, PharosModule, RiskEngineModule, NotificationModule, ControlModule],
     controllers: [
         AuditController,
         TimesheetController,

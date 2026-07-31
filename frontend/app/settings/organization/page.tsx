@@ -4,10 +4,9 @@ import PageHeader from '@/components/ui/PageHeader';
 
 
 import { useState, useEffect } from 'react';
-import { Settings, Save, Plus, Edit2, Trash2, Home, Network, ChevronRight, ChevronDown } from 'lucide-react';
+import { Settings, Save, Plus, Edit2, Trash2, Home, Network, ChevronRight, ChevronDown, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/components/Toast';
-import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
 import Modal from '@/components/ui/Modal';
@@ -178,6 +177,12 @@ function OrganizationSettingsPageContent() {
 
     const renderTree = (nodes: OrgNode[], level = 0) => {
         return (
+            <div className={`space-y-2 ${level > 0 ? 'mt-2 ml-6 pl-4 border-l-2 border-gray-100' : ''}`}>
+                {nodes.map(node => {
+                    const hasChildren = node.children && node.children.length > 0;
+                    const isExpanded = expandedNodes.has(node.id);
+
+                    return (
                         <div key={node.id} className="animate-in fade-in zoom-in-95 duration-200">
                             <div
                                 className={`flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl hover:border-primary/30 hover:shadow-sm transition-all group ${hasChildren ? 'cursor-pointer' : ''}`}

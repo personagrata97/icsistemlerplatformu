@@ -1,6 +1,6 @@
+'use client';
 import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
-'use client';
 
 import React, { useState, useEffect } from 'react';
 import StatCard from '@/components/ui/StatCard';

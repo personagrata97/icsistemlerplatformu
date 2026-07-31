@@ -1,5 +1,5 @@
-import PageHeader from '@/components/ui/PageHeader';
 'use client';
+import PageHeader from '@/components/ui/PageHeader';
 import { useState, useEffect, useRef } from 'react';
 import { Suspense } from 'react';
 import { Search, Filter, Eye, ChevronDown, Download, RefreshCw, Plus, X, Edit2, MessageSquare, ExternalLink, UserPlus, LayoutDashboard, List, AlertTriangle, CheckCircle, Calendar } from 'lucide-react';

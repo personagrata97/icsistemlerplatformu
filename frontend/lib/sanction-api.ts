@@ -146,6 +146,15 @@ export const sanctionApi = {
         const res = await fetch(`${API_BASE_URL}/sanction/reputation/signals?${query.toString()}`, { headers: getHeaders() });
         if (!res.ok) return null;
         return res.json();
+    },
+
+    async createFindingFromMatch(matchId: string) {
+        const res = await fetch(`${API_BASE_URL}/sanction/matches/${matchId}/finding`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error('Failed to create finding from match');
+        return res.json();
     }
 };
 

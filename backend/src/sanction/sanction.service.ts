@@ -317,6 +317,70 @@ export class SanctionService {
         return match;
     }
 
+    async createFindingFromMatch(matchId: string, username: string = 'Sistem') {
+        const match = await this.prisma.sanctionMatch.findUnique({
+            where: { id: matchId },
+            include: { musteri: true, entity: { include: { list: true } } }
+        });
+        
+        if (!match) throw new Error('Eşleşme bulunamadı');
+        if (match.durum !== 'DOGRULANDI') throw new Error('Yalnızca doğrulanan eşleşmeler için bulgu oluşturulabilir');
+
+        // Find or create an audit to attach the finding to
+        let audit = await this.prisma.audit.findFirst({
+            where: { title: 'Mevzuat Uyum ve Yaptırım Kontrolleri', isDeleted: false }
+        });
+
+        if (!audit) {
+            audit = await this.prisma.audit.create({
+                data: {
+                    title: 'Mevzuat Uyum ve Yaptırım Kontrolleri',
+                    type: 'Mevzuat ve Uyum',
+                    status: 'Devam Ediyor',
+                    startDate: new Date().toISOString().split('T')[0],
+                    auditCode: 'UYUM-YAPTIRIM'
+                }
+            });
+        }
+
+        // Generate Finding Code
+        const currentYear = new Date().getFullYear();
+        const sequenceCount = await this.prisma.finding.count({
+            where: { code: { startsWith: `UYM-${currentYear}-` } }
+        });
+        const sequence = (sequenceCount + 1).toString().padStart(3, '0');
+        const findingCode = `UYM-${currentYear}-${sequence}`;
+        const matchData = match as any;
+        const titlePattern = `Yaptırım Listesi Eşleşmesi: ${matchData.musteriAd || match.musteri?.ad_soyad}`;
+
+        // Create Finding
+        const finding = await this.prisma.finding.create({
+            data: {
+                auditId: audit.id,
+                code: findingCode,
+                title: titlePattern,
+                risk: 'Kritik', // Yaptırım ihlali her zaman kritiktir
+                category: 'Yaptırım ve Ambargo',
+                status: 'Açık',
+                description: `Müşteri (${matchData.musteriAd || match.musteri?.ad_soyad} - TCKN: ${match.musteri?.tckn || '-'}) ile yaptırım listesindeki kayıt eşleşmiştir.\nListe: ${matchData.liste || matchData.entity?.list?.ad}\nSkor: %${match.skor}\nGerekçe: ${match.gerekce}\n\nLütfen eşleşmeye dair gerekli dondurma ve bildirim (MASAK) işlemlerini başlatınız.`,
+                department: 'Uyum ve Mevzuat',
+                criteria: 'MASAK 6415 sayılı Terörizmin Finansmanının Önlenmesi Hakkında Kanun, OFAC, AB Yaptırım Kuralları',
+                rootCause: 'Uluslararası yaptırım ve yerel izleme listelerinde eşleşme tespiti.',
+                recommendation: 'Malvarlığı dondurma süreci başlatılmalı ve yasal süresi içinde MASAK bildirimi (Şüpheli İşlem Bildirimi / Dondurma Bildirimi) yapılmalıdır.',
+                dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 gün
+            }
+        });
+
+        await this.createLog({
+            user: username,
+            category: 'YAPTIRIM_KARAR',
+            action: 'Bulgu Oluşturuldu',
+            details: `Eşleşme No ${matchId} için uyum bulgusu oluşturuldu: ${findingCode}`
+        });
+
+        return finding;
+    }
+
     async getLists() {
         const lists = await this.prisma.sanctionList.findMany({
             include: { _count: { select: { entities: true } } }

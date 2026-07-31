@@ -1,7 +1,6 @@
 import React, { InputHTMLAttributes, forwardRef } from 'react';
 import { clsx } from 'clsx';
 import { AlertCircle } from 'lucide-react';
-import DatePicker from './DatePicker';
 
 export interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -64,7 +63,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                                 {props.value || '-'}
                             </div>
                         ) : (
-                            <FormInput
+                            <input
                                 id={inputId}
                                 ref={ref}
                                 required={required}

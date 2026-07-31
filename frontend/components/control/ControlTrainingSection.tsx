@@ -1,6 +1,6 @@
+'use client';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
-'use client';
 
 import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';

@@ -1,5 +1,5 @@
-import PageHeader from '@/components/ui/PageHeader';
 'use client';
+import PageHeader from '@/components/ui/PageHeader';
 
 import React from 'react';
 import ControlTestingSection from '@/components/control/ControlTestingSection';

@@ -1,6 +1,6 @@
+'use client';
 import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
-'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
 
@@ -80,6 +80,15 @@ function SanctionResultsPageContent() {
         return true;
     });
 
+    const handleCreateFinding = async (item: any) => {
+        try {
+            await sanctionApi.createFindingFromMatch(item.id);
+            showToast('Denetim bulgusu başarıyla oluşturuldu.', 'success');
+        } catch (error) {
+            showToast('Bulgu oluşturulurken hata oluştu.', 'error');
+        }
+    };
+
     const handleClearAll = () => {
         setSearchTerm('');
         setStatusFilter('ALL');
@@ -154,11 +163,21 @@ function SanctionResultsPageContent() {
                     },
                     {
                         key: 'actions',
-                        header: 'Karar Ver',
-                        width: '140px',
+                        header: 'İşlemler',
+                        width: '180px',
                         align: 'center',
                         render: (item: any) => (
-                            <Button size="sm" variant="secondary" onClick={() => setSelectedMatch(item)}>İncele & Karar</Button>
+                            <div className="flex gap-2 justify-center">
+                                {item.durum === 'ACIK' && (
+                                    <Button size="sm" variant="secondary" onClick={() => setSelectedMatch(item)}>İncele & Karar</Button>
+                                )}
+                                {item.durum === 'DOGRULANDI' && (
+                                    <Button size="sm" variant="danger" onClick={() => handleCreateFinding(item)}>Bulgu Oluştur</Button>
+                                )}
+                                {item.durum !== 'ACIK' && item.durum !== 'DOGRULANDI' && (
+                                    <span className="text-xs text-gray-500">İşlem Yok</span>
+                                )}
+                            </div>
                         )
                     }
                 ]}

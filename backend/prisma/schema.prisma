@@ -2028,3 +2028,13 @@ model ControlSelfAssessment {
   @@index([isDeleted])
   @@map("control_self_assessment")
 }
+
+model AuditParameter {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+}

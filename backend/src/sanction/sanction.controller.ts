@@ -59,7 +59,13 @@ export class SanctionController {
     @Post('matches/:id/decide')
     async decideMatch(@Param('id') id: string, @Body() body: any, @Req() req: any) {
         const username = req.user?.displayName || req.user?.username || 'Sistem';
-        return this.sanctionService.decideMatch(id, body.decision, body.reason, username);
+        return this.sanctionService.decideMatch(id, body.decision || body.status, body.reason, username);
+    }
+
+    @Post('matches/:id/finding')
+    async createFindingFromMatch(@Param('id') id: string, @Req() req: any) {
+        const username = req.user?.displayName || req.user?.username || 'Sistem';
+        return this.sanctionService.createFindingFromMatch(id, username);
     }
 
     @Get('lists')

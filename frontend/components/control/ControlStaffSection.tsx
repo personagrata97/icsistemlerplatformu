@@ -1,6 +1,6 @@
+'use client';
 import UnitBadge from '@/components/ui/UnitBadge';
 import FormInput from '@/components/ui/FormInput';
-'use client';
 
 import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';

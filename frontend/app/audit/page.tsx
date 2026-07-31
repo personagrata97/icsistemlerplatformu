@@ -1,5 +1,5 @@
-import UnitBadge from '@/components/ui/UnitBadge';
 'use client';
+import UnitBadge from '@/components/ui/UnitBadge';
 import RequireRole from '@/components/auth/RequireRole';
 
 

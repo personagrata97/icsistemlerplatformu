@@ -1254,6 +1254,13 @@ export const auditApi = {
 
 
     // AUDITABLE UNITS (UNIVERSE)
+    getRiskyUnits: async () => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/risky-units`, {
+            headers: getHeaders(),
+        });
+        return handleResponse(res);
+    },
+
     getAuditableUnits: async (summaryOnly: boolean = true) => {
         const query = summaryOnly ? '?summary=true' : '';
         const res = await fetchWithTimeout(`${API_BASE_URL}/audit/units${query}`, { headers: getHeaders() });

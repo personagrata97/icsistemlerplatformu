@@ -1,5 +1,5 @@
-import PageHeader from '@/components/ui/PageHeader';
 'use client';
+import PageHeader from '@/components/ui/PageHeader';
 
 import React, { useState } from 'react';
 import StatCard from '@/components/ui/StatCard';

@@ -1,4 +1,3 @@
-import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 

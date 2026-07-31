@@ -1,7 +1,7 @@
+'use client';
 import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
-'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
 import { useState, useEffect } from 'react';
@@ -214,8 +214,7 @@ function AuditDetailPageContent({ params }: { params: { id: string } }) {
             checkIndependence();
         }
 
-        return () =>
-            <PageHeader title="Denetim Görev Detayı" subtitle="Seçili denetim görevinin çalışma kağıtları, bulguları ve ilerleme takibi" /> {
+        return () => {
             window.removeEventListener('openFindingModalFromInvestigation', handleOpenFindingModal);
         };
     }, [id, user?.id]);

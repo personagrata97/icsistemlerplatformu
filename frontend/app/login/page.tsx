@@ -1,7 +1,7 @@
-import FormInput from '@/components/ui/FormInput';
 'use client';
+import FormInput from '@/components/ui/FormInput';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/Toast';
 import { useRouter } from 'next/navigation';
@@ -18,7 +18,7 @@ export default function LoginPage() {
     const router = useRouter();
 
     // Clear stale session items when arriving at login page without redirect target
-    useState(() => {
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const redirectParam = params.get('redirect');
@@ -29,7 +29,7 @@ export default function LoginPage() {
                 document.cookie = 'access_token=; path=/; max-age=0; samesite=lax';
             }
         }
-    });
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

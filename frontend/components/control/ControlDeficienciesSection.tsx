@@ -1,5 +1,5 @@
-import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
+import FormTextarea from '@/components/ui/FormTextarea';
 
 import React, { useState, useEffect } from 'react';
 import DataTable from '@/components/ui/DataTable';

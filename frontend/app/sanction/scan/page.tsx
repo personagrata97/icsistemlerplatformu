@@ -1,6 +1,6 @@
+'use client';
 import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
-'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
 
