@@ -182,9 +182,7 @@ function ControlTrashPageContent() {
                                 <div>
                                     <h4 className="font-bold text-sm text-slate-900">{selectedItem.title}</h4>
                                     <p className="text-slate-500 font-medium mt-0.5">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${TYPE_COLORS[selectedItem.type]}`}>
-                                            {TYPE_LABELS[selectedItem.type]}
-                                        </span>
+                                        <StatusBadge value={TYPE_LABELS[selectedItem.type]} type="status" />
                                     </p>
                                 </div>
                             </div>

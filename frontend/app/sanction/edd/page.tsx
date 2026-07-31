@@ -215,9 +215,7 @@ function EnhancedDueDiligencePageContent() {
                             header: 'Risk Skoru',
                             width: '120px',
                             render: (item: any) => (
-                                <span className={`font-mono text-xs font-bold px-2 py-1 rounded ${item.riskPuani >= 85 ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
-                                    %{item.riskPuani}
-                                </span>
+                                <StatusBadge value={item.riskPuani >= 85 ? 'Yüksek' : 'Orta'} type="risk" />
                             )
                         },
                         {

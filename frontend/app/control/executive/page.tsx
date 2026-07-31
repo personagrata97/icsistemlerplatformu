@@ -161,7 +161,7 @@ function ControlExecutiveDashboardContent() {
                                     {item.acikEksiklik}
                                 </span>
                             ) },
-                            { key: 'egitimSaat', header: 'Eğitim (Saat)', width: '130px', render: (item: any) => <span className="font-mono text-xs font-bold text-slate-800 bg-blue-100 px-2 py-0.5 rounded">{item.egitimSaat}h</span> },
+                            { key: 'egitimSaat', header: 'Eğitim (Saat)', width: '130px', render: (item: any) => <StatusBadge value={`${item.egitimSaat}h`} type="status" /> },
                             { key: 'durum', header: 'Durum', width: '120px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> }
                         ]}
                         data={[

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, X, Save, Edit3, Info, Check } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import MoneyText from '@/components/ui/MoneyText';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/components/Toast';
 
@@ -167,7 +168,11 @@ export default function RiskLimitsModal({ isOpen, onClose, onSuccess }: RiskLimi
                                                     </div>
                                                 ) : (
                                                     <span>
-                                                        {limit.kpi?.birim === 'YUZDE' ? '%' : limit.kpi?.birim === 'TUTAR' ? '₺' : ''} {Number(limit.esik_deger).toFixed(2)} {limit.kpi?.birim === 'ORAN' ? 'Oran' : ''}
+                                                        {limit.kpi?.birim === 'TUTAR' ? (
+                                                            <MoneyText value={limit.esik_deger} />
+                                                        ) : (
+                                                            <>{limit.kpi?.birim === 'YUZDE' ? '%' : ''} {Number(limit.esik_deger).toFixed(2)} {limit.kpi?.birim === 'ORAN' ? 'Oran' : ''}</>
+                                                        )}
                                                     </span>
                                                 )}
                                             </td>

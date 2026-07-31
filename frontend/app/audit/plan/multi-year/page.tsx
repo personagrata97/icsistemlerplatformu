@@ -10,11 +10,11 @@ import { useRouter } from 'next/navigation';
 import { Calendar, Plus, FileText, Trash2, Edit2, CheckCircle, ChevronRight, Download, AlertCircle } from 'lucide-react';
 import { BackButton } from '@/components/ui/BackButton';
 import PageHeader from '@/components/ui/PageHeader';
+import StatusBadge from '@/components/ui/StatusBadge';
 import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
 import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
-import StatusBadge from '@/components/ui/StatusBadge';
 import DataTable from '@/components/ui/DataTable';
 import { clsx } from 'clsx';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -173,13 +173,7 @@ function MultiYearPlanPageContent() {
                                 >
                                     <div className="flex justify-between items-start mb-2">
                                         <div className="font-semibold text-gray-900">{plan.title}</div>
-                                        {/* Status Badge */}
-                                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${plan.status === 'Aktif' ? 'bg-green-100 text-green-700' :
-                                            plan.status === 'Onaylandı' ? 'bg-blue-100 text-blue-700' :
-                                                'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {plan.status}
-                                        </span>
+                                        <StatusBadge value={plan.status} type="status" />
                                     </div>
                                     <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
                                         <Calendar size={14} />

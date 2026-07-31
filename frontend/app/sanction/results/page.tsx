@@ -124,9 +124,7 @@ function SanctionResultsPageContent() {
                         header: 'Eşleşme Skoru',
                         width: '130px',
                         render: (item: any) => (
-                            <span className={`font-mono font-bold px-2 py-1 rounded text-xs ${item.skor >= 95 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
-                                %{item.skor}
-                            </span>
+                            <StatusBadge value={item.skor >= 95 ? 'KRİTİK' : 'ORTA'} type="risk" />
                         )
                     },
                     {

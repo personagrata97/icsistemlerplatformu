@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import DataUploadModal from '@/components/risk/DataUploadModal';
 import RiskLimitsModal from '@/components/risk/RiskLimitsModal';
 import StatCard from '@/components/ui/StatCard';
+import MoneyText from '@/components/ui/MoneyText';
 import { useToast } from '@/components/Toast';
 import DashboardWidget from '@/components/ui/DashboardWidget';
 import EmptyState from '@/components/ui/EmptyState';
@@ -326,15 +327,16 @@ function RiskCockpitPageContent() {
                             if (percentageKpis.includes(code)) {
                                 return `%${value.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                             }
-                            
                             return value.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                         };
+
+                        const isMoneyKpi = kpi.kpi_kodu === 'TESLIMAT_YUKUMLULUGU';
 
                         return (
                             <StatCard
                                 key={idx}
                                 title={kpiLabel}
-                                value={formatKpiValue(kpi.kpi_kodu, Number(kpi.deger))}
+                                value={isMoneyKpi ? <MoneyText value={kpi.deger} /> as any : formatKpiValue(kpi.kpi_kodu, Number(kpi.deger))}
                                 color={color}
                                 infoTooltip={kpiTooltip}
                             />

@@ -157,9 +157,7 @@ function RiskDashboardPageContent() {
                         header: 'Seviye',
                         width: '130px',
                         render: (item: any) => (
-                            <span className={`font-mono text-xs font-bold px-2 py-1 rounded ${item.seviye === 'KIRMIZI' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
-                                {item.seviye}
-                            </span>
+                            <StatusBadge value={item.seviye === 'KIRMIZI' ? 'RED' : 'YELLOW'} type="risk" />
                         )
                     },
                     {

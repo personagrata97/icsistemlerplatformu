@@ -10,6 +10,8 @@ import { BackButton } from '@/components/ui/BackButton';
 import CustomSelect from '@/components/ui/CustomSelect';
 import FormInput from '@/components/ui/FormInput';
 import CodeBadge from '@/components/ui/CodeBadge';
+import PageHeader from '@/components/ui/PageHeader';
+import StatusBadge from '@/components/ui/StatusBadge';
 import { useAuth } from '@/context/AuthContext';
 import { checkRole, ROLES } from '@/lib/auth-constants';
 import { auditApi } from '@/lib/audit-api';
@@ -21,7 +23,6 @@ import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
 import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
-import StatusBadge from '@/components/ui/StatusBadge';
 import Badge from '@/components/ui/Badge';
 
 // Risk renkleri - Düşük=Sarı, Orta=Turuncu, Yüksek=Kırmızı, Kritik=Bordo
@@ -567,9 +568,7 @@ function UnitRcmPageContent() {
                                     <Activity className="w-5 h-5 text-blue-600" />
                                     <span className="font-semibold text-lg text-gray-800">{proc.name}</span>
                                     {proc.owner && (
-                                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                            Süreç Sahibi: {proc.owner}
-                                        </span>
+                                        <StatusBadge value={proc.owner} type="status" />
                                     )}
                                 </div>
                                 {canManage && (

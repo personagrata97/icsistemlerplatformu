@@ -4,10 +4,10 @@ import RequireRole from '@/components/auth/RequireRole';
 
 import { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
+import StatusBadge from '@/components/ui/StatusBadge';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import DataTable from '@/components/ui/DataTable';
-import StatusBadge from '@/components/ui/StatusBadge';
 import Button from '@/components/ui/Button';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -134,9 +134,7 @@ function SanctionDashboardPageContent() {
                         header: 'Eşleşme Skoru',
                         width: '130px',
                         render: (item: any) => (
-                            <span className={`font-mono font-bold px-2 py-1 rounded text-xs ${item.skor >= 95 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
-                                %{item.skor}
-                            </span>
+                            <StatusBadge value={item.skor >= 95 ? 'KRİTİK' : 'ORTA'} type="risk" />
                         )
                     },
                     {

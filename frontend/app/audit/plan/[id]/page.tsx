@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { auditApi } from '@/lib/audit-api';
+import StatusBadge from '@/components/ui/StatusBadge';
+import PageToolbar from '@/components/ui/PageToolbar';
 import Tooltip from '@/components/ui/Tooltip';
 import LoadingState from '@/components/ui/LoadingState';
 import Link from 'next/link';
@@ -25,7 +27,6 @@ import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
 import DataTable from '@/components/ui/DataTable';
-import StatusBadge from '@/components/ui/StatusBadge';
 import { clsx } from 'clsx';
 import EmptyState from '@/components/ui/EmptyState';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
@@ -276,12 +277,8 @@ function AuditPlanDetailPageContent() {
                 <div className="flex-1">
                     <div className="flex items-center gap-3 flex-wrap">
                         <h1 className="text-2xl font-bold text-gray-900">{plan.title}</h1>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${PLAN_TYPE_COLORS[plan.planType] || 'bg-gray-100'}`}>
-                            {plan.planType || 'Plan'}
-                        </span>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${STATUS_COLORS[plan.status] || 'bg-gray-100'}`}>
-                            {plan.status}
-                        </span>
+                        <StatusBadge value={plan.planType || 'Yıllık Plan'} type="plan-type" />
+                        <StatusBadge value={plan.status} type="status" />
                     </div>
                     <div className="flex gap-4 mt-2 text-sm text-gray-500">
                         <div className="flex items-center gap-1.5"><Calendar size={14} className="text-primary" /> {plan.year}</div>

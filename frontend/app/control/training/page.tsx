@@ -158,9 +158,9 @@ function ControlTrainingPageContent() {
                                 </div>
                             </div>
                         ) },
-                        { key: 'tamamlanan', header: 'Tamamlanan', width: '110px', render: (item: any) => <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">{item.tamamlanan}</span> },
-                        { key: 'planlanan', header: 'Planlanan', width: '110px', render: (item: any) => <span className="font-mono text-xs font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded">{item.planlanan}</span> },
-                        { key: 'sertifika', header: 'Sertifika', width: '110px', render: (item: any) => <span className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${item.sertifika > 0 ? 'bg-purple-100 text-purple-800' : 'bg-slate-100 text-slate-500'}`}>{item.sertifika}</span> },
+                        { key: 'tamamlanan', header: 'Tamamlanan', width: '110px', render: (item: any) => <StatusBadge value="Tamamlandı" type="status" /> },
+                        { key: 'planlanan', header: 'Planlanan', width: '110px', render: (item: any) => <StatusBadge value="Planlandı" type="status" /> },
+                        { key: 'sertifika', header: 'Sertifika', width: '110px', render: (item: any) => <StatusBadge value={item.sertifika > 0 ? 'Onaylandı' : 'Taslak'} type="approval" /> },
                         { key: 'actions', header: 'İncele', width: '90px', render: (item: any) => (
                             <Button variant="secondary" size="sm" leftIcon={<Eye size={14} />} onClick={() => setSelectedPerson(item)}>Detay</Button>
                         ) }

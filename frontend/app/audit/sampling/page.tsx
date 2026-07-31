@@ -10,8 +10,8 @@ import {
 import * as XLSX from 'xlsx';
 import { useToast } from '@/components/Toast';
 import PageHeader from '@/components/ui/PageHeader';
-import ConfirmModal from '@/components/ConfirmModal';
 import StatusBadge from '@/components/ui/StatusBadge';
+import ConfirmModal from '@/components/ConfirmModal';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -797,25 +797,11 @@ function SamplingPageContent() {
                                     </div>
                                     <div>
                                         <div className="text-xs text-gray-500">Örneklem Yeterliliği</div>
-                                        <span className={`px-3 py-1 rounded text-sm font-bold ${selectedPlan.sampleAdequacy === 'Yeterli'
-                                            ? 'bg-green-100 text-green-700'
-                                            : selectedPlan.sampleAdequacy === 'Yetersiz'
-                                                ? 'bg-red-100 text-red-700'
-                                                : 'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {selectedPlan.sampleAdequacy || '-'}
-                                        </span>
+                                        <StatusBadge value={selectedPlan.sampleAdequacy || '-'} type="status" />
                                     </div>
                                     <div>
                                         <div className="text-xs text-gray-500">Kanaat</div>
-                                        <span className={`px-3 py-1 rounded text-sm font-bold ${selectedPlan.conclusions === 'Kabul'
-                                            ? 'bg-green-100 text-green-700'
-                                            : selectedPlan.conclusions === 'Red'
-                                                ? 'bg-red-100 text-red-700'
-                                                : 'bg-blue-100 text-blue-700'
-                                            }`}>
-                                            {selectedPlan.conclusions || '-'}
-                                        </span>
+                                        <StatusBadge value={selectedPlan.conclusions || '-'} type="result" />
                                     </div>
                                 </div>
 

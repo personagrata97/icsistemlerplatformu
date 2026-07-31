@@ -111,9 +111,7 @@ function SanctionHistoryPageContent() {
                         width: '140px',
                         align: 'center',
                         render: (item: any) => (
-                            <span className={`font-mono text-xs font-bold px-2.5 py-1 rounded ${item.eslesme > 0 ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700'}`}>
-                                {item.eslesme} Eşleşme
-                            </span>
+                            <StatusBadge value={item.eslesme > 0 ? 'İhlal' : 'Tamamlandı'} type="status" />
                         )
                     },
                     {
