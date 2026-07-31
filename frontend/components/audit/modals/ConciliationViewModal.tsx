@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MessageSquare, FileText, Target, AlertCircle, Calendar, User, Search, CheckCircle, XCircle, Send } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
+import DateDisplay from '@/components/ui/DateDisplay';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { auditApi, Finding } from '@/lib/audit-api';
 import LoadingState from '@/components/ui/LoadingState';
@@ -177,7 +178,7 @@ export default function ConciliationViewModal({ isOpen, onClose, selectedItem, o
                                     <div key={idx} className={`p-4 rounded-xl border ${msg.senderRole === 'Auditor' ? 'bg-blue-50/50 border-blue-100 ml-8' : 'bg-gray-50 border-gray-200 mr-8'}`}>
                                         <div className="flex justify-between items-center mb-2">
                                             <span className="text-xs font-bold text-gray-700">{msg.senderName} ({msg.senderRole})</span>
-                                            <span className="text-[10px] text-gray-500">{new Date(msg.created_at).toLocaleString('tr-TR')}</span>
+                                            <DateDisplay value={msg.created_at} format="datetime" className="text-[10px] text-gray-500" />
                                         </div>
                                         <p className="text-sm text-gray-800 whitespace-pre-wrap">{msg.message}</p>
 

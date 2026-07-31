@@ -7,17 +7,12 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { auditApi } from '@/lib/audit-api';
 import {
-    Mail,
-    Phone,
-    Calendar,
-    TrendingUp,
-    Shield,
-    Printer,
+    Phone, Mail, Award, Calendar, Shield, Briefcase, GraduationCap, ArrowLeft, Printer, FileText, Globe, MapPin, User, ChevronRight, TrendingUp,
     Users,
-    Award,
     AlertCircle,
     BookOpen
 } from 'lucide-react';
+import DateDisplay from '@/components/ui/DateDisplay';
 import { formatDate } from '@/lib/audit-utils';
 import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';
@@ -514,8 +509,10 @@ function StaffProfilePageContent() {
                 {/* Alt Bilgi - Yazdırma İçin Optimize */}
                 <div className="p-4 bg-gray-50 border-t border-gray-100 text-center print-footer print:bg-white print:fixed print:bottom-0 print:left-0 print:right-0 print:z-[1000] print:py-3">
                     <div className="flex flex-col gap-1 px-5">
-                        <p className="text-[11px] text-gray-500 italic leading-relaxed font-medium print:text-black">
-                            Bu belge, İç Sistemler Platformu - Teftiş Kurulu Modülü üzerinden, {creationReason ? `"${String(creationReason)}"` : 'Yasal Mevzuat ve Kurumsal Denetim hazırlığı'} nedeniyle {String(user?.displayName || user?.username || 'Sistem Yönetici')} tarafından {new Date().toLocaleDateString('tr-TR')} {new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} tarihinde oluşturulmuştur.
+                        <p className="text-[11px] text-gray-500 italic leading-relaxed font-medium print:text-black flex items-center justify-center gap-1 flex-wrap">
+                            <span>Bu belge, İç Sistemler Platformu - Teftiş Kurulu Modülü üzerinden, {creationReason ? `"${String(creationReason)}"` : 'Yasal Mevzuat ve Kurumsal Denetim hazırlığı'} nedeniyle {String(user?.displayName || user?.username || 'Sistem Yönetici')} tarafından</span>
+                            <DateDisplay value={new Date()} format="datetime" className="italic font-bold" />
+                            <span>tarihinde oluşturulmuştur.</span>
                         </p>
                         <div className="flex justify-between items-center text-[10px] text-gray-400 font-mono mt-2 border-t border-gray-100 pt-1.5 print:border-gray-200">
                             <span className="hidden print:block">{currentUrl}</span>

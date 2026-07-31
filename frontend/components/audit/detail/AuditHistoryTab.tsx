@@ -4,7 +4,8 @@ import React from 'react';
 import { formatDateTime } from '@/lib/audit-utils';
 import Timeline, { TimelineEvent, TimelineActionType } from '@/components/ui/Timeline';
 import SectionHeader from '@/components/ui/SectionHeader';
-import { ArrowRight, Clock } from 'lucide-react';
+import { Clock, User, FileEdit, CheckCircle2, History, AlertCircle, ArrowRight } from 'lucide-react';
+import DateDisplay from '@/components/ui/DateDisplay';
 
 interface AuditLog {
     id: string;
@@ -175,14 +176,8 @@ const AuditHistoryTab: React.FC<AuditHistoryTabProps> = ({
                             } else {
                                 displayVal = JSON.stringify(parsedVal);
                             }
-                        } else if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
-                            try {
-                                const dateObj = new Date(val);
-                                displayVal = dateObj.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                            } catch(e) {}
-                        } else if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                            const parts = val.split('-');
-                            displayVal = `${parts[2]}.${parts[1]}.${parts[0]}`;
+                        } else if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}/)) {
+                            displayVal = <DateDisplay value={val} className="text-slate-600 font-medium" /> as any;
                         }
                         if (displayVal.length > 150) displayVal = displayVal.substring(0, 150) + '...';
                         

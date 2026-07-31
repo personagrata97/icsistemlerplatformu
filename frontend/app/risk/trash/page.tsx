@@ -8,6 +8,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import ConfirmModal from '@/components/ConfirmModal';
+import DateDisplay from '@/components/ui/DateDisplay';
 import CodeBadge from '@/components/ui/CodeBadge';
 import StatusBadge from '@/components/ui/StatusBadge';
 import ActionMenu from '@/components/ui/ActionMenu';
@@ -188,7 +189,7 @@ function RiskTrashPageContent() {
                             </div>
                             <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
                                 <span className="text-slate-500 font-medium block">Silinme Tarihi</span>
-                                <span className="font-bold text-slate-900">{new Date(selectedItem.deletedAt).toLocaleDateString('tr-TR')}</span>
+                                <DateDisplay value={selectedItem.deletedAt} className="font-bold text-slate-900" />
                             </div>
                         </div>
                         <div className="flex justify-end gap-2 pt-3 border-t">

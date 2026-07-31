@@ -4,6 +4,7 @@ import RequireRole from '@/components/auth/RequireRole';
 
 import React, { useState } from 'react';
 import { Bell, Check, AlertTriangle, Info, CheckCheck, Trash2 } from 'lucide-react';
+import DateDisplay from '@/components/ui/DateDisplay';
 import Button from '@/components/ui/Button';
 import PageToolbar from '@/components/ui/PageToolbar';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
@@ -202,9 +203,7 @@ function ControlNotificationsPageContent() {
                                         </h4>
                                         <div className="flex items-center gap-2 shrink-0">
                                             <span className="text-[10px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{notification.category}</span>
-                                            <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">
-                                                {new Date(notification.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                            </span>
+                                            <DateDisplay value={notification.createdAt} format="datetime" className="text-[10px] text-slate-400 font-medium whitespace-nowrap" />
                                             <button
                                                 className="p-1 text-slate-300 hover:text-rose-500 transition-colors rounded"
                                                 onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }}

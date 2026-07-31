@@ -5,6 +5,7 @@ import RequireRole from '@/components/auth/RequireRole';
 import React, { useState, useEffect } from 'react';
 import StaffTabs from '@/components/audit/staff/StaffTabs';
 import PageHeader from '@/components/ui/PageHeader';
+import DateDisplay from '@/components/ui/DateDisplay';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
@@ -287,7 +288,7 @@ function IndependencePageContent() {
                                 </div>
                                 <div className="p-3 bg-white border border-slate-100 rounded-lg shadow-sm">
                                     <div className="text-xs text-slate-500 font-medium mb-1">İmza Tarihi</div>
-                                    <div className="font-bold text-slate-700">{selectedStaff.date ? new Date(selectedStaff.date).toLocaleDateString('tr-TR') : '-'}</div>
+                                    <DateDisplay value={selectedStaff.date} className="font-bold text-slate-700" />
                                 </div>
                             </div>
                             <div className="p-3 bg-white border border-slate-100 rounded-lg shadow-sm">

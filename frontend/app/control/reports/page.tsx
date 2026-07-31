@@ -10,6 +10,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
+import DateDisplay from '@/components/ui/DateDisplay';
 import CustomSelect from '@/components/ui/CustomSelect';
 import ActionMenu from '@/components/ui/ActionMenu';
 import { FileBarChart, CheckCircle2, Download, Plus, Eye, Trash2, Send, FileText, Printer } from 'lucide-react';
@@ -127,7 +128,7 @@ function ControlReportsPageContent() {
                             </div>
                             <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
                                 <span className="text-slate-500 font-medium block">Rapor Tarihi</span>
-                                <span className="font-bold text-slate-900">{new Date(selectedReport.tarih).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+                                <DateDisplay value={selectedReport.tarih} className="font-bold text-slate-900" />
                             </div>
                         </div>
                         <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">

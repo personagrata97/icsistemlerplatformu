@@ -10,6 +10,7 @@ import Pagination from '@/components/ui/Pagination';
 
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
+import MoneyText from '@/components/ui/MoneyText';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Modal from '@/components/ui/Modal';
 import { formatDate } from '@/lib/audit-utils';
@@ -138,7 +139,7 @@ function ContractsPageContent() {
                             <div className="flex flex-col items-end">
                                 <div className="text-sm font-black text-slate-900 flex items-center gap-1.5">
                                     <Wallet size={14} className="text-slate-400" />
-                                    ₺{Number(contract.toplam_tutar).toLocaleString('tr-TR', { minimumFractionDigits: 0 })}
+                                    <MoneyText value={contract.toplam_tutar} />
                                 </div>
                                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Tutar</div>
                             </div>
@@ -282,9 +283,7 @@ function ContractsPageContent() {
                             <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div>
                                     <div className="text-gray-400 text-xs mb-0.5">Toplam Tutar</div>
-                                    <div className="font-black text-gray-900 text-base">
-                                        ₺{Number(selectedContract.toplam_tutar || 0).toLocaleString('tr-TR')}
-                                    </div>
+                                    <MoneyText value={selectedContract.toplam_tutar} className="text-base" />
                                 </div>
                                 <div>
                                     <div className="text-gray-400 text-xs mb-0.5">Vade</div>
@@ -298,9 +297,7 @@ function ContractsPageContent() {
                                 </div>
                                 <div>
                                     <div className="text-gray-400 text-xs mb-0.5">Kalan Bakiye</div>
-                                    <div className="font-bold text-gray-800">
-                                        ₺{Number(selectedContract.kalan_bakiye || 0).toLocaleString('tr-TR')}
-                                    </div>
+                                    <MoneyText value={selectedContract.kalan_bakiye} />
                                 </div>
                             </div>
                         </div>

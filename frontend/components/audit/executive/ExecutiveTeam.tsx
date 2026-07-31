@@ -13,6 +13,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Alert from '@/components/ui/Alert';
 import { Calendar, CheckSquare, Clock, UserCheck, Users, XCircle, Target, Activity, CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
+import DateDisplay from '@/components/ui/DateDisplay';
 import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
 
@@ -313,7 +314,7 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                                     rightContent={
                                         <div className="text-right flex flex-col items-end">
                                             <span className="text-xs text-slate-400 font-medium">Tarih</span>
-                                            <span className="text-sm font-bold text-slate-700">{new Date(d.createdAt).toLocaleDateString('tr-TR')}</span>
+                                            <DateDisplay value={d.createdAt} className="text-sm font-bold text-slate-700" />
                                         </div>
                                     }
                                 />
@@ -345,7 +346,7 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                                 status="Kapalı"
                                 rightContent={
                                     <div className="text-right flex flex-col items-end">
-                                        <span className="text-sm font-bold text-slate-700">{new Date(l.eDate).toLocaleDateString('tr-TR')}</span>
+                                        <DateDisplay value={l.eDate} className="text-sm font-bold text-slate-700" />
                                     </div>
                                 }
                             />
@@ -376,9 +377,7 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                                 rightContent={
                                     <div className="text-right flex flex-col items-end">
                                         <span className="text-xs text-slate-400 font-medium">Tarih Aralığı</span>
-                                        <span className="text-sm font-bold text-slate-700">
-                                            {new Date(l.sDate).toLocaleDateString('tr-TR').slice(0, 5)} - {new Date(l.eDate).toLocaleDateString('tr-TR')}
-                                        </span>
+                                        <DateDisplay value={l.sDate} endDate={l.eDate} className="text-sm font-bold text-slate-700" />
                                     </div>
                                 }
                             />

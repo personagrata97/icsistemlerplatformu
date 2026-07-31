@@ -4,8 +4,9 @@ import { Calendar } from 'lucide-react';
 export type DateFormatOption = 'date' | 'datetime' | 'relative' | Intl.DateTimeFormatOptions;
 
 export interface DateDisplayProps {
-    date: string | Date | number | null | undefined;
-    endDate?: string | Date | number | null | undefined;
+    date?: string | Date | number | null;
+    value?: string | Date | number | null;
+    endDate?: string | Date | number | null;
     showIcon?: boolean;
     className?: string;
     iconSize?: number;
@@ -14,13 +15,16 @@ export interface DateDisplayProps {
 
 export const DateDisplay: React.FC<DateDisplayProps> = ({
     date,
+    value,
     endDate,
-    showIcon = true,
+    showIcon = false,
     className = '',
     iconSize = 14,
     format = 'date',
 }) => {
-    if (!date) return <span className={`text-slate-400 font-mono ${className}`}>-</span>;
+    const rawDate = date !== undefined ? date : value;
+
+    if (!rawDate) return <span className={`text-slate-400 font-mono ${className}`}>-</span>;
 
     const formatDateValue = (d: string | Date | number): string => {
         try {
@@ -59,15 +63,19 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
         }
     };
 
-    const dateStr = formatDateValue(date);
+    const dateStr = formatDateValue(rawDate);
     if (dateStr === '-') return <span className={`text-slate-400 font-mono ${className}`}>-</span>;
 
     const endDateStr = endDate ? formatDateValue(endDate) : null;
     const finalStr = endDateStr && endDateStr !== '-' ? `${dateStr} - ${endDateStr}` : dateStr;
 
+    if (!showIcon) {
+        return <span className={`whitespace-nowrap font-medium font-mono text-sm ${className}`}>{finalStr}</span>;
+    }
+
     return (
         <div className={`flex items-center gap-1.5 text-slate-600 ${className}`}>
-            {showIcon && <Calendar size={iconSize} className="text-slate-400 shrink-0" />}
+            <Calendar size={iconSize} className="text-slate-400 shrink-0" />
             <span className="whitespace-nowrap font-medium text-sm">{finalStr}</span>
         </div>
     );

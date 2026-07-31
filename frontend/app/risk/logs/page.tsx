@@ -13,6 +13,7 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import Modal from '@/components/ui/Modal';
 import { formatDate } from '@/lib/audit-utils';
 import ActionMenu from '@/components/ui/ActionMenu';
+import DateDisplay from '@/components/ui/DateDisplay';
 
 import PageToolbar from '@/components/ui/PageToolbar';
 import PageHeader from '@/components/ui/PageHeader';
@@ -189,7 +190,7 @@ function RiskLogsPageContent() {
                             />
                             <div>
                                 <h4 className="font-bold text-gray-900 text-lg leading-tight">{selectedLog.action}</h4>
-                                <p className="text-gray-500 text-sm mt-1">{new Date(selectedLog.date).toLocaleString('tr-TR')}</p>
+                                <DateDisplay value={selectedLog.date} format="datetime" className="text-gray-500 text-sm mt-1" />
                             </div>
                         </div>
 
