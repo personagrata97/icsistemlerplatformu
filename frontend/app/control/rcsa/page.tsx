@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -57,6 +58,7 @@ function ControlRCSAPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Birim Öz Değerlendirmeleri (RCSA)" subtitle="İş birimlerinin kendi süreç içi risk ve kontrollerini dönemsel değerlendirme modülü" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Aktif Dönem Formları" value={selfAssessments.length} icon={FileCheck} color="blue" />
                 <StatCard title="Tamamlanma Oranı" value="%88" icon={CheckCircle2} color="emerald" />

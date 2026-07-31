@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 
 import React from 'react';
@@ -7,6 +8,7 @@ import RequireRole from '@/components/auth/RequireRole';
 function ControlDeficienciesPageContent() {
     return (
         <div className="space-y-6">
+            <PageHeader title="Eksiklik Takibi" subtitle="Kontrol testlerinde tespit edilen yetersizlikler, aksiyon planları ve kapatma süreçleri" />
             <ControlDeficienciesSection />
         </div>
     );

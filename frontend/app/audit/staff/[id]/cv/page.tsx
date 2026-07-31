@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -75,6 +76,7 @@ function StaffOzgecmisLegacyPageContent() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 print:bg-white print:pb-0">
+            <PageHeader title="Müfettiş Özgeçmişi" subtitle="Müfettişin mesleki geçmişi, sertifikaları ve eğitim kayıtları" />
             {/* Üst Eylem Çubuğu - Yazdırmada Gizli */}
             <div className="bg-white border-b sticky top-0 z-10 print:hidden">
                 <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">

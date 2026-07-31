@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -133,6 +134,7 @@ function EnhancedDueDiligencePageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Genişletilmiş Durum Tespiti (EDD)" subtitle="Yüksek riskli müşteriler ve PEP kayıtları için detaylı araştırma ve EDD raporlama" />
             <div className="bg-gradient-to-r from-red-900 to-slate-900 text-white rounded-2xl p-6 shadow-md flex justify-between items-center">
                 <div>
                     <h2 className="text-xl font-bold">Genişletilmiş Durum Tespiti (EDD) ve İtibar Riski Yönetimi</h2>

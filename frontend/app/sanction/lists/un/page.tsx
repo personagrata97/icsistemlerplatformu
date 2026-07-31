@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -77,6 +78,7 @@ function UnListPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Birleşmiş Milletler (UN) Listesi" subtitle="BM Güvenlik Konseyi konsolide yaptırım kararları ve terör listeleri" />
             <PageToolbar
                 searchPlaceholder="UN Ref No veya İsim ile ara..."
                 searchValue={searchTerm}

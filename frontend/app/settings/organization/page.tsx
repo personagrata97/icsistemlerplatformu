@@ -1,5 +1,6 @@
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
+import PageHeader from '@/components/ui/PageHeader';
 
 
 import { useState, useEffect } from 'react';
@@ -177,12 +178,6 @@ function OrganizationSettingsPageContent() {
 
     const renderTree = (nodes: OrgNode[], level = 0) => {
         return (
-            <div className={`space-y-2 ${level > 0 ? 'mt-2 ml-6 pl-4 border-l-2 border-gray-100' : ''}`}>
-                {nodes.map(node => {
-                    const hasChildren = node.children && node.children.length > 0;
-                    const isExpanded = expandedNodes.has(node.id);
-
-                    return (
                         <div key={node.id} className="animate-in fade-in zoom-in-95 duration-200">
                             <div
                                 className={`flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl hover:border-primary/30 hover:shadow-sm transition-all group ${hasChildren ? 'cursor-pointer' : ''}`}
@@ -256,28 +251,22 @@ function OrganizationSettingsPageContent() {
     };
 
     return (
-        <div className="p-8 max-w-[1400px] mx-auto pb-24">
-
-            <div className="flex items-center justify-between gap-4 mb-8">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white shadow-sm border border-gray-100 rounded-xl flex items-center justify-center">
-                        <Settings className="w-6 h-6 text-primary" />
+        <div className="space-y-6">
+            <PageHeader
+                title="Teşkilat Şeması & Birim Yönetimi"
+                subtitle="Kurum içi genel müdürlük, başkanlık, müdürlük ve servis hiyerarşisini yönetin"
+                icon={<Settings className="w-6 h-6 text-primary" />}
+                actions={
+                    <div className="flex items-center gap-3">
+                        <Link href="/settings" className="btn btn-secondary gap-2">
+                            <ArrowLeft size={16} /> Ayarlara Dön
+                        </Link>
+                        <Button onClick={handleCreateRoot} variant="primary" leftIcon={<Plus size={18} />}>
+                            Kök Birim Ekle
+                        </Button>
                     </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Organizasyon Yapısı</h1>
-                        <p className="text-gray-500 text-sm">Kurum içi genel müdürlük, başkanlık, müdürlük ve servis hiyerarşisini yönetin</p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Link
-                        href="/settings"
-                        className="btn btn-secondary gap-2"
-                    >
-                        <Settings className="w-5 h-5" />
-                        <span className="font-medium text-sm">Diğer Ayarlar</span>
-                    </Link>
-                </div>
-            </div>
+                }
+            />
 
             <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
                 <div className="flex justify-between items-center mb-6 pb-6 border-b border-gray-100">

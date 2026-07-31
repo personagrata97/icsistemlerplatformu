@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 
 import React, { useState } from 'react';
@@ -188,6 +189,7 @@ function RiskStaffPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Risk Yönetimi Ekibi" subtitle="Risk analistleri, risk yönetimi kadrosu ve yetki tanımları" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard title="Toplam Risk Kadrosu" value={staffList.length} icon={Users} color="blue" />
                 <StatCard title="Sertifikalı Uzmanlar (FRM/CFA)" value={staffList.filter(s => s.certifications.length > 0).length} icon={Award} color="purple" />

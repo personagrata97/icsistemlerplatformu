@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -372,6 +373,7 @@ function ControlStaffPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Denetçi Kadrosu (BKS)" subtitle="İç Kontrol Denetçileri ve Birim Kontrol Sorumlularının (BKS) görev ve yetki yönetimi" />
             <ControlStaffTabs />
 
             {/* Stat Cards */}

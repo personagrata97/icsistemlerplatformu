@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 
@@ -102,6 +103,7 @@ function ControlConciliationPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Mutabakat ve Tebliğ" subtitle="Tespit edilen kontrol eksikliklerinin ilgili birimlerle mutabakatı ve resmi bildirim takibi" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Mutabakata Gönderilenler" value={pendingConciliation} icon={Send} color="blue" />
                 <StatCard title="Uzlaşılan Eksiklikler" value={agreedCount} icon={CheckCircle2} color="emerald" />

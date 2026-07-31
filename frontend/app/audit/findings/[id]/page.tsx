@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -472,6 +473,7 @@ function FindingDetailPageContent() {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-64">
+            <PageHeader title="Bulgu Detayı" subtitle="Bulgunun kök neden analizi, kanıt belgeleri ve aksiyon geçmişi" />
                 <div className="flex justify-center p-12">
                     <LoadingState message="Bulgu detayları yükleniyor..." />
                 </div>

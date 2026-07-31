@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -151,6 +152,7 @@ function ControlSkillsPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Yetkinlik Matrisi & Kalite" subtitle="Denetçi uzmanlık alanları, kalite güvence puanları ve yetkinlik boşluk analizi" />
             <ControlStaffTabs />
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

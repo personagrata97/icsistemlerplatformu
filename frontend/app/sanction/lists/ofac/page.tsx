@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -78,6 +79,7 @@ function OfacListPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="OFAC Listesi" subtitle="ABD Hazine Bakanlığı Yabancı Varlıkları Kontrol Ofisi yaptırım veri tabanı" />
             <PageToolbar
                 searchPlaceholder="SDN ID, İsim veya Program Kodu ara..."
                 searchValue={searchTerm}

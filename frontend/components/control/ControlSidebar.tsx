@@ -17,43 +17,9 @@ import {
     Send,
     Shield
 } from 'lucide-react';
-import { useAuditTitle } from '@/context/AuditTitleContext';
-
-const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
-    '/control': { title: 'Ana Panel', subtitle: 'İç Kontrol genel performans göstergeleri ve durum takibi' },
-    '/control/executive': { title: 'Yönetici Paneli', subtitle: 'Üst yönetim özet göstergeleri ve stratejik iç kontrol metriklerinin takibi' },
-    '/control/staff': { title: 'Denetçi Kadrosu (BKS)', subtitle: 'İç Kontrol Denetçi kadrosu ve Birim Kontrol Sorumluları (BKS) yönetimi' },
-    '/control/inventory': { title: 'Süreç & Kontrol Envanteri', subtitle: 'Tüm operasyonel süreçlerde tanımlı kontrol noktaları ve etkinlik matrisi' },
-    '/control/rcsa': { title: 'Birim Öz Değerlendirmeleri', subtitle: 'İş birimlerinin kendi süreç içi kontrollerini dönemsel değerlendirdiği öz değerlendirme modülü' },
-    '/control/testing': { title: 'Kontrol Testleri & Saha', subtitle: 'İç Kontrol Denetçileri tarafından gerçekleştirilen tasarım ve işletim etkinlik testleri' },
-    '/control/deficiencies': { title: 'Eksiklik Takibi', subtitle: 'Süreç içi kontrol testlerinde tespit edilen eksiklikler ve düzeltici aksiyon planları' },
-    '/control/conciliation': { title: 'Mutabakat ve Tebliğ', subtitle: 'Tespit edilen kontrol eksikliklerinin sorumlu birimlerle mutabakatı ve resmi tebliğ takibi' },
-    '/control/reports': { title: 'Raporlar', subtitle: 'Üst Yönetim ve Denetim Komitesi sunumuna hazır Dönem Raporları' },
-    '/control/skills': { title: 'Yetkinlik Matrisi & Kalite', subtitle: 'İç Kontrol Denetçilerinin uzmanlık alanları ve yetkinlik matrislerinin yönetimi' },
-    '/control/training': { title: 'Eğitim Kataloğu & CPE', subtitle: 'İç Kontrol personeli ve Birim Kontrol Sorumluları için eğitim programları' },
-};
-
 export default function ControlSidebar() {
     const pathname = usePathname();
-    const { setTitle, setSubtitle } = useAuditTitle();
-
     const isActive = (path: string) => pathname === path || (path !== '/control' && pathname.startsWith(path));
-
-    useEffect(() => {
-        let pageInfo = PAGE_TITLES[pathname];
-        if (!pageInfo) {
-            const pathParts = pathname.split('/');
-            if (pathParts.length > 2) {
-                const parentPath = pathParts.slice(0, 3).join('/');
-                pageInfo = PAGE_TITLES[parentPath];
-            }
-        }
-
-        if (pageInfo) {
-            setTitle(pageInfo.title);
-            setSubtitle(pageInfo.subtitle || '');
-        }
-    }, [pathname, setTitle, setSubtitle]);
 
     return (
         <aside className="sidebar flex flex-col h-screen overflow-hidden bg-white border-r shadow-sm z-50">

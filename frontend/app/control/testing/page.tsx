@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 
 import React from 'react';
@@ -7,6 +8,7 @@ import RequireRole from '@/components/auth/RequireRole';
 function ControlTestingPageContent() {
     return (
         <div className="space-y-6">
+            <PageHeader title="Kontrol Testleri & Saha" subtitle="Tasarım ve işletim etkinlik testlerinin yürütülmesi, kanıt toplanması ve değerlendirilmesi" />
             <ControlTestingSection />
         </div>
     );

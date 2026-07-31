@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -255,6 +256,7 @@ function AuditPlanDetailPageContent() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
+            <PageHeader title="Plan Detayı" subtitle="Seçili denetim planının kapsadığı görevler ve kaynak dağılımı" />
                 <LoadingState message="Plan detayları yükleniyor..." />
             </div>
         );

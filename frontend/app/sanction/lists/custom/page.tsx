@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -97,6 +98,7 @@ function CustomListPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Özel Kurum Kara Listesi" subtitle="Bankaya özel kara liste, yasaklı şirketler ve iç izleme kayıtları" />
             <PageToolbar
                 searchPlaceholder="Kişi/kurum adı veya TCKN/VKN ile ara..."
                 searchValue={searchTerm}

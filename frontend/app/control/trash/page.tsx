@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 
 import React, { useState } from 'react';
@@ -103,6 +104,7 @@ function ControlTrashPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Çöp Kutusu" subtitle="Silinen kontrol kayıtları ve geri yükleme merkezi" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Toplam Silinen Kayıt" value={trashItems.length} icon={Trash2} color="rose" />
                 <StatCard title="Kontrol Noktaları" value={trashItems.filter(t => t.type === 'kontrol').length} icon={ShieldX} color="blue" />

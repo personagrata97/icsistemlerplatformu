@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -66,6 +67,7 @@ function ControlReportsPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Raporlar" subtitle="Dönemsel iç kontrol faaliyet raporları, kurul sunumları ve analiz belgeleri" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Toplam Dönem Raporu" value={reportsList.length} icon={FileBarChart} color="blue" />
                 <StatCard title="Onaylanan Raporlar" value={reportsList.filter(r => r.durum === 'ONAYLANDI').length} icon={CheckCircle2} color="emerald" />

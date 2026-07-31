@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { Suspense } from 'react';
@@ -246,6 +247,7 @@ function EthicsPageContent() {
 
     return (
         <>
+            <PageHeader title="Etik Bildirimler & İhbarlar" subtitle="Etik bildirimlerin alınması, inceleme süreçleri ve vaka dosyaları" />
             <CreateEthicsReportModal
                 isOpen={showAddModal}
                 onClose={() => setShowAddModal(false)}

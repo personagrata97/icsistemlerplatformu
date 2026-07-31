@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -129,6 +130,7 @@ function ControlLogsPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Sistem Logları" subtitle="İç kontrol platformunda gerçekleştirilen tüm kullanıcı işlemleri ve iz kayıtları" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Toplam Log Kaydı" value={logs.length} icon={Database} color="blue" />
                 <StatCard title="Bugünkü İşlemler" value={logs.filter(l => l.date.startsWith('2026-07-27')).length} icon={Activity} color="emerald" />

@@ -3,6 +3,7 @@ import RequireRole from '@/components/auth/RequireRole';
 
 
 import React, { useState } from 'react';
+import PageHeader from '@/components/ui/PageHeader';
 import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -61,6 +62,10 @@ function PharosControlDashboardContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader
+                title="Ana Panel"
+                subtitle="İç Kontrol genel performans göstergeleri, risk matrisi ve canlı denetim takibi"
+            />
             {/* Header with Refresh and Year Filter */}
             <PageToolbar
                 noSearch={true}

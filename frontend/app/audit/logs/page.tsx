@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -149,6 +150,7 @@ function AuditLogsPageContent() {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
+            <PageHeader title="Sistem İz Kayıtları" subtitle="Teftiş Kurulu platformu işlem günlükleri ve erişim izleri" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 px-1 -mx-1 mb-2">
                 <StatCard
                     title="Toplam Kayıt"

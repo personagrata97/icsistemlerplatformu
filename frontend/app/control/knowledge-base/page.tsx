@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -83,6 +84,7 @@ function ControlKnowledgeBasePageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Bilgi Bankası & Rehberler" subtitle="İç kontrol metodolojisi, mevzuat rehberleri ve çalışma kağıdı şablonları" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Kayıtlı Doküman" value={allDocs.length} icon={BookOpen} color="blue" />
                 <StatCard title="Yürürlükteki Rehberler" value={allDocs.filter(d => d.durum === 'YÜRÜRLÜKTE').length} icon={CheckCircle2} color="emerald" />

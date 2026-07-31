@@ -7,41 +7,8 @@ import {
     Shield, Search, AlertTriangle, FileText, Settings, Clock,
     Database, Globe, ShieldAlert
 } from 'lucide-react';
-import { useSanctionTitle } from '@/context/SanctionTitleContext';
-
-const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
-    '/sanction': { title: 'Yaptırım Kokpiti', subtitle: 'MASAK, OFAC ve BM Yaptırım Taramaları Özeti' },
-    '/sanction/scan': { title: 'Müşteri & İşlem Taraması', subtitle: 'MASAK, Resmî Gazete 6415/7262 ve OFAC Canlı Sorgulaması' },
-    '/sanction/results': { title: 'Tarama Sonuçları & Karar Havuzu', subtitle: 'Yaptırım Uyarıları ve Karar Bağlama Süreçleri' },
-    '/sanction/lists': { title: 'Yaptırım Listeleri Yönetimi', subtitle: 'MASAK, OFAC, BM ve AB Yaptırım Kaynakları' },
-    '/sanction/lists/ofac': { title: 'ABD OFAC SDN Listesi', subtitle: 'Office of Foreign Assets Control Specially Designated Nationals List' },
-    '/sanction/lists/un': { title: 'BM Güvenlik Konseyi Listesi', subtitle: 'UN Security Council Consolidated Sanctions List' },
-    '/sanction/lists/eu': { title: 'AB Konsolide Yaptırım Listesi', subtitle: 'EU Financial Sanctions Consolidated List' },
-    '/sanction/lists/masak': { title: 'MASAK & Resmî Gazete Listesi', subtitle: '6415 ve 7262 Sayılı Kanun Malvarlığı Dondurma Kararları' },
-    '/sanction/lists/custom': { title: 'Kurum İçi Özel Kara Liste', subtitle: 'Teftiş ve Uyum Tarafından Tanımlanan Dahili Yasaklı Listesi' },
-    '/sanction/reports': { title: 'Yaptırım ve Uyum Raporları', subtitle: 'Denetim Kurulu ve Uyum Başkanlığı Rapor Arşivi' },
-    '/sanction/history': { title: 'Tarama Geçmişi & Audit İzi', subtitle: 'Otomatik ve Anlık Tarama Günlük Kayıtları' },
-    '/sanction/settings': { title: 'Yaptırım Ayarları', subtitle: 'Eşik Değerleri ve Otomatik Tarama Parametreleri' },
-};
-
 export default function SanctionSidebar() {
     const pathname = usePathname();
-    const { setTitle, setSubtitle } = useSanctionTitle();
-
-    useEffect(() => {
-        let pageInfo = PAGE_TITLES[pathname];
-        if (!pageInfo) {
-            const pathParts = pathname.split('/');
-            if (pathParts.length > 2) {
-                const parentPath = pathParts.slice(0, 3).join('/');
-                pageInfo = PAGE_TITLES[parentPath];
-            }
-        }
-        if (pageInfo) {
-            setTitle(pageInfo.title);
-            setSubtitle(pageInfo.subtitle || '');
-        }
-    }, [pathname, setTitle, setSubtitle]);
 
     const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
 

@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -76,6 +77,7 @@ function SanctionSettingsPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Tarama Ayarları" subtitle="Bulanık mantık (Fuzzy matching) eşik değerleri, algoritma ve liste güncelleme parametreleri" />
             <div className="bg-white border border-gray-200 text-gray-900 rounded-2xl p-6 shadow-sm flex justify-between items-center">
                 <div>
                     <h2 className="text-xl font-bold">{TERMS.sanctionModule} — Dinamik Eşik ve Parametre Yönetimi</h2>

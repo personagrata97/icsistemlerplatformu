@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -490,6 +491,7 @@ function UnitRcmPageContent() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
+            <PageHeader title="Denetim Evreni Birim Detayı" subtitle="Seçili birimin risk skoru, geçmiş denetimleri ve süreç haritası" />
                 <LoadingState fullscreen message="Birim detayları yükleniyor..." />
             </div>
         );

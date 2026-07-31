@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -70,6 +71,7 @@ function SanctionScanPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Müşteri & İşlem Taraması" subtitle="Gerçek ve tüzel kişi verilerinin uluslararası yaptırım listelerinde anlık sorgulanması" />
             <div className="card p-6 bg-white border border-gray-100 shadow-sm space-y-6 rounded-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="md:col-span-2">

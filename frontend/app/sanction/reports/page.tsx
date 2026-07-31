@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -52,6 +53,7 @@ function SanctionReportsPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Yaptırım Raporları" subtitle="MASAK bildirim belgeleri, eşleşme istatistikleri ve dönemsel yaptırım uyum raporları" />
             <PageToolbar
                 searchPlaceholder="Rapor adı ile ara..."
                 searchValue={searchTerm}

@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -35,6 +36,7 @@ function ControlExecutiveDashboardContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Yönetici Paneli" subtitle="Üst yönetim özet göstergeleri, stratejik risk metrikleri ve Denetim Komitesi raporlama araçları" />
             <PageToolbar
                 noSearch={true}
                 onRefresh={handleRefresh}

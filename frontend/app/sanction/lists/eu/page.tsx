@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -64,6 +65,7 @@ function EuListPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Avrupa Birliği (EU) Listesi" subtitle="AB Konseyi mali yaptırım ve kısıtlayıcı tedbirler konsolide listesi" />
             <PageToolbar
                 searchPlaceholder="EU ID, İsim veya Regülasyon Kodu ile ara..."
                 searchValue={searchTerm}

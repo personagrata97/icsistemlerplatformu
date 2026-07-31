@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -105,6 +106,7 @@ function ControlInventoryPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Süreç & Kontrol Envanteri" subtitle="Tüm kurumsal süreçlerin, kontrol noktalarının ve risk kütüphanesinin yönetimi" />
             {/* Stat Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard

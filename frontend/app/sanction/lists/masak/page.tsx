@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -84,6 +85,7 @@ function MasakListPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="MASAK & Ulusal Listeler" subtitle="Mali Suçları Araştırma Kurulu ve Türkiye Cumhuriyeti resmi dondurma kararları" />
             <PageToolbar
                 searchPlaceholder="Kişi, kurum veya Cumhurbaşkanı Karar No ile ara..."
                 searchValue={searchTerm}

@@ -12,35 +12,9 @@ import {
     FileBarChart
 } from 'lucide-react';
 import { useEffect } from 'react';
-import { useRiskTitle } from '@/context/RiskTitleContext';
-
-const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
-    '/risk': { title: 'Risk Kokpiti', subtitle: 'Anlık risk göstergeleri, eşik aşımları ve KPI özeti' },
-    '/risk/cockpit': { title: 'Risk Kokpiti', subtitle: 'Anlık risk göstergeleri ve KPI özeti' },
-    '/risk/staff': { title: 'Risk Personeli Kadrosu', subtitle: 'Risk Analistleri ve Risk Yönetimi Uzman kadro takibi' },
-    '/risk/contracts': { title: 'Sözleşme & Portföy Analizi', subtitle: 'Portföy bazlı sözleşme incelemesi ve kredi riski haritası' },
-    '/risk/scenarios': { title: 'Senaryo & Stres Testi', subtitle: 'Likidite ve sermaye yeterliliği stres testi simülasyonları' },
-    '/risk/alerts': { title: 'Limit Aşımları & Uyarılar', subtitle: 'Mevzuat ve banka içi risk limiti ihlal uyarıları' },
-};
-
 export default function RiskSidebar() {
     const pathname = usePathname();
-    const { setTitle, setSubtitle } = useRiskTitle();
-
-    useEffect(() => {
-        let pageInfo = PAGE_TITLES[pathname];
-        if (!pageInfo) {
-            const pathParts = pathname.split('/');
-            if (pathParts.length > 2) {
-                const parentPath = pathParts.slice(0, 3).join('/');
-                pageInfo = PAGE_TITLES[parentPath];
-            }
-        }
-        if (pageInfo) {
-            setTitle(pageInfo.title);
-            setSubtitle(pageInfo.subtitle || '');
-        }
-    }, [pathname, setTitle, setSubtitle]);
+    const isActive = (path: string) => pathname === path || (path !== '/risk' && pathname.startsWith(path));
 
     const isActive = (path: string) => pathname === path || (path !== '/risk' && pathname.startsWith(path));
 

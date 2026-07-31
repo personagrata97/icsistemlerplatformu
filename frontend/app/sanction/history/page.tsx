@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -51,6 +52,7 @@ function SanctionHistoryPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Tarama Geçmişi" subtitle="Geçmiş toplu ve münferit sorgulamaların denetim izi ve sorgu günlükleri" />
             <PageToolbar
                 searchPlaceholder="Tetikleyici veya çalıştıran kullanıcı ara..."
                 searchValue={searchTerm}

@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -51,6 +52,7 @@ function RiskDashboardPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Risk Motoru & Kokpit" subtitle="Genel risk ısı haritası, yasal rasyolar, KRI izleme ve stres testleri" />
             <div className="bg-white border border-gray-200 text-gray-900 rounded-2xl p-6 shadow-sm flex justify-between items-center">
                 <div>
                     <h2 className="text-xl font-bold">{TERMS.riskModule} — Risk İzleme ve Erken Uyarı Paneli</h2>

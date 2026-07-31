@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -86,6 +87,7 @@ function SanctionResultsPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Eşleşme & Çakışma Yönetimi" subtitle="Tarama sonucu oluşan aday çakışmaların (Match) inceleme, onay ve karar süreçleri" />
             <PageToolbar
                 searchPlaceholder="Müşteri adına göre ara..."
                 searchValue={searchTerm}

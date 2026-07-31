@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
 
@@ -93,6 +94,7 @@ function ConciliationPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Mutabakat & Tebliğ Süreci" subtitle="Taslak rapor bulgularının birimlerle mutabakatı ve tebliğ süreçleri" />
             {/* Top Navigation Tabs */}
             <div className="mb-6">
                 <PageToolbar

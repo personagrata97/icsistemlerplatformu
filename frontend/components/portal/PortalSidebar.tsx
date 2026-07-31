@@ -7,24 +7,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useAuditTitle } from '@/context/AuditTitleContext';
 import { useEffect } from 'react';
 
-const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
-    '/portal': { title: 'Birim Portalı', subtitle: 'Biriminizin denetim ve aksiyon özeti' },
-    '/portal/findings': { title: 'Bulgular ve Aksiyonlar', subtitle: 'Yanıtlamanız ve kanıt yüklemeniz gereken bulgular' }
-};
-
 export default function PortalSidebar() {
     const pathname = usePathname();
-    const { setTitle, setSubtitle } = useAuditTitle();
-
     const isActive = (path: string) => pathname === path || (path !== '/portal' && pathname.startsWith(`${path}/`));
-
-    useEffect(() => {
-        let pageInfo = PAGE_TITLES[pathname];
-        if (pageInfo) {
-            setTitle(pageInfo.title);
-            setSubtitle(pageInfo.subtitle || '');
-        }
-    }, [pathname, setTitle, setSubtitle]);
 
     return (
         <aside className="sidebar flex flex-col h-screen overflow-hidden bg-white border-r shadow-sm z-50">

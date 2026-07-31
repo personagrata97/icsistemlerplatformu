@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 
 import React, { useState } from 'react';
@@ -93,6 +94,7 @@ function RiskTrashPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Çöp Kutusu" subtitle="Silinen risk senaryoları ve arşiv kayıtları" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Toplam Silinen Kayıt" value={trashItems.length} icon={Trash2} color="rose" />
                 <StatCard title="Limit Aşımları" value={trashItems.filter(t => t.type === 'limit').length} icon={ShieldX} color="rose" />

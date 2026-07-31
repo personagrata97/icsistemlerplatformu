@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -40,6 +41,7 @@ function ControlStaffCalendarPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Çalışma Takvimi" subtitle="İç kontrol ekibinin yıllık denetim, saha çalışması ve izin takvimi" />
             <ControlStaffTabs />
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

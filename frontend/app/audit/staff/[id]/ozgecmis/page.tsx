@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -82,6 +83,7 @@ function StaffProfilePageContent() {
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-8">
+            <PageHeader title="Müfettiş Özgeçmişi" subtitle="Müfettiş mesleki deneyim ve eğitim ayrıntıları" />
                 <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
                     <AlertCircle size={32} className="text-red-500" />
                 </div>

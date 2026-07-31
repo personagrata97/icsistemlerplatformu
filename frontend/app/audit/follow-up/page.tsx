@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
@@ -119,6 +120,7 @@ function FollowUpPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Bulgu Takip (Follow-Up)" subtitle="Kesinleşmiş bulguların aksiyon vadeleri ve kapatma doğrulamaları" />
             {/* Top Navigation Tabs */}
             <div className="mb-6">
                 <PageToolbar

@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
@@ -137,7 +138,8 @@ function FastTrackPageInner() {
         }
         
         updateSeal();
-        return () => { activeTimer = false; };
+        return () =>
+            <PageHeader title="Hızlı Denetim (Fast-Track)" subtitle="Acil ve kritik konularda hızlı denetim görevi oluşturma ve yürütme" /> { activeTimer = false; };
     }, [findingDetails, isAuthenticated, managerProfile, adUsername, timestamp, isAgreed, response, rootCause, actions]);
 
     // Periodically update timestamp to show dynamic seal live-sync

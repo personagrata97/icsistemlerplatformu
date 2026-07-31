@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -148,6 +149,7 @@ function ControlNotificationsPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Bildirimler" subtitle="Görevinizle ilgili aksiyon uyarıları, onay talepleri ve sistem bildirimleri" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Toplam Bildirim" value={notifications.length} icon={Bell} color="blue" />
                 <StatCard title="Okunmamış" value={unreadCount} icon={AlertTriangle} color="amber" />

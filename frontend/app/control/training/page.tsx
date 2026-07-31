@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -82,6 +83,7 @@ function ControlTrainingPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Eğitim Kataloğu & CPE" subtitle="İç kontrol personeli mesleki eğitim kayıtları ve sürekli gelişim (CPE) puan takibi" />
             <ControlStaffTabs />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <StatCard title="Toplam Eğitim Programı" value={trainingList.length} icon={BookOpen} color="blue" />

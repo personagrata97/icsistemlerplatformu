@@ -1,3 +1,4 @@
+import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -50,6 +51,7 @@ function SanctionListsOverviewPageContent() {
 
     return (
         <div className="space-y-6">
+            <PageHeader title="Yaptırım Listeleri" subtitle="Küresel ve ulusal yaptırım listelerinin versiyon, veri tazeliği ve kaynak yönetimi" />
             <PageToolbar
                 searchPlaceholder="Liste adı veya kodu ile ara..."
                 searchValue={searchTerm}
