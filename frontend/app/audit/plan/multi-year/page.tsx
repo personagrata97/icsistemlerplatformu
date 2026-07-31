@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Calendar, Plus, FileText, Trash2, Edit2, CheckCircle, ChevronRight, Download, AlertCircle } from 'lucide-react';
 import { BackButton } from '@/components/ui/BackButton';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
 import Modal from '@/components/ui/Modal';

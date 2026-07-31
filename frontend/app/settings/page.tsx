@@ -14,7 +14,7 @@ import { useToast } from '@/components/Toast';
 import LoadingState from '@/components/ui/LoadingState';
 import { useAuth } from '@/context/AuthContext';
 import { organizationApi } from '@/lib/organization-api';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import Modal from '@/components/ui/Modal';
 import ConfirmModal from '@/components/ConfirmModal';
 import CustomSelect from '@/components/ui/CustomSelect';

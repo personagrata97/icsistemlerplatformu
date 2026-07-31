@@ -16,7 +16,7 @@ import { useAuth } from '@/context/AuthContext';
 import { checkRole, ROLES } from '@/lib/auth-constants';
 import Alert from '@/components/ui/Alert';
 import Button from '@/components/ui/Button';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import PendingDeletionsModal from '@/components/audit/PendingDeletionsModal';
 import PageToolbar from '@/components/ui/PageToolbar';
 import CustomSelect from '@/components/ui/CustomSelect';

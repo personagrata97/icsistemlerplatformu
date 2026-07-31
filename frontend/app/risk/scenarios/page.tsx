@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { RiskLogger } from '@/lib/risk-logger';
 import { useToast } from '@/components/Toast';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import RequireRole from '@/components/auth/RequireRole';
 
 // Senaryo parametreleri — backend ScenarioParameters tipiyle uyumlu

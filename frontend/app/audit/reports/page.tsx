@@ -8,7 +8,7 @@ import AuditHeader from '@/components/audit/AuditHeader';
 import StatCard from '@/components/ui/StatCard';
 import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import ReportGenerationModal from '@/components/audit/ReportGenerationModal';
 import Pagination from '@/components/ui/Pagination';
 import RefreshButton from '@/components/ui/RefreshButton';

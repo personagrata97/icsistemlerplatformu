@@ -15,7 +15,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import ActionMenu from '@/components/ui/ActionMenu';
 
 import PageToolbar from '@/components/ui/PageToolbar';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import RequireRole from '@/components/auth/RequireRole';
 
 function AlertsPageContent() {

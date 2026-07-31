@@ -24,7 +24,7 @@ import { DateDisplay } from '@/components/ui/DateDisplay';
 import Button from '@/components/ui/Button';
 import ActionMenu, { ActionMenuItem } from '@/components/ui/ActionMenu';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import StatCard from '@/components/ui/StatCard';
 import { AccessDenied } from '@/components/audit/AuditLogComponents';
 

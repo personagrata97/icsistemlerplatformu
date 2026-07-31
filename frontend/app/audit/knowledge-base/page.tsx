@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { DateDisplay } from '@/components/ui/DateDisplay';
 import Button from '@/components/ui/Button';
 import { ShieldCheck, Building2, Scale, ClipboardList, Bot, Download, FileText, Plus, Eye, X, Filter, Trash2 } from 'lucide-react';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import Tooltip from '@/components/ui/Tooltip';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';

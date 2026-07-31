@@ -3,7 +3,7 @@ import RequireRole from '@/components/auth/RequireRole';
 
 
 import { useState, useEffect } from 'react';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import DataTable from '@/components/ui/DataTable';

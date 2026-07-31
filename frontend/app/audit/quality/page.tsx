@@ -11,7 +11,7 @@ import {
 import { useToast } from '@/components/Toast';
 import LoadingState from '@/components/ui/LoadingState';
 import ConfirmModal from '@/components/ConfirmModal';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';

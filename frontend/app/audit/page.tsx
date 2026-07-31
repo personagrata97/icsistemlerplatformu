@@ -21,7 +21,7 @@ import Tooltip from '@/components/ui/Tooltip';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useAuth } from '@/context/AuthContext';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import CodeBadge from '@/components/ui/CodeBadge';

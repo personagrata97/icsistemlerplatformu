@@ -5,7 +5,7 @@ import RequireRole from '@/components/auth/RequireRole';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { auditApi, Audit, Finding } from '@/lib/audit-api';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import DashboardWidget from '@/components/ui/DashboardWidget';
 import DashboardListItem from '@/components/ui/DashboardListItem';
 import CodeBadge from '@/components/ui/CodeBadge';

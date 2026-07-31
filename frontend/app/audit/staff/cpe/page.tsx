@@ -13,7 +13,7 @@ import { useToast } from '@/components/Toast';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Modal from '@/components/ui/Modal';
 import ActionMenu from '@/components/ui/ActionMenu';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import EmptyState from '@/components/ui/EmptyState';
 import { formatDate, getPhotoUrl } from '@/lib/audit-utils';

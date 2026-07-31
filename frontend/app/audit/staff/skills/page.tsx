@@ -17,7 +17,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import Badge from '@/components/ui/Badge';
 import EntityIcon from '@/components/ui/EntityIcon';
 import { EntityType } from '@/lib/entity-config';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import Tooltip from '@/components/ui/Tooltip';
 import EmptyState from '@/components/ui/EmptyState';

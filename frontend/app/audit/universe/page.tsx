@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { createPortal } from 'react-dom';
 import { Building, Users, MapPin, Plus, ChevronDown, ChevronRight, Edit2, Trash2, Download, AlertTriangle, CheckCircle, Shield, TrendingUp, Calendar, FileText, Briefcase, Scale, Activity, Upload, Table, LayoutGrid, GitBranch, Maximize } from 'lucide-react';
 import { DateDisplay } from '@/components/ui/DateDisplay';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import LoadingState from '@/components/ui/LoadingState';
 import Tooltip from '@/components/ui/Tooltip';
 import Button from '@/components/ui/Button';

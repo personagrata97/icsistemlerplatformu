@@ -15,7 +15,7 @@ import { formatDate } from '@/lib/audit-utils';
 import ActionMenu from '@/components/ui/ActionMenu';
 
 import PageToolbar from '@/components/ui/PageToolbar';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 
 function RiskLogsPageContent() {
     const [logs, setLogs] = useState<LogEntry[]>([]);

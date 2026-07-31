@@ -15,7 +15,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import Tooltip from '@/components/ui/Tooltip';
 import Link from 'next/link';
 
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 
 // KPI kod → Türkçe açıklama haritası
 const KPI_LABELS: Record<string, string> = {

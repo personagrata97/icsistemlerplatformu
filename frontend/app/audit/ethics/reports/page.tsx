@@ -18,7 +18,7 @@ import ActionLink from '@/components/ui/ActionLink';
 import ActionMenu from '@/components/ui/ActionMenu';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import InfoRow from '@/components/ui/InfoRow';

@@ -10,7 +10,7 @@ import Tooltip from '@/components/ui/Tooltip';
 import OverflowTooltip from '@/components/ui/OverflowTooltip';
 import { auditApi, AuditStaff, StaffExperience, StaffEducation, StaffTraining, StaffPromotion } from '@/lib/audit-api';
 import PageToolbar from '@/components/ui/PageToolbar';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import DataTable from '@/components/ui/DataTable';
 import RefreshButton from '@/components/ui/RefreshButton';

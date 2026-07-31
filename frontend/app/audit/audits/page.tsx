@@ -24,7 +24,7 @@ import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import AuditTable from '@/components/audit/AuditTable'; // Özel mantık için korunuyor
 import AuditActionButtons from '@/components/audit/AuditActionButtons';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import Pagination from '@/components/ui/Pagination';
 import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';

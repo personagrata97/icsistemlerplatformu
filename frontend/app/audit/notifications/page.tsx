@@ -9,7 +9,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import { formatDate, formatDateTime } from '@/lib/audit-utils';
 import { useAuditTitle } from '@/context/AuditTitleContext';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import EmptyState, { NoResultsState } from '@/components/ui/EmptyState';
 import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';

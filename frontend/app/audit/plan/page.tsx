@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Calendar, RefreshCw, FileText, CheckCircle, AlertTriangle, Eye, Upload, PieChart, Loader2 } from 'lucide-react';
 import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
-import PageHeader from '@/components/audit/PageHeader';
+import PageHeader from '@/components/ui/PageHeader';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
