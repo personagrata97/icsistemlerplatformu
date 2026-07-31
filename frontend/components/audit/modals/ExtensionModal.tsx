@@ -4,6 +4,8 @@ import { Clock, Calendar } from 'lucide-react';
 import CodeBadge from '@/components/ui/CodeBadge';
 import { formatDate } from '@/lib/audit-utils';
 import Button from '@/components/ui/Button';
+import DatePicker from '@/components/ui/DatePicker';
+import FormTextarea from '@/components/ui/FormTextarea';
 
 interface ExtensionModalProps {
     isOpen: boolean;
@@ -59,30 +61,25 @@ export default function ExtensionModal({
                     </div>
                 </div>
 
-                <div className="form-group">
-                    <label className="form-label text-gray-700 font-semibold mb-2 flex items-center gap-2">
+                <div>
+                    <label className="text-sm font-semibold text-slate-700 mb-1.5 flex items-center gap-2">
                         <Calendar size={16} className="text-primary" />
-                        Yeni İstenen Aksiyon Tarihi
+                        Yeni İstenen Aksiyon Tarihi *
                     </label>
-                    <input
-                        type="date"
-                        className="form-input focus:ring-primary/20 focus:border-primary border-gray-300 rounded-lg w-full p-2.5"
+                    <DatePicker
                         value={requestedDeadline}
-                        onChange={e => setRequestedDeadline(e.target.value)}
-                        required
+                        onChange={val => setRequestedDeadline(val)}
                     />
                 </div>
 
-                <div className="form-group">
-                    <label className="form-label text-gray-700 font-semibold mb-2 block">Uzatma Gerekçesi</label>
-                    <textarea
-                        className="form-input min-h-[100px] w-full focus:ring-primary/20 focus:border-primary border-gray-300 rounded-lg p-3"
-                        placeholder="Gecikme nedenini ve alınan ek önlemleri buraya yazınız..."
-                        value={reason}
-                        onChange={e => setReason(e.target.value)}
-                        required
-                    ></textarea>
-                </div>
+                <FormTextarea
+                    label="Uzatma Gerekçesi"
+                    required
+                    rows={3}
+                    placeholder="Gecikme nedenini ve alınan ek önlemleri buraya yazınız..."
+                    value={reason}
+                    onChange={e => setReason(e.target.value)}
+                />
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                     <Button variant="secondary" onClick={onClose}>

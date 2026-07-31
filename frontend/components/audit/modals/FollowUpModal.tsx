@@ -5,6 +5,8 @@ import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
 import StaffSelect from '@/components/audit/StaffSelect';
 import FormInput from "@/components/ui/FormInput";
+import DatePicker from "@/components/ui/DatePicker";
+import FormTextarea from "@/components/ui/FormTextarea";
 
 interface FollowUpFormData {
     action: string;
@@ -53,8 +55,27 @@ export default function FollowUpModal({ isOpen, onClose, onSubmit, initialData, 
             }
         >
             <form id="followUpForm" onSubmit={handleSubmit} className="space-y-4">
-                <div className="form-group"><label className="form-label">Aksiyon *</label><input type="text" className="form-input" required value={formData.action} onChange={e => setFormData({ ...formData, action: e.target.value })} /></div>
-                <div className="grid grid-cols-2 gap-4"><div className="form-group"><label className="form-label">Bulgu No</label><input type="text" className="form-input" placeholder="B-2024-XXX" value={formData.findingCode} onChange={e => setFormData({ ...formData, findingCode: e.target.value })} /></div><div className="form-group"><label className="form-label">Son Tarih *</label><FormInput type="date"  required value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} /></div></div>
+                <FormInput
+                    label="Aksiyon"
+                    required
+                    value={formData.action}
+                    onChange={e => setFormData({ ...formData, action: e.target.value })}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                    <FormInput
+                        label="Bulgu No"
+                        placeholder="B-2024-XXX"
+                        value={formData.findingCode}
+                        onChange={e => setFormData({ ...formData, findingCode: e.target.value })}
+                    />
+                    <div>
+                        <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Son Tarih *</label>
+                        <DatePicker
+                            value={formData.deadline}
+                            onChange={val => setFormData({ ...formData, deadline: val })}
+                        />
+                    </div>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                     <StaffSelect
                         label="Sorumlu Kişi"
@@ -73,15 +94,13 @@ export default function FollowUpModal({ isOpen, onClose, onSubmit, initialData, 
                         ]}
                     />
                 </div>
-                <div className="form-group">
-                    <label className="form-label">Açıklama / Notlar</label>
-                    <textarea 
-                        className="form-textarea min-h-[100px] resize-y" 
-                        placeholder="Aksiyonla ilgili ek detaylar..." 
-                        value={formData.notes || ''} 
-                        onChange={e => setFormData({ ...formData, notes: e.target.value })} 
-                    />
-                </div>
+                <FormTextarea
+                    label="Açıklama / Notlar"
+                    rows={3}
+                    placeholder="Aksiyonla ilgili ek detaylar..."
+                    value={formData.notes || ''}
+                    onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                />
             </form>
         </Modal>
     )

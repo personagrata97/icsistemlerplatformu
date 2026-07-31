@@ -5,6 +5,8 @@ import { Mail, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import { ORG } from '@/lib/org-config';
 
 interface ComposeLetterModalProps {
@@ -97,30 +99,22 @@ export default function ComposeLetterModal({ isOpen, onClose, onSubmit, auditDet
                     </div>
                 </div>
 
-                <div className="form-group">
-                    <label className="form-label">Konu Başlığı</label>
-                    <input
-                        type="text"
-                        required
-                        className="form-input"
-                        placeholder="Yazışma konusu..."
-                        value={formData.subject}
-                        onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                    />
-                </div>
+                <FormInput
+                    label="Konu Başlığı"
+                    required
+                    placeholder="Yazışma konusu..."
+                    value={formData.subject}
+                    onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                />
 
-                <div className="form-group">
-                    <label className="form-label flex justify-between">
-                        <span>İçerik (Mail Metni)</span>
-                    </label>
-                    <textarea
-                        required
-                        className="form-textarea min-h-[250px] font-sans text-sm leading-relaxed"
-                        placeholder="Sayın ilgili..."
-                        value={formData.content}
-                        onChange={e => setFormData({ ...formData, content: e.target.value })}
-                    />
-                </div>
+                <FormTextarea
+                    label="İçerik (Mail Metni)"
+                    required
+                    rows={8}
+                    placeholder="Sayın ilgili..."
+                    value={formData.content}
+                    onChange={e => setFormData({ ...formData, content: e.target.value })}
+                />
 
                 <div className="form-group">
                     <CustomSelect

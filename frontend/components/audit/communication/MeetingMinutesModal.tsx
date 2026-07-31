@@ -5,6 +5,8 @@ import { Users, Presentation, Clock } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import { useToast } from '@/components/Toast';
 
 interface MeetingMinutesModalProps {
@@ -139,39 +141,30 @@ export default function MeetingMinutesModal({ isOpen, onClose, onSubmit, auditDe
                             onChange={e => setFormData({ ...formData, attendees: e.target.value })}
                         />
                     </div>
-                    <div className="form-group">
-                        <label className="form-label flex gap-2 items-center"><Clock size={16} /> Konum / Platform</label>
-                        <input
-                            type="text"
-                            className="form-input"
-                            placeholder="Genel Müdürlük Toplantı Salonu / Teams"
-                            value={formData.location}
-                            onChange={e => setFormData({ ...formData, location: e.target.value })}
-                        />
-                    </div>
-                </div>
-
-                <div className="form-group">
-                    <label className="form-label">Toplantı Gündemi</label>
-                    <input
-                        type="text"
-                        className="form-input"
-                        placeholder="Örn: Bulgularda tespit edilen istisnai durumların yönetime sorulması..."
-                        value={formData.agenda}
-                        onChange={e => setFormData({ ...formData, agenda: e.target.value })}
+                    <FormInput
+                        label="Konum / Platform"
+                        placeholder="Genel Müdürlük Toplantı Salonu / Teams"
+                        value={formData.location}
+                        onChange={e => setFormData({ ...formData, location: e.target.value })}
+                        leftIcon={<Clock size={16} />}
                     />
                 </div>
 
-                <div className="form-group">
-                    <label className="form-label font-semibold">Toplantı Tutanakları / Alınan Kararlar</label>
-                    <textarea
-                        required
-                        className="form-textarea min-h-[150px] font-sans text-sm leading-relaxed"
-                        placeholder="Yönetim tespit edilen bulguları kabul etmiştir. Gecikme faizi hesaplamalarındaki sistemsel hatalar düzeltilecektir..."
-                        value={formData.minutes}
-                        onChange={e => setFormData({ ...formData, minutes: e.target.value })}
-                    />
-                </div>
+                <FormInput
+                    label="Toplantı Gündemi"
+                    placeholder="Örn: Bulgularda tespit edilen istisnai durumların yönetime sorulması..."
+                    value={formData.agenda}
+                    onChange={e => setFormData({ ...formData, agenda: e.target.value })}
+                />
+
+                <FormTextarea
+                    label="Toplantı Tutanakları / Alınan Kararlar"
+                    required
+                    rows={5}
+                    placeholder="Yönetim tespit edilen bulguları kabul etmiştir. Gecikme faizi hesaplamalarındaki sistemsel hatalar düzeltilecektir..."
+                    value={formData.minutes}
+                    onChange={e => setFormData({ ...formData, minutes: e.target.value })}
+                />
 
                 <div className="form-group">
                     <CustomSelect

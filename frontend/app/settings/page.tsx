@@ -15,6 +15,8 @@ import LoadingState from '@/components/ui/LoadingState';
 import { useAuth } from '@/context/AuthContext';
 import { organizationApi } from '@/lib/organization-api';
 import PageHeader from '@/components/ui/PageHeader';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import Modal from '@/components/ui/Modal';
 import ConfirmModal from '@/components/ConfirmModal';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -748,26 +750,20 @@ function SettingsPageContent() {
                     }
                 >
                     <div className="space-y-4">
-                        <div>
-                            <label className="form-label mb-1">Rol Adı *</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="Örn: Kıdemli Müfettiş"
-                                value={newRoleData.name}
-                                onChange={(e) => setNewRoleData({ ...newRoleData, name: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="form-label mb-1">Açıklama</label>
-                            <textarea
-                                className="form-input"
-                                rows={3}
-                                placeholder="Rolün tanımı ve sorumlulukları..."
-                                value={newRoleData.description}
-                                onChange={(e) => setNewRoleData({ ...newRoleData, description: e.target.value })}
-                            />
-                        </div>
+                        <FormInput
+                            label="Rol Adı"
+                            required
+                            placeholder="Örn: Kıdemli Müfettiş"
+                            value={newRoleData.name}
+                            onChange={(e) => setNewRoleData({ ...newRoleData, name: e.target.value })}
+                        />
+                        <FormTextarea
+                            label="Açıklama"
+                            rows={3}
+                            placeholder="Rolün tanımı ve sorumlulukları..."
+                            value={newRoleData.description}
+                            onChange={(e) => setNewRoleData({ ...newRoleData, description: e.target.value })}
+                        />
                     </div>
                 </Modal>
             )}

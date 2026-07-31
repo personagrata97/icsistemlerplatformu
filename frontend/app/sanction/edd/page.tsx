@@ -4,6 +4,10 @@ import RequireRole from '@/components/auth/RequireRole';
 
 import React, { useState } from 'react';
 import StatCard from '@/components/ui/StatCard';
+import PageHeader from '@/components/ui/PageHeader';
+import Checkbox from '@/components/ui/Checkbox';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -272,26 +276,11 @@ function EnhancedDueDiligencePageContent() {
                         <div>
                             <label className="form-label mb-2 block font-bold text-gray-900">1. Resmî Araştırma Kontrol Listesi (Checklist)</label>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 bg-gray-50 p-3 rounded-xl text-xs border border-gray-200">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked={ticaretSicil} onChange={e => setTicaretSicil(e.target.checked)} className="rounded text-red-700 focus:ring-red-600" />
-                                    <span>Ticaret Sicil Gazetesi</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked={resmiGazete} onChange={e => setResmiGazete(e.target.checked)} className="rounded text-red-700 focus:ring-red-600" />
-                                    <span>Resmî Gazete İlanları</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked={tmsfListesi} onChange={e => setTmsfListesi(e.target.checked)} className="rounded text-red-700 focus:ring-red-600" />
-                                    <span>TMSF Şirket Listesi</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked={acikKaynak} onChange={e => setAcikKaynak(e.target.checked)} className="rounded text-red-700 focus:ring-red-600" />
-                                    <span>Açık Kaynak Araştırması</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked={kurumIci} onChange={e => setKurumIci(e.target.checked)} className="rounded text-red-700 focus:ring-red-600" />
-                                    <span>Kurum İçi Geçmiş Kaydı</span>
-                                </label>
+                                <Checkbox label="Ticaret Sicil Gazetesi" checked={ticaretSicil} onChange={checked => setTicaretSicil(checked)} />
+                                <Checkbox label="Resmî Gazete İlanları" checked={resmiGazete} onChange={checked => setResmiGazete(checked)} />
+                                <Checkbox label="TMSF Şirket Listesi" checked={tmsfListesi} onChange={checked => setTmsfListesi(checked)} />
+                                <Checkbox label="Açık Kaynak Araştırması" checked={acikKaynak} onChange={checked => setAcikKaynak(checked)} />
+                                <Checkbox label="Kurum İçi Geçmiş Kaydı" checked={kurumIci} onChange={checked => setKurumIci(checked)} />
                             </div>
                         </div>
 
@@ -330,14 +319,17 @@ function EnhancedDueDiligencePageContent() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 text-xs">
-                                <div>
-                                    <label className="form-label mb-1">Kaynak Adı & Belge Numarası</label>
-                                    <input type="text" className="form-input text-xs" value={kaynakAd} onChange={e => setKaynakAd(e.target.value)} />
-                                </div>
-                                <div>
-                                    <label className="form-label mb-1">Kaynak Bağlantısı (Metin Olarak Saklanır)</label>
-                                    <input type="text" className="form-input text-xs font-mono" value={kaynakBaglantisi} onChange={e => setKaynakBaglantisi(e.target.value)} />
-                                </div>
+                                <FormInput
+                                    label="Kaynak Adı & Belge Numarası"
+                                    value={kaynakAd}
+                                    onChange={e => setKaynakAd(e.target.value)}
+                                />
+                                <FormInput
+                                    label="Kaynak Bağlantısı (Metin Olarak Saklanır)"
+                                    value={kaynakBaglantisi}
+                                    onChange={e => setKaynakBaglantisi(e.target.value)}
+                                    inputClassName="font-mono"
+                                />
                             </div>
                         </div>
 
@@ -368,16 +360,14 @@ function EnhancedDueDiligencePageContent() {
                                 </button>
                             </div>
 
-                            <div>
-                                <label className="form-label mb-1 block text-xs font-bold text-gray-900">Karar Gerekçesi (Zorunlu)</label>
-                                <textarea
-                                    className="form-input text-xs w-full"
-                                    rows={3}
-                                    placeholder="Kararın hukuki ve operasyonel dayanaklarını, incelenen belgeleri detaylı yazınız..."
-                                    value={kararGerekcesi}
-                                    onChange={e => setKararGerekcesi(e.target.value)}
-                                />
-                            </div>
+                            <FormTextarea
+                                label="Karar Gerekçesi"
+                                required
+                                rows={3}
+                                placeholder="Kararın hukuki ve operasyonel dayanaklarını, incelenen belgeleri detaylı yazınız..."
+                                value={kararGerekcesi}
+                                onChange={e => setKararGerekcesi(e.target.value)}
+                            />
                         </div>
                     </div>
                 </Modal>

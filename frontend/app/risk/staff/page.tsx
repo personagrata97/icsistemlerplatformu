@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
+import FormInput from '@/components/ui/FormInput';
+import CustomSelect from '@/components/ui/CustomSelect';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
@@ -253,69 +255,49 @@ function RiskStaffPageContent() {
                 >
                     <form onSubmit={handleSaveStaff} className="space-y-4 text-xs">
                         <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="font-bold text-gray-700 block mb-1">Ad *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-xs"
-                                    value={formData.firstName || ''}
-                                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="font-bold text-gray-700 block mb-1">Soyad *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-xs"
-                                    value={formData.lastName || ''}
-                                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                                />
-                            </div>
+                            <FormInput
+                                label="Ad"
+                                required
+                                value={formData.firstName || ''}
+                                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                            />
+                            <FormInput
+                                label="Soyad"
+                                required
+                                value={formData.lastName || ''}
+                                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                            />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="font-bold text-gray-700 block mb-1">Unvan</label>
-                                <select
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-xs"
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                >
-                                    {RISK_TITLES.map(t => <option key={t} value={t}>{t}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="font-bold text-gray-700 block mb-1">Departman</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-xs"
-                                    value={formData.department || ''}
-                                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                                <CustomSelect
+                                    label="Unvan"
+                                    options={RISK_TITLES.map(t => ({ value: t, label: t }))}
+                                    value={formData.title || ''}
+                                    onChange={(val) => setFormData({ ...formData, title: String(val) })}
                                 />
                             </div>
+                            <FormInput
+                                label="Departman"
+                                value={formData.department || ''}
+                                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                            />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="font-bold text-gray-700 block mb-1">E-Posta</label>
-                                <input
-                                    type="email"
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-xs"
-                                    value={formData.email || ''}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="font-bold text-gray-700 block mb-1">Telefon</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-xs"
-                                    value={formData.phone || ''}
-                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                />
-                            </div>
+                            <FormInput
+                                label="E-Posta"
+                                type="email"
+                                value={formData.email || ''}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            />
+                            <FormInput
+                                label="Telefon"
+                                type="tel"
+                                value={formData.phone || ''}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            />
                         </div>
 
                         <div className="flex justify-end gap-2 pt-4 border-t">

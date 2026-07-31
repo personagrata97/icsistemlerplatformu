@@ -6,6 +6,9 @@ import { useState, useEffect } from 'react';
 import { Settings, Save, Plus, Edit2, Trash2, Home, Network, ChevronRight, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/components/Toast';
+import PageHeader from '@/components/ui/PageHeader';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import Modal from '@/components/ui/Modal';
 import { organizationApi } from '@/lib/organization-api';
 import Button from '@/components/ui/Button';
@@ -317,29 +320,21 @@ function OrganizationSettingsPageContent() {
             >
                 <form onSubmit={handleSave} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="md:col-span-1">
-                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Birim Kodu</label>
-                            <input
-                                required
-                                type="text"
-                                placeholder="Örn: BT-001"
-                                className="form-input"
-                                value={formData.code}
-                                onChange={e => setFormData({ ...formData, code: e.target.value })}
-                            />
-                        </div>
+                        <FormInput
+                            label="Birim Kodu"
+                            required
+                            placeholder="Örn: BT-001"
+                            value={formData.code}
+                            onChange={e => setFormData({ ...formData, code: e.target.value })}
+                        />
 
-                        <div className="md:col-span-1">
-                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Birim Adı</label>
-                            <input
-                                required
-                                type="text"
-                                placeholder="Örn: Bilgi Teknolojileri Servisi"
-                                className="form-input"
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                            />
-                        </div>
+                        <FormInput
+                            label="Birim Adı"
+                            required
+                            placeholder="Örn: Bilgi Teknolojileri Servisi"
+                            value={formData.name}
+                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                        />
 
                         <div>
                             <CustomSelect
@@ -370,24 +365,20 @@ function OrganizationSettingsPageContent() {
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mevcut Risk Skoru</label>
-                            <input
-                                type="number"
-                                step="0.1"
-                                placeholder="Örn: 8.5"
-                                className="form-input"
-                                value={formData.riskScore}
-                                onChange={e => setFormData({ ...formData, riskScore: e.target.value })}
-                            />
-                        </div>
+                        <FormInput
+                            label="Mevcut Risk Skoru"
+                            type="number"
+                            step="0.1"
+                            placeholder="Örn: 8.5"
+                            value={formData.riskScore}
+                            onChange={e => setFormData({ ...formData, riskScore: e.target.value })}
+                        />
 
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Birim Açıklaması / Misyonu (Opsiyonel)</label>
-                            <textarea
+                            <FormTextarea
+                                label="Birim Açıklaması / Misyonu (Opsiyonel)"
                                 rows={3}
                                 placeholder="Birimin görev alanını ve sorumluluklarını kısaca açıklayın..."
-                                className="form-input resize-none"
                                 value={formData.description}
                                 onChange={e => setFormData({ ...formData, description: e.target.value })}
                             />

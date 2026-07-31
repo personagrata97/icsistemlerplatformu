@@ -7,6 +7,9 @@ import Switch from '@/components/ui/Switch';
 import { auditApi, Audit, Finding, Process, Risk, Control, CreateFindingDto } from '@/lib/audit-api';
 import { adminApi } from '@/lib/admin-api';
 import CustomSelect from '@/components/ui/CustomSelect';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
+import MoneyInput from '@/components/ui/MoneyInput';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import Button from '@/components/ui/Button';
 import Tooltip from '@/components/ui/Tooltip';
@@ -839,10 +842,8 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
 
                         {/* Tags Input */}
                         <div>
-                            <label className="form-label">Etiketler</label>
-                            <input
-                                type="text"
-                                className="form-input"
+                            <FormInput
+                                label="Etiketler"
                                 placeholder="Enter ile ekle: zimmet, yetki..."
                                 onKeyDown={e => {
                                     if (e.key === 'Enter') {
@@ -926,27 +927,21 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                         <h3 className="font-bold text-gray-700">Bulgu Detayları</h3>
                     </div>
                     <div className="space-y-4">
-                        <div>
-                            <label className="form-label">Kriter - Dayanak</label>
-                            <textarea
-                                className="form-input bg-gray-50/50 resize-none"
-                                rows={2}
-                                placeholder="İlgili mevzuat, yönetmelik veya prosedür maddeleri..."
-                                value={form.criteria}
-                                onChange={e => setForm({ ...form, criteria: e.target.value })}
-                            ></textarea>
-                        </div>
-                        <div>
-                            <label className="form-label">Bulgu İçeriği *</label>
-                            <textarea
-                                className="w-full border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all min-h-[120px]"
-                                rows={4}
-                                placeholder="Mevcut durumun detaylı açıklaması, incelenen örneklemler, göze çarpan eksikliklerin somut verileri (5N1K)..."
-                                value={form.content}
-                                onChange={e => setForm({ ...form, content: e.target.value })}
-                                required
-                            ></textarea>
-                        </div>
+                        <FormTextarea
+                            label="Kriter - Dayanak"
+                            rows={2}
+                            placeholder="İlgili mevzuat, yönetmelik veya prosedür maddeleri..."
+                            value={form.criteria}
+                            onChange={e => setForm({ ...form, criteria: e.target.value })}
+                        />
+                        <FormTextarea
+                            label="Bulgu İçeriği"
+                            required
+                            rows={4}
+                            placeholder="Mevcut durumun detaylı açıklaması, incelenen örneklemler, göze çarpan eksikliklerin somut verileri (5N1K)..."
+                            value={form.content}
+                            onChange={e => setForm({ ...form, content: e.target.value })}
+                        />
                         <div>
                             <CustomSelect
                                 label="Kök Neden (COSO Standartları)"
@@ -967,20 +962,19 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                         </div>
                         {form.rootCause === 'Diğer' && (
                             <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                                <label className="form-label">Diğer Kök Neden Açıklaması *</label>
-                                <textarea
-                                    className="form-input resize-none"
+                                <FormTextarea
+                                    label="Diğer Kök Neden Açıklaması"
+                                    required
                                     rows={2}
                                     placeholder="Lütfen kök nedeni açıklayın..."
                                     value={form.otherDescription}
                                     onChange={e => setForm({ ...form, otherDescription: e.target.value })}
-                                    required
-                                ></textarea>
+                                />
                             </div>
                         )}
                         <div>
                             <div className="flex justify-between items-center mb-1">
-                                <label className="form-label text-red-700 !mb-0">Tahmini Finansal Etki (TL)</label>
+                                <label className="form-label text-red-700 !mb-0">Tahmini Finansal Etki</label>
                                 <Button
                                     variant="secondary"
                                     size="sm"
@@ -991,34 +985,26 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                                     AI ile Öner
                                 </Button>
                             </div>
-                            <input
-                                type="number"
-                                className="w-full border-red-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all bg-red-50/50 placeholder:text-red-300 font-bold text-red-700"
+                            <MoneyInput
                                 placeholder="Varsa tahmini finansal kayıp tutarı..."
                                 value={form.financialImpact}
                                 onChange={e => setForm({ ...form, financialImpact: e.target.value })}
                             />
                         </div>
-                        <div>
-                            <label className="form-label">Etki (Sonuç)</label>
-                            <textarea
-                                className="form-input bg-gray-50/50"
-                                rows={2}
-                                placeholder="Bu durumun yaratacağı potansiyel veya gerçekleşen etki (Maddi kayıp, itibar kaybı vb.)"
-                                value={form.effect || ''}
-                                onChange={e => setForm({ ...form, effect: e.target.value })}
-                            ></textarea>
-                        </div>
-                        <div>
-                            <label className="form-label">Müfettiş Önerisi</label>
-                            <textarea
-                                className="form-input bg-gray-50/50"
-                                rows={2}
-                                placeholder="Önerilen aksiyonlar..."
-                                value={form.inspectorRecommendation}
-                                onChange={e => setForm({ ...form, inspectorRecommendation: e.target.value })}
-                            ></textarea>
-                        </div>
+                        <FormTextarea
+                            label="Etki (Sonuç)"
+                            rows={2}
+                            placeholder="Bu durumun yaratacağı potansiyel veya gerçekleşen etki (Maddi kayıp, itibar kaybı vb.)"
+                            value={form.effect || ''}
+                            onChange={e => setForm({ ...form, effect: e.target.value })}
+                        />
+                        <FormTextarea
+                            label="Müfettiş Önerisi"
+                            rows={2}
+                            placeholder="Önerilen aksiyonlar..."
+                            value={form.inspectorRecommendation}
+                            onChange={e => setForm({ ...form, inspectorRecommendation: e.target.value })}
+                        />
                     </div>
                 </section>
 
@@ -1038,16 +1024,14 @@ const CreateFindingModal: React.FC<CreateFindingModalProps> = ({ isOpen, onClose
                                         Bulguyu kaydettiğinizde durumu otomatik olarak <strong className="font-bold">"Mutabakat Bekliyor"</strong> olacak ve ilgili birim yöneticisine sistemden onay e-postası (Magic Link) iletilecektir. Birim onayı tek tuşla verdiğinde bulgu <strong className="font-bold">"Aksiyon Bekliyor"</strong> durumuna geçerek mutabakat tamamlanacaktır.
                                     </p>
                                 </div>
-                                <div>
-                                    <label className="form-label text-blue-800">Birim Cevabı / Alınan Aksiyon Özeti *</label>
-                                    <textarea
-                                        className="w-full border-blue-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all min-h-[100px]"
-                                        placeholder="Birim yetkilisi adına girilecek alınan aksiyon kararı (Bu metin onaya gidecektir)..."
-                                        value={form.actionPlan}
-                                        onChange={e => setForm({ ...form, actionPlan: e.target.value })}
-                                        required={form.isAgreedPre}
-                                    ></textarea>
-                                </div>
+                                <FormTextarea
+                                    label="Birim Cevabı / Alınan Aksiyon Özeti"
+                                    required={form.isAgreedPre}
+                                    rows={3}
+                                    placeholder="Birim yetkilisi adına girilecek alınan aksiyon kararı (Bu metin onaya gidecektir)..."
+                                    value={form.actionPlan}
+                                    onChange={e => setForm({ ...form, actionPlan: e.target.value })}
+                                />
                             </div>
                         </div>
                     </section>

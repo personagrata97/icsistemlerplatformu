@@ -4,6 +4,9 @@ import RequireRole from '@/components/auth/RequireRole';
 
 import React, { useState } from 'react';
 import StatCard from '@/components/ui/StatCard';
+import PageHeader from '@/components/ui/PageHeader';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -138,18 +141,26 @@ function ControlKnowledgeBasePageContent() {
             {/* Document Upload Modal */}
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={`${TAB_LABELS[activeTab as DocCategory]} — Yeni Doküman Yükle`} size="lg">
                 <form onSubmit={handleSaveDoc} className="space-y-4">
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Doküman Kodu</label>
-                        <input type="text" className="form-input text-xs w-full bg-slate-100 font-mono" value={newDoc.id} readOnly />
-                    </div>
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Doküman Tanımı (Zorunlu)</label>
-                        <input type="text" className="form-input text-xs w-full" placeholder="Örn: BDDK İç Kontrol Standartları Rehberi..." value={newDoc.ad} onChange={(e) => setNewDoc({ ...newDoc, ad: e.target.value })} required />
-                    </div>
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Açıklama</label>
-                        <textarea className="form-input text-xs w-full" rows={3} placeholder="Doküman hakkında kısa açıklama..." value={newDoc.aciklama} onChange={(e) => setNewDoc({ ...newDoc, aciklama: e.target.value })} />
-                    </div>
+                    <FormInput
+                        label="Doküman Kodu"
+                        value={newDoc.id}
+                        readOnlyView
+                        inputClassName="font-mono"
+                    />
+                    <FormInput
+                        label="Doküman Tanımı"
+                        required
+                        placeholder="Örn: BDDK İç Kontrol Standartları Rehberi..."
+                        value={newDoc.ad}
+                        onChange={(e) => setNewDoc({ ...newDoc, ad: e.target.value })}
+                    />
+                    <FormTextarea
+                        label="Açıklama"
+                        rows={3}
+                        placeholder="Doküman hakkında kısa açıklama..."
+                        value={newDoc.aciklama}
+                        onChange={(e) => setNewDoc({ ...newDoc, aciklama: e.target.value })}
+                    />
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <CustomSelect label="Doküman Türü" options={[
@@ -160,10 +171,12 @@ function ControlKnowledgeBasePageContent() {
                                 { value: 'PowerPoint', label: 'PowerPoint' }
                             ]} value={newDoc.tur} onChange={(val) => setNewDoc({ ...newDoc, tur: val as string })} />
                         </div>
-                        <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Versiyon</label>
-                            <input type="text" className="form-input text-xs w-full font-mono" value={newDoc.versiyon} onChange={(e) => setNewDoc({ ...newDoc, versiyon: e.target.value })} />
-                        </div>
+                        <FormInput
+                            label="Versiyon"
+                            value={newDoc.versiyon}
+                            onChange={(e) => setNewDoc({ ...newDoc, versiyon: e.target.value })}
+                            inputClassName="font-mono"
+                        />
                     </div>
                     <div className="flex justify-end gap-2 pt-3 border-t">
                         <Button variant="secondary" type="button" onClick={() => setIsAddModalOpen(false)}>İptal</Button>

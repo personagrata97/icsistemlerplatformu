@@ -20,6 +20,8 @@ import { EthicsPageHeader } from '@/components/audit/ethics/EthicsPageHeader';
 import { EthicsActionCard } from '@/components/audit/ethics/EthicsActionCard';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Tooltip from '@/components/ui/Tooltip';
+import PageHeader from '@/components/ui/PageHeader';
+import FormTextarea from '@/components/ui/FormTextarea';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
@@ -417,18 +419,15 @@ export default function PublicEthicsPortalPage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-3 font-poppins">
-                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest pl-1">Detaylı Açıklama *</label>
-                                    <textarea
-                                        {...register('description', { required: true, minLength: 50 })}
-                                        className="form-textarea min-h-[180px] font-bold !p-6 !rounded-2xl"
-                                        placeholder="Lütfen olay yerini, zamanını, varsa şahitleri ve olayı detaylıca anlatınız..."
-                                    />
-                                    <div className="flex justify-between px-2 font-poppins text-slate-400">
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">En az 50 karakter girmelisiniz</span>
-                                        {errors.description && <span className="text-[10px] text-red-500 font-black uppercase tracking-widest">Gerekli karakter sayısına ulaşılmadı</span>}
-                                    </div>
-                                </div>
+                                 <FormTextarea
+                                     label="Detaylı Açıklama"
+                                     required
+                                     rows={5}
+                                     placeholder="Lütfen olay yerini, zamanını, varsa şahitleri ve olayı detaylıca anlatınız..."
+                                     helperText="En az 50 karakter girmelisiniz"
+                                     error={errors.description ? 'Gerekli karakter sayısına ulaşılmadı' : undefined}
+                                     {...register('description', { required: true, minLength: 50 })}
+                                 />
 
                                 <div className="space-y-3 font-poppins">
                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest pl-1">Belge ve Kanıt Ekleme</label>

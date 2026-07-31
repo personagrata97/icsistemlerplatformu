@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
+import PageHeader from '@/components/ui/PageHeader';
+import FormInput from '@/components/ui/FormInput';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
@@ -96,20 +98,18 @@ function ControlRCSAPageContent() {
             {/* Real Interactive RCSA Modal */}
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Yeni Öz Değerlendirme (KÖD) Dönemi Başlat" size="lg">
                 <form onSubmit={handleSaveForm} className="space-y-4">
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Form Kodu</label>
-                        <input type="text" className="form-input text-xs w-full bg-slate-100 font-mono" value={newForm.id} readOnly />
-                    </div>
+                    <FormInput
+                        label="Form Kodu"
+                        value={newForm.id}
+                        readOnlyView
+                        inputClassName="font-mono"
+                    />
                     <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Değerlendirilen Birim</label>
-                            <input
-                                type="text"
-                                className="form-input text-xs w-full"
-                                value={newForm.birim}
-                                onChange={(e) => setNewForm({ ...newForm, birim: e.target.value })}
-                            />
-                        </div>
+                        <FormInput
+                            label="Değerlendirilen Birim"
+                            value={newForm.birim}
+                            onChange={(e) => setNewForm({ ...newForm, birim: e.target.value })}
+                        />
                         <div>
                             <CustomSelect
                                 label="Değerlendirme Dönemi"
@@ -122,15 +122,11 @@ function ControlRCSAPageContent() {
                             />
                         </div>
                     </div>
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Birim Kontrol Sorumlusu (BKS)</label>
-                        <input
-                            type="text"
-                            className="form-input text-xs w-full"
-                            value={newForm.sorumlusu}
-                            onChange={(e) => setNewForm({ ...newForm, sorumlusu: e.target.value })}
-                        />
-                    </div>
+                    <FormInput
+                        label="Birim Kontrol Sorumlusu (BKS)"
+                        value={newForm.sorumlusu}
+                        onChange={(e) => setNewForm({ ...newForm, sorumlusu: e.target.value })}
+                    />
                     <div className="flex justify-end gap-2 pt-3 border-t">
                         <Button variant="secondary" type="button" onClick={() => setIsAddModalOpen(false)}>İptal</Button>
                         <Button variant="primary" type="submit">Öz Değerlendirme Formunu Başlat</Button>

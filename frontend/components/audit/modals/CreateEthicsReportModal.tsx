@@ -5,6 +5,8 @@ import { ETHICS_CATEGORIES } from '@/lib/audit-utils';
 import Button from '@/components/ui/Button';
 import { Plus, Check, AlertCircle } from 'lucide-react';
 import { FileUpload } from '@/components/ui/FileUpload';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 
 interface CreateEthicsReportModalProps {
     isOpen: boolean;
@@ -157,37 +159,28 @@ export default function CreateEthicsReportModal({
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-gray-500 uppercase px-1">Bildiren Ad-Soyad</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                placeholder="Belirtilmedi (Anonim)"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-gray-500 uppercase px-1">İrtibat Bilgisi</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                placeholder="E-posta veya Telefon"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-500 uppercase px-1">Bildirim Detayı *</label>
-                        <textarea
-                            className="form-input h-32 resize-none"
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            placeholder="Bildirim detaylarını buraya giriniz..."
+                        <FormInput
+                            label="Bildiren Ad-Soyad"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            placeholder="Belirtilmedi (Anonim)"
+                        />
+                        <FormInput
+                            label="İrtibat Bilgisi"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            placeholder="E-posta veya Telefon"
                         />
                     </div>
+
+                    <FormTextarea
+                        label="Bildirim Detayı"
+                        required
+                        rows={4}
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        placeholder="Bildirim detaylarını buraya giriniz..."
+                    />
 
                     <div className="space-y-1">
                         <label className="text-xs font-bold text-gray-500 uppercase px-1">Kanıt / Ek Dosyalar</label>

@@ -7,6 +7,9 @@ import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
+import PageHeader from '@/components/ui/PageHeader';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
@@ -265,15 +268,16 @@ function ControlTrainingPageContent() {
             {/* Add Training Modal */}
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Yeni İç Kontrol Eğitim Programı Tanımla" size="lg">
                 <form onSubmit={(e) => { e.preventDefault(); setIsAddModalOpen(false); showToast('Yeni Eğitim Programı başarıyla tanımlandı', 'success'); }} className="space-y-4">
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Eğitim Başlığı (Zorunlu)</label>
-                        <input type="text" className="form-input text-xs w-full" placeholder="Örn: Operasyonel Risk ve İç Kontrol Farkındalık Eğitimi..." required />
-                    </div>
+                    <FormInput
+                        label="Eğitim Başlığı"
+                        required
+                        placeholder="Örn: Operasyonel Risk ve İç Kontrol Farkındalık Eğitimi..."
+                    />
                     <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Eğitmen</label>
-                            <input type="text" className="form-input text-xs w-full" placeholder="Eğitmen adı..." />
-                        </div>
+                        <FormInput
+                            label="Eğitmen"
+                            placeholder="Eğitmen adı..."
+                        />
                         <div>
                             <CustomSelect label="Hedef Kitle" options={[
                                 { value: 'İç Kontrolör Kadrosu', label: 'İç Kontrolör Kadrosu' },
@@ -282,10 +286,11 @@ function ControlTrainingPageContent() {
                             ]} value="İç Kontrolör Kadrosu" onChange={() => {}} />
                         </div>
                     </div>
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Eğitim İçeriği Özeti</label>
-                        <textarea className="form-input text-xs w-full" rows={3} placeholder="Eğitim müfredatı ve konu başlıkları..." />
-                    </div>
+                    <FormTextarea
+                        label="Eğitim İçeriği Özeti"
+                        rows={3}
+                        placeholder="Eğitim müfredatı ve konu başlıkları..."
+                    />
                     <div className="flex justify-end gap-2 pt-3 border-t">
                         <Button variant="secondary" type="button" onClick={() => setIsAddModalOpen(false)}>İptal</Button>
                         <Button variant="primary" type="submit">Eğitimi Kaydet & Planla</Button>

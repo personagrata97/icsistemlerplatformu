@@ -2,7 +2,7 @@ import React from 'react';
 import { Check } from 'lucide-react';
 
 interface CheckboxProps {
-    id: string;
+    id?: string;
     checked: boolean;
     onChange: (checked: boolean) => void;
     label?: React.ReactNode;
@@ -20,15 +20,22 @@ export default function Checkbox({
     className = '',
     required = false
 }: CheckboxProps) {
+    const inputId = id || `checkbox-${Math.random().toString(36).substring(2, 9)}`;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (disabled) return;
+        onChange(e.target.checked);
+    };
+
     return (
         <div className={`flex items-center gap-3 select-none ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${className}`}>
             <div className="relative flex items-center">
                 <input
                     type="checkbox"
-                    id={id}
+                    id={inputId}
                     className="sr-only"
                     checked={checked}
-                    onChange={(e) => !disabled && onChange(e.target.checked)}
+                    onChange={handleChange}
                     disabled={disabled}
                     required={required}
                 />
@@ -48,7 +55,7 @@ export default function Checkbox({
             </div>
             {label && (
                 <label
-                    htmlFor={id}
+                    htmlFor={inputId}
                     className={`text-sm leading-tight transition-colors ${checked ? 'text-slate-900 font-medium' : 'text-slate-600'} cursor-pointer`}
                 >
                     {label}

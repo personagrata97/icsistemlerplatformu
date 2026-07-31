@@ -3,6 +3,8 @@ import RequireRole from '@/components/auth/RequireRole';
 
 
 import PageToolbar from '@/components/ui/PageToolbar';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
@@ -202,18 +204,28 @@ function CustomListPageContent() {
                     }
                 >
                     <div className="space-y-4 text-sm">
-                        <div>
-                            <label className="form-label mb-1">Kişi / Kurum Adı (Zorunlu)</label>
-                            <input type="text" className="form-input" placeholder="Örn: Ahmet Yılmaz veya ABC Ltd." value={name} onChange={(e) => setName(e.target.value)} />
-                        </div>
-                        <div>
-                            <label className="form-label mb-1">TCKN veya Vergi Kimlik No (Zorunlu)</label>
-                            <input type="text" className="form-input font-mono" placeholder="Örn: 10928374652" value={tckn} onChange={(e) => setTckn(e.target.value)} />
-                        </div>
-                        <div>
-                            <label className="form-label mb-1">Yasaklama Gerekçesi / Rapor Referansı</label>
-                            <textarea className="form-input" rows={3} placeholder="Gerekçe ve teftiş rapor numarasını belirtiniz..." value={reason} onChange={(e) => setReason(e.target.value)}></textarea>
-                        </div>
+                        <FormInput
+                            label="Kişi / Kurum Adı"
+                            required
+                            placeholder="Örn: Ahmet Yılmaz veya ABC Ltd."
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                        <FormInput
+                            label="TCKN veya Vergi Kimlik No"
+                            required
+                            placeholder="Örn: 10928374652"
+                            value={tckn}
+                            onChange={(e) => setTckn(e.target.value)}
+                            inputClassName="font-mono"
+                        />
+                        <FormTextarea
+                            label="Yasaklama Gerekçesi / Rapor Referansı"
+                            rows={3}
+                            placeholder="Gerekçe ve teftiş rapor numarasını belirtiniz..."
+                            value={reason}
+                            onChange={(e) => setReason(e.target.value)}
+                        />
                     </div>
                 </Modal>
             )}

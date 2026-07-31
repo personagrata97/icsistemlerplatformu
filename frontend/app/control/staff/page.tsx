@@ -23,8 +23,10 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import ActionMenu from '@/components/ui/ActionMenu';
 import FormField from '@/components/ui/FormField';
-import FormInput from "@/components/ui/FormInput";
-import FormTextarea from "@/components/ui/FormTextarea";
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
+import PageHeader from '@/components/ui/PageHeader';
+import DatePicker from '@/components/ui/DatePicker';
 import ProfileHeader from '@/components/ui/ProfileHeader';
 import UserAvatar from '@/components/ui/UserAvatar';
 import CodeBadge from '@/components/ui/CodeBadge';
@@ -621,25 +623,35 @@ function ControlStaffPageContent() {
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={isEditingStaff ? "Personel Bilgilerini Düzenle" : "Yeni İç Kontrol Personeli / BKS Ekle"} size="lg">
                 <form onSubmit={handleSaveStaff} className="space-y-4 text-xs">
                     <div className="grid grid-cols-2 gap-3">
+                        <FormInput
+                            label="Sicil No"
+                            value={staffForm.registrationNumber}
+                            onChange={(e) => setStaffForm({ ...staffForm, registrationNumber: e.target.value })}
+                            placeholder="IKM-009"
+                            inputClassName="font-mono"
+                        />
                         <div>
-                            <label className="form-label mb-1 block font-bold text-slate-700">Sicil No</label>
-                            <input type="text" className="form-input text-xs w-full font-mono" value={staffForm.registrationNumber} onChange={(e) => setStaffForm({ ...staffForm, registrationNumber: e.target.value })} placeholder="IKM-009" />
-                        </div>
-                        <div>
-                            <label className="form-label mb-1 block font-bold text-slate-700">İşe Başlama Tarihi</label>
-                            <input type="date" className="form-input text-xs w-full" value={staffForm.hireDate} onChange={(e) => setStaffForm({ ...staffForm, hireDate: e.target.value })} />
+                            <label className="text-sm font-semibold text-slate-700 mb-1.5 block">İşe Başlama Tarihi</label>
+                            <DatePicker
+                                value={staffForm.hireDate}
+                                onChange={(val) => setStaffForm({ ...staffForm, hireDate: val })}
+                            />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="form-label mb-1 block font-bold text-slate-700">Ad (Zorunlu)</label>
-                            <input type="text" className="form-input text-xs w-full" value={staffForm.firstName} onChange={(e) => setStaffForm({ ...staffForm, firstName: e.target.value })} required />
-                        </div>
-                        <div>
-                            <label className="form-label mb-1 block font-bold text-slate-700">Soyad (Zorunlu)</label>
-                            <input type="text" className="form-input text-xs w-full" value={staffForm.lastName} onChange={(e) => setStaffForm({ ...staffForm, lastName: e.target.value })} required />
-                        </div>
+                        <FormInput
+                            label="Ad"
+                            required
+                            value={staffForm.firstName}
+                            onChange={(e) => setStaffForm({ ...staffForm, firstName: e.target.value })}
+                        />
+                        <FormInput
+                            label="Soyad"
+                            required
+                            value={staffForm.lastName}
+                            onChange={(e) => setStaffForm({ ...staffForm, lastName: e.target.value })}
+                        />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -656,14 +668,20 @@ function ControlStaffPageContent() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="form-label mb-1 block font-bold text-slate-700">E-posta</label>
-                            <input type="email" className="form-input text-xs w-full" value={staffForm.email} onChange={(e) => setStaffForm({ ...staffForm, email: e.target.value })} placeholder="ad.soyad@banka.com" />
-                        </div>
-                        <div>
-                            <label className="form-label mb-1 block font-bold text-slate-700">Telefon</label>
-                            <input type="tel" className="form-input text-xs w-full" value={staffForm.phone} onChange={(e) => setStaffForm({ ...staffForm, phone: e.target.value })} placeholder="+90 212 555 XX XX" />
-                        </div>
+                        <FormInput
+                            label="E-posta"
+                            type="email"
+                            value={staffForm.email}
+                            onChange={(e) => setStaffForm({ ...staffForm, email: e.target.value })}
+                            placeholder="ad.soyad@banka.com"
+                        />
+                        <FormInput
+                            label="Telefon"
+                            type="tel"
+                            value={staffForm.phone}
+                            onChange={(e) => setStaffForm({ ...staffForm, phone: e.target.value })}
+                            placeholder="+90 212 555 XX XX"
+                        />
                     </div>
 
                     <div className="flex justify-end gap-2 pt-3 border-t">

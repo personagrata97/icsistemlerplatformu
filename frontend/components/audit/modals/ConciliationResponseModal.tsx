@@ -6,7 +6,8 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import Switch from '@/components/ui/Switch';
 import Tooltip from '@/components/ui/Tooltip';
 import ActionList, { ActionItem } from '../ActionList';
-import { FileUpload } from '@/components/ui/FileUpload'; // Import FileUpload component
+import { FileUpload } from '@/components/ui/FileUpload';
+import FormTextarea from '@/components/ui/FormTextarea'; // Import FileUpload component
 
 // Simple ID generator to avoid external dependencies
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -157,17 +158,14 @@ export default function ConciliationResponseModal({ isOpen, onClose, selectedIte
                         {/* CASE: DISAGREE */}
                         {isAgreed === false && (
                             <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                                <label className="form-label text-red-700 font-bold flex items-center gap-2">
-                                    <X size={16} /> Bulguya Katılmama Gerekçesi
-                                </label>
-                                <textarea
-                                    className="form-input bg-red-50/20 focus:ring-red-500/10 focus:border-red-400 border-red-100"
+                                <FormTextarea
+                                    label="Bulguya Katılmama Gerekçesi"
+                                    required
                                     rows={4}
                                     placeholder="Neden mutabık olmadığınızı ve dayanaklarınızı detaylıca açıklayınız..."
                                     value={disagreementReason}
                                     onChange={e => setDisagreementReason(e.target.value)}
-                                    required
-                                ></textarea>
+                                />
                             </div>
                         )}
 
@@ -175,32 +173,23 @@ export default function ConciliationResponseModal({ isOpen, onClose, selectedIte
                         {isAgreed === true && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-top-2">
                                 {/* Root Cause */}
-                                <div className="space-y-2">
-                                    <label className="form-label flex items-center gap-2">
-                                        <AlertCircle size={14} className="text-amber-500" /> Kök Neden Analizi
-                                    </label>
-                                    <textarea
-                                        className="form-input min-h-[80px]"
-                                        placeholder="Bu bulgunun temel sebebi nedir?"
-                                        value={rootCause}
-                                        onChange={e => setRootCause(e.target.value)}
-                                    ></textarea>
-                                </div>
+                                <FormTextarea
+                                    label="Kök Neden Analizi"
+                                    rows={2}
+                                    placeholder="Bu bulgunun temel sebebi nedir?"
+                                    value={rootCause}
+                                    onChange={e => setRootCause(e.target.value)}
+                                />
 
                                 {/* Management Response */}
-                                <div className="space-y-2">
-                                    <label className="form-label text-green-700 font-bold flex items-center gap-2">
-                                        <Check size={16} /> Birim/Yönetim Yanıtı
-                                    </label>
-                                    <textarea
-                                        className="form-input bg-green-50/20 focus:ring-green-500/10 focus:border-green-400 border-green-100"
-                                        rows={3}
-                                        placeholder="Genel yönetim yanıtı ve açıklamalarınız..."
-                                        value={response}
-                                        onChange={e => setResponse(e.target.value)}
-                                        required
-                                    ></textarea>
-                                </div>
+                                <FormTextarea
+                                    label="Birim/Yönetim Yanıtı"
+                                    required
+                                    rows={3}
+                                    placeholder="Genel yönetim yanıtı ve açıklamalarınız..."
+                                    value={response}
+                                    onChange={e => setResponse(e.target.value)}
+                                />
 
                                 {/* Dynamic Action List */}
                                 <ActionList

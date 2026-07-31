@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 
 interface EditPlanModalProps {
     isOpen: boolean;
@@ -45,15 +47,18 @@ export default function EditPlanModal({
             }
         >
             <div className="space-y-4">
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Plan Başlığı</label>
-                    <input type="text" className="form-input w-full" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
-                </div>
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
-                    <textarea className="form-textarea w-full" rows={3} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-                </div>
-                <div className="form-group">
+                <FormInput
+                    label="Plan Başlığı"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                />
+                <FormTextarea
+                    label="Açıklama"
+                    rows={3}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                />
+                <div>
                     <CustomSelect
                         label="Durum"
                         value={formData.status}

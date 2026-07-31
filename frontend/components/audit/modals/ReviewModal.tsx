@@ -3,6 +3,7 @@ import Modal from '@/components/ui/Modal';
 import { History as HistoryIcon, AlertTriangle } from 'lucide-react';
 import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
+import FormTextarea from '@/components/ui/FormTextarea';
 
 interface ReviewModalProps {
     isOpen: boolean;
@@ -64,16 +65,14 @@ export default function ReviewModal({
                     <div><strong>Bulgu Başlığı:</strong> {finding.title}</div>
                 </div>
 
-                <div className="form-group">
-                    <label className="form-label text-gray-700 font-semibold mb-2 block">Revizyon Notu / Düzeltme Gerekçesi</label>
-                    <textarea
-                        className="form-textarea min-h-[140px]"
-                        placeholder="Müfettişin düzeltmesi gereken alanları ve nedenlerini buraya detaylıca yazınız..."
-                        value={notes}
-                        onChange={e => setNotes(e.target.value)}
-                        required
-                    ></textarea>
-                </div>
+                <FormTextarea
+                    label="Revizyon Notu / Düzeltme Gerekçesi"
+                    required
+                    rows={4}
+                    placeholder="Müfettişin düzeltmesi gereken alanları ve nedenlerini buraya detaylıca yazınız..."
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                />
             </div>
         </Modal>
     );

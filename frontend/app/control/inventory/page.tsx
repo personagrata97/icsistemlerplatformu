@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
@@ -228,43 +230,31 @@ function ControlInventoryPageContent() {
                 size="lg"
             >
                 <form onSubmit={handleAddControl} className="space-y-4 text-xs">
-                    <div>
-                        <label className="font-bold text-gray-700 block mb-1">Kontrol Adı / Tanımı *</label>
-                        <input
-                            type="text"
-                            required
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
-                            placeholder="Örn: Kredi Tahsis Yetki Limitlerinin Sistemsel Kısıtlanması Kontrolü"
-                            value={newControl.title}
-                            onChange={(e) => setNewControl({ ...newControl, title: e.target.value })}
-                        />
-                    </div>
+                    <FormInput
+                        label="Kontrol Adı / Tanımı"
+                        required
+                        placeholder="Örn: Kredi Tahsis Yetki Limitlerinin Sistemsel Kısıtlanması Kontrolü"
+                        value={newControl.title}
+                        onChange={(e) => setNewControl({ ...newControl, title: e.target.value })}
+                    />
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="font-bold text-gray-700 block mb-1">İlişkili Süreç</label>
-                            <input
-                                type="text"
-                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
-                                value={newControl.processName}
-                                onChange={(e) => setNewControl({ ...newControl, processName: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="font-bold text-gray-700 block mb-1">Sorumlu Birim</label>
-                            <input
-                                type="text"
-                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
-                                value={newControl.department}
-                                onChange={(e) => setNewControl({ ...newControl, department: e.target.value })}
-                            />
-                        </div>
+                        <FormInput
+                            label="İlişkili Süreç"
+                            value={newControl.processName}
+                            onChange={(e) => setNewControl({ ...newControl, processName: e.target.value })}
+                        />
+                        <FormInput
+                            label="Sorumlu Birim"
+                            value={newControl.department}
+                            onChange={(e) => setNewControl({ ...newControl, department: e.target.value })}
+                        />
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                         <div>
-                            <label className="font-bold text-gray-700 block mb-1">Kontrol Türü</label>
                             <CustomSelect
+                                label="Kontrol Türü"
                                 options={[
                                     { value: 'Önleyici', label: 'Önleyici' },
                                     { value: 'Tespit Edici', label: 'Tespit Edici' },
@@ -275,8 +265,8 @@ function ControlInventoryPageContent() {
                             />
                         </div>
                         <div>
-                            <label className="font-bold text-gray-700 block mb-1">Uygulama Yöntemi</label>
                             <CustomSelect
+                                label="Uygulama Yöntemi"
                                 options={[
                                     { value: 'Otomatik', label: 'Otomatik (Sistemsel)' },
                                     { value: 'Elle', label: 'Manuel (Elle)' },
@@ -287,8 +277,8 @@ function ControlInventoryPageContent() {
                             />
                         </div>
                         <div>
-                            <label className="font-bold text-gray-700 block mb-1">Kontrol Sıklığı</label>
                             <CustomSelect
+                                label="Kontrol Sıklığı"
                                 options={[
                                     { value: 'Sürekli', label: 'Sürekli (Anlık)' },
                                     { value: 'Günlük', label: 'Günlük' },
@@ -301,16 +291,13 @@ function ControlInventoryPageContent() {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="font-bold text-gray-700 block mb-1">Bağlı Risk Açıklaması</label>
-                        <textarea
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs"
-                            rows={2}
-                            placeholder="Bu kontrolün azaltmayı hedeflediği ana operasyonel/mali risk..."
-                            value={newControl.riskTitle}
-                            onChange={(e) => setNewControl({ ...newControl, riskTitle: e.target.value })}
-                        />
-                    </div>
+                    <FormTextarea
+                        label="Bağlı Risk Açıklaması"
+                        rows={2}
+                        placeholder="Bu kontrolün azaltmayı hedeflediği ana operasyonel/mali risk..."
+                        value={newControl.riskTitle}
+                        onChange={(e) => setNewControl({ ...newControl, riskTitle: e.target.value })}
+                    />
 
                     <div className="flex justify-end gap-2 pt-2 border-t">
                         <Button type="button" variant="secondary" onClick={() => setIsAddModalOpen(false)}>İptal</Button>

@@ -10,6 +10,8 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
+import FormInput from '@/components/ui/FormInput';
+import FormTextarea from '@/components/ui/FormTextarea';
 import DateDisplay from '@/components/ui/DateDisplay';
 import CustomSelect from '@/components/ui/CustomSelect';
 import ActionMenu from '@/components/ui/ActionMenu';
@@ -146,14 +148,19 @@ function ControlReportsPageContent() {
             {/* Report Creation Modal */}
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Yeni İç Kontrol Dönem Raporu Oluştur" size="lg">
                 <form onSubmit={handleSaveReport} className="space-y-4">
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Rapor Kodu</label>
-                        <input type="text" className="form-input text-xs w-full bg-slate-100 font-mono" value={newReport.id} readOnly />
-                    </div>
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Rapor Başlığı / Tanımı (Zorunlu)</label>
-                        <input type="text" className="form-input text-xs w-full" placeholder="Örn: 2026 Q3 Dönemsel İç Kontrol Değerlendirme Raporu..." value={newReport.ad} onChange={(e) => setNewReport({ ...newReport, ad: e.target.value })} required />
-                    </div>
+                    <FormInput
+                        label="Rapor Kodu"
+                        value={newReport.id}
+                        readOnlyView
+                        inputClassName="font-mono"
+                    />
+                    <FormInput
+                        label="Rapor Başlığı / Tanımı"
+                        required
+                        placeholder="Örn: 2026 Q3 Dönemsel İç Kontrol Değerlendirme Raporu..."
+                        value={newReport.ad}
+                        onChange={(e) => setNewReport({ ...newReport, ad: e.target.value })}
+                    />
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <CustomSelect
@@ -163,15 +170,19 @@ function ControlReportsPageContent() {
                                 onChange={(val) => setNewReport({ ...newReport, birim: val as string })}
                             />
                         </div>
-                        <div>
-                            <label className="form-label mb-1 block text-xs font-bold text-slate-700">Hazırlayan İç Kontrolör</label>
-                            <input type="text" className="form-input text-xs w-full" value={newReport.yazar} onChange={(e) => setNewReport({ ...newReport, yazar: e.target.value })} />
-                        </div>
+                        <FormInput
+                            label="Hazırlayan İç Kontrolör"
+                            value={newReport.yazar}
+                            onChange={(e) => setNewReport({ ...newReport, yazar: e.target.value })}
+                        />
                     </div>
-                    <div>
-                        <label className="form-label mb-1 block text-xs font-bold text-slate-700">Rapor İçerik Özeti</label>
-                        <textarea className="form-input text-xs w-full" rows={3} placeholder="Rapor kapsamı, test edilen kontroller, tespit edilen eksiklikler..." value={newReport.icerik} onChange={(e) => setNewReport({ ...newReport, icerik: e.target.value })} />
-                    </div>
+                    <FormTextarea
+                        label="Rapor İçerik Özeti"
+                        rows={3}
+                        placeholder="Rapor kapsamı, test edilen kontroller, tespit edilen eksiklikler..."
+                        value={newReport.icerik}
+                        onChange={(e) => setNewReport({ ...newReport, icerik: e.target.value })}
+                    />
                     <div>
                         <CustomSelect label="Rapor Durumu" options={[
                             { value: 'TASLAK', label: 'TASLAK' },
