@@ -1,7 +1,9 @@
 'use client';
+import PageHeader from '@/components/ui/PageHeader';
+import RequireRole from '@/components/auth/RequireRole';
+import FormInput from '@/components/ui/FormInput';
 
-import React, { useState, useEffect } from 'react';
-import { Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import LoadingState from '@/components/ui/LoadingState';
 import { useSearchParams } from 'next/navigation';
 import { 
@@ -255,6 +257,7 @@ function FastTrackPageContent() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 p-4 md:p-8 flex flex-col items-center justify-center">
+            <PageHeader title="Hızlı Denetim (Fast-Track)" subtitle="Acil ve kritik konularda hızlı denetim görevi oluşturma ve yürütme" />
             
             {/* Elegant Header */}
             <div className="w-full max-w-4xl text-center mb-8">
@@ -283,8 +286,8 @@ function FastTrackPageContent() {
                             <div>
                                 <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">AD Sicil / Kullanıcı Adı</label>
                                 <div className="relative">
-                                    <User className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
-                                    <input 
+                                    <User className="absolute left-3 top-3 w-4 h-4 text-slate-500 z-10" />
+                                    <FormInput 
                                         type="text" 
                                         value={adUsername}
                                         onChange={(e) => setAdUsername(e.target.value)}
@@ -297,8 +300,8 @@ function FastTrackPageContent() {
                             <div>
                                 <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">AD Şifre</label>
                                 <div className="relative">
-                                    <Key className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
-                                    <input 
+                                    <Key className="absolute left-3 top-3 w-4 h-4 text-slate-500 z-10" />
+                                    <FormInput 
                                         type="password" 
                                         value={adPassword}
                                         onChange={(e) => setAdPassword(e.target.value)}
@@ -491,7 +494,7 @@ function FastTrackPageContent() {
                                             
                                             <div className="md:col-span-6 space-y-1">
                                                 <label className="block text-[10px] text-slate-500 font-semibold uppercase">Aksiyon Planı Açıklaması</label>
-                                                <input 
+                                                <FormInput 
                                                     type="text"
                                                     value={act.action}
                                                     onChange={(e) => updateActionRow(index, 'action', e.target.value)}
@@ -502,7 +505,7 @@ function FastTrackPageContent() {
 
                                             <div className="md:col-span-2 space-y-1">
                                                 <label className="block text-[10px] text-slate-500 font-semibold uppercase">Sorumlu Birim/Sicil</label>
-                                                <input 
+                                                <FormInput 
                                                     type="text"
                                                     value={act.responsible}
                                                     onChange={(e) => updateActionRow(index, 'responsible', e.target.value)}
@@ -513,7 +516,7 @@ function FastTrackPageContent() {
 
                                             <div className="md:col-span-2 space-y-1">
                                                 <label className="block text-[10px] text-slate-500 font-semibold uppercase">Vade Tarihi</label>
-                                                <input 
+                                                <FormInput 
                                                     type="date"
                                                     value={act.dueDate}
                                                     onChange={(e) => updateActionRow(index, 'dueDate', e.target.value)}
@@ -678,8 +681,10 @@ function FastTrackPageContent() {
 
 export default function FastTrackPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingState message="Sayfa Yükleniyor..." /></div>}>
-      <FastTrackPageContent />
-    </Suspense>
+    <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingState message="Sayfa Yükleniyor..." /></div>}>
+        <FastTrackPageContent />
+      </Suspense>
+    </RequireRole>
   );
 }
