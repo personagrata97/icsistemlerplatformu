@@ -12,7 +12,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import DateDisplay from '@/components/ui/DateDisplay';
 import CodeBadge from '@/components/ui/CodeBadge';
 import StatusBadge from '@/components/ui/StatusBadge';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import Checkbox from '@/components/ui/Checkbox';
 import { useToast } from '@/components/Toast';
@@ -150,7 +150,7 @@ function RiskTrashPageContent() {
                     ) },
                     { key: 'deletedAt', header: 'Silinme Tarihi', type: 'date' as any, width: '160px' },
                     { key: 'actions', header: 'İşlemler', width: '130px', render: (item: any) => (
-                        <ActionMenu
+                        <TableActions
                             items={[
                                 { label: 'Detayları Görüntüle', icon: <Eye size={14} />, onClick: () => setSelectedItem(item) },
                                 { label: 'Geri Yükle', icon: <RotateCcw size={14} />, onClick: () => setConfirmRestore({ isOpen: true, item }) },

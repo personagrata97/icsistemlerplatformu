@@ -1,6 +1,6 @@
 import React from 'react';
 import { Eye, FileCheck, Edit2, Trash2, AlertTriangle } from 'lucide-react';
-import ActionMenu, { ActionMenuItem } from '@/components/ui/ActionMenu';
+import TableActions, { TableActionsItem } from '@/components/ui/TableActions';
 import Tooltip from '@/components/ui/Tooltip';
 
 interface IndependenceActionButtonsProps {
@@ -9,7 +9,7 @@ interface IndependenceActionButtonsProps {
     onReview?: (declaration: any) => void;
     onEdit?: (declaration: any) => void;
     onDelete?: (declaration: any) => void;
-    showLabels?: boolean; // deprecated with ActionMenu
+    showLabels?: boolean; // deprecated with TableActions
 }
 
 export default function IndependenceActionButtons({
@@ -19,7 +19,7 @@ export default function IndependenceActionButtons({
     onEdit,
     onDelete,
 }: IndependenceActionButtonsProps) {
-    const menuItems: ActionMenuItem[] = [];
+    const menuItems: TableActionsItem[] = [];
 
     menuItems.push({
         label: "İncele",
@@ -65,7 +65,7 @@ export default function IndependenceActionButtons({
                     </div>
                 </Tooltip>
             )}
-            <ActionMenu items={menuItems} />
+            <TableActions items={menuItems} />
         </div>
     );
 }

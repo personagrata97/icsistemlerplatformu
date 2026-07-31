@@ -3,9 +3,9 @@
 import React from 'react';
 import { Users, Plus, Mail, Phone, FolderOpen, Trash2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import UserCell from '@/components/ui/UserCell';
+import PersonCell from '@/components/ui/PersonCell';
 
 interface TeamMember {
     id: string;
@@ -35,7 +35,7 @@ const AuditTeamTab: React.FC<AuditTeamTabProps> = ({
             sortable: true,
             align: 'left',
             render: (member) => (
-                <UserCell name={member.name} className="!w-auto" />
+                <PersonCell name={member.name} className="!w-auto" />
             )
         },
         {
@@ -70,7 +70,7 @@ const AuditTeamTab: React.FC<AuditTeamTabProps> = ({
             width: '80px',
             align: 'center' as const,
             render: (member) => (
-                <ActionMenu
+                <TableActions
                     variant="ghost"
                     items={[
                         {

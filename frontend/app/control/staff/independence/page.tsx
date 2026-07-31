@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -9,7 +10,7 @@ import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import StatusBadge from '@/components/ui/StatusBadge';
-import UserAvatar from '@/components/ui/UserAvatar';
+import PersonCell from '@/components/ui/PersonCell';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
@@ -64,14 +65,14 @@ function ControlStaffIndependencePageContent() {
                 columns={[
                     { key: 'name', header: 'Personel', sortable: true, render: (row: any) => (
                         <div className="flex items-center gap-3">
-                            <UserAvatar name={row.name} size="md" />
+                            <PersonCell name={row.name} size="md" />
                             <div>
                                 <div className="font-bold text-slate-900 text-xs">{row.name}</div>
                                 <div className="text-[11px] text-slate-500">{row.title}</div>
                             </div>
                         </div>
                     ) },
-                    { key: 'department', header: 'Birim', render: (row: any) => <span className="text-xs font-semibold text-slate-700">{row.department}</span> },
+                    { key: 'department', header: 'Birim', render: (row: any) => <span className="text-xs font-semibold text-slate-700"><UnitBadge name={row.department} /></span> },
                     { key: 'period', header: 'Beyan Dönemi', width: '130px', render: (row: any) => <span className="font-mono text-xs font-bold text-slate-800">{row.period}</span> },
                     { key: 'status', header: 'Uyum Durumu', width: '140px', render: (row: any) => <StatusBadge value={row.status} type="status" /> },
                     { key: 'declaredAt', header: 'Beyan Tarihi', type: 'date', width: '130px' },
@@ -90,7 +91,7 @@ function ControlStaffIndependencePageContent() {
                     <div className="p-4 space-y-4 text-xs">
                         <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
                             <h4 className="font-bold text-slate-900">{selectedStaff.name} — {selectedStaff.title}</h4>
-                            <p className="text-slate-500 font-medium">{selectedStaff.department}</p>
+                            <p className="text-slate-500 font-medium"><UnitBadge name={selectedStaff.department} /></p>
                         </div>
 
                         <div className="p-4 bg-white border border-slate-200 rounded-xl space-y-2">

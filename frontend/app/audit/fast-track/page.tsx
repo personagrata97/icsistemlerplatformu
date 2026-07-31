@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
@@ -386,7 +387,7 @@ function FastTrackPageInner() {
 
                                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                                     <span className="block text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1">Birim / Departman</span>
-                                    <div className="text-xs font-bold text-slate-800">{findingDetails.department}</div>
+                                    <div className="text-xs font-bold text-slate-800"><UnitBadge name={findingDetails.department} /></div>
                                 </div>
                             </div>
 

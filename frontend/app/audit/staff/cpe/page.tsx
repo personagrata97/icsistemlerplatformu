@@ -12,7 +12,7 @@ import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Modal from '@/components/ui/Modal';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import PageHeader from '@/components/ui/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import EmptyState from '@/components/ui/EmptyState';
@@ -192,7 +192,7 @@ function CpePageContent() {
                 
                 return (
                     <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                        <ActionMenu
+                        <TableActions
                             items={[
                                 { label: 'Eğitim Detayları', icon: <Eye size={14} />, onClick: () => setSelectedStaff(row) }
                             ]}

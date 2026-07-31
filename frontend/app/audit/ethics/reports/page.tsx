@@ -15,7 +15,7 @@ import { useAuditTitle } from '@/context/AuditTitleContext';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
 import ActionLink from '@/components/ui/ActionLink';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import PageHeader from '@/components/ui/PageHeader';
@@ -150,7 +150,7 @@ function EthicsReportsPageContent() {
                         align: 'center',
                         render: (item: any) => (
                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                <ActionMenu items={[{ label: 'Detayı İncele', icon: Eye, onClick: () => router.push(`/audit/ethics?id=${item.id}`) }]} />
+                                <TableActions items={[{ label: 'Detayı İncele', icon: Eye, onClick: () => router.push(`/audit/ethics?id=${item.id}`) }]} />
                             </div>
                         )
                     }

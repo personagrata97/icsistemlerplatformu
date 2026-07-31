@@ -11,7 +11,7 @@ import PageHeader from '@/components/ui/PageHeader';
 import LoadingState from '@/components/ui/LoadingState';
 import Tooltip from '@/components/ui/Tooltip';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 
 import { auditApi } from '@/lib/audit-api';
 import Modal from '@/components/ui/Modal';
@@ -304,7 +304,7 @@ const TreeNode = ({ node, units, level, canManage, onEdit, onDelete, onViewRCM, 
                                             {unit.auditCycle && <span className="text-[10px] text-gray-500 mt-1">Döngü: {unit.auditCycle} Yıl</span>}
                                         </div>
                                         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                            <ActionMenu
+                                            <TableActions
                                                 variant="ghost"
                                                 items={[
                                                     { label: 'RCM Görüntüle', icon: Shield, onClick: () => onViewRCM(unit.id) },
@@ -1122,7 +1122,7 @@ function AuditUniversePageContent() {
                             width: '100px',
                             render: (unit: AuditableUnit) => (
                                 <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                    <ActionMenu
+                                    <TableActions
                                         variant="ghost"
                                         items={[
                                             { label: 'RCM', icon: Shield, onClick: () => router.push(`/audit/universe/${unit.id}`) },
@@ -1264,7 +1264,7 @@ function AuditUniversePageContent() {
 
                                         return (
                                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                                <ActionMenu variant="ghost" items={items} />
+                                                <TableActions variant="ghost" items={items} />
                                             </div>
                                         );
                                     }
@@ -1397,7 +1397,7 @@ function AuditUniversePageContent() {
                                         {item.estimatedDays ? `${item.estimatedDays} gün` : '-'}
                                     </div>
                                     <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                        <ActionMenu
+                                        <TableActions
                                             variant="ghost"
                                             items={[
                                                 { label: 'RCM Görüntüle', icon: Shield, onClick: () => router.push(`/audit/universe/${item.id}`) },

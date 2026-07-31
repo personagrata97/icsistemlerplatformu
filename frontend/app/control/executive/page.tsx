@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -156,7 +157,7 @@ function ControlExecutiveDashboardContent() {
                                     <div className="text-[11px] text-slate-500">{item.unvan}</div>
                                 </div>
                             ) },
-                            { key: 'birim', header: 'Birim', width: '200px', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.birim}</span> },
+                            { key: 'birim', header: 'Birim', width: '200px', render: (item: any) => <span className="text-xs font-semibold text-slate-700"><UnitBadge name={item.birim} /></span> },
                             { key: 'testSayisi', header: 'Test Sayısı', width: '120px', sortable: true, render: (item: any) => <span className="font-mono text-xs font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded">{item.testSayisi}</span> },
                             { key: 'acikEksiklik', header: 'Açık Eksiklik', width: '130px', render: (item: any) => (
                                 <span className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${item.acikEksiklik > 0 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}`}>
@@ -218,7 +219,7 @@ function ControlExecutiveDashboardContent() {
                         <DashboardWidget title="KÖD Gönderim Uyumu (Q2 2026)" icon={FileBarChart}>
                             <DataTable
                                 columns={[
-                                    { key: 'birim', header: 'Birim', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.birim}</span> },
+                                    { key: 'birim', header: 'Birim', render: (item: any) => <span className="text-xs font-semibold text-slate-700"><UnitBadge name={item.birim} /></span> },
                                     { key: 'durum', header: 'KÖD Durumu', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
                                     { key: 'tarih', header: 'Gönderim', width: '120px', type: 'date' as any }
                                 ]}

@@ -12,7 +12,7 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import DataTable from '@/components/ui/DataTable';
 import { formatDate } from '@/lib/audit-utils';
 import ConfirmModal from '@/components/ConfirmModal';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 
 import PageToolbar from '@/components/ui/PageToolbar';
 import PageHeader from '@/components/ui/PageHeader';

@@ -10,7 +10,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Badge from '@/components/ui/Badge';
 import StatusBadge from '@/components/ui/StatusBadge';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
@@ -97,7 +97,7 @@ function TimesheetPageContent() {
             header: 'İşlemler',
             align: 'center' as const,
             render: (row: any) => (
-                <ActionMenu items={[
+                <TableActions items={[
                     { 
                         label: 'Çizelge Detayı', 
                         icon: Clock, 

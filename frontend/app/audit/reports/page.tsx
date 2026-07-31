@@ -15,7 +15,7 @@ import RefreshButton from '@/components/ui/RefreshButton';
 import EmptyState from '@/components/ui/EmptyState';
 import Tooltip from '@/components/ui/Tooltip';
 import DataTable from '@/components/ui/DataTable';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import Button from '@/components/ui/Button';
 import PageToolbar from '@/components/ui/PageToolbar';
 import PartialCopyModal from '@/components/audit/PartialCopyModal';
@@ -275,7 +275,7 @@ function ReportsPageContent() {
                         width: '60px',
                         align: 'right',
                         render: (item: any) => (
-                            <ActionMenu
+                            <TableActions
                                 items={[
                                     {
                                         label: 'Raporu İndir',

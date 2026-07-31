@@ -23,7 +23,7 @@ import { useAuditTitle } from '@/context/AuditTitleContext';
 import Tooltip from '@/components/ui/Tooltip';
 import { DateDisplay } from '@/components/ui/DateDisplay';
 import Button from '@/components/ui/Button';
-import ActionMenu, { ActionMenuItem } from '@/components/ui/ActionMenu';
+import TableActions, { TableActionsItem } from '@/components/ui/TableActions';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import PageHeader from '@/components/ui/PageHeader';
 import StatCard from '@/components/ui/StatCard';
@@ -543,7 +543,7 @@ function TrashPageContent() {
                         render: (item: any) => {
                             return (
                                 <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                    <ActionMenu items={[
+                                    <TableActions items={[
                                         { label: 'İncele', icon: Eye, onClick: () => { setSelectedItem(item); setShowViewModal(true); } },
                                         { label: 'Geri Yükle', icon: RotateCcw, onClick: () => handleRestore(item.id, item.sourceType) },
                                         ...(isManager ? [{ label: 'Kalıcı Sil', icon: ShieldX, variant: 'danger' as const, onClick: () => handlePermanentDelete(item.id, item.sourceType) }] : [])

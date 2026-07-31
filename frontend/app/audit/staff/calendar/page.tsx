@@ -9,7 +9,7 @@ import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Badge from '@/components/ui/Badge';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { getPhotoUrl } from '@/lib/audit-utils';
 import { Calendar, X } from 'lucide-react';
 import { auditApi } from '@/lib/audit-api';
@@ -137,7 +137,7 @@ function CalendarPageContent() {
             header: 'İşlemler',
             align: 'center' as const,
             render: (row: any) => (
-                <ActionMenu items={[
+                <TableActions items={[
                     { 
                         label: 'Takvimi İncele', 
                         icon: Calendar, 

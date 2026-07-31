@@ -1,6 +1,6 @@
 import React from 'react';
 import { Eye, Edit2, Trash2, AlertCircle } from 'lucide-react';
-import ActionMenu, { ActionMenuItem } from '@/components/ui/ActionMenu';
+import TableActions, { TableActionsItem } from '@/components/ui/TableActions';
 
 interface EducationActionButtonsProps {
     onView?: () => void;
@@ -8,7 +8,7 @@ interface EducationActionButtonsProps {
     onDelete?: () => void;
     onResolve?: () => void;
     isOverdue?: boolean;
-    showLabels?: boolean; // Deprecated with ActionMenu
+    showLabels?: boolean; // Deprecated with TableActions
 }
 
 const EducationActionButtons: React.FC<EducationActionButtonsProps> = ({
@@ -18,7 +18,7 @@ const EducationActionButtons: React.FC<EducationActionButtonsProps> = ({
     onResolve,
     isOverdue = false,
 }) => {
-    const menuItems: ActionMenuItem[] = [];
+    const menuItems: TableActionsItem[] = [];
 
     if (isOverdue && onResolve) {
         menuItems.push({
@@ -56,7 +56,7 @@ const EducationActionButtons: React.FC<EducationActionButtonsProps> = ({
 
     return (
         <div className="flex justify-center" onClick={e => e.stopPropagation()}>
-            <ActionMenu items={menuItems} />
+            <TableActions items={menuItems} />
         </div>
     );
 };

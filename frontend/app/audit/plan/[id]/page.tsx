@@ -1,3 +1,4 @@
+import PersonCell from '@/components/ui/PersonCell';
 import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
@@ -27,7 +28,7 @@ import ResourcePlanningModal from '@/components/audit/modals/ResourcePlanningMod
 import EditPlanModal from '@/components/audit/modals/EditPlanModal';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import DataTable from '@/components/ui/DataTable';
 import { clsx } from 'clsx';
 import EmptyState from '@/components/ui/EmptyState';
@@ -290,7 +291,7 @@ function AuditPlanDetailPageContent() {
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <ActionMenu items={[
+                    <TableActions items={[
                         { label: 'Düzenle', icon: Edit2, onClick: () => setShowEditModal(true) },
                         { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => setShowDeleteConfirm(true) }
                     ]} />
@@ -443,7 +444,7 @@ function AuditPlanDetailPageContent() {
                                                         {audit.status}
                                                     </span>
                                                     <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                                        <ActionMenu items={[
+                                                        <TableActions items={[
                                                             { label: 'İncele', icon: Eye, onClick: () => router.push(`/audit/audits/${audit.id}`) },
                                                             { label: 'Kaldır', icon: Trash2, variant: 'danger' as const, onClick: () => handleRemoveAuditFromPlan(audit.id) }
                                                         ]} />
@@ -473,12 +474,7 @@ function AuditPlanDetailPageContent() {
                                         key: 'name',
                                         header: 'Personel',
                                         render: (r: any) => (
-                                            <div className="cell-user">
-                                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs ring-2 ring-white shadow-sm">
-                                                    {r.name?.charAt(0) || 'P'}
-                                                </div>
-                                                <span className="font-semibold text-slate-700">{r.name}</span>
-                                            </div>
+                                            <PersonCell name={r.name} />
                                         )
                                     },
                                     {
@@ -506,7 +502,7 @@ function AuditPlanDetailPageContent() {
                                         align: 'center',
                                         render: (r: any) => (
                                             <div className="flex justify-center items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                                <ActionMenu items={[
+                                                <TableActions items={[
                                                     { label: 'Kaldır', icon: Trash2, variant: 'danger' as const, onClick: () => handleRemoveResource(r.staffId) }
                                                 ]} />
                                             </div>

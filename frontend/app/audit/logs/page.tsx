@@ -9,7 +9,7 @@ import {
     FileText, AlertCircle, CheckCircle, Clock, X, Download, ShieldCheck,
     Eye, ArrowRight, Activity, Database, ChevronLeft, ChevronRight
 } from 'lucide-react';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import Tooltip from '@/components/ui/Tooltip';
 import { auditApi } from '@/lib/audit-api';
 import RefreshButton from '@/components/ui/RefreshButton';

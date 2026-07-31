@@ -1,6 +1,6 @@
 import { Eye, Edit2, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import ActionMenu, { ActionMenuItem } from '@/components/ui/ActionMenu';
+import TableActions, { TableActionsItem } from '@/components/ui/TableActions';
 
 interface AuditActionButtonsProps {
     viewUrl?: string;
@@ -9,7 +9,7 @@ interface AuditActionButtonsProps {
     onDelete?: () => void;
     canDelete?: boolean;
     className?: string; // no longer fully determining horizontal layout but kept for compatibility
-    showLabels?: boolean; // deprecated with ActionMenu, kept for prop compatibility
+    showLabels?: boolean; // deprecated with TableActions, kept for prop compatibility
     viewTooltip?: string;
     editTooltip?: string;
     deleteTooltip?: string;
@@ -27,7 +27,7 @@ const AuditActionButtons: React.FC<AuditActionButtonsProps> = ({
 }) => {
     const router = useRouter();
 
-    const menuItems: ActionMenuItem[] = [];
+    const menuItems: TableActionsItem[] = [];
 
     if (viewUrl || onView) {
         menuItems.push({
@@ -59,7 +59,7 @@ const AuditActionButtons: React.FC<AuditActionButtonsProps> = ({
 
     return (
         <div className="flex justify-center" onClick={e => e.stopPropagation()}>
-            <ActionMenu items={menuItems} />
+            <TableActions items={menuItems} />
         </div>
     );
 };

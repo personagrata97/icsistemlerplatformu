@@ -2,7 +2,7 @@ import React from 'react';
 import { Eye, Edit, Trash2, Bell, History as HistoryIcon } from 'lucide-react';
 import { Finding } from '@/lib/audit-api';
 import { useAuth } from '@/context/AuthContext';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 
 interface FindingActionButtonsProps {
     finding: Finding;
@@ -58,7 +58,7 @@ export default function FindingActionButtons({
 
     return (
         <div className="flex justify-center" onClick={e => e.stopPropagation()}>
-            <ActionMenu items={items} />
+            <TableActions items={items} />
         </div>
     );
 }

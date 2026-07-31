@@ -2,7 +2,7 @@ import FormTextarea from '@/components/ui/FormTextarea';
 import React, { useState } from 'react';
 import DashboardWidget from '@/components/ui/DashboardWidget';
 import DashboardListItem from '@/components/ui/DashboardListItem';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import EmptyState from '@/components/ui/EmptyState';
 import ConfirmModal from '@/components/ConfirmModal';
 import Modal from '@/components/ui/Modal';
@@ -280,7 +280,7 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                                     subtitle={l.type}
                                     status="Planlandı"
                                     rightContent={
-                                        <ActionMenu 
+                                        <TableActions 
                                             items={[
                                                 { label: 'Onayla', icon: CheckSquare, onClick: () => setApproveLeaveId(l.id) },
                                                 { label: 'Reddet', icon: XCircle, onClick: () => setRejectLeaveId(l.id) }
@@ -507,7 +507,7 @@ const ExecutiveTeam: React.FC<ExecutiveTeamProps> = ({
                                                                     <Badge variant="outline" size="sm" className="text-slate-400">Planlanmadı</Badge>
                                                                 )}
                                                                 
-                                                                <ActionMenu 
+                                                                <TableActions 
                                                                     items={[
                                                                         { label: 'Görevi Devret', icon: Target, onClick: () => setReassignAuditData({ auditId: currentAuditId, currentStaffId: selectedStaffForTimeline.id, auditTitle: assignment.title, role: assignment.role }) },
                                                                         { label: 'Ekipten Çıkar', icon: XCircle, variant: 'danger', onClick: () => setRemoveAuditData({ auditId: currentAuditId, currentStaffId: selectedStaffForTimeline.id, auditTitle: assignment.title, role: assignment.role }) }

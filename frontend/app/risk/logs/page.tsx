@@ -12,7 +12,7 @@ import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Modal from '@/components/ui/Modal';
 import { formatDate } from '@/lib/audit-utils';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import DateDisplay from '@/components/ui/DateDisplay';
 
 import PageToolbar from '@/components/ui/PageToolbar';
@@ -151,7 +151,7 @@ function RiskLogsPageContent() {
                         align: 'center',
                         render: (log: any) => (
                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                <ActionMenu items={[{ label: 'Detay İncele', icon: Eye, onClick: () => setSelectedLog(log) }]} />
+                                <TableActions items={[{ label: 'Detay İncele', icon: Eye, onClick: () => setSelectedLog(log) }]} />
                             </div>
                         )
                     }

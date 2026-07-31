@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import FormTextarea from '@/components/ui/FormTextarea';
 import React, { useEffect, useState } from 'react';
 import { MessageSquare, FileText, Target, AlertCircle, Calendar, User, Search, CheckCircle, XCircle, Send } from 'lucide-react';
@@ -148,7 +149,7 @@ export default function ConciliationViewModal({ isOpen, onClose, selectedItem, o
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm bg-gray-50 p-4 rounded-xl border border-gray-100">
                             <div className="space-y-1">
                                 <span className="text-gray-400 text-xs uppercase tracking-wider font-semibold">Departman</span>
-                                <p className="font-medium text-gray-800">{selectedItem.department}</p>
+                                <p className="font-medium text-gray-800"><UnitBadge name={selectedItem.department} /></p>
                             </div>
                             <div className="space-y-1">
                                 <span className="text-gray-400 text-xs uppercase tracking-wider font-semibold">Yönetici</span>

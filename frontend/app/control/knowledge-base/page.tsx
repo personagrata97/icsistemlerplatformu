@@ -16,7 +16,7 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { BookOpen, FileText, Download, ShieldCheck, CheckCircle2, Plus, Eye, Trash2, Scale, ClipboardList } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
@@ -127,7 +127,7 @@ function ControlKnowledgeBasePageContent() {
                     { key: 'durum', header: 'Durum', width: '130px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
                     { key: 'tarih', header: 'Yayın Tarihi', type: 'date', width: '150px' },
                     { key: 'actions', header: 'İşlemler', width: '120px', render: (item: any) => (
-                        <ActionMenu items={[
+                        <TableActions items={[
                             { label: 'Detay Görüntüle', icon: <Eye size={14} />, onClick: () => setSelectedDoc(item) },
                             { label: 'İndir (PDF)', icon: <Download size={14} />, onClick: () => showToast(`${item.ad} indiriliyor`, 'success') },
                             { label: 'Sil', icon: <Trash2 size={14} />, onClick: () => showToast(`${item.id} silindi`, 'success'), variant: 'danger' as any }

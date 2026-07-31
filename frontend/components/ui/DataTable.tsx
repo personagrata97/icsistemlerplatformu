@@ -10,7 +10,7 @@ import { LucideIcon, Calendar, Clock, User as UserIcon, Mail, Phone, Info } from
 import { formatDate, formatDateTime, getPhotoUrl } from '@/lib/audit-utils';
 import CodeBadge from './CodeBadge';
 import StatusBadge from './StatusBadge';
-import UserCell from './UserCell';
+import PersonCell from './PersonCell';
 import OverflowTooltip from './OverflowTooltip';
 import Tooltip from './Tooltip';
 
@@ -271,7 +271,7 @@ export default function DataTable<T>({
                 const userAlignClass = col.align === 'left' ? 'justify-start' : col.align === 'right' ? 'justify-end' : 'justify-center';
                 return (
                     <div className="w-full">
-                        <UserCell name={nameStr} title={titleStr} avatarUrl={photoUrlStr ? getPhotoUrl(photoUrlStr) || undefined : undefined} className={userAlignClass} />
+                        <PersonCell name={nameStr} title={titleStr} avatarUrl={photoUrlStr ? getPhotoUrl(photoUrlStr) || undefined : undefined} className={userAlignClass} />
                     </div>
                 );
             default:

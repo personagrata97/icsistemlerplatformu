@@ -20,10 +20,10 @@ import ConfirmModal from '@/components/ConfirmModal';
 import LoadingState from '@/components/ui/LoadingState';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import FormField from '@/components/ui/FormField';
 import ProfileHeader from '@/components/ui/ProfileHeader';
-import UserAvatar from '@/components/ui/UserAvatar';
+import PersonCell from '@/components/ui/PersonCell';
 import SectionHeader from '@/components/ui/SectionHeader';
 import CodeBadge from '@/components/ui/CodeBadge';
 import InfoItem from '@/components/ui/InfoItem';
@@ -1266,7 +1266,7 @@ function AuditStaffPageContent() {
                         align: 'center',
                         render: (staff: AuditStaff) => (
                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                <ActionMenu items={[
+                                <TableActions items={[
                                     { label: 'Detayı İncele', icon: Eye, onClick: () => openModal(staff, true) },
                                     ...(canManage || user?.id === staff.id ? [{ label: 'Düzenle', icon: Edit2, onClick: () => openModal(staff, false) }] : [])
                                 ]} />
@@ -1756,7 +1756,7 @@ function AuditStaffPageContent() {
                                                     </div>
                                                     {!isViewMode && canManage && (
                                                         <div className="flex gap-2">
-                                                            <ActionMenu items={[
+                                                            <TableActions items={[
                                                                 { label: 'Düzenle', icon: Edit2, onClick: () => openPromotionModal(promo) },
                                                                 { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => handleDeletePromotion(promo.id) }
                                                             ]} />
@@ -1828,7 +1828,7 @@ function AuditStaffPageContent() {
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     {canManage && (
-                                                        <ActionMenu
+                                                        <TableActions
                                                             items={[
                                                                 ...(leave.status === 'Planlandı' ? [
                                                                     {
@@ -2285,7 +2285,7 @@ function AuditStaffPageContent() {
                                                             }
                                                             return (
                                                                 <div className="flex gap-2 justify-center">
-                                                                    {actions.length > 0 ? <ActionMenu items={actions} /> : <span className="text-gray-400">-</span>}
+                                                                    {actions.length > 0 ? <TableActions items={actions} /> : <span className="text-gray-400">-</span>}
                                                                 </div>
                                                             );
                                                         }
@@ -2345,7 +2345,7 @@ function AuditStaffPageContent() {
                                                 </div>
                                                 {!isViewMode && (
                                                     <div className="flex gap-2">
-                                                        <ActionMenu items={[
+                                                        <TableActions items={[
                                                             { label: 'Düzenle', icon: Edit2, onClick: () => openExperienceModal(exp) },
                                                             { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => handleDeleteExperience(exp.id) }
                                                         ]} />
@@ -2403,7 +2403,7 @@ function AuditStaffPageContent() {
                                                 </div>
                                                 {!isViewMode && (
                                                     <div className="flex gap-2">
-                                                        <ActionMenu items={[
+                                                        <TableActions items={[
                                                             { label: 'Düzenle', icon: Edit2, onClick: () => openEducationModal(edu) },
                                                             { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => handleDeleteEducation(edu.id) }
                                                         ]} />
@@ -2477,7 +2477,7 @@ function AuditStaffPageContent() {
                                                 </div>
                                                 {!isViewMode && (
                                                     <div className="flex gap-1">
-                                                        <ActionMenu items={[
+                                                        <TableActions items={[
                                                             { label: 'Düzenle', icon: Edit2, onClick: () => openTrainingModal(trn) },
                                                             { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => handleDeleteTraining(trn.id) }
                                                         ]} />

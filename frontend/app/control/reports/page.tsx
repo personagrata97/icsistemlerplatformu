@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -15,7 +16,7 @@ import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
 import DateDisplay from '@/components/ui/DateDisplay';
 import CustomSelect from '@/components/ui/CustomSelect';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { FileBarChart, CheckCircle2, Download, Plus, Eye, Trash2, Send, FileText, Printer } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { DEPARTMENTS } from '@/lib/organization-constants';
@@ -98,7 +99,7 @@ function ControlReportsPageContent() {
                     { key: 'durum', header: 'Durum', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
                     { key: 'tarih', header: 'Rapor Tarihi', type: 'date', width: '150px' },
                     { key: 'actions', header: 'İşlemler', width: '120px', render: (item: any) => (
-                        <ActionMenu items={[
+                        <TableActions items={[
                             { label: 'Detay Görüntüle', icon: Eye, onClick: () => setSelectedReport(item) },
                             { label: 'PDF İndir', icon: Download, onClick: () => showToast(`${item.ad} PDF olarak indiriliyor`, 'success') },
                             { label: 'Word Oluştur', icon: FileText, onClick: () => showToast(`${item.ad} Word formatında oluşturuluyor`, 'success') },
@@ -128,7 +129,7 @@ function ControlReportsPageContent() {
                         <div className="grid grid-cols-2 gap-3">
                             <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
                                 <span className="text-slate-500 font-medium block">Sorumlu Birim</span>
-                                <span className="font-bold text-slate-900">{selectedReport.birim}</span>
+                                <span className="font-bold text-slate-900"><UnitBadge name={selectedReport.birim} /></span>
                             </div>
                             <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
                                 <span className="text-slate-500 font-medium block">Rapor Tarihi</span>

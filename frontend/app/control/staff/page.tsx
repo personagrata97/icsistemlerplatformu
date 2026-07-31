@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -22,14 +23,14 @@ import ConfirmModal from '@/components/ConfirmModal';
 import LoadingState from '@/components/ui/LoadingState';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import FormField from '@/components/ui/FormField';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
 import PageHeader from '@/components/ui/PageHeader';
 import DatePicker from '@/components/ui/DatePicker';
 import ProfileHeader from '@/components/ui/ProfileHeader';
-import UserAvatar from '@/components/ui/UserAvatar';
+import PersonCell from '@/components/ui/PersonCell';
 import CodeBadge from '@/components/ui/CodeBadge';
 import InfoItem from '@/components/ui/InfoItem';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -458,14 +459,14 @@ function ControlStaffPageContent() {
                     { key: 'registrationNumber', header: 'Sicil No', width: '120px', render: (item: any) => <CodeBadge code={item.registrationNumber} /> },
                     { key: 'fullName', header: 'Ad Soyad & Ünvan', sortable: true, render: (item: any) => (
                         <div className="flex items-center gap-3">
-                            <UserAvatar name={`${item.firstName} ${item.lastName}`} size="md" />
+                            <PersonCell name={`${item.firstName} ${item.lastName}`} size="md" />
                             <div>
                                 <div className="font-bold text-slate-900 text-xs">{item.firstName} {item.lastName}</div>
                                 <div className="text-[11px] text-slate-500 font-medium">{item.title}</div>
                             </div>
                         </div>
                     ) },
-                    { key: 'department', header: 'Birim / Servis', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.department}</span> },
+                    { key: 'department', header: 'Birim / Servis', render: (item: any) => <span className="text-xs font-semibold text-slate-700"><UnitBadge name={item.department} /></span> },
                     { key: 'role', header: 'Rol', width: '160px', render: (item: any) => (
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${item.role.includes('BKS') ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'}`}>
                             {item.role}
@@ -474,7 +475,7 @@ function ControlStaffPageContent() {
                     { key: 'cpeHours', header: 'Eğitim (Saat)', width: '110px', sortable: true, render: (item: any) => <span className="font-mono text-xs font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded">{item.cpeHours}h</span> },
                     { key: 'status', header: 'Durum', width: '100px', render: (item: any) => <StatusBadge value={item.status} type="status" /> },
                     { key: 'actions', header: 'İşlemler', width: '110px', render: (item: any) => (
-                        <ActionMenu items={[
+                        <TableActions items={[
                             { label: 'Detay & Özlük İncele', icon: Eye, onClick: () => { setSelectedStaff(item); setActiveDetailTab('general'); } },
                             { label: 'Düzenle', icon: Edit2, onClick: () => { setSelectedStaff(item); setStaffForm({ registrationNumber: item.registrationNumber, firstName: item.firstName, lastName: item.lastName, title: item.title, role: item.role, department: item.department, email: item.email, phone: item.phone, hireDate: item.hireDate }); setIsEditingStaff(true); setIsAddModalOpen(true); } },
                             { label: 'Sil', icon: Trash2, variant: 'danger', onClick: () => setDeleteConfirmId(item.id) },

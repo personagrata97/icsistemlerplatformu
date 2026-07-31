@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import FormInput from '@/components/ui/FormInput';
 'use client';
 
@@ -100,7 +101,7 @@ export default function ControlStaffSection() {
                             <div className="text-xs text-slate-500 font-medium">{item.unvan}</div>
                         </div>
                     ) },
-                    { key: 'birim', header: 'Görevli Birim', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.birim}</span> },
+                    { key: 'birim', header: 'Görevli Birim', render: (item: any) => <span className="text-xs font-semibold text-slate-700"><UnitBadge name={item.birim} /></span> },
                     { key: 'uzmanlik', header: 'Uzmanlık Alanı', render: (item: any) => <span className="text-xs text-slate-600 font-medium">{item.uzmanlik}</span> },
                     { key: 'rol', header: 'Rol Türü', width: '130px', render: (item: any) => (
                         <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${item.rol === 'KONTROLÖR' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>

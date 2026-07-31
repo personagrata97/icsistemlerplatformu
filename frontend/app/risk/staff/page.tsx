@@ -12,7 +12,7 @@ import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import ConfirmModal from '@/components/ConfirmModal';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { Users, Award, ShieldCheck, Activity, UserPlus, Edit3, Trash2, BookOpen, Clock, FileCheck } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import RequireRole from '@/components/auth/RequireRole';
@@ -232,7 +232,7 @@ function RiskStaffPageContent() {
                     { key: 'status', header: 'DURUM', width: '120px', render: (item: any) => <StatusBadge value={item.status} type="status" /> },
                     {
                         key: 'actions', header: 'İŞLEM', width: '120px', render: (item: any) => (
-                            <ActionMenu
+                            <TableActions
                                 items={[
                                     { label: 'Detay & Düzenle', icon: <Edit3 size={14} />, onClick: () => handleOpenEdit(item) },
                                     { label: 'Kadrodan Çıkar', icon: <Trash2 size={14} />, onClick: () => setDeleteConfirmId(item.id), variant: 'danger' as any }

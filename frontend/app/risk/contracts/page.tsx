@@ -14,7 +14,7 @@ import MoneyText from '@/components/ui/MoneyText';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Modal from '@/components/ui/Modal';
 import { formatDate } from '@/lib/audit-utils';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 
 import PageToolbar from '@/components/ui/PageToolbar';
 import PageHeader from '@/components/ui/PageHeader';
@@ -190,7 +190,7 @@ function ContractsPageContent() {
                         align: 'center',
                         render: (contract: any) => (
                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                <ActionMenu items={[{
+                                <TableActions items={[{
                                     label: 'Detay İncele',
                                     icon: Eye,
                                     onClick: () => setSelectedContract(contract)

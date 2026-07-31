@@ -11,7 +11,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CustomSelect from '@/components/ui/CustomSelect';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { Edit2 } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal';
 
@@ -126,7 +126,7 @@ export default function AuditMeetingsTab({ auditId }: { auditId: string }) {
         {
             key: 'actions', header: 'İşlemler', width: '80px',
             render: (_: any, row: any) => (
-                <ActionMenu
+                <TableActions
                     items={[
                         { label: 'Düzenle', icon: Edit2, onClick: () => openEdit(row) },
                         { label: 'Sil', icon: Trash2, onClick: () => handleDelete(row.id), variant: 'danger' }

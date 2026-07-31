@@ -26,7 +26,7 @@ import { checkRole, ROLES } from '@/lib/auth-constants';
 import CustomSelect from '@/components/ui/CustomSelect';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import ConfirmModal from '@/components/ConfirmModal';
 import FormInput from "@/components/ui/FormInput";
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
@@ -585,7 +585,7 @@ function FindingDetailPageContent() {
                                 >
                                     AI Analiz
                                 </Button>
-                                <ActionMenu items={[
+                                <TableActions items={[
                                     { label: 'Düzenle', icon: Edit2, onClick: () => setIsEditing(true) },
                                     { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: handleDelete }
                                 ]} />
@@ -825,7 +825,7 @@ function FindingDetailPageContent() {
                                                 </div>
                                             </div>
                                             <div className="flex gap-1 items-center" onClick={(e) => e.stopPropagation()}>
-                                                <ActionMenu items={[
+                                                <TableActions items={[
                                                     { label: 'İndir', icon: Download, onClick: () => {} },
                                                     { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => {} }
                                                 ]} />

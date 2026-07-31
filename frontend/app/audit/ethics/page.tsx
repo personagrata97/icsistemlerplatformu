@@ -24,10 +24,10 @@ import { useAuditTitle } from '@/context/AuditTitleContext';
 import LoadingState from '@/components/ui/LoadingState';
 import Pagination from '@/components/ui/Pagination';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import PageToolbar from '@/components/ui/PageToolbar';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
-import UserCell from '@/components/ui/UserCell';
+import PersonCell from '@/components/ui/PersonCell';
 
 interface EthicsReport {
     id: string;
@@ -436,7 +436,7 @@ function EthicsPageContent() {
                                 sortable: true,
                                 width: '180px',
                                 render: (item: any) => (
-                                    <UserCell name={item.assignee?.displayName || 'Atama Bekliyor'} className="!w-auto text-xs" />
+                                    <PersonCell name={item.assignee?.displayName || 'Atama Bekliyor'} className="!w-auto text-xs" />
                                 )
                             },
                             {
@@ -461,7 +461,7 @@ function EthicsPageContent() {
                                 align: 'center',
                                 render: (item: any) => (
                                     <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                        <ActionMenu
+                                        <TableActions
                                             items={[
                                                 { label: 'Detayı İncele', icon: Eye, onClick: () => handleView(item) }
                                             ]}

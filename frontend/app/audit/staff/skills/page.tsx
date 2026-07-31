@@ -12,7 +12,7 @@ import Button from '@/components/ui/Button';
 import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';
 import Modal from '@/components/ui/Modal';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import StatCard from '@/components/ui/StatCard';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Badge from '@/components/ui/Badge';
@@ -376,7 +376,7 @@ function SkillsMatrixPageContent() {
 
                 return (
                     <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                        <ActionMenu
+                        <TableActions
                             items={[
                                 { 
                                     label: canEditThisRow ? 'Yetkinlikleri Düzenle' : 'Yetkinlikleri Görüntüle', 

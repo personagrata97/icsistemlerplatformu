@@ -16,7 +16,7 @@ import StatCard from '@/components/ui/StatCard';
 import RefreshButton from '@/components/ui/RefreshButton';
 import { useRouter } from 'next/navigation';
 import CustomSelect from '@/components/ui/CustomSelect';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import Button from '@/components/ui/Button';
 import { auditApi } from '@/lib/audit-api';
 import { DateDisplay } from '@/components/ui/DateDisplay';

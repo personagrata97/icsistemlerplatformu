@@ -4,7 +4,7 @@ import Button from '@/components/ui/Button';
 import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 
 import { useAuth } from '@/context/AuthContext';
@@ -223,7 +223,7 @@ export default function AuditTimesheetTab({ auditId }: AuditTimesheetTabProps) {
             render: (row: any) => {
                 const isEditable = canManageTimesheet && (isManager || row.userId === user?.id || row.isNew);
                 return isEditable ? (
-                    <ActionMenu variant="ghost" items={[
+                    <TableActions variant="ghost" items={[
                         { label: 'Satırı Sil', icon: Trash2, onClick: () => handleDeleteEntry(row.id), variant: 'danger' }
                     ]} />
                 ) : null;

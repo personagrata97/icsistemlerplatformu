@@ -6,7 +6,7 @@ import RequireRole from '@/components/auth/RequireRole';
 
 import { useState, useEffect } from 'react';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import {
     ArrowLeft, Calendar, User, FileText, Plus, MoreHorizontal, Download, Filter, Search,
     Trash2, Edit2, X, CheckCircle, Clock, AlertCircle, Send, RotateCw, Mail, MessageSquare,

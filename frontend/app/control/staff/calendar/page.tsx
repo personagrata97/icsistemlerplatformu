@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -9,10 +10,10 @@ import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import StatusBadge from '@/components/ui/StatusBadge';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import UserAvatar from '@/components/ui/UserAvatar';
+import PersonCell from '@/components/ui/PersonCell';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { Calendar, Users, Eye, Clock } from 'lucide-react';
@@ -66,14 +67,14 @@ function ControlStaffCalendarPageContent() {
                 columns={[
                     { key: 'name', header: 'Personel', sortable: true, render: (row: any) => (
                         <div className="flex items-center gap-3">
-                            <UserAvatar name={row.name} size="md" />
+                            <PersonCell name={row.name} size="md" />
                             <div>
                                 <div className="font-bold text-slate-900 text-xs">{row.name}</div>
                                 <div className="text-[11px] text-slate-500">{row.title}</div>
                             </div>
                         </div>
                     ) },
-                    { key: 'department', header: 'Birim', render: (row: any) => <span className="text-xs font-semibold text-slate-700">{row.department}</span> },
+                    { key: 'department', header: 'Birim', render: (row: any) => <span className="text-xs font-semibold text-slate-700"><UnitBadge name={row.department} /></span> },
                     { key: 'status', header: 'Durum', width: '110px', render: (row: any) => <StatusBadge value={row.status} type="status" /> },
                     { key: 'capacityRate', header: 'Doluluk Oranı', width: '160px', render: (row: any) => (
                         <div className="space-y-1">

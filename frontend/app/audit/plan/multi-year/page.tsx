@@ -5,7 +5,7 @@ import RequireRole from '@/components/auth/RequireRole';
 
 import LoadingState from '@/components/ui/LoadingState';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';

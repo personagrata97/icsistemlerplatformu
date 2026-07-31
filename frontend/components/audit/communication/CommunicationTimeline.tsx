@@ -4,7 +4,7 @@ import React from 'react';
 import { Mail, Calendar, CheckCircle2, Send, FileText, FileSignature, Presentation, FolderOpen, Edit, Trash2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import StatusBadge from '@/components/ui/StatusBadge';
 
 interface CommunicationTimelineProps {
@@ -129,7 +129,7 @@ export default function CommunicationTimeline({
                     });
                 }
 
-                return <ActionMenu items={items} variant="ghost" />;
+                return <TableActions items={items} variant="ghost" />;
             }
         }
     ];

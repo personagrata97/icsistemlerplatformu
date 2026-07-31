@@ -16,7 +16,7 @@ import StatCard from '@/components/ui/StatCard';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { BookOpen, Award, Users, Plus, Eye, Calendar, CheckCircle2, Clock, User } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import ControlStaffTabs from '@/components/control/ControlStaffTabs';
@@ -128,7 +128,7 @@ function ControlTrainingPageContent() {
                         { key: 'durum', header: 'Durum', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
                         { key: 'tarih', header: 'Eğitim Tarihi', type: 'date', width: '140px' },
                         { key: 'actions', header: 'İşlem', width: '100px', render: (item: any) => (
-                            <ActionMenu items={[
+                            <TableActions items={[
                                 { label: 'Detay Görüntüle', icon: <Eye size={14} />, onClick: () => setSelectedTraining(item) },
                             ]} />
                         ) }

@@ -6,7 +6,7 @@ import FindingActionButtons from './FindingActionButtons';
 import { getRiskBadgeClass, formatDate } from '@/lib/audit-utils';
 import CodeBadge from '@/components/ui/CodeBadge';
 import StatusBadge from '@/components/ui/StatusBadge';
-import UserCell from '@/components/ui/UserCell';
+import PersonCell from '@/components/ui/PersonCell';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import { Finding } from '@/lib/audit-api';
 

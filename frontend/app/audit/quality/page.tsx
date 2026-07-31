@@ -21,7 +21,7 @@ import { auditApi } from '@/lib/audit-api';
 import { DateDisplay } from '@/components/ui/DateDisplay';
 import Tooltip from '@/components/ui/Tooltip';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
@@ -690,7 +690,7 @@ function QualityAssurancePageContent() {
                                 <p className="text-sm text-gray-500">
                                     {eqaInfo.status === 'NOT_FOUND' ? 'Henüz dış değerlendirme kaydı bulunmamaktadır.' :
                                      eqaInfo.status === 'OVERDUE' ? `KRİTİK: Süre doldu! (Hedef: ${eqaInfo.nextDate?.toLocaleDateString('tr-TR')})` :
-                                     `Sonraki dış değerlendirme: ${eqaInfo.nextDate?.toLocaleDateString('tr-TR')} (${eqaInfo.daysLeft} gün kaldı)`}
+                                     `Sonraki dış değerlendirme: ${eqaInfo.nextDate?.toLocaleDateString('tr-TR')} ($<DurationText days={eqaInfo.daysLeft} mode="remaining" />)`}
                                 </p>
                             </div>
                         </div>
@@ -781,7 +781,7 @@ function QualityAssurancePageContent() {
                                             <div className="flex items-center gap-1">
                                                 <span className={`px-2 py-0.5 text-xs font-medium rounded-full border ${getStatusColor(metric.status)}`}>{metric.status}</span>
                                                 <div className="flex gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <ActionMenu items={[
+                                                    <TableActions items={[
                                                         { label: 'Düzenle', icon: Edit, onClick: () => openEditMetric(metric) },
                                                         { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => setDeleteConfirm({ type: 'metric', id: metric.id }) }
                                                     ]} />
@@ -854,7 +854,7 @@ function QualityAssurancePageContent() {
                                 key: 'actions_col', header: 'İşlemler', width: '140px', align: 'center',
                                 render: (a: any) => (
                                     <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                        <ActionMenu
+                                        <TableActions
                                             items={[
                                                 { label: 'Düzenle', icon: Edit, onClick: () => openEditAssessment(a) },
                                                 { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => setDeleteConfirm({ type: 'assessment', id: a.id }) }
@@ -928,7 +928,7 @@ function QualityAssurancePageContent() {
                             key: 'actions_col', header: 'İşlemler', width: '140px', align: 'center',
                             render: (a: any) => (
                                 <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                    <ActionMenu
+                                    <TableActions
                                         items={[
                                             { label: 'Düzenle', icon: Edit, onClick: () => openEditAction(a) },
                                             { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => setDeleteConfirm({ type: 'action', id: a.id }) }

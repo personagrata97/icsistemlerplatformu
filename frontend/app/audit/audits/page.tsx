@@ -27,7 +27,7 @@ import AuditActionButtons from '@/components/audit/AuditActionButtons';
 import PageHeader from '@/components/ui/PageHeader';
 import Pagination from '@/components/ui/Pagination';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { getStatusBadgeClass } from '@/lib/audit-utils';
 
 function AuditsPageInner() {
@@ -415,7 +415,7 @@ function AuditsPageInner() {
                         align: 'center',
                         render: (item: any) => (
                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                <ActionMenu
+                                <TableActions
                                     items={[
                                         {
                                             label: 'Detayı İncele',

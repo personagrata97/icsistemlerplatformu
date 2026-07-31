@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Paperclip, Plus, Eye, Download, Trash2, FileText, FolderOpen } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import Modal from '@/components/ui/Modal';
 import TruncatedText from '@/components/ui/TruncatedText';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -142,7 +142,7 @@ const AuditAttachmentsTab: React.FC<AuditAttachmentsTabProps> = ({
                 }
                 return (
                     <div onClick={(e) => e.stopPropagation()}>
-                        <ActionMenu items={actionItems} />
+                        <TableActions items={actionItems} />
                     </div>
                 );
             }

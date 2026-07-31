@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
@@ -9,7 +10,7 @@ import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import StatusBadge from '@/components/ui/StatusBadge';
-import UserAvatar from '@/components/ui/UserAvatar';
+import PersonCell from '@/components/ui/PersonCell';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Modal from '@/components/ui/Modal';
@@ -64,14 +65,14 @@ function ControlStaffTimesheetPageContent() {
                 columns={[
                     { key: 'name', header: 'Personel', sortable: true, render: (row: any) => (
                         <div className="flex items-center gap-3">
-                            <UserAvatar name={row.name} size="md" />
+                            <PersonCell name={row.name} size="md" />
                             <div>
                                 <div className="font-bold text-slate-900 text-xs">{row.name}</div>
                                 <div className="text-[11px] text-slate-500">{row.title}</div>
                             </div>
                         </div>
                     ) },
-                    { key: 'department', header: 'Birim', render: (row: any) => <span className="text-xs font-semibold text-slate-700">{row.department}</span> },
+                    { key: 'department', header: 'Birim', render: (row: any) => <span className="text-xs font-semibold text-slate-700"><UnitBadge name={row.department} /></span> },
                     { key: 'totalHours', header: 'Toplam Efor', width: '120px', render: (row: any) => <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded">{row.totalHours} Saat</span> },
                     { key: 'testHours', header: 'Saha & Test', width: '110px', render: (row: any) => <span className="font-mono text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">{row.testHours}h</span> },
                     { key: 'reportingHours', header: 'Raporlama', width: '110px', render: (row: any) => <span className="font-mono text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">{row.reportingHours}h</span> },
@@ -91,7 +92,7 @@ function ControlStaffTimesheetPageContent() {
                     <div className="p-4 space-y-3 text-xs">
                         <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
                             <h4 className="font-bold text-slate-900">{selectedStaff.name} — {selectedStaff.title}</h4>
-                            <p className="text-slate-500 font-medium">{selectedStaff.department}</p>
+                            <p className="text-slate-500 font-medium"><UnitBadge name={selectedStaff.department} /></p>
                         </div>
                         <div className="grid grid-cols-3 gap-3 text-center">
                             <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl">

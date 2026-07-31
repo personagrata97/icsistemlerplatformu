@@ -14,7 +14,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import RefreshButton from '@/components/ui/RefreshButton';
 import DataTable from '@/components/ui/DataTable';
 import { auditApi, API_BASE_URL } from '@/lib/audit-api';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import { useToast } from '@/components/Toast';
 import PageToolbar from '@/components/ui/PageToolbar';
 import { useEffect, useRef } from 'react';
@@ -302,7 +302,7 @@ function KnowledgeBasePageContent() {
                         width: '220px',
                         render: (doc: any) => (
                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                <ActionMenu
+                                <TableActions
                                     items={[
                                         { label: 'İncele', icon: Eye, onClick: () => handleView(doc) },
                                         { label: 'İndir', icon: Download, onClick: () => handleDownload(doc) },

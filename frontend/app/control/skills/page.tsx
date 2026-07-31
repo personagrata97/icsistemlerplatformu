@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 'use client';
@@ -10,7 +11,7 @@ import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import RatingStars from '@/components/ui/RatingStars';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Badge from '@/components/ui/Badge';
@@ -19,7 +20,7 @@ import { Award, Users, TrendingUp, Eye, Edit2, History, Star } from 'lucide-reac
 import { useToast } from '@/components/Toast';
 import ControlStaffTabs from '@/components/control/ControlStaffTabs';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
-import UserAvatar from '@/components/ui/UserAvatar';
+import PersonCell from '@/components/ui/PersonCell';
 
 interface SkillRatings {
     coso_framework: number;
@@ -186,14 +187,14 @@ function ControlSkillsPageContent() {
                 columns={[
                     { key: 'ad', header: 'Kontrolör', sortable: true, render: (item: any) => (
                         <div className="flex items-center gap-3">
-                            <UserAvatar name={item.ad} size="md" />
+                            <PersonCell name={item.ad} size="md" />
                             <div>
                                 <div className="font-bold text-slate-900 text-xs">{item.ad}</div>
                                 <div className="text-[11px] text-slate-500">{item.unvan}</div>
                             </div>
                         </div>
                     ) },
-                    { key: 'birim', header: 'Görevli Birim', render: (item: any) => <span className="text-xs font-semibold text-slate-700">{item.birim}</span> },
+                    { key: 'birim', header: 'Görevli Birim', render: (item: any) => <span className="text-xs font-semibold text-slate-700"><UnitBadge name={item.birim} /></span> },
                     { key: 'ortPuan', header: 'Ortalama Seviye', width: '150px', sortable: true, render: (item: any) => (
                         <div className="flex items-center gap-2">
                             <RatingStars level={Math.round(item.ortPuan)} size={14} />
@@ -202,7 +203,7 @@ function ControlSkillsPageContent() {
                     ) },
                     { key: 'sonGuncelleme', header: 'Son Güncelleme', type: 'date', width: '130px' },
                     { key: 'actions', header: 'İşlemler', width: '120px', render: (item: any) => (
-                        <ActionMenu items={[
+                        <TableActions items={[
                             { label: 'Yetkinlik Değerlendir', icon: Edit2, onClick: () => handleEditSkills(item) },
                             { label: 'Güncelleme Tarihçesi', icon: History, onClick: () => { setHistoryStaff(item); setHistoryModalOpen(true); } }
                         ]} />
@@ -220,7 +221,7 @@ function ControlSkillsPageContent() {
                     <div className="space-y-6 text-xs p-1">
                         <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
                             <div className="font-bold text-slate-900">{selectedStaff.ad} — {selectedStaff.unvan}</div>
-                            <div className="text-slate-500 font-medium">{selectedStaff.birim}</div>
+                            <div className="text-slate-500 font-medium"><UnitBadge name={selectedStaff.birim} /></div>
                         </div>
 
                         <div className="space-y-5">

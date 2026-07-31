@@ -22,7 +22,7 @@ import { useToast } from '@/components/Toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import Tooltip from '@/components/ui/Tooltip';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import Badge from '@/components/ui/Badge';
@@ -585,7 +585,7 @@ function UnitRcmPageContent() {
                                         >
                                             Risk Ekle
                                         </Button>
-                                        <ActionMenu items={[
+                                        <TableActions items={[
                                             { label: 'Düzenle', icon: Edit2, onClick: () => openProcessModal(proc) },
                                             { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => setDeleteProcessId(proc.id) }
                                         ]} />
@@ -634,7 +634,7 @@ function UnitRcmPageContent() {
                                                                     >
                                                                         Kontrol Ekle
                                                                     </Button>
-                                                                    <ActionMenu items={[
+                                                                    <TableActions items={[
                                                                         { label: 'Düzenle', icon: Edit2, onClick: () => openRiskModal(proc.id, risk) },
                                                                         { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => {
                                                                             setDeleteRiskId(risk.id);
@@ -676,7 +676,7 @@ function UnitRcmPageContent() {
                                                                                 </div>
                                                                                 {canManage && (
                                                                                     <div className="flex items-center gap-1 ml-4" onClick={e => e.stopPropagation()}>
-                                                                                        <ActionMenu items={[
+                                                                                        <TableActions items={[
                                                                                             { label: 'Düzenle', icon: Edit2, onClick: () => openControlModal(risk.id, control) },
                                                                                             { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => {
                                                                                                 setDeleteControlId(control.id);

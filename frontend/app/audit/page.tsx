@@ -1,3 +1,4 @@
+import UnitBadge from '@/components/ui/UnitBadge';
 'use client';
 import RequireRole from '@/components/auth/RequireRole';
 
@@ -558,7 +559,7 @@ function AuditDashboardContent() {
                         <div key={unit.id} className="p-3 bg-gray-50 rounded-lg border border-gray-100 flex justify-between items-center hover:border-primary/30 transition-colors group">
                             <div>
                                 <div className="font-bold text-sm text-gray-800 group-hover:text-primary transition-colors">{unit.name}</div>
-                                {unit.department && <div className="text-xs text-gray-500 mt-0.5">{unit.department}</div>}
+                                {unit.department && <div className="text-xs text-gray-500 mt-0.5"><UnitBadge name={unit.department} /></div>}
                             </div>
                             <ActionLink href={`/audit/universe/${unit.id}`} variant="primary">Detay</ActionLink>
                         </div>

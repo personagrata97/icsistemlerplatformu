@@ -12,7 +12,7 @@ import { useToast } from '@/components/Toast';
 import PageHeader from '@/components/ui/PageHeader';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import PageToolbar from '@/components/ui/PageToolbar';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import ActionLink from '@/components/ui/ActionLink';
@@ -457,7 +457,7 @@ function AuditPlanPageContent() {
 
                             return (
                                 <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
-                                    <ActionMenu items={items} />
+                                    <TableActions items={items} />
                                 </div>
                             );
                         }

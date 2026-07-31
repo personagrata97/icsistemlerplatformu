@@ -9,8 +9,8 @@ import ConfirmModal from '../ConfirmModal';
 import Modal from '../ui/Modal';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import Tooltip from '@/components/ui/Tooltip';
-import ActionMenu from '@/components/ui/ActionMenu';
-import UserCell from '@/components/ui/UserCell';
+import TableActions from '@/components/ui/TableActions';
+import PersonCell from '@/components/ui/PersonCell';
 
 interface WorkpaperListProps {
     auditId: string;
@@ -180,7 +180,7 @@ export default function WorkpaperList({ auditId, currentUser }: WorkpaperListPro
             align: 'left',
             render: (wp: any) => (
                 <div className="flex flex-col gap-1.5">
-                    <UserCell name={wp.preparer?.displayName || 'Bilinmiyor'} className="!w-auto" />
+                    <PersonCell name={wp.preparer?.displayName || 'Bilinmiyor'} className="!w-auto" />
                     <div className="cell-date flex items-center gap-1.5 justify-start">
                         <Calendar size={14} className="text-gray-400" />
                         {formatDate(wp.preparedAt)}
@@ -215,7 +215,7 @@ export default function WorkpaperList({ auditId, currentUser }: WorkpaperListPro
             align: 'left',
             render: (wp: any) => wp.reviewer ? (
                 <div className="flex flex-col gap-1.5">
-                    <UserCell name={wp.reviewer.displayName} className="!w-auto" />
+                    <PersonCell name={wp.reviewer.displayName} className="!w-auto" />
                     <div className="cell-date flex items-center gap-1.5 justify-start">
                         <Calendar size={14} className="text-gray-400" />
                         {formatDate(wp.reviewedAt)}
@@ -232,7 +232,7 @@ export default function WorkpaperList({ auditId, currentUser }: WorkpaperListPro
             align: 'left',
             render: (wp: any) => wp.supervisor ? (
                 <div className="flex flex-col gap-1.5">
-                    <UserCell name={wp.supervisor.displayName} className="!w-auto" />
+                    <PersonCell name={wp.supervisor.displayName} className="!w-auto" />
                     <div className="cell-date flex items-center gap-1.5 justify-start">
                         <Calendar size={14} className="text-gray-400" />
                         {formatDate(wp.supervisorApprovedAt)}
@@ -249,7 +249,7 @@ export default function WorkpaperList({ auditId, currentUser }: WorkpaperListPro
             align: 'center',
             render: (wp: any) => (
                 <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-                    <ActionMenu items={[
+                    <TableActions items={[
                         { label: 'Görüntüle', icon: Eye, onClick: () => window.open(getSecureUrl(wp.fileUrl), '_blank') },
                         { label: 'İndir', icon: Download, onClick: () => {
                             const link = document.createElement('a');

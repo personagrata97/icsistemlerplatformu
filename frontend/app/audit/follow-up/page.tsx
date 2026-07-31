@@ -213,7 +213,7 @@ function FollowUpPageContent() {
                                     <div className="text-xs text-gray-700 font-mono">
                                         <div>{formatDate(item.terminTarihi)}</div>
                                         <div className={`text-[10px] font-bold ${diffDays < 0 ? 'text-red-600' : 'text-emerald-700'}`}>
-                                            {diffDays < 0 ? `${Math.abs(diffDays)} gün gecikmiş` : `${diffDays} gün kaldı`}
+                                            <DurationText days={-(diffDays < 0 ? `${Math.abs(diffDays))} mode="remaining" />` : `$<DurationText days={diffDays} mode="remaining" />`}
                                         </div>
                                     </div>
                                 );

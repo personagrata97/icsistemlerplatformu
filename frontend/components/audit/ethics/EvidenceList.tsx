@@ -4,7 +4,7 @@ import React from 'react';
 import { Paperclip, ChevronDown, FileText, Eye, Download } from 'lucide-react';
 import Tooltip from '@/components/ui/Tooltip';
 import Button from '@/components/ui/Button';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 
 interface EvidenceFile {
     fileName?: string;
@@ -142,7 +142,7 @@ export const EvidenceList: React.FC<EvidenceListProps> = ({ evidences, trackingC
                                         <p className="text-[9px] text-slate-400 font-medium">{size}</p>
                                     </div>
                                     <div className="flex items-center pl-2 shrink-0">
-                                        <ActionMenu
+                                        <TableActions
                                             variant="ghost"
                                             items={[
                                                 {

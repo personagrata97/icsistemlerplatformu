@@ -21,7 +21,7 @@ import StatCard from '@/components/ui/StatCard';
 import Tooltip from '@/components/ui/Tooltip';
 import Pagination from '@/components/ui/Pagination';
 import LoadingState from '@/components/ui/LoadingState';
-import ActionMenu from '@/components/ui/ActionMenu';
+import TableActions from '@/components/ui/TableActions';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
@@ -493,7 +493,7 @@ function SamplingPageContent() {
                         width: '160px',
                         align: 'center',
                         render: (plan: any) => (
-                            <ActionMenu
+                            <TableActions
                                 items={[
                                     { label: 'Detayı İncele', icon: Eye, onClick: () => setSelectedPlan(plan) }
                                 ]}
