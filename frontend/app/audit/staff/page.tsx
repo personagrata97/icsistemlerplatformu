@@ -39,7 +39,6 @@ import { checkRole, ROLES } from '@/lib/auth-constants';
 import { DateDisplay } from '@/components/ui/DateDisplay';
 import Timeline, { TimelineEvent, TimelineActionType } from '@/components/ui/Timeline';
 import { getRiskScoreColor, getRiskLevelFromScore, getAuditCycleFromScore } from '@/lib/audit-utils';
-import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import EducationModal from '@/components/audit/staff/modals/EducationModal';
 import ExperienceModal from '@/components/audit/staff/modals/ExperienceModal';
@@ -91,7 +90,7 @@ const getNestedDepartmentOptions = () => {
             }
         });
     };
-    flatten(HIERARCHY);
+    flatten([]);
     return options;
 };
 
@@ -613,28 +612,7 @@ function AuditStaffPageContent() {
 
             // Hiyerarşik seçim için üst birimi bul (Rekkursif arama)
             if (exp.department) {
-                const findParentForDept = (deptName: string): string => {
-                    for (const group of HIERARCHY) {
-                        for (const child of group.children) {
-                            if (child.title === deptName) return ''; // Top level child has no parent select value
-                            if (child.children) {
-                                const checkNested = (items: any[], parentTitle: string): string | null => {
-                                    for (const item of items) {
-                                        if (item.title === deptName) return parentTitle;
-                                        if (item.children) {
-                                            const found = checkNested(item.children, parentTitle);
-                                            if (found) return found;
-                                        }
-                                    }
-                                    return null;
-                                };
-                                const found = checkNested(child.children, child.title);
-                                if (found) return found;
-                            }
-                        }
-                    }
-                    return '';
-                };
+                const findParentForDept = (deptName: string): string => '';
                 setSelectedParentExp(findParentForDept(exp.department));
             } else {
                 setSelectedParentExp('');
@@ -957,28 +935,7 @@ function AuditStaffPageContent() {
 
             // Hiyerarşik seçim için üst birimi bul
             if (promo.department) {
-                const findParentForDept = (deptName: string): string => {
-                    for (const group of HIERARCHY) {
-                        for (const child of group.children) {
-                            if (child.title === deptName) return ''; // Top level child has no parent select value
-                            if (child.children) {
-                                const checkNested = (items: any[], parentTitle: string): string | null => {
-                                    for (const item of items) {
-                                        if (item.title === deptName) return parentTitle;
-                                        if (item.children) {
-                                            const found = checkNested(item.children, parentTitle);
-                                            if (found) return found;
-                                        }
-                                    }
-                                    return null;
-                                };
-                                const found = checkNested(child.children, child.title);
-                                if (found) return found;
-                            }
-                        }
-                    }
-                    return '';
-                };
+                const findParentForDept = (deptName: string): string => '';
                 setSelectedParentDept(findParentForDept(promo.department));
             } else {
                 setSelectedParentDept('');

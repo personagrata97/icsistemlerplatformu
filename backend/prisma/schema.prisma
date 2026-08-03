@@ -491,6 +491,8 @@ model AuditableUnit {
   code                 String?
   type                 String
   parentId             String?
+  orgUnitId             String?
+  orgUnit              OrgUnit?            @relation(fields: [orgUnitId], references: [id])
   riskLevel            String
   description          String?
   manager              String?
@@ -2038,3 +2040,39 @@ model AuditParameter {
   updatedAt   DateTime @updatedAt
   updatedBy   String?
 }
+
+model OrgUnit {
+  id             String          @id @default(cuid())
+  code           String          @unique
+  name           String
+  type           String
+  parentId       String?
+  level          Int             @default(1)
+  isActive       Boolean         @default(true)
+  sortOrder      Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  parent         OrgUnit?        @relation("OrgUnitHierarchy", fields: [parentId], references: [id])
+  children       OrgUnit[]       @relation("OrgUnitHierarchy")
+  jobTitles      JobTitle[]
+  auditableUnits AuditableUnit[]
+
+  @@map("org_unit")
+}
+
+model JobTitle {
+  id        String   @id @default(cuid())
+  name      String
+  module    String
+  cadre     Int      @default(1)
+  unitId    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unit      OrgUnit? @relation(fields: [unitId], references: [id])
+
+  @@map("job_title")
+}
+

@@ -5,7 +5,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import DatePicker from '@/components/ui/DatePicker';
 import FormTextarea from '@/components/ui/FormTextarea';
 import FormField from '@/components/ui/FormField';
-import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
+import { organizationApi } from '@/lib/organization-api';
 
 const TITLES = [
     'Müfettiş Yardımcısı', 
@@ -90,55 +90,14 @@ export default function PromotionModal({
                 </div>
                 {(promotionForm.type === 'Atama' || promotionForm.type === 'Geçici Görevlendirme') && (
                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
-                        <FormField label="Yeni Üst Birim / Grup">
+                        <FormField label="Yeni Birim / Servis">
                             <CustomSelect
-                                value={selectedParentDept}
-                                onChange={val => {
-                                    setSelectedParentDept(val as string);
-                                    setPromotionForm({ ...promotionForm, department: '' });
-                                }}
-                                options={HIERARCHY.flatMap(group =>
-                                    group.children.map(child => ({
-                                        value: child.title,
-                                        label: `${group.title} > ${child.title}`
-                                    }))
-                                )}
-                                placeholder="Grup seçiniz..."
+                                value={promotionForm.department}
+                                onChange={val => setPromotionForm({ ...promotionForm, department: val as string })}
+                                options={[{ value: 'Teftiş Kurulu Müdürlüğü', label: 'Teftiş Kurulu Müdürlüğü' }, { value: 'İç Kontrol Müdürlüğü', label: 'İç Kontrol Müdürlüğü' }, { value: 'Risk Yönetimi Müdürlüğü', label: 'Risk Yönetimi Müdürlüğü' }, { value: 'Mali İşler Direktörlüğü', label: 'Mali İşler Direktörlüğü' }, { value: 'Operasyon Direktörlüğü', label: 'Operasyon Direktörlüğü' }, { value: 'Bilgi Teknolojileri Müdürlüğü', label: 'Bilgi Teknolojileri Müdürlüğü' }]}
+                                placeholder="Birim seçiniz..."
                             />
                         </FormField>
-                        {selectedParentDept && (
-                            <div className="animate-in fade-in slide-in-from-top-1">
-                                <FormField label="Yeni Birim / Servis">
-                                    <CustomSelect
-                                        value={promotionForm.department}
-                                        onChange={val => setPromotionForm({ ...promotionForm, department: val as string })}
-                                        options={(function () {
-                                            const flatten = (items: Array<{ title: string; children?: any[] }>, level: number = 0): Array<{ value: string; label: string }> => {
-                                                return items.flatMap(item => {
-                                                    const current = {
-                                                        value: item.title,
-                                                        label: (level > 0 ? '→ '.repeat(level) + ' ' : '') + item.title
-                                                    };
-                                                    if (item.children) {
-                                                        return [current, ...flatten(item.children, level + 1)];
-                                                    }
-                                                    return [current];
-                                                });
-                                            };
-
-                                            for (const group of HIERARCHY) {
-                                                const child = group.children.find(c => c.title === selectedParentDept);
-                                                if (child && 'children' in child) {
-                                                    return flatten((child as { children: any[] }).children);
-                                                }
-                                            }
-                                            return DEPARTMENTS.map(d => ({ value: d, label: d }));
-                                        })()}
-                                        placeholder="Birim seçiniz..."
-                                    />
-                                </FormField>
-                            </div>
-                        )}
                     </div>
                 )}
                 <FormField label="Yeni Ünvan">

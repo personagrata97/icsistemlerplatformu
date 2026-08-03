@@ -20,7 +20,7 @@ export const organizationApi = {
 
     getUnits: async () => {
         try {
-            const response = await fetch(`${BASE_URL}/organization/tree`, {
+            const response = await fetch(`${BASE_URL}/organization/units`, {
                 headers: getHeaders()
             });
             if (!response.ok) return [];
@@ -32,7 +32,7 @@ export const organizationApi = {
     },
 
     // Create a new node/unit
-    createNode: async (data: { name: string; type: string; parentId?: string; riskScore?: number; manager?: string; auditCycle?: string; isActive?: boolean }) => {
+    createNode: async (data: { code?: string; name: string; type: string; parentId?: string; sortOrder?: number; isActive?: boolean }) => {
         const response = await fetch(`${BASE_URL}/organization`, {
             method: 'POST',
             headers: getHeaders(),
@@ -46,7 +46,7 @@ export const organizationApi = {
     },
 
     // Update existing node
-    updateNode: async (id: string, data: { name?: string; type?: string; parentId?: string; riskScore?: number; manager?: string; auditCycle?: string; isActive?: boolean }) => {
+    updateNode: async (id: string, data: { code?: string; name?: string; type?: string; parentId?: string; sortOrder?: number; isActive?: boolean }) => {
         const response = await fetch(`${BASE_URL}/organization/${id}`, {
             method: 'PUT',
             headers: getHeaders(),
@@ -68,6 +68,54 @@ export const organizationApi = {
         if (!response.ok) {
             const err = await response.json();
             throw new Error(err.message || 'Failed to delete organization node');
+        }
+        return response.json();
+    },
+
+    // JobTitles API
+    getTitles: async (module?: string) => {
+        const url = module ? `${BASE_URL}/organization/titles?module=${module}` : `${BASE_URL}/organization/titles`;
+        const response = await fetch(url, {
+            headers: getHeaders()
+        });
+        if (!response.ok) return [];
+        return response.json();
+    },
+
+    createTitle: async (data: { name: string; module: string; cadre: number; unitId?: string; isActive?: boolean }) => {
+        const response = await fetch(`${BASE_URL}/organization/titles`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || 'Failed to create job title');
+        }
+        return response.json();
+    },
+
+    updateTitle: async (id: string, data: { name?: string; module?: string; cadre?: number; unitId?: string; isActive?: boolean }) => {
+        const response = await fetch(`${BASE_URL}/organization/titles/${id}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || 'Failed to update job title');
+        }
+        return response.json();
+    },
+
+    deleteTitle: async (id: string) => {
+        const response = await fetch(`${BASE_URL}/organization/titles/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || 'Failed to delete job title');
         }
         return response.json();
     }

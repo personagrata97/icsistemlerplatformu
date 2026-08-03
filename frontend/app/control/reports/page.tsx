@@ -2,8 +2,6 @@
 import UnitBadge from '@/components/ui/UnitBadge';
 import PageHeader from '@/components/ui/PageHeader';
 import RequireRole from '@/components/auth/RequireRole';
-
-
 import React, { useState } from 'react';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -19,7 +17,6 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import TableActions from '@/components/ui/TableActions';
 import { FileBarChart, CheckCircle2, Download, Plus, Eye, Trash2, Send, FileText, Printer } from 'lucide-react';
 import { useToast } from '@/components/Toast';
-import { DEPARTMENTS } from '@/lib/organization-constants';
 
 function ControlReportsPageContent() {
     const { showToast } = useToast();
@@ -68,40 +65,34 @@ function ControlReportsPageContent() {
 
     return (
         <div className="space-y-6">
-            <PageHeader title="Raporlar" subtitle="Dönemsel iç kontrol faaliyet raporları, kurul sunumları ve analiz belgeleri" />
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <StatCard title="Toplam Dönem Raporu" value={reportsList.length} icon={FileBarChart} color="blue" />
-                <StatCard title="Onaylanan Raporlar" value={reportsList.filter(r => r.durum === 'ONAYLANDI').length} icon={CheckCircle2} color="emerald" />
-                <StatCard title="Taslak Raporlar" value={reportsList.filter(r => r.durum === 'TASLAK').length} icon={FileText} color="amber" />
-                <StatCard title="Denetim Komitesine Sunulan" value={2} icon={Send} color="purple" />
+            <PageHeader title="İç Kontrol Raporları" subtitle="Dönemsel kontrol değerlendirme raporları ve kurul sunumları" />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatCard title="Yayınlanan Raporlar" value={reportsList.filter(r => r.durum === 'ONAYLANDI').length} icon={FileBarChart} color="emerald" subtext="Onaylanan ve Kurul'a sunulan" />
+                <StatCard title="Hazırlanan Taslaklar" value={reportsList.filter(r => r.durum === 'TASLAK').length} icon={CheckCircle2} color="amber" subtext="İnceleme aşamasındaki raporlar" />
+                <StatCard title="Toplam Kontrol Raporu" value={reportsList.length} icon={Download} color="blue" subtext="Bu yıla ait toplam rapor sayısı" />
             </div>
 
             <PageToolbar
-                searchPlaceholder="Rapor adı veya kodu ile ara..."
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
-                rightActions={
-                    <Button variant="primary" leftIcon={<Plus size={18} />} onClick={() => setIsAddModalOpen(true)}>
-                        Yeni Rapor Oluştur
-                    </Button>
-                }
+                searchPlaceholder="Rapor koda veya tanıma göre ara..."
+                showAddButton
+                onAddClick={() => setIsAddModalOpen(true)}
+                addButtonText="Yeni Rapor Oluştur"
             />
 
             <DataTable
                 columns={[
-                    { key: 'id', header: 'Rapor Kodu', width: '150px', render: (item: any) => <CodeBadge code={item.id} /> },
-                    { key: 'ad', header: 'Rapor Tanımı', sortable: true, render: (item: any) => (
-                        <div>
-                            <div className="font-bold text-slate-900">{item.ad}</div>
-                            <div className="text-xs text-slate-500 font-medium">Birim: {item.birim} • Hazırlayan: {item.yazar}</div>
-                        </div>
-                    ) },
-                    { key: 'durum', header: 'Durum', width: '140px', render: (item: any) => <StatusBadge value={item.durum} type="status" /> },
-                    { key: 'tarih', header: 'Rapor Tarihi', type: 'date', width: '150px' },
-                    { key: 'actions', header: 'İşlemler', width: '120px', render: (item: any) => (
+                    { key: 'id', header: 'Rapor Kodu', render: (item) => <CodeBadge code={item.id} /> },
+                    { key: 'ad', header: 'Rapor Başlığı / Konusu', render: (item) => <span className="font-semibold text-slate-900 hover:text-emerald-700 cursor-pointer" onClick={() => setSelectedReport(item)}>{item.ad}</span> },
+                    { key: 'birim', header: 'İlgili Birim', render: (item) => <UnitBadge name={item.birim} /> },
+                    { key: 'tarih', header: 'Tarih', render: (item) => <DateDisplay value={item.tarih} /> },
+                    { key: 'durum', header: 'Durum', render: (item) => <StatusBadge value={item.durum} type="status" /> },
+                    { key: 'actions', header: 'İşlemler', align: 'right', render: (item) => (
                         <TableActions items={[
-                            { label: 'Detay Görüntüle', icon: Eye, onClick: () => setSelectedReport(item) },
-                            { label: 'PDF İndir', icon: Download, onClick: () => showToast(`${item.ad} PDF olarak indiriliyor`, 'success') },
+                            { label: 'Detay Göster', icon: Eye, onClick: () => setSelectedReport(item) },
+                            { label: 'PDF İndir', icon: Download, onClick: () => showToast(`${item.ad} PDF indiriliyor`, 'success') },
                             { label: 'Word Oluştur', icon: FileText, onClick: () => showToast(`${item.ad} Word formatında oluşturuluyor`, 'success') },
                             { label: 'Yazdır', icon: Printer, onClick: () => showToast(`${item.ad} yazdırılmak üzere hazırlanıyor`, 'success') },
                             { label: 'Denetim Komitesine Gönder', icon: Send, onClick: () => showToast(`${item.ad} Denetim Komitesine iletildi`, 'success') },
@@ -168,7 +159,7 @@ function ControlReportsPageContent() {
                         <div>
                             <CustomSelect
                                 label="Sorumlu Birim (Resmi Şema)"
-                                options={DEPARTMENTS.map(d => ({ value: d, label: d }))}
+                                options={['İç Kontrol ve Uyum Müdürlüğü', 'Teftiş Kurulu Müdürlüğü', 'Risk Yönetimi Müdürlüğü', 'Mali İşler Direktörlüğü', 'Operasyon Direktörlüğü', 'Bilgi Teknolojileri Müdürlüğü'].map(d => ({ value: d, label: d }))}
                                 value={newReport.birim}
                                 onChange={(val) => setNewReport({ ...newReport, birim: val as string })}
                             />
@@ -202,10 +193,9 @@ function ControlReportsPageContent() {
     );
 }
 
-
 export default function ControlReportsPage() {
     return (
-        <RequireRole allowedRoles={['DENETCI', 'KONTROL_YONETICISI', 'ADMIN', 'SUPER_ADMIN']}>
+        <RequireRole allowedRoles={['DENETCI', 'GOZETIM_SORUMLUSU', 'YONETICI', 'ADMIN', 'SUPER_ADMIN']}>
             <ControlReportsPageContent />
         </RequireRole>
     );

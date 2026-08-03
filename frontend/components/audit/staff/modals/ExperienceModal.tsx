@@ -9,7 +9,7 @@ import FormTextarea from '@/components/ui/FormTextarea';
 import Tooltip from '@/components/ui/Tooltip';
 import { AlertCircle } from 'lucide-react';
 import FormField from '@/components/ui/FormField';
-import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
+import { organizationApi } from '@/lib/organization-api';
 
 interface ExperienceForm {
     companyName: string;
@@ -70,56 +70,17 @@ export default function ExperienceModal({
                 <FormField label="Departman / Birim">
                     <div className="space-y-3">
                         <CustomSelect
-                            value={selectedParentExp}
-                            onChange={val => {
-                                setSelectedParentExp(val as string);
-                                setExperienceForm({ ...experienceForm, department: '' });
-                            }}
-                            options={HIERARCHY.flatMap(group =>
-                                group.children.map(child => ({
-                                    value: child.title,
-                                    label: `${group.title} > ${child.title}`
-                                }))
-                            )}
-                            placeholder="Üst Birim seçiniz..."
+                            value={experienceForm.department}
+                            onChange={val => setExperienceForm({ ...experienceForm, department: val as string })}
+                            options={[{ value: 'Teftiş Kurulu Müdürlüğü', label: 'Teftiş Kurulu Müdürlüğü' }, { value: 'İç Kontrol Müdürlüğü', label: 'İç Kontrol Müdürlüğü' }, { value: 'Risk Yönetimi Müdürlüğü', label: 'Risk Yönetimi Müdürlüğü' }, { value: 'Mali İşler Direktörlüğü', label: 'Mali İşler Direktörlüğü' }, { value: 'Operasyon Direktörlüğü', label: 'Operasyon Direktörlüğü' }, { value: 'Bilgi Teknolojileri Müdürlüğü', label: 'Bilgi Teknolojileri Müdürlüğü' }]}
+                            placeholder="Birim seçiniz..."
                         />
-                        {selectedParentExp && (
-                            <CustomSelect
-                                value={experienceForm.department}
-                                onChange={val => setExperienceForm({ ...experienceForm, department: val as string })}
-                                options={(function () {
-                                    const flatten = (items: Array<{ title: string; children?: any[] }>, level: number = 0): Array<{ value: string; label: string }> => {
-                                        return items.flatMap(item => {
-                                            const current = {
-                                                value: item.title,
-                                                label: (level > 0 ? '→ '.repeat(level) + ' ' : '') + item.title
-                                            };
-                                            if (item.children) {
-                                                return [current, ...flatten(item.children, level + 1)];
-                                            }
-                                            return [current];
-                                        });
-                                    };
-
-                                    for (const group of HIERARCHY) {
-                                        const child = group.children.find(c => c.title === selectedParentExp);
-                                        if (child && 'children' in child) {
-                                            return flatten((child as { children: any[] }).children);
-                                        }
-                                    }
-                                    return DEPARTMENTS.map(d => ({ value: d, label: d }));
-                                })()}
-                                placeholder="Alt Birim seçiniz..."
-                            />
-                        )}
-                        {!selectedParentExp && (
-                            <FormInput
-                                type="text"
-                                value={experienceForm.department}
-                                onChange={e => setExperienceForm({ ...experienceForm, department: e.target.value })}
-                                placeholder="Veya elle giriniz..."
-                            />
-                        )}
+                        <FormInput
+                            type="text"
+                            value={experienceForm.department}
+                            onChange={e => setExperienceForm({ ...experienceForm, department: e.target.value })}
+                            placeholder="Veya elle giriniz..."
+                        />
                     </div>
                 </FormField>
                 <FormInput

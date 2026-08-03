@@ -38,7 +38,6 @@ import EmptyState from '@/components/ui/EmptyState';
 import ControlStaffTabs from '@/components/control/ControlStaffTabs';
 import Checkbox from '@/components/ui/Checkbox';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
-import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 import EducationModal from '@/components/audit/staff/modals/EducationModal';
 import ExperienceModal from '@/components/audit/staff/modals/ExperienceModal';
 import TrainingModal from '@/components/audit/staff/modals/TrainingModal';
@@ -73,8 +72,9 @@ interface ControlStaffMember {
     leaves: any[];
 }
 
-const CONTROL_TITLES = ['İç Kontrol Müdürü', 'Başdenetçi', 'Denetçi', 'Yetkili Denetçi Yardımcısı', 'Denetçi Yardımcısı', 'Birim Kontrol Sorumlusu (BKS)'];
-const CONTROL_ROLES = ['İç Kontrol Müdürü', 'Başdenetçi', 'Denetçi', 'Birim Kontrol Sorumlusu (BKS)'];
+const CONTROL_TITLES = ['Denetçi Yardımcısı', 'Yetkili Denetçi Yardımcısı', 'Denetçi', 'Başdenetçi', 'İç Kontrol Müdürü'];
+const CONTROL_ROLES = ['Süreç Kontrolörü', 'BT Kontrolörü', 'Şube Kontrolörü', 'Uyum Görevlisi', 'İç Kontrol Müdürü'];
+const CONTROL_DEPARTMENTS = ['İç Kontrol ve Uyum Müdürlüğü', 'Teftiş Kurulu Müdürlüğü', 'Risk Yönetimi Müdürlüğü', 'Mali İşler Direktörlüğü', 'Operasyon Direktörlüğü', 'Bilgi Teknolojileri Müdürlüğü'];
 
 function ControlStaffPageContent() {
     const router = useRouter();
@@ -302,7 +302,7 @@ function ControlStaffPageContent() {
         lastName: '',
         title: CONTROL_TITLES[2],
         role: CONTROL_ROLES[1],
-        department: DEPARTMENTS[1],
+        department: CONTROL_DEPARTMENTS[1],
         email: '',
         phone: '',
         hireDate: new Date().toISOString().split('T')[0]
@@ -408,7 +408,7 @@ function ControlStaffPageContent() {
                 <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
                     <div>
                         <p className="text-xs text-slate-500 font-medium">Kapsanan Birimler</p>
-                        <h3 className="text-xl font-bold text-amber-600 mt-1">{DEPARTMENTS.length} Birim</h3>
+                        <h3 className="text-xl font-bold text-amber-600 mt-1">{CONTROL_DEPARTMENTS.length} Birim</h3>
                     </div>
                     <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
                         <Award size={20} />
@@ -430,7 +430,7 @@ function ControlStaffPageContent() {
                     >
                         <CustomSelect label="Ünvan" value={filters.title} onChange={(val) => setFilters({ ...filters, title: val as string[] })} isMulti options={CONTROL_TITLES.map(t => ({ value: t, label: t }))} />
                         <CustomSelect label="Sorumlu Rol" value={filters.role} onChange={(val) => setFilters({ ...filters, role: val as string[] })} isMulti options={CONTROL_ROLES.map(r => ({ value: r, label: r }))} />
-                        <CustomSelect label="Görevli Birim" value={filters.department} onChange={(val) => setFilters({ ...filters, department: val as string[] })} isMulti options={DEPARTMENTS.map(d => ({ value: d, label: d }))} />
+                        <CustomSelect label="Görevli Birim" value={filters.department} onChange={(val) => setFilters({ ...filters, department: val as string[] })} isMulti options={CONTROL_DEPARTMENTS.map(d => ({ value: d, label: d }))} />
                         <CustomSelect label="Durum" value={filters.status} onChange={(val) => setFilters({ ...filters, status: val as string[] })} isMulti options={[{ value: "Aktif", label: "Aktif" }, { value: "İzinli", label: "İzinli" }, { value: "Pasif", label: "Pasif" }]} />
                     </FilterDropdown>
                 }
@@ -666,7 +666,7 @@ function ControlStaffPageContent() {
                     </div>
 
                     <div>
-                        <CustomSelect label="Görevli Birim (Resmi Şema)" options={DEPARTMENTS.map(d => ({ value: d, label: d }))} value={staffForm.department} onChange={(val) => setStaffForm({ ...staffForm, department: val as string })} />
+                        <CustomSelect label="Görevli Birim (Resmi Şema)" options={CONTROL_DEPARTMENTS.map(d => ({ value: d, label: d }))} value={staffForm.department} onChange={(val) => setStaffForm({ ...staffForm, department: val as string })} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">

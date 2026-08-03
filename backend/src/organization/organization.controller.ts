@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -10,6 +10,11 @@ export class OrganizationController {
     @Get('tree')
     getTree() {
         return this.organizationService.getTree();
+    }
+
+    @Get('units')
+    getUnits() {
+        return this.organizationService.getUnits();
     }
 
     @Post()
@@ -25,5 +30,26 @@ export class OrganizationController {
     @Delete(':id')
     deleteNode(@Param('id') id: string) {
         return this.organizationService.deleteNode(id);
+    }
+
+    // --- JobTitles API ---
+    @Get('titles')
+    getJobTitles(@Query('module') module?: string) {
+        return this.organizationService.getJobTitles(module);
+    }
+
+    @Post('titles')
+    createJobTitle(@Body() data: any) {
+        return this.organizationService.createJobTitle(data);
+    }
+
+    @Put('titles/:id')
+    updateJobTitle(@Param('id') id: string, @Body() data: any) {
+        return this.organizationService.updateJobTitle(id, data);
+    }
+
+    @Delete('titles/:id')
+    deleteJobTitle(@Param('id') id: string) {
+        return this.organizationService.deleteJobTitle(id);
     }
 }

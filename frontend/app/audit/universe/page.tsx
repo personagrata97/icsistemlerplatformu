@@ -41,7 +41,6 @@ import { FileUpload } from '@/components/ui/FileUpload';
 import ControlPickerModal from '@/components/audit/ControlPickerModal';
 import { getRiskScoreColor, getRiskLevelFromScore, getAuditCycleFromScore, formatDate } from '@/lib/audit-utils';
 import { useAuth } from '@/context/AuthContext';
-import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
 import FormInput from "@/components/ui/FormInput";
 import FormTextarea from "@/components/ui/FormTextarea";
 import DatePicker from "@/components/ui/DatePicker";
@@ -1293,7 +1292,7 @@ function AuditUniversePageContent() {
                         </h3>
                         <div className="overflow-x-auto pb-4 custom-scrollbar max-h-[700px]">
                             <OrganizationTree
-                                hierarchy={HIERARCHY}
+                                hierarchy={[]}
                                 units={filteredUnits}
                                 canManage={canManage}
                                 onEdit={(unit) => handleOpenEditModal(unit, { stopPropagation: () => {} } as any)}
@@ -1470,50 +1469,11 @@ function AuditUniversePageContent() {
                                                 {(!newUnit.type || newUnit.type === 'Departman' || newUnit.type === 'Birim' || newUnit.type === 'Süreç') ? (
                                                     <div className="space-y-3">
                                                         <CustomSelect
-                                                            value={selectedParent}
-                                                            onChange={(val) => {
-                                                                setSelectedParent(val as string);
-                                                                setNewUnit({ ...newUnit, name: '' }); // Üst birim değiştiğinde ismi sıfırla
-                                                            }}
-                                                            options={HIERARCHY.flatMap(group =>
-                                                                group.children
-                                                                    .filter(child => child.title !== 'Teftiş Kurulu Müdürlüğü')
-                                                                    .map(child => ({
-                                                                        value: child.title,
-                                                                        label: `${group.title} > ${child.title}`
-                                                                    }))
-                                                            )}
-                                                            placeholder="Üst Birim / Grup Seçiniz..."
+                                                            value={newUnit.name}
+                                                            onChange={(val) => setNewUnit({ ...newUnit, name: val as string })}
+                                                            options={['İç Kontrol ve Uyum Müdürlüğü', 'Risk Yönetimi Müdürlüğü', 'Mali İşler Direktörlüğü', 'Operasyon Direktörlüğü', 'Bilgi Teknolojileri Müdürlüğü', 'Muhasebe Servisi', 'Bütçe ve Raporlama Servisi', 'Finans Servisi', 'Operasyon Servisi', 'Tahsisat Servisi', 'Satış Servisi', 'CRM ve Performans Servisi'].map(d => ({ value: d, label: d }))}
+                                                            placeholder="Birim / Servis Seçiniz..."
                                                         />
-                                                        {selectedParent && (
-                                                            <CustomSelect
-                                                                value={newUnit.name}
-                                                                onChange={(val) => setNewUnit({ ...newUnit, name: val as string })}
-                                                                options={(function () {
-                                                                    const flatten = (items: any[], level: number = 0): any[] => {
-                                                                        return items.flatMap(item => {
-                                                                            const current = {
-                                                                                value: item.title,
-                                                                                label: (level > 0 ? '→ '.repeat(level) + ' ' : '') + item.title
-                                                                            };
-                                                                            if (item.children) {
-                                                                                return [current, ...flatten(item.children, level + 1)];
-                                                                            }
-                                                                            return [current];
-                                                                        });
-                                                                    };
-
-                                                                    for (const group of HIERARCHY) {
-                                                                        const child = group.children.find(c => c.title === selectedParent);
-                                                                        if (child && 'children' in child) {
-                                                                            return flatten((child as any).children);
-                                                                        }
-                                                                    }
-                                                                    return DEPARTMENTS.filter(d => d !== 'Teftiş Kurulu Müdürlüğü').map(d => ({ value: d, label: d }));
-                                                                })()}
-                                                                placeholder="Alt Birim / Servis Seçiniz..."
-                                                            />
-                                                        )}
                                                     </div>
                                                 ) : (
                                                     <FormInput required value={newUnit.name} onChange={e => setNewUnit({ ...newUnit, name: e.target.value })} placeholder="Örn: İstanbul Şubesi" />

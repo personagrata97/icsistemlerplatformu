@@ -9,7 +9,7 @@ import StaffSelect from '@/components/audit/StaffSelect';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { DEPARTMENTS, HIERARCHY } from '@/lib/organization-constants';
+import { organizationApi } from '@/lib/organization-api';
 import { calculateDynamicSkills } from '@/lib/audit-utils';
 
 interface CreateAuditModalProps {
@@ -94,16 +94,7 @@ export default function CreateAuditModal({ isOpen, onClose, onSuccess, staffList
                 });
                 // Set parent department for edit mode
                 if (initialData.department) {
-                    for (const group of HIERARCHY) {
-                        const child = group.children.find((c: any) =>
-                            c.title === initialData.department ||
-                            (c.children && c.children.some((sc: any) => sc.title === initialData.department))
-                        );
-                        if (child) {
-                            setSelectedParentDept(child.title);
-                            break;
-                        }
-                    }
+                    setSelectedParentDept(initialData.department);
                 }
             } else {
                 setFormData({
@@ -140,20 +131,9 @@ export default function CreateAuditModal({ isOpen, onClose, onSuccess, staffList
     // Check if selected parent department has sub-units
     useEffect(() => {
         if (selectedParentDept) {
-            let found = false;
-            for (const group of HIERARCHY) {
-                const child = group.children.find(c => c.title === selectedParentDept);
-                if (child && 'children' in child && (child as any).children.length > 0) {
-                    found = true;
-                    break;
-                }
-            }
-            setHasSubUnits(found);
-
-            // If it has no sub-units (like Risk Management), automatically set department to parent name
-            if (!found) {
-                setFormData(prev => ({ ...prev, department: selectedParentDept }));
-            }
+            // Simplified logic: treat department as terminal if no hierarchy data provided
+            setHasSubUnits(false);
+            setFormData(prev => ({ ...prev, department: selectedParentDept }));
         } else {
             setHasSubUnits(true);
         }
@@ -374,61 +354,15 @@ export default function CreateAuditModal({ isOpen, onClose, onSuccess, staffList
                                 ]}
                             />
                             <CustomSelect
-                                label="Genel Müdür Yardımcılığı / Grup"
-                                value={selectedParentDept}
-                                onChange={(val) => {
-                                    setSelectedParentDept(val as string);
-                                    setFormData({ ...formData, department: '' });
-                                }}
-                                options={HIERARCHY.flatMap(group =>
-                                    group.children
-                                        .filter(child => child.title !== 'Teftiş Kurulu Müdürlüğü')
-                                        .filter(child => {
-                                            if (formData.type === 'Şube Denetimi') return child.title.includes('Satış') || child.title.includes('Şube');
-                                            if (formData.type === 'Bilgi Teknolojileri Denetimi') return child.title.includes('Bilgi Teknolojileri');
-                                            return true;
-                                        })
-                                        .map(child => ({
-                                            value: child.title,
-                                            label: `${group.title} > ${child.title}`
-                                        }))
-                                )}
-                                placeholder="Grup seçiniz..."
+                                label="Denetlenecek Birim / Süreç"
+                                value={formData.department}
+                                onChange={(val) => setFormData({ ...formData, department: val as string })}
+                                options={units.map(u => ({
+                                    value: u.name,
+                                    label: `${u.name} (${u.type || 'Birim'})`
+                                }))}
+                                placeholder="Birim seçiniz..."
                             />
-                            {selectedParentDept && hasSubUnits && (
-                                <CustomSelect
-                                    label="Alt Birim / Servis"
-                                    value={formData.department}
-                                    onChange={(val) => setFormData({ ...formData, department: val as string })}
-                                    options={(function () {
-                                        const flatten = (items: any[], level: number = 0): any[] => {
-                                            return items.flatMap(item => {
-                                                const current = {
-                                                    value: item.title,
-                                                    label: (level > 0 ? '→ '.repeat(level) + ' ' : '') + item.title
-                                                };
-                                                if (item.children) {
-                                                    return [current, ...flatten(item.children, level + 1)];
-                                                }
-                                                return [current];
-                                            });
-                                        };
-
-                                        for (const group of HIERARCHY) {
-                                            const child = group.children.find(c => c.title === selectedParentDept);
-                                            if (child) {
-                                                if ('children' in child && (child as any).children.length > 0) {
-                                                    return flatten((child as any).children);
-                                                } else {
-                                                    return [];
-                                                }
-                                            }
-                                        }
-                                        return [];
-                                    })()}
-                                    placeholder="Birim seçiniz..."
-                                />
-                            )}
 
                             {selectedParentDept && !hasSubUnits && (
                                 <div className="form-group flex items-end pb-1 text-sm text-gray-500 italic">
