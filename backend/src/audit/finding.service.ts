@@ -110,7 +110,18 @@ export class FindingService {
     async getFinding(id: string, user: any) {
         const finding = await this.prisma.finding.findUnique({
             where: { id, isDeleted: false },
-            include: { audit: { include: { AuditableUnit: true } }, auditTest: true, followUps: true, extensionRequests: true, assignedUser: { select: { id: true, displayName: true, title: true, department: true, photoUrl: true } }, notes: { include: { author: true }, orderBy: { created_at: 'desc' } } }
+            include: {
+                audit: { include: { AuditableUnit: true } },
+                auditTest: true,
+                followUps: true,
+                extensionRequests: true,
+                assignedUser: { select: { id: true, displayName: true, title: true, department: true, photoUrl: true } },
+                submittedBy: { select: { id: true, displayName: true, title: true, department: true } },
+                supervisor: { select: { id: true, displayName: true, title: true } },
+                manager: { select: { id: true, displayName: true, title: true } },
+                approvalLogs: { orderBy: { createdAt: 'asc' } },
+                notes: { include: { author: true }, orderBy: { created_at: 'desc' } }
+            }
         });
 
         if (!finding) throw new NotFoundException('Bulgu bulunamadı');
@@ -1223,5 +1234,343 @@ export class FindingService {
             stream.on('finish', () => resolve());
             stream.on('error', (err) => reject(err));
         });
+    }
+
+    // ==================== ONAY ZİNCİRİ METOTLARI ====================
+
+    async submitToSupervisor(findingId: string, user: any) {
+        const finding = await this.prisma.finding.findUnique({
+            where: { id: findingId, isDeleted: false },
+            include: { audit: true }
+        });
+        if (!finding) throw new NotFoundException('Bulgu bulunamadı.');
+
+        if (finding.status !== 'Taslak' && finding.status !== 'TASLAK' && finding.status !== 'İade' && finding.status !== 'IADE') {
+            throw new ForbiddenException(`Yalnızca Taslak durumundaki bulgular gözetim onayına gönderilebilir. Mevcut durum: ${finding.status}`);
+        }
+
+        const updated = await this.prisma.finding.update({
+            where: { id: findingId },
+            data: {
+                status: 'Gözetim Onayında',
+                submittedToSupervisorAt: new Date(),
+                submittedById: user.id
+            }
+        });
+
+        const log = await this.prisma.findingApprovalLog.create({
+            data: {
+                findingId,
+                stage: 'GOZETIM_ONAYINDA',
+                decision: 'SUBMITTED',
+                userId: user.id,
+                userName: user.displayName || user.username,
+                userRole: user.roles?.[0]?.code || user.role || 'MUFETTIS',
+                note: 'Gözetim onayına gönderildi'
+            }
+        });
+
+        await this.auditLogService.createLog({
+            action: 'BULGU_GOZETIM_ONAYINA_GUNDERILDI',
+            details: `Bulgu (${finding.code || finding.title}) gözetim onayına sunuldu.`,
+            targetType: 'Finding',
+            targetId: findingId,
+            user: user.username || user.displayName
+        });
+
+        if (finding.audit?.supervisorId) {
+            await this.prisma.notification.create({
+                data: {
+                    userId: finding.audit.supervisorId,
+                    title: 'Gözetim Onayı Bekleyen Bulgu',
+                    description: `${finding.code || finding.title} başlıklı bulgu onayınıza sunuldu.`,
+                    type: 'warning',
+                    category: 'Bulgu Onayı',
+                    module: 'audit',
+                    link: `/audit/findings/${findingId}`
+                }
+            });
+        }
+
+        return { ...updated, approvalLog: log };
+    }
+
+    async supervisorApprove(findingId: string, user: any, note?: string) {
+        const finding = await this.prisma.finding.findUnique({
+            where: { id: findingId, isDeleted: false },
+            include: { audit: true }
+        });
+        if (!finding) throw new NotFoundException('Bulgu bulunamadı.');
+
+        if (finding.status !== 'Gözetim Onayında') {
+            throw new ForbiddenException(`Bulgu gözetim onayında değil. Mevcut durum: ${finding.status}`);
+        }
+
+        // Kendi bulgusunu onaylayamaz engeli
+        if (finding.submittedById === user.id || finding.assignedUserId === user.id) {
+            throw new ForbiddenException('Kendi hazırladığınız bulguyu gözetim sorumlusu olarak onaylayamazsınız.');
+        }
+
+        const updated = await this.prisma.finding.update({
+            where: { id: findingId },
+            data: {
+                status: 'Müdür Onayında',
+                supervisorId: user.id,
+                supervisorReviewAt: new Date(),
+                supervisorDecision: 'ONAY',
+                supervisorNote: note || null
+            }
+        });
+
+        const log = await this.prisma.findingApprovalLog.create({
+            data: {
+                findingId,
+                stage: 'MUDUR_ONAYINDA',
+                decision: 'ONAY',
+                userId: user.id,
+                userName: user.displayName || user.username,
+                userRole: 'GOZETIM_SORUMLUSU',
+                note: note || 'Gözetim sorumlusu onayladı. Müdür onayına sevk edildi.'
+            }
+        });
+
+        await this.auditLogService.createLog({
+            action: 'BULGU_GOZETIM_ONAYLADI',
+            details: `Bulgu (${finding.code || finding.title}) gözetim sorumlusu tarafından onaylandı.`,
+            targetType: 'Finding',
+            targetId: findingId,
+            user: user.username || user.displayName
+        });
+
+        if (finding.submittedById) {
+            await this.prisma.notification.create({
+                data: {
+                    userId: finding.submittedById,
+                    title: 'Bulgunuz Gözetim Onayından Geçti',
+                    description: `${finding.code || finding.title} başlıklı bulgu gözetim onayını tamamladı ve Müdür onayına iletildi.`,
+                    type: 'success',
+                    category: 'Bulgu Onayı',
+                    module: 'audit',
+                    link: `/audit/findings/${findingId}`
+                }
+            });
+        }
+
+        return { ...updated, approvalLog: log };
+    }
+
+    async supervisorReturn(findingId: string, user: any, note: string) {
+        if (!note || !note.trim()) {
+            throw new ForbiddenException('Bulguyu iade ederken iade gerekçesi / notu yazılması zorunludur.');
+        }
+
+        const finding = await this.prisma.finding.findUnique({
+            where: { id: findingId, isDeleted: false }
+        });
+        if (!finding) throw new NotFoundException('Bulgu bulunamadı.');
+
+        if (finding.status !== 'Gözetim Onayında') {
+            throw new ForbiddenException(`Bulgu gözetim onayında değil. Mevcut durum: ${finding.status}`);
+        }
+
+        const updated = await this.prisma.finding.update({
+            where: { id: findingId },
+            data: {
+                status: 'Taslak',
+                supervisorId: user.id,
+                supervisorReviewAt: new Date(),
+                supervisorDecision: 'IADE',
+                supervisorNote: note
+            }
+        });
+
+        const log = await this.prisma.findingApprovalLog.create({
+            data: {
+                findingId,
+                stage: 'TASLAK',
+                decision: 'IADE',
+                userId: user.id,
+                userName: user.displayName || user.username,
+                userRole: 'GOZETIM_SORUMLUSU',
+                note: note
+            }
+        });
+
+        await this.auditLogService.createLog({
+            action: 'BULGU_GOZETIM_IADE_ETTI',
+            details: `Bulgu (${finding.code || finding.title}) gözetim sorumlusu tarafından iade edildi: ${note}`,
+            targetType: 'Finding',
+            targetId: findingId,
+            user: user.username || user.displayName
+        });
+
+        if (finding.submittedById) {
+            await this.prisma.notification.create({
+                data: {
+                    userId: finding.submittedById,
+                    title: 'Bulgunuz İade Edildi',
+                    description: `${finding.code || finding.title} başlıklı bulgu gözetim sorumlusu tarafından iade edildi. Not: ${note}`,
+                    type: 'error',
+                    category: 'Bulgu İade',
+                    module: 'audit',
+                    link: `/audit/findings/${findingId}`
+                }
+            });
+        }
+
+        return { ...updated, approvalLog: log };
+    }
+
+    async submitToManager(findingId: string, user: any) {
+        const finding = await this.prisma.finding.findUnique({
+            where: { id: findingId, isDeleted: false }
+        });
+        if (!finding) throw new NotFoundException('Bulgu bulunamadı.');
+
+        const updated = await this.prisma.finding.update({
+            where: { id: findingId },
+            data: {
+                status: 'Müdür Onayında'
+            }
+        });
+
+        const log = await this.prisma.findingApprovalLog.create({
+            data: {
+                findingId,
+                stage: 'MUDUR_ONAYINDA',
+                decision: 'SUBMITTED',
+                userId: user.id,
+                userName: user.displayName || user.username,
+                userRole: user.roles?.[0]?.code || 'GOZETIM_SORUMLUSU',
+                note: 'Müdür / Kurul Başkanı onayına sunuldu'
+            }
+        });
+
+        return { ...updated, approvalLog: log };
+    }
+
+    async managerApprove(findingId: string, user: any, note?: string) {
+        const finding = await this.prisma.finding.findUnique({
+            where: { id: findingId, isDeleted: false }
+        });
+        if (!finding) throw new NotFoundException('Bulgu bulunamadı.');
+
+        if (finding.status !== 'Müdür Onayında') {
+            throw new ForbiddenException(`Bulgu müdür onayında değil. Mevcut durum: ${finding.status}`);
+        }
+
+        // Kendi bulgusunu onaylayamaz engeli
+        if (finding.submittedById === user.id || finding.supervisorId === user.id) {
+            throw new ForbiddenException('Kendi hazırladığınız veya gözetmenlik yaptığınız bulguyu müdür olarak onaylayamazsınız.');
+        }
+
+        const updated = await this.prisma.finding.update({
+            where: { id: findingId },
+            data: {
+                status: 'Tebliğe Hazır',
+                managerId: user.id,
+                managerApprovalAt: new Date(),
+                managerDecision: 'ONAY',
+                managerNote: note || null
+            }
+        });
+
+        const log = await this.prisma.findingApprovalLog.create({
+            data: {
+                findingId,
+                stage: 'TEBLIGE_HAZIR',
+                decision: 'ONAY',
+                userId: user.id,
+                userName: user.displayName || user.username,
+                userRole: 'KURUL_BASKANI',
+                note: note || 'Kurul Başkanı / Müdür tarafından onaylandı. Bulgu Tebliğe Hazır durumuna geçti.'
+            }
+        });
+
+        await this.auditLogService.createLog({
+            action: 'BULGU_MUDUR_ONAYLADI',
+            details: `Bulgu (${finding.code || finding.title}) Kurul Başkanı / Müdür tarafından onaylandı. Tebliğe hazır.`,
+            targetType: 'Finding',
+            targetId: findingId,
+            user: user.username || user.displayName
+        });
+
+        if (finding.submittedById) {
+            await this.prisma.notification.create({
+                data: {
+                    userId: finding.submittedById,
+                    title: 'Bulgunuz Kurul Başkanı Tarafından Onaylandı',
+                    description: `${finding.code || finding.title} başlıklı bulgu tebliğe hazır durumuna getirildi.`,
+                    type: 'success',
+                    category: 'Bulgu Onayı',
+                    module: 'audit',
+                    link: `/audit/findings/${findingId}`
+                }
+            });
+        }
+
+        return { ...updated, approvalLog: log };
+    }
+
+    async managerReturn(findingId: string, user: any, note: string) {
+        if (!note || !note.trim()) {
+            throw new ForbiddenException('Bulguyu müdür aşamasında iade ederken iade gerekçesi / notu yazılması zorunludur.');
+        }
+
+        const finding = await this.prisma.finding.findUnique({
+            where: { id: findingId, isDeleted: false }
+        });
+        if (!finding) throw new NotFoundException('Bulgu bulunamadı.');
+
+        if (finding.status !== 'Müdür Onayında') {
+            throw new ForbiddenException(`Bulgu müdür onayında değil. Mevcut durum: ${finding.status}`);
+        }
+
+        const updated = await this.prisma.finding.update({
+            where: { id: findingId },
+            data: {
+                status: 'Taslak',
+                managerId: user.id,
+                managerApprovalAt: new Date(),
+                managerDecision: 'IADE',
+                managerNote: note
+            }
+        });
+
+        const log = await this.prisma.findingApprovalLog.create({
+            data: {
+                findingId,
+                stage: 'TASLAK',
+                decision: 'IADE',
+                userId: user.id,
+                userName: user.displayName || user.username,
+                userRole: 'KURUL_BASKANI',
+                note: note
+            }
+        });
+
+        await this.auditLogService.createLog({
+            action: 'BULGU_MUDUR_IADE_ETTI',
+            details: `Bulgu (${finding.code || finding.title}) Kurul Başkanı / Müdür tarafından iade edildi: ${note}`,
+            targetType: 'Finding',
+            targetId: findingId,
+            user: user.username || user.displayName
+        });
+
+        if (finding.submittedById) {
+            await this.prisma.notification.create({
+                data: {
+                    userId: finding.submittedById,
+                    title: 'Bulgunuz Müdürü / Kurul Başkanı Tarafından İade Edildi',
+                    description: `${finding.code || finding.title} başlıklı bulgu iade edildi. Not: ${note}`,
+                    type: 'error',
+                    category: 'Bulgu İade',
+                    module: 'audit',
+                    link: `/audit/findings/${findingId}`
+                }
+            });
+        }
+
+        return { ...updated, approvalLog: log };
     }
 }

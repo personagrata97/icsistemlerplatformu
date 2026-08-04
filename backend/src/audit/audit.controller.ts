@@ -235,6 +235,42 @@ export class AuditController {
         return this.findingService.notifyFinding(id, body.email, req.user);
     }
 
+    @Post('findings/:id/submit-to-supervisor')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async submitToSupervisor(@Param('id') id: string, @Request() req: any) {
+        return this.findingService.submitToSupervisor(id, req.user);
+    }
+
+    @Post('findings/:id/supervisor-approve')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async supervisorApprove(@Param('id') id: string, @Body() body: { note?: string }, @Request() req: any) {
+        return this.findingService.supervisorApprove(id, req.user, body?.note);
+    }
+
+    @Post('findings/:id/supervisor-return')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async supervisorReturn(@Param('id') id: string, @Body() body: { note: string }, @Request() req: any) {
+        return this.findingService.supervisorReturn(id, req.user, body?.note);
+    }
+
+    @Post('findings/:id/submit-to-manager')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async submitToManager(@Param('id') id: string, @Request() req: any) {
+        return this.findingService.submitToManager(id, req.user);
+    }
+
+    @Post('findings/:id/manager-approve')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async managerApprove(@Param('id') id: string, @Body() body: { note?: string }, @Request() req: any) {
+        return this.findingService.managerApprove(id, req.user, body?.note);
+    }
+
+    @Post('findings/:id/manager-return')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async managerReturn(@Param('id') id: string, @Body() body: { note: string }, @Request() req: any) {
+        return this.findingService.managerReturn(id, req.user, body?.note);
+    }
+
     @Post('findings/:id/accept-risk')
     @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
     @UseInterceptors(FileInterceptor('file', {

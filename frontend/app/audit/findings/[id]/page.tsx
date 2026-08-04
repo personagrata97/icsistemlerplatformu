@@ -1,9 +1,8 @@
 'use client';
+
 import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 import RequireRole from '@/components/auth/RequireRole';
-
-
 import { useState, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -11,16 +10,15 @@ import {
     ArrowLeft, Check, Send, Eye, Download, Save, Upload, RefreshCw, Plus,
     History, ChevronDown, AlertCircle, ClipboardList, Paperclip, Calendar,
     FileText, Edit2, Trash2, X, User, Clock, CheckCircle, XCircle, RotateCcw,
-    MessageSquare, Mail, RotateCw, ExternalLink, Sparkles, BookOpen, Lightbulb
+    MessageSquare, Mail, RotateCw, ExternalLink, Sparkles, BookOpen, Lightbulb,
+    PlayCircle, FileSearch, ShieldCheck, ArrowRight
 } from 'lucide-react';
 import Tooltip from '@/components/ui/Tooltip';
-import { PlayCircle, FileSearch } from 'lucide-react';
 import { auditApi } from '@/lib/audit-api';
 import { BackButton } from '@/components/ui/BackButton';
 import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';
 import { getStatusColor, getRiskColor, formatDate } from '@/lib/audit-utils';
-import { getAvailableTransitions } from '@/lib/audit-workflow';
 import { useAuth } from '@/context/AuthContext';
 import { checkRole, ROLES } from '@/lib/auth-constants';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -31,6 +29,17 @@ import ConfirmModal from '@/components/ConfirmModal';
 import FormInput from "@/components/ui/FormInput";
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 
+interface FindingApprovalLog {
+    id: string;
+    stage: string;
+    decision: string;
+    userId: string;
+    userName?: string;
+    userRole?: string;
+    note?: string;
+    createdAt: string;
+}
+
 interface Finding {
     id: string;
     code: string;
@@ -39,6 +48,18 @@ interface Finding {
     risk: string;
     status: string;
     assignedTo?: string;
+    assignedUserId?: string;
+    submittedById?: string;
+    submittedToSupervisorAt?: string;
+    supervisorId?: string;
+    supervisorReviewAt?: string;
+    supervisorDecision?: string;
+    supervisorNote?: string;
+    managerId?: string;
+    managerApprovalAt?: string;
+    managerDecision?: string;
+    managerNote?: string;
+    approvalLogs?: FindingApprovalLog[];
     dueDate?: string;
     category?: string;
     auditId?: string;
@@ -93,7 +114,6 @@ interface FindingAnalysis {
     generalNotes?: string;
 }
 
-// Icon map for workflow buttons
 const IconMap: Record<string, any> = {
     Send, CheckCircle, XCircle, RotateCw, Mail, MessageSquare, Check, FileText,
     PlayCircle, FileSearch, Eye, History
@@ -102,107 +122,6 @@ const IconMap: Record<string, any> = {
 function FindingDetailPageContent() {
     const params = useParams();
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const { showToast } = useToast();
-    const { user, hasRole } = useAuth();
-
-    // Determine back URL
-    const backUrl = searchParams.get('from') || '/audit/findings';
-
-    const findingId = params.id as string;
-
-    // Data States
-    const [finding, setFinding] = useState<Finding | null>(null);
-    const [audit, setAudit] = useState<Audit | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    // UI States
-    const [showHistory, setShowHistory] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [showNoteModal, setShowNoteModal] = useState(false);
-    const [showResponseModal, setShowResponseModal] = useState(false);
-    const [showAttachmentModal, setShowAttachmentModal] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'details' | 'conciliation' | 'history'>('details');
-
-    const [pendingTransition, setPendingTransition] = useState<any>(null);
-
-    // AI States
-    const [showAiModal, setShowAiModal] = useState(false);
-    const [analyzing, setAnalyzing] = useState(false);
-    const [aiAnalysis, setAiAnalysis] = useState<FindingAnalysis | null>(null);
-
-    // Form States
-    const [editForm, setEditForm] = useState({
-        title: '',
-        description: '',
-        risk: '',
-        category: '',
-        dueDate: '',
-        assignedTo: ''
-    });
-    const [actionNote, setActionNote] = useState('');
-    const [departmentResponse, setDepartmentResponse] = useState('');
-    const [newAttachment, setNewAttachment] = useState<File | null>(null);
-
-    // Workflow Steps for findings
-    const workflowSteps = ['Taslak', 'Gözden Geçirme Bek.', 'Onay Bekliyor', 'Onaylandı', 'Tebliğ Edildi', 'Birim Yanıtladı', 'Takip Ediliyor', 'Doğrulama Bekliyor', 'Tamamlandı'];
-
-    useEffect(() => {
-        if (findingId) {
-            loadData();
-        }
-    }, [findingId]);
-
-    const loadData = async () => {
-        setLoading(true);
-        try {
-            // Fetch finding by ID
-            const findingData = await auditApi.getFindingById(findingId);
-            if (findingData) {
-                setFinding(findingData);
-                setEditForm({
-                    title: findingData.title || '',
-                    description: findingData.description || '',
-                    risk: findingData.risk || 'Orta',
-                    category: findingData.category || '',
-                    dueDate: findingData.dueDate || '',
-                    assignedTo: findingData.assignedTo || ''
-                });
-                setDepartmentResponse(findingData.departmentResponse || '');
-
-                // Fetch related audit
-                if (findingData.auditId) {
-                    const auditData = await auditApi.getAuditById(findingData.auditId);
-                    setAudit(auditData);
-                }
-            }
-        } catch (error) {
-            console.error('Failed to load finding:', error);
-            showToast('Bulgu verileri yüklenirken hata oluştu', 'error');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Add process log
-    const addProcessLog = async (action: string, note?: string, fromStatus?: string, toStatus?: string) => {
-        if (!finding) return;
-
-        const newLog: ProcessLog = {
-            id: Date.now().toString(),
-            action,
-            user: user?.displayName || 'Sistem',
-            date: new Date().toISOString(),
-            note,
-            fromStatus,
-            toStatus
-        };
-
-        const updatedHistory = [...(finding.processHistory || []), newLog];
-
-        try {
-            await auditApi.updateFinding(findingId, {
                 processHistory: JSON.stringify(updatedHistory),
                 lastEditedAt: new Date().toISOString()
             });
@@ -587,20 +506,6 @@ function FindingDetailPageContent() {
                                 </Button>
                                 <TableActions items={[
                                     { label: 'Düzenle', icon: Edit2, onClick: () => setIsEditing(true) },
-                                    { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: handleDelete }
-                                ]} />
-                            </>
-                        )}
-                    </div>
-                </div >
-
-                {/* Tabs */}
-                <div className="mb-6">
-                    <SegmentedTabs
-                        tabs={[
-                            { id: 'details', label: 'Detaylar', icon: FileText },
-                            { id: 'conciliation', label: 'Mutabakat & Yanıt', icon: MessageSquare },
-                            { id: 'history', label: 'Ekler & Geçmiş', icon: History }
                         ]}
                         activeTab={activeTab}
                         onChange={(id) => setActiveTab(id as any)}
@@ -834,12 +739,45 @@ function FindingDetailPageContent() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="py-8 text-center text-gray-400 bg-gray-50/50 rounded-lg border border-dashed border-gray-300">
                                     <Paperclip size={32} className="mx-auto mb-2 opacity-20" />
                                     <p className="text-sm italic">Henüz dosya eklenmemiş.</p>
                                 </div>
                             )}
-                        </div>
+                        {/* Approval Log History */}
+                        {finding.approvalLogs && finding.approvalLogs.length > 0 && (
+                            <div className="bg-white rounded-xl border p-5 shadow-sm">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h4 className="font-bold flex items-center gap-2 text-gray-800">
+                                        <ShieldCheck size={18} className="text-primary" /> Onay Zinciri Geçmişi ({finding.approvalLogs.length})
+                                    </h4>
+                                </div>
+                                <div className="space-y-3">
+                                    {finding.approvalLogs.map((log: FindingApprovalLog) => (
+                                        <div key={log.id} className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                                            <div className="flex items-center gap-3">
+                                                <span className={`px-2 py-0.5 rounded font-bold uppercase text-[10px] ${
+                                                    log.decision === 'ONAY' ? 'bg-emerald-100 text-emerald-800' :
+                                                    log.decision === 'IADE' ? 'bg-red-100 text-red-800' :
+                                                    'bg-blue-100 text-blue-800'
+                                                }`}>
+                                                    {log.decision === 'ONAY' ? 'ONAYLANDI' : log.decision === 'IADE' ? 'İADE EDİLDİ' : 'SEVK EDİLDİ'}
+                                                </span>
+                                                <span className="font-semibold text-gray-800">{log.stage}</span>
+                                                <span className="text-gray-500">| {log.userName || 'Kullanıcı'} ({log.userRole || 'Rol'})</span>
+                                            </div>
+                                            <div className="text-gray-400 text-[11px] font-mono">
+                                                {formatDate(log.createdAt)}
+                                            </div>
+                                            {log.note && (
+                                                <div className="w-full text-gray-600 bg-white p-2 rounded border border-gray-100 italic">
+                                                    "{log.note}"
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Process History */}
                         <div className="bg-white rounded-xl border p-5 shadow-sm">
@@ -1142,6 +1080,63 @@ function FindingDetailPageContent() {
                     </div>
                 )
             }
+
+            {/* Approval Modal */}
+            {showApprovalModal && (
+                <div className="modal-overlay open" onClick={() => setShowApprovalModal(false)}>
+                    <div className="modal max-w-lg" onClick={e => e.stopPropagation()}>
+                        <div className="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
+                            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                <ShieldCheck size={20} className="text-primary" />
+                                {approvalAction === 'submit' && 'Gözetim Onayına Gönder'}
+                                {approvalAction === 'supervisor_approve' && 'Gözetim Onayı'}
+                                {approvalAction === 'supervisor_return' && 'Gözetim İadesi'}
+                                {approvalAction === 'manager_approve' && 'Müdür / Kurul Başkanı Onayı'}
+                                {approvalAction === 'manager_return' && 'Müdür / Kurul Başkanı İadesi'}
+                            </h3>
+                            <button onClick={() => setShowApprovalModal(false)} className="p-1.5 hover:bg-gray-200 rounded-full">
+                                <X size={18} />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            {(approvalAction === 'supervisor_return' || approvalAction === 'manager_return') && (
+                                <div className="p-3 bg-red-50 text-red-800 rounded border border-red-200 text-xs">
+                                    <AlertCircle size={14} className="inline mr-1" />
+                                    Bulguyu iade ederken gerekçe notu yazılması zorunludur.
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="form-label font-medium text-sm text-gray-700 block mb-1">
+                                    {(approvalAction === 'supervisor_return' || approvalAction === 'manager_return') ? 'İade Gerekçesi *' : 'Açıklama / Not (Opsiyonel)'}
+                                </label>
+                                <FormTextarea
+                                    rows={4}
+                                    value={approvalNote}
+                                    onChange={e => setApprovalNote(e.target.value)}
+                                    placeholder={approvalAction?.includes('return') ? 'İade nedeninizi detaylı yazınız...' : 'Opsiyonel not ekleyebilirsiniz...'}
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                <Button variant="secondary" onClick={() => setShowApprovalModal(false)}>
+                                    İptal
+                                </Button>
+                                <Button
+                                    variant={approvalAction?.includes('return') ? 'danger' : 'primary'}
+                                    onClick={handleApprovalActionSubmit}
+                                >
+                                    {approvalAction === 'submit' && 'Onaya Gönder'}
+                                    {approvalAction === 'supervisor_approve' && 'Onayla ve İlet'}
+                                    {approvalAction === 'supervisor_return' && 'İade Et'}
+                                    {approvalAction === 'manager_approve' && 'Onayla ve Tebliğe Al'}
+                                    {approvalAction === 'manager_return' && 'İade Et'}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <ConfirmModal
                 isOpen={isDeleteModalOpen}

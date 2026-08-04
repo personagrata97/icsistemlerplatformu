@@ -1165,6 +1165,50 @@ export const auditApi = {
         return handleResponse(res);
     },
 
+    submitFindingToSupervisor: async (id: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/findings/${id}/submit-to-supervisor`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+        return handleResponse(res);
+    },
+
+    supervisorApproveFinding: async (id: string, note?: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/findings/${id}/supervisor-approve`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ note })
+        });
+        return handleResponse(res);
+    },
+
+    supervisorReturnFinding: async (id: string, note: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/findings/${id}/supervisor-return`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ note })
+        });
+        return handleResponse(res);
+    },
+
+    managerApproveFinding: async (id: string, note?: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/findings/${id}/manager-approve`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ note })
+        });
+        return handleResponse(res);
+    },
+
+    managerReturnFinding: async (id: string, note: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/findings/${id}/manager-return`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ note })
+        });
+        return handleResponse(res);
+    },
+
     uploadConciliationEvidence: async (findingId: string, file: File) => {
         const formData = new FormData();
         formData.append('file', file);
