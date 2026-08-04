@@ -119,6 +119,81 @@ export class AuditController {
         return this.auditService.getAudit(id, req.user);
     }
 
+    // EKİP YÖNETİMİ ENDPOINT'LERİ
+    @Get('audits/:auditId/team')
+    @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
+    async getTeamWorkload(@Param('auditId') auditId: string) {
+        return this.auditService.getTeamWorkload(auditId);
+    }
+
+    @Post('audits/:auditId/team')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async assignTeamMember(
+        @Param('auditId') auditId: string,
+        @Body() body: { userId: string, rol: string, planlananGun?: number },
+        @Request() req: any
+    ) {
+        return this.auditService.assignTeamMember(auditId, body, req.user);
+    }
+
+    @Put('audits/:auditId/team/:memberId')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async updateTeamMemberRole(
+        @Param('auditId') auditId: string,
+        @Param('memberId') memberId: string,
+        @Body() body: { rol?: string, planlananGun?: number, gerceklesenGun?: number, aktif?: boolean },
+        @Request() req: any
+    ) {
+        return this.auditService.updateTeamMemberRole(auditId, memberId, body, req.user);
+    }
+
+    @Delete('audits/:auditId/team/:memberId')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async removeTeamMember(
+        @Param('auditId') auditId: string,
+        @Param('memberId') memberId: string,
+        @Request() req: any
+    ) {
+        return this.auditService.removeTeamMember(auditId, memberId, req.user);
+    }
+
+    // DENETİM PROGRAMI ENDPOINT'LERİ
+    @Get('audits/:auditId/program')
+    @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
+    async getAuditProgram(@Param('auditId') auditId: string) {
+        return this.auditService.getAuditProgram(auditId);
+    }
+
+    @Post('audits/:auditId/program')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async createProgram(
+        @Param('auditId') auditId: string,
+        @Body() body: { baslik: string, aciklama?: string, sorumluId?: string, planlananGun?: number, sira?: number },
+        @Request() req: any
+    ) {
+        return this.auditService.createProgram(auditId, body, req.user);
+    }
+
+    @Post('program/:programId/step')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async addProgramStep(
+        @Param('programId') programId: string,
+        @Body() body: { testAdimi: string, yontem?: string, beklenenKanit?: string, sorumluId?: string, sira?: number },
+        @Request() req: any
+    ) {
+        return this.auditService.addProgramStep(programId, body, req.user);
+    }
+
+    @Put('program-step/:stepId')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    async updateStepResult(
+        @Param('stepId') stepId: string,
+        @Body() body: { durum?: string, sonuc?: string, notlar?: string, sorumluId?: string },
+        @Request() req: any
+    ) {
+        return this.auditService.updateStepResult(stepId, body, req.user);
+    }
+
     @Get('audits/:id/history')
     @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
     async getAuditHistory(@Param('id') id: string) {

@@ -1209,6 +1209,71 @@ export const auditApi = {
         return handleResponse(res);
     },
 
+    // Team Management
+    getAuditTeam: async (auditId: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/audits/${auditId}/team`, { headers: getHeaders() });
+        return handleResponse(res);
+    },
+
+    assignTeamMember: async (auditId: string, data: { userId: string, rol: string, planlananGun?: number }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/audits/${auditId}/team`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
+    updateTeamMemberRole: async (auditId: string, memberId: string, data: { rol?: string, planlananGun?: number, gerceklesenGun?: number, aktif?: boolean }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/audits/${auditId}/team/${memberId}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
+    removeTeamMember: async (auditId: string, memberId: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/audits/${auditId}/team/${memberId}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        return handleResponse(res);
+    },
+
+    // Audit Program Management
+    getAuditProgram: async (auditId: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/audits/${auditId}/program`, { headers: getHeaders() });
+        return handleResponse(res);
+    },
+
+    createAuditProgram: async (auditId: string, data: { baslik: string, aciklama?: string, sorumluId?: string, planlananGun?: number }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/audits/${auditId}/program`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
+    addAuditProgramStep: async (programId: string, data: { testAdimi: string, yontem?: string, beklenenKanit?: string, sorumluId?: string }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/program/${programId}/step`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
+    updateAuditProgramStep: async (stepId: string, data: { durum?: string, sonuc?: string, notlar?: string, sorumluId?: string }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/program-step/${stepId}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
     uploadConciliationEvidence: async (findingId: string, file: File) => {
         const formData = new FormData();
         formData.append('file', file);

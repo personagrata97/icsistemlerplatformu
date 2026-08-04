@@ -3388,4 +3388,262 @@ export class AuditService {
 
         return updated;
     }
+
+    // ==================== DENETİM EKİBİ METOTLARI ====================
+
+    async assignTeamMember(auditId: string, data: { userId: string, rol: string, planlananGun?: number }, currentUser: any) {
+        const audit = await this.prisma.audit.findUnique({
+            where: { id: auditId, isDeleted: false }
+        });
+        if (!audit) throw new NotFoundException('Denetim bulunamadı.');
+
+        // Bağımsızlık kontrolü
+        await this.validateIndependence(data.userId, audit.department || '');
+
+        // Tek Ekip Başkanı kuralı
+        if (data.rol === 'EKIP_BASKANI') {
+            const existingLeader = await this.prisma.auditTeamMember.findFirst({
+                where: { auditId, rol: 'EKIP_BASKANI', aktif: true }
+            });
+            if (existingLeader && existingLeader.userId !== data.userId) {
+                throw new ForbiddenException('Bir denetimde yalnızca bir Ekip Başkanı atanabilir.');
+            }
+        }
+
+        const existingMember = await this.prisma.auditTeamMember.findFirst({
+            where: { auditId, userId: data.userId }
+        });
+
+        let member;
+        if (existingMember) {
+            member = await this.prisma.auditTeamMember.update({
+                where: { id: existingMember.id },
+                data: {
+                    rol: data.rol,
+                    planlananGun: data.planlananGun ?? existingMember.planlananGun,
+                    aktif: true
+                },
+                include: { user: { select: { id: true, displayName: true, title: true, department: true, photoUrl: true } } }
+            });
+        } else {
+            member = await this.prisma.auditTeamMember.create({
+                data: {
+                    auditId,
+                    userId: data.userId,
+                    rol: data.rol,
+                    planlananGun: data.planlananGun || 0,
+                    aktif: true
+                },
+                include: { user: { select: { id: true, displayName: true, title: true, department: true, photoUrl: true } } }
+            });
+        }
+
+        await this.auditLogService.createLog({
+            user: currentUser.displayName || currentUser.username,
+            action: 'Denetim Ekip Üyesi Atandı',
+            details: `"${audit.title}" denetimine ${member.user?.displayName || data.userId} (${data.rol}) üye olarak atandı.`,
+            targetType: 'Audit',
+            targetId: auditId
+        });
+
+        return member;
+    }
+
+    async updateTeamMemberRole(auditId: string, memberId: string, data: { rol?: string, planlananGun?: number, gerceklesenGun?: number, aktif?: boolean }, currentUser: any) {
+        const member = await this.prisma.auditTeamMember.findUnique({
+            where: { id: memberId },
+            include: { user: true }
+        });
+        if (!member || member.auditId !== auditId) {
+            throw new NotFoundException('Ekip üyesi bulunamadı.');
+        }
+
+        // Ekip üyesi kendi rolünü değiştiremez
+        const roles = currentUser.roles?.map((r: any) => typeof r === 'string' ? r : r.code || r.role?.code) || [];
+        const isAdmin = roles.includes('ADMIN') || roles.includes('SUPER_ADMIN');
+        if (data.rol && data.rol !== member.rol && currentUser.id === member.userId && !isAdmin) {
+            throw new ForbiddenException('Ekip üyesi kendi rolünü değiştiremez.');
+        }
+
+        // Tek Ekip Başkanı kuralı
+        if (data.rol === 'EKIP_BASKANI' && member.rol !== 'EKIP_BASKANI') {
+            const existingLeader = await this.prisma.auditTeamMember.findFirst({
+                where: { auditId, rol: 'EKIP_BASKANI', aktif: true, id: { not: memberId } }
+            });
+            if (existingLeader) {
+                throw new ForbiddenException('Bir denetimde yalnızca bir Ekip Başkanı atanabilir.');
+            }
+        }
+
+        const updated = await this.prisma.auditTeamMember.update({
+            where: { id: memberId },
+            data: {
+                ...(data.rol ? { rol: data.rol } : {}),
+                ...(data.planlananGun !== undefined ? { planlananGun: data.planlananGun } : {}),
+                ...(data.gerceklesenGun !== undefined ? { gerceklesenGun: data.gerceklesenGun } : {}),
+                ...(data.aktif !== undefined ? { aktif: data.aktif } : {})
+            },
+            include: { user: { select: { id: true, displayName: true, title: true, department: true, photoUrl: true } } }
+        });
+
+        return updated;
+    }
+
+    async removeTeamMember(auditId: string, memberId: string, currentUser: any) {
+        const member = await this.prisma.auditTeamMember.findUnique({
+            where: { id: memberId }
+        });
+        if (!member || member.auditId !== auditId) {
+            throw new NotFoundException('Ekip üyesi bulunamadı.');
+        }
+
+        const updated = await this.prisma.auditTeamMember.update({
+            where: { id: memberId },
+            data: { aktif: false }
+        });
+
+        return { success: true, memberId };
+    }
+
+    async getTeamWorkload(auditId: string) {
+        const members = await this.prisma.auditTeamMember.findMany({
+            where: { auditId, aktif: true },
+            include: {
+                user: { select: { id: true, displayName: true, title: true, department: true, photoUrl: true, email: true } }
+            },
+            orderBy: { atanmaTarihi: 'asc' }
+        });
+
+        const totalPlannedDays = members.reduce((sum, m) => sum + (m.planlananGun || 0), 0);
+        const totalActualDays = members.reduce((sum, m) => sum + (m.gerceklesenGun || 0), 0);
+
+        return {
+            members,
+            totalMembers: members.length,
+            totalPlannedDays,
+            totalActualDays
+        };
+    }
+
+    // ==================== DENETİM PROGRAMI METOTLARI ====================
+
+    async createProgram(auditId: string, data: { baslik: string, aciklama?: string, sorumluId?: string, planlananGun?: number, sira?: number }, currentUser: any) {
+        const audit = await this.prisma.audit.findUnique({
+            where: { id: auditId, isDeleted: false }
+        });
+        if (!audit) throw new NotFoundException('Denetim bulunamadı.');
+
+        const maxSira = await this.prisma.auditProgram.aggregate({
+            where: { auditId },
+            _max: { sira: true }
+        });
+        const sira = data.sira || ((maxSira._max.sira || 0) + 1);
+
+        const program = await this.prisma.auditProgram.create({
+            data: {
+                auditId,
+                baslik: data.baslik,
+                aciklama: data.aciklama || null,
+                sorumluId: data.sorumluId || null,
+                planlananGun: data.planlananGun || 0,
+                sira,
+                durum: 'Planlandı'
+            },
+            include: {
+                sorumlu: { select: { id: true, displayName: true, title: true } },
+                steps: true
+            }
+        });
+
+        return program;
+    }
+
+    async addProgramStep(programId: string, data: { testAdimi: string, yontem?: string, beklenenKanit?: string, sorumluId?: string, sira?: number }, currentUser: any) {
+        const program = await this.prisma.auditProgram.findUnique({
+            where: { id: programId }
+        });
+        if (!program) throw new NotFoundException('Denetim programı bulunamadı.');
+
+        const maxSira = await this.prisma.auditProgramStep.aggregate({
+            where: { programId },
+            _max: { sira: true }
+        });
+        const sira = data.sira || ((maxSira._max.sira || 0) + 1);
+
+        const step = await this.prisma.auditProgramStep.create({
+            data: {
+                programId,
+                testAdimi: data.testAdimi,
+                yontem: data.yontem || null,
+                beklenenKanit: data.beklenenKanit || null,
+                sorumluId: data.sorumluId || null,
+                sira,
+                durum: 'Planlandı'
+            },
+            include: {
+                sorumlu: { select: { id: true, displayName: true, title: true } }
+            }
+        });
+
+        return step;
+    }
+
+    async updateStepResult(stepId: string, data: { durum?: string, sonuc?: string, notlar?: string, sorumluId?: string }, currentUser: any) {
+        const step = await this.prisma.auditProgramStep.findUnique({
+            where: { id: stepId },
+            include: { program: true }
+        });
+        if (!step) throw new NotFoundException('Program testi adımı bulunamadı.');
+
+        const updated = await this.prisma.auditProgramStep.update({
+            where: { id: stepId },
+            data: {
+                ...(data.durum ? { durum: data.durum } : {}),
+                ...(data.sonuc !== undefined ? { sonuc: data.sonuc } : {}),
+                ...(data.notlar !== undefined ? { notlar: data.notlar } : {}),
+                ...(data.sorumluId !== undefined ? { sorumluId: data.sorumluId } : {})
+            },
+            include: {
+                sorumlu: { select: { id: true, displayName: true, title: true } }
+            }
+        });
+
+        if (data.durum === 'Tamamlandı') {
+            const steps = await this.prisma.auditProgramStep.findMany({
+                where: { programId: step.programId }
+            });
+            const allDone = steps.every(s => s.durum === 'Tamamlandı');
+            if (allDone) {
+                await this.prisma.auditProgram.update({
+                    where: { id: step.programId },
+                    data: { durum: 'Tamamlandı' }
+                });
+            } else {
+                await this.prisma.auditProgram.update({
+                    where: { id: step.programId },
+                    data: { durum: 'Devam Ediyor' }
+                });
+            }
+        }
+
+        return updated;
+    }
+
+    async getAuditProgram(auditId: string) {
+        const programs = await this.prisma.auditProgram.findMany({
+            where: { auditId },
+            include: {
+                sorumlu: { select: { id: true, displayName: true, title: true, photoUrl: true } },
+                steps: {
+                    include: {
+                        sorumlu: { select: { id: true, displayName: true, title: true, photoUrl: true } }
+                    },
+                    orderBy: { sira: 'asc' }
+                }
+            },
+            orderBy: { sira: 'asc' }
+        });
+
+        return programs;
+    }
 }

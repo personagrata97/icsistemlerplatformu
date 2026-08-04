@@ -61,6 +61,7 @@ import ComposeLetterModal from '@/components/audit/communication/ComposeLetterMo
 import MeetingMinutesModal from '@/components/audit/communication/MeetingMinutesModal';
 import AuditMeetingsTab from '@/components/audit/AuditMeetingsTab';
 import AuditPlanningTab from '@/components/audit/detail/AuditPlanningTab';
+import AuditProgramTab from '@/components/audit/detail/AuditProgramTab';
 
 
 interface TeamMember {
@@ -152,6 +153,7 @@ function AuditDetailPageContent({ params }: { params: { id: string } }) {
     const [auditData, setAuditData] = useState<any>(null);
     const [findings, setFindings] = useState<Finding[]>([]);
     const [team, setTeam] = useState<TeamMember[]>([]);
+    const [dbTeamMembers, setDbTeamMembers] = useState<any[]>([]);
     const [workpapers, setWorkpapers] = useState<Workpaper[]>([]);
     const [attachments, setAttachments] = useState<Attachment[]>([]);
     const [reportAttachments, setReportAttachments] = useState<Attachment[]>([]);
@@ -247,6 +249,12 @@ function AuditDetailPageContent({ params }: { params: { id: string } }) {
                 const staffList = await auditApi.getStaff();
                 setAllStaff(Array.isArray(staffList) ? staffList : []);
             } catch (e) { console.error('Staff fetch error', e); }
+
+            // Get DB Team Members
+            try {
+                const teamWorkload = await auditApi.getAuditTeam(id);
+                setDbTeamMembers(teamWorkload?.members || []);
+            } catch (e) { console.error('Team workload fetch error', e); }
 
             if (audit) {
                 setAuditData({
@@ -1094,6 +1102,8 @@ function AuditDetailPageContent({ params }: { params: { id: string } }) {
                     <SegmentedTabs
                         tabs={[
                             { id: 'overview', label: 'Genel Bakış', icon: Activity },
+                            { id: 'team', label: 'Ekip', icon: Users },
+                            { id: 'audit_program', label: 'Denetim Programı', icon: ClipboardCheck },
                             { id: 'team_timesheet', label: 'Denetim Ekibi ve Efor', icon: Users },
                             { id: 'planning', label: 'Planlama ve Kapsam', icon: ClipboardCheck, disabled: isSensitiveTabBlocked, disabledTooltip: blockedReason },
                             { id: 'field_work', label: 'Saha Çalışması', icon: PenTool, disabled: isSensitiveTabBlocked, disabledTooltip: blockedReason },
@@ -1160,6 +1170,28 @@ function AuditDetailPageContent({ params }: { params: { id: string } }) {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'team' && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <AuditTeamTab
+                                auditId={id}
+                                teamMembers={dbTeamMembers}
+                                allStaff={allStaff}
+                                onRefresh={loadData}
+                                canManageTeam={true}
+                            />
+                        </div>
+                    )}
+
+                    {activeTab === 'audit_program' && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <AuditProgramTab
+                                auditId={id}
+                                allStaff={allStaff}
+                                canEdit={true}
+                            />
                         </div>
                     )}
 

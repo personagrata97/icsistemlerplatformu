@@ -306,6 +306,8 @@ model Audit {
   auditExtensions     AuditExtensionRequest[]
   communications      AuditCommunication[]
   meetings            AuditMeeting[]
+  teamMembers         AuditTeamMember[]
+  auditPrograms       AuditProgram[]
   
   // Soruşturma & İnceleme (Investigation) ACFE Alanları
   fraudType           String?
@@ -452,6 +454,64 @@ model FindingApprovalLog {
   @@index([findingId])
   @@index([userId])
   @@map("finding_approval_log")
+}
+
+model AuditTeamMember {
+  id             String   @id @default(cuid())
+  auditId        String
+  audit          Audit    @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User     @relation("TeamMemberUser", fields: [userId], references: [id])
+  rol            String
+  atanmaTarihi   DateTime @default(now())
+  planlananGun   Int      @default(0)
+  gerceklesenGun Int      @default(0)
+  aktif          Boolean  @default(true)
+
+  @@index([auditId])
+  @@index([userId])
+  @@map("audit_team_member")
+}
+
+model AuditProgram {
+  id           String             @id @default(cuid())
+  auditId      String
+  audit        Audit              @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  sira         Int                @default(1)
+  baslik       String
+  aciklama     String?
+  sorumluId    String?
+  sorumlu      User?              @relation("ProgramSorumlu", fields: [sorumluId], references: [id])
+  durum        String             @default("Planlandı")
+  planlananGun Int                @default(0)
+  steps        AuditProgramStep[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([auditId])
+  @@index([sorumluId])
+  @@map("audit_program")
+}
+
+model AuditProgramStep {
+  id            String       @id @default(cuid())
+  programId     String
+  program       AuditProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  sira          Int          @default(1)
+  testAdimi     String
+  yontem        String?
+  beklenenKanit String?
+  sorumluId     String?
+  sorumlu       User?        @relation("StepSorumlu", fields: [sorumluId], references: [id])
+  durum         String       @default("Planlandı")
+  sonuc         String?
+  notlar        String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([programId])
+  @@index([sorumluId])
+  @@map("audit_program_step")
 }
 
 model Notification {
@@ -868,6 +928,9 @@ model User {
   submittedFindings       Finding[]             @relation("FindingSubmitter")
   managerApprovedFindings Finding[]             @relation("FindingManager")
   findingApprovalLogs     FindingApprovalLog[]  @relation("ApprovalLogUser")
+  auditTeamMembers          AuditTeamMember[]         @relation("TeamMemberUser")
+  assignedAuditPrograms     AuditProgram[]            @relation("ProgramSorumlu")
+  assignedAuditProgramSteps AuditProgramStep[]        @relation("StepSorumlu")
   declarations       IndependenceDeclaration[] @relation("UserDeclarations")
   reportedEthics     EthicsReport[]            @relation("ReportedEthics")
   assignedEthics     EthicsReport[]            @relation("AssignedEthics")
