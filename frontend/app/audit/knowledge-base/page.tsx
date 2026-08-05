@@ -279,36 +279,28 @@ function KnowledgeBasePageContent() {
                         )
                     },
                     {
-                        key: 'size',
+                        key: 'fileSize',
                         header: 'Boyut',
-            sortable: true,
-                        align: 'center',
-                        width: '120px',
-                        render: (doc: any) => (
-                            <span className="font-mono text-[11px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 border border-slate-200/60 rounded inline-block">
-                                {formatFileSize(doc.fileSize || doc.size)}
-                            </span>
-                        )
+                        type: 'filesize',
+                        sortable: true,
+                        align: 'center' as const,
+                        width: '120px'
                     },
                     {
                         key: 'uploadedBy',
                         header: 'Yükleyen',
-            sortable: true,
-                        align: 'center',
-                        width: '180px',
-                        render: (doc: any) => <div className="cell-user justify-center">{doc.uploadedBy || 'Sistem'}</div>
+                        type: 'user',
+                        sortable: true,
+                        align: 'center' as const,
+                        width: '180px'
                     },
                     {
-                        key: 'uploadDate',
+                        key: 'createdAt',
                         header: 'Tarih',
-            sortable: true,
-                        align: 'center',
-                        width: '140px',
-                        render: (doc: any) => (
-                            <div className="cell-date text-center">
-                                <DateDisplay date={doc.createdAt || doc.uploadDate || new Date().toISOString()} showIcon={false} className="justify-center" />
-                            </div>
-                        )
+                        type: 'date',
+                        sortable: true,
+                        align: 'center' as const,
+                        width: '140px'
                     },
                     {
                         key: 'actions',
