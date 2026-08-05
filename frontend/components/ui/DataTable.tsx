@@ -261,7 +261,7 @@ export default function DataTable<T>({
                     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
                 };
                 return (
-                    <span className="font-mono text-[11px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 border border-slate-200/60 rounded inline-block">
+                    <span className="font-mono text-xs font-medium text-slate-600">
                         {formatSize(val)}
                     </span>
                 );

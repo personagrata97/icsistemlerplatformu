@@ -243,22 +243,21 @@ function KnowledgeBasePageContent() {
                 onChange={handleFileChange}
             />
 
-            {/* Content Area - Using DataTable or EmptyState */}
-            {filteredDocs.length === 0 && !loading ? (
-                <EmptyState
-                    icon={FileText}
-                    title="Doküman Bulunamadı"
-                    description="Seçili kategoride veya filtre kriterlerinizde doküman bulunmuyor."
-                    action={{
-                        label: "Doküman Ekle",
-                        onClick: handleUploadClick
-                    }}
-                />
-            ) : (
-                <DataTable
-                    rowKey="id"
-                    data={filteredDocs}
-                    loading={loading}
+            {/* Content Area - Using Centralized DataTable */}
+            <DataTable
+                rowKey="id"
+                data={filteredDocs}
+                loading={loading}
+                emptyIcon={FileText}
+                emptyTitle="Doküman Bulunamadı"
+                emptyDescription="Seçili kategoride veya sistemde kayıtlı bir doküman bulunmuyor."
+                searchTerm={searchTerm}
+                hasActiveFilters={Boolean(searchTerm.trim() !== '' || filterUploader.length > 0 || filterYear.length > 0)}
+                onClearFilters={() => {
+                    setSearchTerm('');
+                    setFilterUploader([]);
+                    setFilterYear([]);
+                }}
                 paginated={true}
                 manualPagination={true}
                 currentPage={page}
@@ -330,15 +329,7 @@ function KnowledgeBasePageContent() {
                         )
                     }
                 ]}
-                emptyTitle="Doküman Bulunamadı"
-                emptyDescription="Bu kategoride veya kriterlerde listelenecek doküman bulunamadı."
-                onClearFilters={() => {
-                    setSearchTerm('');
-                    setFilterUploader([]);
-                    setFilterYear([]);
-                }}
-                />
-            )}
+            />
 
             {/* Confirm Delete Modal */}
             <ConfirmModal

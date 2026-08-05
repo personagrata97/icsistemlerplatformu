@@ -50,7 +50,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
 
                 <div className="relative flex items-center">
                     {leftIcon && (
-                        <div className="absolute left-3 flex items-center justify-center pointer-events-none text-slate-400">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-slate-400 z-10">
                             {leftIcon}
                         </div>
                     )}
@@ -69,7 +69,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                                 required={required}
                                 className={clsx(
                                     'flex-1 w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm outline-none transition-all duration-200',
-                                    'placeholder:text-slate-400',
+                                    'placeholder:text-slate-400 text-slate-900',
                                     leftIcon && 'pl-9',
                                     rightIcon && 'pr-9',
                                     inputClassName,
@@ -82,13 +82,13 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                         )}
 
                         {rightIcon && (
-                            <div className="absolute right-3 flex items-center justify-center text-slate-400">
+                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center text-slate-400 z-10">
                                 {rightIcon}
                             </div>
                         )}
                         
                         {error && !rightIcon && (
-                            <div className="absolute right-3 flex items-center justify-center pointer-events-none text-rose-500">
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-rose-500 z-10">
                                 <AlertCircle size={16} />
                             </div>
                         )}

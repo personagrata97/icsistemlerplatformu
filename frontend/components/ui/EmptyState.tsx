@@ -104,7 +104,7 @@ export default function EmptyState({
     const iconSize = variant === 'minimal' ? 32 : 56;
 
     return (
-        <div className={`flex flex-col items-center justify-center text-center ${variantStyles.container} ${className}`}>
+        <div className={`w-full min-h-[220px] flex flex-col items-center justify-center text-center ${variantStyles.container} ${className}`}>
             <div className={`mb-4 ${variantStyles.icon}`}>
                 {entityType ? (
                     <EntityIcon type={entityType} size={iconSize} variant="text-only" className="opacity-50" />
@@ -150,7 +150,7 @@ export function NoResultsState({
             description={searchTerm ? `"${searchTerm}" için sonuç bulunamadı.` : 'Arama kriterlerinize uygun kayıt bulunamadı.'}
             variant="search"
             action={onClear ? { label: 'Filtreleri Temizle', onClick: onClear } : undefined}
-            className="py-12"
+            className="py-12 w-full"
         />
     );
 }
