@@ -1274,6 +1274,63 @@ export const auditApi = {
         return handleResponse(res);
     },
 
+    // Quality File Review API
+    getQualityChecklists: async () => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/quality/checklist-templates`, { headers: getHeaders() });
+        return handleResponse(res);
+    },
+
+    getQualityReviews: async (auditId?: string) => {
+        const url = auditId ? `${API_BASE_URL}/audit/quality/reviews?auditId=${auditId}` : `${API_BASE_URL}/audit/quality/reviews`;
+        const res = await fetchWithTimeout(url, { headers: getHeaders() });
+        return handleResponse(res);
+    },
+
+    createQualityReview: async (data: { auditId: string, tur: string }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/quality/reviews`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
+    createQualityReviewFromChecklist: async (data: { auditId: string, tur: string }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/quality/reviews/create-from-checklist`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
+    addQualityReviewItem: async (reviewId: string, data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/quality/reviews/${reviewId}/items`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
+    updateQualityReviewItem: async (itemId: string, data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/quality/review-items/${itemId}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
+    completeQualityReview: async (reviewId: string, data: { genelSonuc: string, ozet?: string }) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/quality/reviews/${reviewId}/complete`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+
     uploadConciliationEvidence: async (findingId: string, file: File) => {
         const formData = new FormData();
         formData.append('file', file);

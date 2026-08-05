@@ -1316,9 +1316,10 @@ function AuditDetailPageContent({ params }: { params: { id: string } }) {
                     {activeTab === 'team_timesheet' && (
                         <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <AuditTeamTab
-                                team={team}
-                                onAddMember={() => setShowTeamModal(true)}
-                                onRemoveMember={handleRemoveMember}
+                                auditId={id as string}
+                                teamMembers={auditData?.teamMembers || []}
+                                allStaff={allStaff || []}
+                                onRefresh={loadData}
                                 canManageTeam={isSupervisor}
                             />
                             <div className="border-t border-slate-200 mt-2 pt-6">

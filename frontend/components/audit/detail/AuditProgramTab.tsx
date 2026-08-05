@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ClipboardCheck, Plus, CheckCircle2, Clock, AlertCircle, User, Edit3, ChevronRight, FileText, Check, X } from 'lucide-react';
+import { ClipboardCheck, Plus, CheckCircle2, Clock, AlertCircle, User, Edit3, ChevronRight, FileText, Check, X, ListChecks } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
@@ -190,7 +190,7 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                                 )}
                                 {canEdit && (
                                     <Button
-                                        size="xs"
+                                        size="sm"
                                         variant="secondary"
                                         onClick={() => {
                                             setActiveProgramId(program.id);
@@ -240,7 +240,7 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                                             {getStatusBadge(step.durum)}
                                             {canEdit && (
                                                 <Button
-                                                    size="xs"
+                                                    size="sm"
                                                     variant="secondary"
                                                     leftIcon={<Edit3 size={14} />}
                                                     onClick={() => {
@@ -257,8 +257,8 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                                     </div>
                                 ))
                             ) : (
-                                <div className="p-6 text-center text-xs text-slate-400 italic">
-                                    Bu programa henüz test adımı eklenmemiş.
+                                <div className="p-6 text-center text-xs text-slate-500 italic">
+                                    Bu program başlığı altında henüz tanımlanmış test adımı bulunmuyor.
                                 </div>
                             )}
                         </div>
@@ -266,9 +266,9 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                 ))
             ) : (
                 <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400">
-                    <ClipboardCheck size={48} className="mx-auto mb-3 opacity-30" />
-                    <p className="text-base font-semibold text-slate-700">Denetim Programı Bulunamadı</p>
-                    <p className="text-xs text-slate-500 mt-1">Saha çalışması için denetim programı başlıkları oluşturabilirsiniz.</p>
+                    <ListChecks size={48} className="mx-auto mb-3 opacity-30" />
+                    <p className="text-base font-semibold text-slate-700">Henüz Denetim Programı Tanımlanmadı</p>
+                    <p className="text-xs text-slate-500 mt-1">Saha çalışmasına başlamak için denetim programı başlıkları ve test adımlarını ekleyin.</p>
                 </div>
             )}
 
@@ -285,18 +285,19 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                         <div className="p-6 space-y-4">
                             <div>
                                 <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                    Program / Test Konusu Başlığı *
+                                    Program Başlığı *
                                 </label>
                                 <FormInput
+                                    type="text"
                                     value={programBaslik}
                                     onChange={e => setProgramBaslik(e.target.value)}
-                                    placeholder="Örn: Yetkilendirme & Erişim Kontrolleri Testleri"
+                                    placeholder="Örn: Kredi Tahsis Süreçleri Kontrolü"
                                 />
                             </div>
 
                             <div>
                                 <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                    Açıklama / Kapsam Notu
+                                    Açıklama / Amaç
                                 </label>
                                 <FormTextarea
                                     rows={3}
@@ -312,7 +313,7 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                                 </label>
                                 <CustomSelect
                                     value={programSorumluId}
-                                    onChange={setProgramSorumluId}
+                                    onChange={(val) => setProgramSorumluId(val as string)}
                                     options={allStaff.map(s => ({ value: s.id, label: s.name || s.displayName }))}
                                     placeholder="Sorumlu seçiniz..."
                                 />
@@ -344,23 +345,25 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                         <div className="p-6 space-y-4">
                             <div>
                                 <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                    Test Adımı / Prosedür *
+                                    Test Adımı Açıklaması *
                                 </label>
-                                <FormInput
+                                <FormTextarea
+                                    rows={2}
                                     value={stepTestAdimi}
                                     onChange={e => setStepTestAdimi(e.target.value)}
-                                    placeholder="Örn: Aktif kullanıcı şifre karmaşıklığı parametre kontrolü"
+                                    placeholder="Gerçekleştirilecek test adımını detaylı yazınız..."
                                 />
                             </div>
 
                             <div>
                                 <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                    Test Yöntemi
+                                    Test Yöntemi (Sorgulama, Örnekleme vb.)
                                 </label>
                                 <FormInput
+                                    type="text"
                                     value={stepYontem}
                                     onChange={e => setStepYontem(e.target.value)}
-                                    placeholder="Örn: Örnekleme ile SQL sorgulama / Ekran görüntüsü incelemesi"
+                                    placeholder="Örn: %100 Populasyon Veri Analizi"
                                 />
                             </div>
 
@@ -369,9 +372,10 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                                     Beklenen Kanıt / Belge
                                 </label>
                                 <FormInput
+                                    type="text"
                                     value={stepBeklenenKanit}
                                     onChange={e => setStepBeklenenKanit(e.target.value)}
-                                    placeholder="Örn: Active Directory politika raporu"
+                                    placeholder="Örn: Kredi Onay Komitesi Karar Tutanağı"
                                 />
                             </div>
 
@@ -380,7 +384,7 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                                     İptal
                                 </Button>
                                 <Button variant="primary" onClick={handleAddStep}>
-                                    Test Adımı Ekle
+                                    Test Adımını Kaydet
                                 </Button>
                             </div>
                         </div>
@@ -393,9 +397,7 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                 <div className="modal-overlay open" onClick={() => setEditingStep(null)}>
                     <div className="modal max-w-lg" onClick={e => e.stopPropagation()}>
                         <div className="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
-                            <h3 className="text-base font-bold text-slate-800">
-                                Test Adımı Sonucu Gir: {editingStep.testAdimi}
-                            </h3>
+                            <h3 className="text-base font-bold text-slate-800">Test Sonucu ve Değerlendirme</h3>
                             <button onClick={() => setEditingStep(null)} className="p-1.5 hover:bg-slate-200 rounded-full">
                                 <X size={18} />
                             </button>
@@ -407,7 +409,7 @@ const AuditProgramTab: React.FC<AuditProgramTabProps> = ({
                                 </label>
                                 <CustomSelect
                                     value={stepDurum}
-                                    onChange={setStepDurum}
+                                    onChange={(val) => setStepDurum(val as string)}
                                     options={[
                                         { value: 'Planlandı', label: 'Planlandı' },
                                         { value: 'Devam Ediyor', label: 'Devam Ediyor' },

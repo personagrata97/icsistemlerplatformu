@@ -308,6 +308,7 @@ model Audit {
   meetings            AuditMeeting[]
   teamMembers         AuditTeamMember[]
   auditPrograms       AuditProgram[]
+  qualityReviews      QualityReview[]
   
   // Soruşturma & İnceleme (Investigation) ACFE Alanları
   fraudType           String?
@@ -512,6 +513,58 @@ model AuditProgramStep {
   @@index([programId])
   @@index([sorumluId])
   @@map("audit_program_step")
+}
+
+model QualityReview {
+  id              String              @id @default(cuid())
+  auditId         String
+  audit           Audit               @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  tur             String              // IC_DEGERLENDIRME, DIS_DEGERLENDIRME
+  gozdenGecirenId String
+  gozdenGeciren   User                @relation("ReviewerUser", fields: [gozdenGecirenId], references: [id])
+  baslangicTarihi DateTime            @default(now())
+  bitisTarihi     DateTime?
+  durum           String              @default("Planlandı") // Planlandı, Devam, Tamamlandı
+  genelSonuc      String?             // Yeterli, Kısmen Yeterli, Yetersiz
+  ozet            String?
+  items           QualityReviewItem[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([auditId])
+  @@index([gozdenGecirenId])
+  @@map("quality_review")
+}
+
+model QualityReviewItem {
+  id             String        @id @default(cuid())
+  reviewId       String
+  review         QualityReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  kontrolBasligi String
+  kategori       String        // Planlama, Saha, Kanıt, Raporlama, İzleme
+  sonuc          String?       // Uygun, Kısmen, Uygun Değil, Uygulanamaz
+  bulgu          String?
+  oneri          String?
+  sorumluId      String?
+  sorumlu        User?         @relation("ReviewItemSorumlu", fields: [sorumluId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([reviewId])
+  @@index([sorumluId])
+  @@map("quality_review_item")
+}
+
+model QualityChecklist {
+  id           String   @id @default(cuid())
+  ad           String
+  kategori     String   // Planlama, Saha, Kanıt, Raporlama, İzleme
+  kontrolMetni String
+  sira         Int      @default(1)
+  aktif        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@map("quality_checklist")
 }
 
 model Notification {
@@ -931,6 +984,8 @@ model User {
   auditTeamMembers          AuditTeamMember[]         @relation("TeamMemberUser")
   assignedAuditPrograms     AuditProgram[]            @relation("ProgramSorumlu")
   assignedAuditProgramSteps AuditProgramStep[]        @relation("StepSorumlu")
+  conductedQualityReviews     QualityReview[]           @relation("ReviewerUser")
+  assignedQualityReviewItems QualityReviewItem[]       @relation("ReviewItemSorumlu")
   declarations       IndependenceDeclaration[] @relation("UserDeclarations")
   reportedEthics     EthicsReport[]            @relation("ReportedEthics")
   assignedEthics     EthicsReport[]            @relation("AssignedEthics")

@@ -260,7 +260,7 @@ const AuditTeamTab: React.FC<AuditTeamTabProps> = ({
                                 </label>
                                 <CustomSelect
                                     value={selectedUserId}
-                                    onChange={setSelectedUserId}
+                                    onChange={(val) => setSelectedUserId(val as string)}
                                     options={allStaff.map(s => ({
                                         value: s.id,
                                         label: `${s.name || s.displayName} (${s.role || s.title || 'Müfettiş'})`
@@ -275,7 +275,7 @@ const AuditTeamTab: React.FC<AuditTeamTabProps> = ({
                                 </label>
                                 <CustomSelect
                                     value={selectedRole}
-                                    onChange={setSelectedRole}
+                                    onChange={(val) => setSelectedRole(val as string)}
                                     options={[
                                         { value: 'EKIP_BASKANI', label: 'Ekip Başkanı (Tek kişi olabilir)' },
                                         { value: 'EKIP_UYESI', label: 'Ekip Üyesi' },
@@ -328,7 +328,7 @@ const AuditTeamTab: React.FC<AuditTeamTabProps> = ({
                                 </label>
                                 <CustomSelect
                                     value={editRole}
-                                    onChange={setEditRole}
+                                    onChange={(val) => setEditRole(val as string)}
                                     options={[
                                         { value: 'EKIP_BASKANI', label: 'Ekip Başkanı' },
                                         { value: 'EKIP_UYESI', label: 'Ekip Üyesi' },

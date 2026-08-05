@@ -163,4 +163,48 @@ export class QualityController {
     calculateAutoMetrics() {
         return this.qualityService.calculateAutoMetrics();
     }
+
+    // ==================== QUALITY REVIEWS ====================
+
+    @Get('checklist-templates')
+    @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
+    getChecklistTemplates() {
+        return this.qualityService.getChecklistTemplates();
+    }
+
+    @Get('reviews')
+    @RequirePermissions({ module: 'AUDIT', action: 'VIEW' })
+    getReviewsByAudit(@Query('auditId') auditId?: string) {
+        return this.qualityService.getReviewsByAudit(auditId);
+    }
+
+    @Post('reviews')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    createReview(@Body() body: { auditId: string, tur: string }, @Request() req: any) {
+        return this.qualityService.createReview(body, req.user);
+    }
+
+    @Post('reviews/create-from-checklist')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    createFromChecklist(@Body() body: { auditId: string, tur: string }, @Request() req: any) {
+        return this.qualityService.createFromChecklist(body.auditId, body, req.user);
+    }
+
+    @Post('reviews/:reviewId/items')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    addReviewItem(@Param('reviewId') reviewId: string, @Body() body: any, @Request() req: any) {
+        return this.qualityService.addReviewItem(reviewId, body, req.user);
+    }
+
+    @Put('review-items/:itemId')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    updateReviewItem(@Param('itemId') itemId: string, @Body() body: any, @Request() req: any) {
+        return this.qualityService.updateReviewItem(itemId, body, req.user);
+    }
+
+    @Post('reviews/:reviewId/complete')
+    @RequirePermissions({ module: 'AUDIT', action: 'EDIT' })
+    completeReview(@Param('reviewId') reviewId: string, @Body() body: { genelSonuc: string, ozet?: string }, @Request() req: any) {
+        return this.qualityService.completeReview(reviewId, body, req.user);
+    }
 }

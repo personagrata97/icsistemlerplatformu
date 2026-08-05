@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { Prisma } from '@prisma/client';
 import { AuditLogService } from './audit-log.service';
@@ -484,5 +484,217 @@ export class QualityService {
                 isAutoCalculated: true,
             },
         ];
+    }
+
+    // ==================== DOSYA GÖZDEN GEÇİRME (QUALITY REVIEWS) ====================
+
+    async getChecklistTemplates() {
+        let items = await this.prisma.qualityChecklist.findMany({
+            where: { aktif: true },
+            orderBy: [{ kategori: 'asc' }, { sira: 'asc' }]
+        });
+
+        if (items.length === 0) {
+            const seedItems = [
+                // Planlama
+                { ad: 'Planlama Standartları', kategori: 'Planlama', kontrolMetni: 'Denetim alanına ilişkin risk değerlendirmesi yapıldı mı?', sira: 1 },
+                { ad: 'Planlama Standartları', kategori: 'Planlama', kontrolMetni: 'Denetim kapsamı ve amaçları yeterli belirlendi mi?', sira: 2 },
+                { ad: 'Planlama Standartları', kategori: 'Planlama', kontrolMetni: 'Denetim ekibi yetkinliği ve bağımsızlığı sağlandı mı?', sira: 3 },
+                // Saha
+                { ad: 'Saha Çalışması Kontrolleri', kategori: 'Saha', kontrolMetni: 'Denetim programı adımları eksiksiz tamamlandı mı?', sira: 1 },
+                { ad: 'Saha Çalışması Kontrolleri', kategori: 'Saha', kontrolMetni: 'Çalışma kâğıtlarındaki kanıtlar yeterli ve uygun mu?', sira: 2 },
+                { ad: 'Saha Çalışması Kontrolleri', kategori: 'Saha', kontrolMetni: 'Örneklem seçimi ve popülasyon temsili uygun mu?', sira: 3 },
+                // Kanıt
+                { ad: 'Kanıt Standartları', kategori: 'Kanıt', kontrolMetni: 'Çalışma kâğıtları müfettiş ve başmüfettiş tarafından imzalandı mı?', sira: 1 },
+                { ad: 'Kanıt Standartları', kategori: 'Kanıt', kontrolMetni: 'Kanıtlar denetim izini (audit trail) izlenebilir kılıyor mu?', sira: 2 },
+                // Raporlama
+                { ad: 'Raporlama Kalitesi', kategori: 'Raporlama', kontrolMetni: 'Bulgular yeterli ve ikna edici kanıtlara dayanıyor mu?', sira: 1 },
+                { ad: 'Raporlama Kalitesi', kategori: 'Raporlama', kontrolMetni: 'Öneriler uygulanabilir ve kök nedene yönelik mi?', sira: 2 },
+                { ad: 'Raporlama Kalitesi', kategori: 'Raporlama', kontrolMetni: 'Birim yanıtı ve aksiyon planı alındı mı?', sira: 3 },
+                // İzleme
+                { ad: 'Takip ve İzleme', kategori: 'İzleme', kontrolMetni: 'Aksiyon planları için termin tarihi ve sorumlular belirlenip takip ediliyor mu?', sira: 1 }
+            ];
+
+            for (const seed of seedItems) {
+                await this.prisma.qualityChecklist.create({ data: seed });
+            }
+
+            items = await this.prisma.qualityChecklist.findMany({
+                where: { aktif: true },
+                orderBy: [{ kategori: 'asc' }, { sira: 'asc' }]
+            });
+        }
+
+        return items;
+    }
+
+    async getReviewsByAudit(auditId?: string) {
+        const where = auditId ? { auditId } : {};
+        return this.prisma.qualityReview.findMany({
+            where,
+            include: {
+                audit: { select: { id: true, title: true, auditCode: true, status: true, department: true, creatorId: true } },
+                gozdenGeciren: { select: { id: true, displayName: true, title: true, photoUrl: true } },
+                items: {
+                    include: {
+                        sorumlu: { select: { id: true, displayName: true, title: true } }
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+    }
+
+    async createReview(data: { auditId: string, tur: string }, user: any) {
+        const audit = await this.prisma.audit.findUnique({
+            where: { id: data.auditId, isDeleted: false },
+            include: { teamMembers: true }
+        });
+        if (!audit) throw new NotFoundException('Denetim bulunamadı.');
+
+        // KURAL 2: Gözden geçirme yalnızca "Tamamlandı" durumundaki denetimler için açılabilir.
+        if (audit.status !== 'Tamamlandı') {
+            throw new BadRequestException('Kalite gözden geçirmesi yalnızca "Tamamlandı" durumundaki denetimler için açılabilir.');
+        }
+
+        // KURAL 1: Denetimi yapan kişi kendi denetimini gözden geçiremez.
+        const isCreator = audit.creatorId === user.id;
+        const isTeamMember = audit.teamMembers?.some(m => m.userId === user.id && m.aktif);
+        if (isCreator || isTeamMember) {
+            throw new ForbiddenException('Denetimi yapan müfettiş / ekip üyesi kendi denetimini kalite gözden geçirmesinden geçiremez.');
+        }
+
+        const review = await this.prisma.qualityReview.create({
+            data: {
+                auditId: data.auditId,
+                tur: data.tur || 'İÇ_DEĞERLENDİRME',
+                gozdenGecirenId: user.id,
+                durum: 'Devam'
+            },
+            include: {
+                audit: { select: { id: true, title: true, auditCode: true } },
+                gozdenGeciren: { select: { id: true, displayName: true, title: true } }
+            }
+        });
+
+        await this.auditLogService.createLog({
+            user: user.displayName || user.username,
+            action: 'Kalite Gözden Geçirme Oluşturuldu',
+            details: `"${audit.title}" denetimi için kalite gözden geçirmesi başlatıldı.`,
+            targetType: 'Audit',
+            targetId: data.auditId
+        });
+
+        return review;
+    }
+
+    async createFromChecklist(auditId: string, data: { tur: string }, user: any) {
+        const review = await this.createReview({ auditId, tur: data.tur }, user);
+        const templates = await this.getChecklistTemplates();
+
+        for (const tmpl of templates) {
+            await this.prisma.qualityReviewItem.create({
+                data: {
+                    reviewId: review.id,
+                    kontrolBasligi: tmpl.kontrolMetni,
+                    kategori: tmpl.kategori,
+                    sonuc: 'Uygun'
+                }
+            });
+        }
+
+        return this.prisma.qualityReview.findUnique({
+            where: { id: review.id },
+            include: {
+                audit: { select: { id: true, title: true, auditCode: true } },
+                gozdenGeciren: { select: { id: true, displayName: true, title: true } },
+                items: true
+            }
+        });
+    }
+
+    async addReviewItem(reviewId: string, data: { kontrolBasligi: string, kategori: string, sonuc?: string, bulgu?: string, oneri?: string, sorumluId?: string }, user: any) {
+        const review = await this.prisma.qualityReview.findUnique({ where: { id: reviewId } });
+        if (!review) throw new NotFoundException('Kalite gözden geçirmesi bulunamadı.');
+
+        // KURAL 3: "Uygun Değil" sonucu olan her madde için öneri zorunlu.
+        if (data.sonuc === 'Uygun Değil' && (!data.oneri || !data.oneri.trim())) {
+            throw new BadRequestException('"Uygun Değil" olarak değerlendirilen maddeler için öneri girilmesi zorunludur.');
+        }
+
+        const item = await this.prisma.qualityReviewItem.create({
+            data: {
+                reviewId,
+                kontrolBasligi: data.kontrolBasligi,
+                kategori: data.kategori,
+                sonuc: data.sonuc || 'Uygun',
+                bulgu: data.bulgu || null,
+                oneri: data.oneri || null,
+                sorumluId: data.sorumluId || null
+            }
+        });
+
+        return item;
+    }
+
+    async updateReviewItem(itemId: string, data: { sonuc?: string, bulgu?: string, oneri?: string, sorumluId?: string }, user: any) {
+        const item = await this.prisma.qualityReviewItem.findUnique({ where: { id: itemId } });
+        if (!item) throw new NotFoundException('Gözden geçirme maddesi bulunamadı.');
+
+        const targetSonuc = data.sonuc !== undefined ? data.sonuc : item.sonuc;
+        const targetOneri = data.oneri !== undefined ? data.oneri : item.oneri;
+
+        // KURAL 3: "Uygun Değil" sonucu olan her madde için öneri zorunlu.
+        if (targetSonuc === 'Uygun Değil' && (!targetOneri || !targetOneri.trim())) {
+            throw new BadRequestException('"Uygun Değil" olarak değerlendirilen maddeler için öneri girilmesi zorunludur.');
+        }
+
+        return this.prisma.qualityReviewItem.update({
+            where: { id: itemId },
+            data: {
+                ...(data.sonuc !== undefined ? { sonuc: data.sonuc } : {}),
+                ...(data.bulgu !== undefined ? { bulgu: data.bulgu } : {}),
+                ...(data.oneri !== undefined ? { oneri: data.oneri } : {}),
+                ...(data.sorumluId !== undefined ? { sorumluId: data.sorumluId } : {})
+            }
+        });
+    }
+
+    async completeReview(reviewId: string, data: { genelSonuc: string, ozet?: string }, user: any) {
+        const review = await this.prisma.qualityReview.findUnique({
+            where: { id: reviewId },
+            include: { items: true }
+        });
+        if (!review) throw new NotFoundException('Kalite gözden geçirmesi bulunamadı.');
+
+        // KURAL 3 kontrolü: Herhangi bir madde "Uygun Değil" ise önerisi var mı?
+        const invalidItem = review.items.find(i => i.sonuc === 'Uygun Değil' && (!i.oneri || !i.oneri.trim()));
+        if (invalidItem) {
+            throw new BadRequestException(`"${invalidItem.kontrolBasligi}" maddesi "Uygun Değil" olarak işaretlenmiş ancak öneri girilmemiştir.`);
+        }
+
+        const updated = await this.prisma.qualityReview.update({
+            where: { id: reviewId },
+            data: {
+                durum: 'Tamamlandı',
+                genelSonuc: data.genelSonuc,
+                ozet: data.ozet || null,
+                bitisTarihi: new Date()
+            },
+            include: {
+                audit: true,
+                items: true
+            }
+        });
+
+        await this.auditLogService.createLog({
+            user: user.displayName || user.username,
+            action: 'Kalite Gözden Geçirme Tamamlandı',
+            details: `"${updated.audit.title}" denetimi için kalite gözden geçirmesi tamamlandı. Genel Sonuc: ${data.genelSonuc}`,
+            targetType: 'Audit',
+            targetId: review.auditId
+        });
+
+        return updated;
     }
 }

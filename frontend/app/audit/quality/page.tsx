@@ -1,8 +1,6 @@
 'use client';
-import FormTextarea from '@/components/ui/FormTextarea';
-import RequireRole from '@/components/auth/RequireRole';
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     Shield, CheckCircle, AlertTriangle, BarChart3, Calendar,
     Download, TrendingUp, TrendingDown, FileText, ClipboardCheck,
@@ -31,6 +29,12 @@ import { formatDate } from '@/lib/audit-utils';
 import { NoResultsState } from '@/components/ui/EmptyState';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import FormInput from "@/components/ui/FormInput";
+import FormTextarea from '@/components/ui/FormTextarea';
+import RequireRole from '@/components/auth/RequireRole';
+import { useAuth } from '@/context/AuthContext';
+import { checkRole, ROLES } from '@/lib/auth-constants';
+import { AccessDenied } from '@/components/audit/AuditLogComponents';
+import QualityFileReviewsTab from '@/components/audit/quality/QualityFileReviewsTab';
 
 // ======================== INTERFACES ========================
 
@@ -78,13 +82,11 @@ interface QualityAction {
 
 // ======================== HELPERS ========================
 
-/** Türk standardında yüzde/birim formatlama: %90, 14 gün, 0 adet */
 const formatMetricValue = (value: number, unit: string) => {
     if (unit === '%') return `%${value}`;
     return `${value} ${unit}`;
 };
 
-/** Hedef formatlama: Hedef: %90, Hedef: 30 gün */
 const formatTarget = (target: number, unit: string) => {
     if (unit === '%') return `Hedef: %${target}`;
     return `Hedef: ${target} ${unit}`;
@@ -99,28 +101,13 @@ const getStatusColor = (status: string) => {
     }
 };
 
-const getActionStatusColor = (status: string) => {
-    switch (status) {
-        case 'Tamamlandı': return 'success';
-        case 'Devam Ediyor': return 'info';
-        case 'Açık': return 'warning';
-        case 'Gecikmiş': return 'danger';
-        default: return 'info';
-    }
-};
-
 const TABS = [
     { id: 'overview', label: 'Genel Bakış', icon: Target },
+    { id: 'file_reviews', label: 'Dosya Gözden Geçirmeleri', icon: FileText },
     { id: 'metrics', label: 'Performans Metrikleri', icon: BarChart3 },
     { id: 'assessments', label: 'Değerlendirmeler', icon: ClipboardCheck },
     { id: 'actions', label: 'İyileştirme Planları', icon: ListChecks },
 ];
-
-import { useAuth } from '@/context/AuthContext';
-import { checkRole, ROLES } from '@/lib/auth-constants';
-import { AccessDenied } from '@/components/audit/AuditLogComponents';
-
-// ======================== COMPONENT ========================
 
 function QualityAssurancePageContent() {
     const { hasRole } = useAuth();
@@ -630,6 +617,11 @@ function QualityAssurancePageContent() {
                         </FilterDropdown>
                     }
                 />
+            )}
+
+            {/* ==================== TAB: DOSYA GÖZDEN GEÇİRMELERİ ==================== */}
+            {activeTab === 'file_reviews' && (
+                <QualityFileReviewsTab onRefreshNeeded={() => loadData(false)} />
             )}
 
             {/* ==================== TAB: GENEL BAKIŞ ==================== */}
