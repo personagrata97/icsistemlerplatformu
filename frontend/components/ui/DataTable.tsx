@@ -8,6 +8,7 @@ import EmptyState, { NoResultsState } from './EmptyState';
 import Pagination, { usePagination } from './Pagination';
 import { LucideIcon, Calendar, Clock, User as UserIcon, Mail, Phone, Info } from 'lucide-react';
 import { formatDate, formatDateTime, getPhotoUrl } from '@/lib/audit-utils';
+import DateDisplay from './DateDisplay';
 import CodeBadge from './CodeBadge';
 import StatusBadge from './StatusBadge';
 import PersonCell from './PersonCell';
@@ -212,17 +213,17 @@ export default function DataTable<T>({
 
         switch (col.type) {
             case 'date':
+                const dateVal = val !== undefined && val !== null ? val : ((item as any).uploadDate || (item as any).createdAt || (item as any).date);
                 return (
                     <div className={`cell-date ${alignClass}`}>
-                        <Calendar size={14} className="text-gray-400" />
-                        {formatDate(val)}
+                        <DateDisplay date={dateVal} showIcon={true} />
                     </div>
                 );
             case 'datetime':
+                const dateTimeVal = val !== undefined && val !== null ? val : ((item as any).uploadDate || (item as any).createdAt || (item as any).date);
                 return (
                     <div className={`cell-date ${alignClass}`}>
-                        <Calendar size={14} className="text-gray-400" />
-                        {formatDateTime(val)}
+                        <DateDisplay date={dateTimeVal} format="datetime" showIcon={true} />
                     </div>
                 );
             case 'currency':
@@ -250,6 +251,7 @@ export default function DataTable<T>({
                     </div>
                 );
             case 'filesize':
+                const sizeVal = val !== undefined && val !== null && val !== '' ? val : ((item as any).fileSize || (item as any).size);
                 const formatSize = (v: any) => {
                     if (v === null || v === undefined || v === '') return '-';
                     const bytes = Number(v);
@@ -261,14 +263,14 @@ export default function DataTable<T>({
                     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
                 };
                 return (
-                    <span className="font-mono text-xs font-medium text-slate-600">
-                        {formatSize(val)}
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono font-semibold bg-slate-100/80 text-slate-700 border border-slate-200/60 shadow-xs">
+                        {formatSize(sizeVal)}
                     </span>
                 );
             case 'user':
                 const userObj = val && typeof val === 'object' ? val : item as any;
                 const nameStr = typeof val === 'object' ? (val.displayName || val.name || `${val.firstName || ''} ${val.lastName || ''}`.trim() || 'İsimsiz') : String(val);
-                const titleStr = typeof val === 'object' ? val.title : (item as any).title;
+                const titleStr = typeof val === 'object' ? val.title : (val ? undefined : (item as any).userTitle);
                 const photoUrlStr = typeof val === 'object' ? val.photoUrl : (item as any).photoUrl;
                 const userAlignClass = col.align === 'left' ? 'justify-start' : col.align === 'right' ? 'justify-end' : 'justify-center';
                 return (
