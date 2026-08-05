@@ -3,17 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
-import FormTextarea from '@/components/ui/FormTextarea';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Button from '@/components/ui/Button';
 import DataTable from '@/components/ui/DataTable';
 import RefreshButton from '@/components/ui/RefreshButton';
 import RequireRole from '@/components/auth/RequireRole';
+import StatusBadge from '@/components/ui/StatusBadge';
+import { DateDisplay } from '@/components/ui/DateDisplay';
+import EmptyState from '@/components/ui/EmptyState';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import { SearchInput } from '@/components/ui/SearchInput';
+import Alert from '@/components/ui/Alert';
 import { useToast } from '@/components/Toast';
 import { auditApi } from '@/lib/audit-api';
 import {
-    FileText, Scale, Plus, AlertTriangle, Clock, RefreshCw, CheckCircle,
-    Edit3, History, Link, Search, X, ShieldAlert, Eye, Calendar, Layers
+    FileText, Scale, Plus, Edit3, History, Link, X, Eye, Layers, ShieldAlert
 } from 'lucide-react';
 
 export default function RegulationsPage() {
@@ -33,8 +37,8 @@ function CompanyDocumentManagementPage() {
 
     // Filters
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedType, setSelectedType] = useState<string>('ALL');
-    const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
+    const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+    const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
     // Modals
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -139,13 +143,19 @@ function CompanyDocumentManagementPage() {
         setGozdenGecirmePeriyodu(12);
     };
 
+    const clearFilters = () => {
+        setSearchTerm('');
+        setSelectedTypes([]);
+        setSelectedStatuses([]);
+    };
+
     // Filtering logic
     const filteredDocuments = documents.filter(doc => {
         const matchesSearch = !searchTerm ||
             doc.ad.toLowerCase().includes(searchTerm.toLowerCase()) ||
             doc.kod.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesType = selectedType === 'ALL' || doc.tur === selectedType;
-        const matchesStatus = selectedStatus === 'ALL' || doc.durum === selectedStatus;
+        const matchesType = selectedTypes.length === 0 || selectedTypes.includes(doc.tur);
+        const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(doc.durum);
         return matchesSearch && matchesType && matchesStatus;
     });
 
@@ -164,7 +174,7 @@ function CompanyDocumentManagementPage() {
                         </span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-slate-400">
-                        <span>Yürürlük: {new Date(row.yururlukTarihi).toLocaleDateString('tr-TR')}</span>
+                        <span>Yürürlük: <DateDisplay date={row.yururlukTarihi} /></span>
                         <span>•</span>
                         <span>Periyot: {row.gozdenGecirmePeriyodu || 12} Ay</span>
                     </div>
@@ -175,9 +185,7 @@ function CompanyDocumentManagementPage() {
             key: 'tur',
             header: 'Tür',
             accessor: (row: any) => (
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                    {row.tur}
-                </span>
+                <StatusBadge value={row.tur} type="status" />
             )
         },
         {
@@ -193,16 +201,9 @@ function CompanyDocumentManagementPage() {
         {
             key: 'durum',
             header: 'Durum',
-            accessor: (row: any) => {
-                let badgeStyle = 'bg-emerald-100 text-emerald-800 border-emerald-200';
-                if (row.durum === 'Revizyonda') badgeStyle = 'bg-amber-100 text-amber-800 border-amber-200';
-                if (row.durum === 'Yürürlükten Kalktı') badgeStyle = 'bg-slate-100 text-slate-600 border-slate-200';
-                return (
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${badgeStyle}`}>
-                        {row.durum}
-                    </span>
-                );
-            }
+            accessor: (row: any) => (
+                <StatusBadge value={row.durum} type="status" />
+            )
         },
         {
             key: 'references',
@@ -248,6 +249,8 @@ function CompanyDocumentManagementPage() {
         }
     ];
 
+    const isFiltered = searchTerm !== '' || selectedTypes.length > 0 || selectedStatuses.length > 0;
+
     return (
         <div className="space-y-6 pb-12">
             <PageHeader
@@ -262,93 +265,113 @@ function CompanyDocumentManagementPage() {
 
             {/* Expiring Documents Warning Banner */}
             {expiringDocs.length > 0 && (
-                <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-300 rounded-xl p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
-                            <ShieldAlert size={20} className="text-amber-600" />
-                            Gözden Geçirme Tarihi Yaklaşan / Dolan Şirket Dokümanları ({expiringDocs.length})
-                        </div>
-                        <span className="text-xs font-semibold text-amber-800 bg-amber-200/60 px-2.5 py-1 rounded-full">
-                            Periyodik İnceleme Uyarısı
-                        </span>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        {expiringDocs.map((doc: any) => (
-                            <div key={doc.id} className="p-3 bg-white rounded-lg border border-amber-200 shadow-xs flex justify-between items-start">
-                                <div>
-                                    <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900">
-                                        {doc.kod}
-                                    </span>
-                                    <h5 className="font-bold text-xs text-slate-800 mt-1">{doc.ad}</h5>
-                                    <p className="text-[11px] text-amber-700 mt-0.5">
-                                        Periyot: {doc.gozdenGecirmePeriyodu} Ay • v{doc.versiyon}
-                                    </p>
+                <Alert
+                    variant="warning"
+                    title={`Gözden Geçirme Tarihi Yaklaşan / Dolan Şirket Dokümanları (${expiringDocs.length})`}
+                    description={
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+                            {expiringDocs.map((doc: any) => (
+                                <div key={doc.id} className="p-3 bg-white rounded-lg border border-slate-200 shadow-xs flex justify-between items-start">
+                                    <div>
+                                        <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+                                            {doc.kod}
+                                        </span>
+                                        <h5 className="font-bold text-xs text-slate-800 mt-1">{doc.ad}</h5>
+                                        <p className="text-[11px] text-slate-600 mt-0.5">
+                                            Periyot: {doc.gozdenGecirmePeriyodu} Ay • v{doc.versiyon}
+                                        </p>
+                                    </div>
+                                    <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        onClick={() => {
+                                            setSelectedDoc(doc);
+                                            setNewVersion(doc.versiyon);
+                                            setNewDurum(doc.durum);
+                                            setShowVersionModal(true);
+                                        }}
+                                    >
+                                        İncele
+                                    </Button>
                                 </div>
-                                <Button
-                                    size="sm"
-                                    variant="secondary"
-                                    onClick={() => {
-                                        setSelectedDoc(doc);
-                                        setNewVersion(doc.versiyon);
-                                        setNewDurum(doc.durum);
-                                        setShowVersionModal(true);
-                                    }}
-                                >
-                                    İncele
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                            ))}
+                        </div>
+                    }
+                />
             )}
 
-            {/* Filters */}
+            {/* Filters Toolbar */}
             <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                    <div className="relative flex-1 md:w-72">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <FormInput
-                            type="text"
+                <div className="flex items-center gap-3 w-full md:w-auto flex-wrap">
+                    <div className="w-full md:w-72">
+                        <SearchInput
                             value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
+                            onChange={(e: any) => setSearchTerm(typeof e === 'string' ? e : e.target.value)}
                             placeholder="Doküman adı veya kod arayınız..."
-                            className="pl-9 text-xs"
                         />
                     </div>
-                    <CustomSelect
-                        value={selectedType}
-                        onChange={val => setSelectedType(val as string)}
-                        options={[
-                            { value: 'ALL', label: 'Tüm Doküman Türleri' },
-                            { value: 'Yönetmelik', label: 'Yönetmelik' },
-                            { value: 'Prosedür', label: 'Prosedür' },
-                            { value: 'Talimat', label: 'Talimat' },
-                            { value: 'Politika', label: 'Politika' },
-                            { value: 'Form', label: 'Form / Şablon' }
-                        ]}
-                    />
-                    <CustomSelect
-                        value={selectedStatus}
-                        onChange={val => setSelectedStatus(val as string)}
-                        options={[
-                            { value: 'ALL', label: 'Tüm Durumlar' },
-                            { value: 'Yürürlükte', label: 'Yürürlükte' },
-                            { value: 'Revizyonda', label: 'Revizyonda' },
-                            { value: 'Yürürlükten Kalktı', label: 'Yürürlükten Kalktı' }
-                        ]}
-                    />
+                    <FilterDropdown
+                        label="Filtrele"
+                        activeCount={selectedTypes.length + selectedStatuses.length}
+                        onClear={clearFilters}
+                    >
+                        <div className="space-y-4 min-w-[220px]">
+                            <CustomSelect
+                                label="Doküman Türü"
+                                placeholder="Tümü"
+                                isMulti
+                                value={selectedTypes}
+                                onChange={(val) => setSelectedTypes(val as string[])}
+                                options={[
+                                    { value: 'Yönetmelik', label: 'Yönetmelik' },
+                                    { value: 'Prosedür', label: 'Prosedür' },
+                                    { value: 'Talimat', label: 'Talimat' },
+                                    { value: 'Politika', label: 'Politika' },
+                                    { value: 'Form', label: 'Form' }
+                                ]}
+                            />
+                            <CustomSelect
+                                label="Doküman Durumu"
+                                placeholder="Tümü"
+                                isMulti
+                                value={selectedStatuses}
+                                onChange={(val) => setSelectedStatuses(val as string[])}
+                                options={[
+                                    { value: 'Yürürlükte', label: 'Yürürlükte' },
+                                    { value: 'Revizyonda', label: 'Revizyonda' },
+                                    { value: 'Yürürlükten Kalktı', label: 'Yürürlükten Kalktı' }
+                                ]}
+                            />
+                        </div>
+                    </FilterDropdown>
+                    {isFiltered && (
+                        <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-slate-700">
+                            Filtreyi Temizle
+                        </Button>
+                    )}
                 </div>
                 <RefreshButton onClick={loadData} loading={loading} />
             </div>
 
-            {/* Table */}
-            <DataTable
-                data={filteredDocuments}
-                columns={columns}
-                loading={loading}
-                rowKey="id"
-                emptyTitle="Sistemde kayıtlı şirket dokümanı / mevzuat bulunamadı."
-            />
+            {/* Table or EmptyState */}
+            {filteredDocuments.length === 0 && !loading ? (
+                <EmptyState
+                    icon={FileText}
+                    title="Şirket Dokümanı Bulunamadı"
+                    description={isFiltered ? 'Arama kriterlerinize uygun şirket dokümanı bulunamadı. Filtreleri temizleyebilirsiniz.' : 'Sistemde henüz kayıtlı şirket içi mevzuat dokümanı bulunmuyor.'}
+                    action={{
+                        label: isFiltered ? 'Filtreleri Temizle' : 'Yeni Doküman Ekle',
+                        onClick: isFiltered ? clearFilters : () => setShowCreateModal(true)
+                    }}
+                />
+            ) : (
+                <DataTable
+                    data={filteredDocuments}
+                    columns={columns}
+                    loading={loading}
+                    rowKey="id"
+                />
+            )}
 
             {/* Create Document Modal */}
             {showCreateModal && (
@@ -490,9 +513,11 @@ function CompanyDocumentManagementPage() {
                                 />
                             </div>
 
-                            <div className="p-3 bg-blue-50 text-blue-800 rounded text-xs">
-                                <strong>Bilgi:</strong> Bu işlem son gözden geçirme tarihini bugüne günceller ve bir sonraki periyodik inceleme uyarısını sıfırlar.
-                            </div>
+                            <Alert
+                                variant="info"
+                                title="Gözden Geçirme Tarihi"
+                                description="Bu işlem son gözden geçirme tarihini bugüne günceller ve bir sonraki periyodik inceleme uyarısını sıfırlar."
+                            />
 
                             <div className="flex justify-end gap-3 pt-4 border-t">
                                 <Button variant="secondary" onClick={() => setShowVersionModal(false)}>
@@ -524,11 +549,11 @@ function CompanyDocumentManagementPage() {
                         </div>
                         <div className="p-6 space-y-4">
                             <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl text-xs">
-                                <div><strong>Tür:</strong> {selectedDoc.tur}</div>
+                                <div><strong>Tür:</strong> <StatusBadge value={selectedDoc.tur} type="status" /></div>
                                 <div><strong>Versiyon:</strong> v{selectedDoc.versiyon}</div>
-                                <div><strong>Durum:</strong> {selectedDoc.durum}</div>
-                                <div><strong>Yürürlük Tarihi:</strong> {new Date(selectedDoc.yururlukTarihi).toLocaleDateString('tr-TR')}</div>
-                                <div><strong>Son Gözden Geçirme:</strong> {selectedDoc.sonGozdenGecirmeTarihi ? new Date(selectedDoc.sonGozdenGecirmeTarihi).toLocaleDateString('tr-TR') : 'Yapılmadı'}</div>
+                                <div><strong>Durum:</strong> <StatusBadge value={selectedDoc.durum} type="status" /></div>
+                                <div><strong>Yürürlük Tarihi:</strong> <DateDisplay date={selectedDoc.yururlukTarihi} /></div>
+                                <div><strong>Son Gözden Geçirme:</strong> {selectedDoc.sonGozdenGecirmeTarihi ? <DateDisplay date={selectedDoc.sonGozdenGecirmeTarihi} /> : 'Yapılmadı'}</div>
                                 <div><strong>İnceleme Periyodu:</strong> {selectedDoc.gozdenGecirmePeriyodu || 12} Ay</div>
                             </div>
 
@@ -538,7 +563,11 @@ function CompanyDocumentManagementPage() {
                                     Atıf Yapılan Denetim Bulguları & Prosedürleri ({selectedDoc.references?.length || 0})
                                 </h4>
                                 {selectedDoc.references?.length === 0 ? (
-                                    <p className="text-xs text-slate-400 italic">Bu dokümana henüz herhangi bir bulgudan atıf yapılmamıştır.</p>
+                                    <EmptyState
+                                        icon={FileText}
+                                        title="Atıf Yapılmamış"
+                                        description="Bu dokümana henüz herhangi bir bulgudan atıf yapılmamıştır."
+                                    />
                                 ) : (
                                     <div className="space-y-2 max-h-48 overflow-y-auto">
                                         {selectedDoc.references?.map((ref: any) => (
@@ -547,7 +576,7 @@ function CompanyDocumentManagementPage() {
                                                     <span className="font-bold text-slate-800">{ref.kaynakTuru} #{ref.kaynakId}</span>
                                                     {ref.aciklama && <p className="text-slate-600 italic">{ref.aciklama}</p>}
                                                 </div>
-                                                <span className="text-[10px] text-slate-400">{new Date(ref.createdAt).toLocaleDateString('tr-TR')}</span>
+                                                <DateDisplay date={ref.createdAt} />
                                             </div>
                                         ))}
                                     </div>

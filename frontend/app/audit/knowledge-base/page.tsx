@@ -13,6 +13,7 @@ import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import CustomSelect from '@/components/ui/CustomSelect';
 import RefreshButton from '@/components/ui/RefreshButton';
 import DataTable from '@/components/ui/DataTable';
+import EmptyState from '@/components/ui/EmptyState';
 import { auditApi, API_BASE_URL } from '@/lib/audit-api';
 import TableActions from '@/components/ui/TableActions';
 import { useToast } from '@/components/Toast';
@@ -242,11 +243,22 @@ function KnowledgeBasePageContent() {
                 onChange={handleFileChange}
             />
 
-            {/* Content Area - Using DataTable for consistency */}
-            <DataTable
-                rowKey="id"
-                data={filteredDocs}
-                loading={loading}
+            {/* Content Area - Using DataTable or EmptyState */}
+            {filteredDocs.length === 0 && !loading ? (
+                <EmptyState
+                    icon={FileText}
+                    title="Doküman Bulunamadı"
+                    description="Seçili kategoride veya filtre kriterlerinizde doküman bulunmuyor."
+                    action={{
+                        label: "Doküman Ekle",
+                        onClick: handleUploadClick
+                    }}
+                />
+            ) : (
+                <DataTable
+                    rowKey="id"
+                    data={filteredDocs}
+                    loading={loading}
                 paginated={true}
                 manualPagination={true}
                 currentPage={page}
@@ -320,7 +332,8 @@ function KnowledgeBasePageContent() {
                     setFilterUploader([]);
                     setFilterYear([]);
                 }}
-            />
+                />
+            )}
 
             {/* Confirm Delete Modal */}
             <ConfirmModal

@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import FormInput from '@/components/ui/FormInput';
 import Modal from '@/components/ui/Modal';
 import CustomSelect from '@/components/ui/CustomSelect';
+import Checkbox from '@/components/ui/Checkbox';
 import Button from '@/components/ui/Button';
 import LoadingState from '@/components/ui/LoadingState';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -312,17 +313,13 @@ function JobTitlesPageContent() {
                         ]}
                     />
 
-                    <div className="flex items-center gap-2 pt-2">
-                        <input
-                            type="checkbox"
+                    <div className="pt-2">
+                        <Checkbox
                             id="isActive"
                             checked={formData.isActive}
-                            onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                            className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                            onChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                            label="Kadro Aktif Kullanımda"
                         />
-                        <label htmlFor="isActive" className="text-xs font-semibold text-slate-700 cursor-pointer">
-                            Kadro Aktif Kullanımda
-                        </label>
                     </div>
 
                     <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
