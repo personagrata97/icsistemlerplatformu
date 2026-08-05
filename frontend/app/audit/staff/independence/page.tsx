@@ -6,6 +6,8 @@ import React, { useState, useEffect } from 'react';
 import StaffTabs from '@/components/audit/staff/StaffTabs';
 import PageHeader from '@/components/ui/PageHeader';
 import DateDisplay from '@/components/ui/DateDisplay';
+import EmptyState from '@/components/ui/EmptyState';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';

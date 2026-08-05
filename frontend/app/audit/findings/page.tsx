@@ -41,6 +41,7 @@ import Button from '@/components/ui/Button';
 import StatCard from '@/components/ui/StatCard';
 import ReviewModal from '@/components/audit/modals/ReviewModal';
 import ExtensionModal from '@/components/audit/modals/ExtensionModal';
+import EmptyState from '@/components/ui/EmptyState';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import Pagination from '@/components/ui/Pagination';

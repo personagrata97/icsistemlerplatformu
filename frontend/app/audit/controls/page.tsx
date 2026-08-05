@@ -5,6 +5,7 @@ import RequireRole from '@/components/auth/RequireRole';
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
 import PageToolbar from '@/components/ui/PageToolbar';
+import EmptyState from '@/components/ui/EmptyState';
 import DataTable from '@/components/ui/DataTable';
 import StatCard from '@/components/ui/StatCard';
 import { auditApi, Control } from '@/lib/audit-api';

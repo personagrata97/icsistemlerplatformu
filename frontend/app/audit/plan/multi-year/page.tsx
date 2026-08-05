@@ -17,6 +17,7 @@ import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
 import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import { clsx } from 'clsx';
 import ConfirmModal from '@/components/ConfirmModal';

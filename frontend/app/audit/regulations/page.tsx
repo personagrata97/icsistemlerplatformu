@@ -5,6 +5,7 @@ import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Button from '@/components/ui/Button';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import RefreshButton from '@/components/ui/RefreshButton';
 import RequireRole from '@/components/auth/RequireRole';

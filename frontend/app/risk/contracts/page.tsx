@@ -8,6 +8,7 @@ import RefreshButton from '@/components/ui/RefreshButton';
 import Button from '@/components/ui/Button';
 import Pagination from '@/components/ui/Pagination';
 
+import EmptyState from '@/components/ui/EmptyState';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import MoneyText from '@/components/ui/MoneyText';

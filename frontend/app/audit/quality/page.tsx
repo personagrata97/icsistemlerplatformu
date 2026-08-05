@@ -20,6 +20,7 @@ import { DateDisplay } from '@/components/ui/DateDisplay';
 import Tooltip from '@/components/ui/Tooltip';
 import Button from '@/components/ui/Button';
 import TableActions from '@/components/ui/TableActions';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';

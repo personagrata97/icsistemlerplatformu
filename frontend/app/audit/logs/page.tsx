@@ -18,6 +18,7 @@ import Button from '@/components/ui/Button';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
 import { checkRole, ROLES } from '@/lib/auth-constants';
+import EmptyState from '@/components/ui/EmptyState';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import CustomSelect from '@/components/ui/CustomSelect';

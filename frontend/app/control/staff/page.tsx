@@ -15,6 +15,7 @@ import Tooltip from '@/components/ui/Tooltip';
 import OverflowTooltip from '@/components/ui/OverflowTooltip';
 import PageToolbar from '@/components/ui/PageToolbar';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import RefreshButton from '@/components/ui/RefreshButton';
 import { formatDate, formatPhone, getPhotoUrl } from '@/lib/audit-utils';

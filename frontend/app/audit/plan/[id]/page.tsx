@@ -29,6 +29,7 @@ import EditPlanModal from '@/components/audit/modals/EditPlanModal';
 import StatCard from '@/components/ui/StatCard';
 import Button from '@/components/ui/Button';
 import TableActions from '@/components/ui/TableActions';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import { clsx } from 'clsx';
 import EmptyState from '@/components/ui/EmptyState';

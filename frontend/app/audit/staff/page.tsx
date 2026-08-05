@@ -12,6 +12,7 @@ import { auditApi, AuditStaff, StaffExperience, StaffEducation, StaffTraining, S
 import PageToolbar from '@/components/ui/PageToolbar';
 import PageHeader from '@/components/ui/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import RefreshButton from '@/components/ui/RefreshButton';
 import { formatDate, formatPhone } from '@/lib/audit-utils';

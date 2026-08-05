@@ -21,6 +21,7 @@ import CreateAuditModal from '@/components/audit/CreateAuditModal';
 import CustomSelect from '@/components/ui/CustomSelect';
 import PageToolbar from '@/components/ui/PageToolbar';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import EmptyState from '@/components/ui/EmptyState';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import AuditTable from '@/components/audit/AuditTable'; // Özel mantık için korunuyor
 import AuditActionButtons from '@/components/audit/AuditActionButtons';

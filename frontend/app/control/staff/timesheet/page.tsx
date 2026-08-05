@@ -6,6 +6,8 @@ import RequireRole from '@/components/auth/RequireRole';
 
 import React, { useState } from 'react';
 import ControlStaffTabs from '@/components/control/ControlStaffTabs';
+import EmptyState from '@/components/ui/EmptyState';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';

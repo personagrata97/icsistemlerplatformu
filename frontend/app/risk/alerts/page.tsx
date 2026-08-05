@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import Pagination from '@/components/ui/Pagination';
 
 import StatusBadge from '@/components/ui/StatusBadge';
+import EmptyState from '@/components/ui/EmptyState';
 import DataTable from '@/components/ui/DataTable';
 import { formatDate } from '@/lib/audit-utils';
 import ConfirmModal from '@/components/ConfirmModal';

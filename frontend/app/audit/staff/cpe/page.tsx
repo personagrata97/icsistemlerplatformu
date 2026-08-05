@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { auditApi } from '@/lib/audit-api';
 import { Users, TrendingUp, TrendingDown, Minus, Clock, BookOpen, FileText, Eye } from 'lucide-react';
 import PageToolbar from '@/components/ui/PageToolbar';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
 import LoadingState from '@/components/ui/LoadingState';

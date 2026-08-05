@@ -11,6 +11,8 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import { Search, ShieldAlert, CheckCircle, RefreshCw, UserCheck, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/Toast';
+import EmptyState from '@/components/ui/EmptyState';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Link from 'next/link';

@@ -3,6 +3,8 @@ import PageHeader from '@/components/ui/PageHeader';
 
 import React, { useState } from 'react';
 import { Trash2, RotateCcw, AlertTriangle, Eye, ShieldX } from 'lucide-react';
+import EmptyState from '@/components/ui/EmptyState';
+import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
 import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
