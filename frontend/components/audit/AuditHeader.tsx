@@ -35,12 +35,17 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
     const isAdmin = hasRole('ADMIN') || hasRole('SYSTEM_ADMIN') || hasRole('AUDIT_ADMIN') || hasRole('AUDIT_MANAGER');
     const isAuditor = isAdmin || hasRole('AUDIT_SUPERVISOR') || hasRole('AUDIT_INSPECTOR');
 
-    // Modül Sızıntısı Önleme: URL path'ine göre modül bağlamını oku
     const currentModule = pathname?.startsWith('/control') 
         ? 'control' 
         : pathname?.startsWith('/risk') 
         ? 'risk' 
         : 'audit';
+
+    const moduleBrand = currentModule === 'control'
+        ? { title: 'İç Kontrol ve Uyum Platformu', subtitle: 'Süreç İçi Kontrol ve Risk İzleme' }
+        : currentModule === 'risk'
+        ? { title: 'Risk Yönetim Platformu', subtitle: 'Kurumsal Risk ve Limit İzleme' }
+        : { title: 'Teftiş Kurulu Platformu', subtitle: 'Dijital Denetim ve Yönetim Sistemi' };
 
     return (
         <header className="header flex items-center justify-between h-20 bg-white border-b border-gray-200 px-8">
@@ -60,10 +65,8 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
                         <ShieldCheck size={24} strokeWidth={2.5} />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none" id="page-title">{title}</h1>
-                        {subtitle && (
-                            <p className="text-xs text-gray-500 font-medium mt-1">{subtitle}</p>
-                        )}
+                        <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none" id="page-title">{moduleBrand.title}</h1>
+                        <p className="text-xs text-gray-500 font-medium mt-1">{moduleBrand.subtitle}</p>
                     </div>
                 </div>
             </div>

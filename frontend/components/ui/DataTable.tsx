@@ -63,6 +63,7 @@ interface DataTableProps<T> {
     rightElement?: React.ReactNode;
     onClearFilters?: () => void;
     searchTerm?: string;
+    hasActiveFilters?: boolean;
 }
 
 export default function DataTable<T>({
@@ -96,7 +97,8 @@ export default function DataTable<T>({
     description,
     rightElement,
     onClearFilters,
-    searchTerm
+    searchTerm,
+    hasActiveFilters
 }: DataTableProps<T>) {
     // Internal sorting state for autonomous mode
     const [internalSortCol, setInternalSortCol] = React.useState<string | undefined>(sortColumn);
@@ -322,7 +324,8 @@ export default function DataTable<T>({
     }
 
     if (data.length === 0) {
-        if (onClearFilters) {
+        const isFiltered = Boolean(hasActiveFilters || (searchTerm && searchTerm.trim() !== ''));
+        if (isFiltered && onClearFilters) {
             return (
                 <div className={`card !p-0 overflow-hidden ${className}`}>
                     {(title || rightElement) && (

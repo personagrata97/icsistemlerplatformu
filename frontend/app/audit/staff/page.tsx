@@ -1243,6 +1243,7 @@ function AuditStaffPageContent() {
                 emptyDescription="Arama kriterlerinize uygun veya sistemde kayıtlı bir personel bulunmuyor."
                 className="shadow-sm border border-gray-100"
                 searchTerm={searchTerm}
+                hasActiveFilters={Boolean(searchTerm.trim() !== '' || (filters.title || []).length > 0 || (filters.status || []).length > 0 || (filters.hireYear || []).length > 0 || (filters.certifications || []).length > 0 || (filters.skills || []).length > 0)}
                 onClearFilters={() => {
                     setSearchTerm('');
                     setFilters({ title: [], status: [], hireYear: [], certifications: [], skills: [] });

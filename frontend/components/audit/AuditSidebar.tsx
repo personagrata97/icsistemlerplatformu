@@ -194,12 +194,7 @@ export default function AuditSidebar() {
                                 </Link>
                             </li>
 
-                            <li className="nav-item">
-                                <Link href="/audit/regulations" className={`nav-link ${isActive('/audit/regulations') ? 'active' : ''}`}>
-                                    <Scale size={18} />
-                                    <span>Şirket İçi Mevzuat</span>
-                                </Link>
-                            </li>
+
 
                         </ul>
                     </li>
