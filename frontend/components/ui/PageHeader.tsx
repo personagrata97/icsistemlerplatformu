@@ -36,12 +36,19 @@ export default function PageHeader({
         setSubtitle(subtitle);
     }, [title, subtitle, setTitle, setSubtitle]);
 
+    const hasBreadcrumb = breadcrumb && breadcrumb.length > 0;
+    const hasActions = Boolean(actions);
+
+    if (!hasBreadcrumb && !hasActions) {
+        return null;
+    }
+
     return (
-        <div className={`mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 ${className}`}>
-            <div className="space-y-1">
-                {breadcrumb && breadcrumb.length > 0 && (
+        <div className={`mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 ${className}`}>
+            <div>
+                {hasBreadcrumb && (
                     <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
-                        {breadcrumb.map((item, idx) => (
+                        {breadcrumb!.map((item, idx) => (
                             <React.Fragment key={idx}>
                                 {idx > 0 && <ChevronRight size={12} className="text-slate-400" />}
                                 {item.href ? (
@@ -55,18 +62,8 @@ export default function PageHeader({
                         ))}
                     </nav>
                 )}
-                <div className="flex items-center gap-2.5">
-                    {icon && <div className="text-primary shrink-0">{icon}</div>}
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                        {title}
-                        {badge && <span className="inline-flex items-center">{badge}</span>}
-                    </h1>
-                </div>
-                {subtitle && (
-                    <p className="text-sm text-slate-500 font-normal leading-relaxed">{subtitle}</p>
-                )}
             </div>
-            {actions && (
+            {hasActions && (
                 <div className="flex items-center gap-3 shrink-0">
                     {actions}
                 </div>

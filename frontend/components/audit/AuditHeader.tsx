@@ -65,8 +65,10 @@ export default function AuditHeader({ title, subtitle, onToggleSidebar, hideSide
                         <ShieldCheck size={24} strokeWidth={2.5} />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none" id="page-title">{moduleBrand.title}</h1>
-                        <p className="text-xs text-gray-500 font-medium mt-1">{moduleBrand.subtitle}</p>
+                        <h1 className="text-xl font-bold text-gray-900 tracking-tight leading-none" id="page-title">{String(title || '')}</h1>
+                        {subtitle && (
+                            <p className="text-xs text-gray-500 font-medium mt-1">{subtitle}</p>
+                        )}
                     </div>
                 </div>
             </div>
