@@ -41,8 +41,8 @@ const TYPE_LABELS: Record<TrashItemType, string> = {
 
 const TYPE_COLORS: Record<TrashItemType, string> = {
     limit: 'bg-rose-100 text-rose-800',
-    senaryo: 'bg-amber-100 text-amber-800',
-    sozlesme: 'bg-blue-100 text-blue-800',
+    senaryo: 'bg-slate-100 text-slate-700',
+    sozlesme: 'bg-slate-100 text-slate-700',
     dokuman: 'bg-purple-100 text-purple-800'
 };
 

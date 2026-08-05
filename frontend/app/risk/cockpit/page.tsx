@@ -188,7 +188,7 @@ function RiskCockpitPageContent() {
                 <DashboardWidget widgetType="actions" variant="transparent">
                     <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8">
                         <div className="flex flex-col md:flex-row items-start gap-6">
-                            <div className="p-4 bg-blue-100 rounded-xl text-blue-600 shrink-0">
+                            <div className="p-4 bg-slate-100 rounded-xl text-blue-600 shrink-0">
                                 <Info className="w-8 h-8" />
                             </div>
                             <div className="flex-1">
@@ -254,7 +254,7 @@ function RiskCockpitPageContent() {
             {/* 1. DURUM ÇUBUĞU */}
             <div className={`p-6 rounded-2xl border ${isSafe ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
                 <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-xl ${isSafe ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
+                    <div className={`p-3 rounded-xl ${isSafe ? 'bg-slate-100 text-slate-700' : 'bg-slate-100 text-slate-700'}`}>
                         {isSafe ? <ShieldCheck className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
                     </div>
                     <div>
@@ -349,7 +349,7 @@ function RiskCockpitPageContent() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Link href="/risk/alerts" className="group p-5 bg-white border border-gray-200 rounded-2xl hover:border-primary/30 hover:shadow-md transition-all">
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-500 group-hover:bg-red-100 transition-colors">
+                        <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-500 group-hover:bg-slate-100 transition-colors">
                             <AlertTriangle size={20} />
                         </div>
                         <div>
@@ -361,7 +361,7 @@ function RiskCockpitPageContent() {
 
                 <Link href="/risk/contracts" className="group p-5 bg-white border border-gray-200 rounded-2xl hover:border-primary/30 hover:shadow-md transition-all">
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 group-hover:bg-blue-100 transition-colors">
+                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 group-hover:bg-slate-100 transition-colors">
                             <FileText size={20} />
                         </div>
                         <div>

@@ -41,11 +41,11 @@ const TYPE_LABELS: Record<TrashItemType, string> = {
 };
 
 const TYPE_COLORS: Record<TrashItemType, string> = {
-    kontrol: 'bg-blue-100 text-blue-800',
-    test: 'bg-emerald-100 text-emerald-800',
+    kontrol: 'bg-slate-100 text-slate-700',
+    test: 'bg-slate-100 text-slate-700',
     eksiklik: 'bg-rose-100 text-rose-800',
     rapor: 'bg-purple-100 text-purple-800',
-    dokuman: 'bg-amber-100 text-amber-800'
+    dokuman: 'bg-slate-100 text-slate-700'
 };
 
 function ControlTrashPageContent() {

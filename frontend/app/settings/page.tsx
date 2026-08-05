@@ -604,7 +604,7 @@ function SettingsPageContent() {
                                 render: (u) => (
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-                                            {(u.displayName || u.username || '?').charAt(0).toUpperCase()}
+                                            {(u.displayName || u.username || '?').substring(0, 1).toUpperCase()}
                                         </div>
                                         <div className="min-w-0">
                                             <div className="font-semibold text-gray-800 truncate">{u.displayName || u.username}</div>

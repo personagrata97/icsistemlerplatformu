@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { RiskLogger, LogEntry } from '@/lib/risk-logger';
 import { FileText, Download, Clock, User, Activity, AlertCircle, CheckCircle, Search, Filter, ChevronRight, X, Eye, RefreshCw, ArrowRight } from 'lucide-react';
 import RefreshButton from '@/components/ui/RefreshButton';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import { clsx } from 'clsx';
 import Button from '@/components/ui/Button';
 
@@ -139,7 +140,7 @@ function RiskLogsPageContent() {
                             return (
                                 <div className="flex items-center justify-center gap-2">
                                     <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 border border-slate-200">
-                                        {userName.charAt(0).toUpperCase() || '?'}
+                                        {userName.substring(0, 1).toUpperCase() || '?'}
                                     </div>
                                     <span className="text-xs font-bold text-slate-600">{userName}</span>
                                 </div>
@@ -204,8 +205,8 @@ function RiskLogsPageContent() {
                         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                             <h5 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Kullanıcı Bilgileri</h5>
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
-                                    {selectedLog.user.charAt(0)}
+                                <div className="w-8 h-8 bg-slate-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
+                                    {selectedLog.user.substring(0, 1)}
                                 </div>
                                 <div>
                                     <div className="text-sm font-semibold text-gray-900">{selectedLog.user}</div>

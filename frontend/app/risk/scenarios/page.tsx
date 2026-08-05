@@ -127,7 +127,7 @@ function ScenariosPageContent() {
             <div className="card border-l-4 border-primary bg-white">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-start gap-4">
-                        <div className="p-3 bg-green-100 rounded-full">
+                        <div className="p-3 bg-slate-100 rounded-full">
                             <PlayCircle className="w-8 h-8 text-primary" />
                         </div>
                         <div>

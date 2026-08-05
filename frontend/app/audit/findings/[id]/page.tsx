@@ -735,7 +735,7 @@ function FindingDetailPageContent() {
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         {/* Status Alert for Conciliation */}
                         <div className={`p-4 rounded-lg flex items-start gap-4 border shadow-sm ${finding.status === 'Mutabık Değil' ? 'bg-orange-50 border-orange-200 text-orange-800' : 'bg-blue-50 border-blue-200 text-blue-800'}`}>
-                            <div className={`p-2 rounded-full ${finding.status === 'Mutabık Değil' ? 'bg-orange-100' : 'bg-blue-100'}`}>
+                            <div className={`p-2 rounded-full ${finding.status === 'Mutabık Değil' ? 'bg-orange-100' : 'bg-slate-100'}`}>
                                 <AlertCircle size={20} />
                             </div>
                             <div>

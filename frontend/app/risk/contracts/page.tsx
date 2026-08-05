@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { Search, FileText, Eye, Clock, Wallet, MapPin, User, Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 import RefreshButton from '@/components/ui/RefreshButton';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import Button from '@/components/ui/Button';
 import Pagination from '@/components/ui/Pagination';
 

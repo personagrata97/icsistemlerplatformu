@@ -1,5 +1,6 @@
 'use client';
 import PageHeader from '@/components/ui/PageHeader';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import FormTextarea from '@/components/ui/FormTextarea';
 
 import React, { useState, useEffect } from 'react';
@@ -140,7 +141,7 @@ function ControlConciliationPageContent() {
                         },
                         {
                             key: 'unitResponse', header: 'BİRİM MUTABAKAT YANITI', width: '180px', render: (item: any) => (
-                                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded ${item.unitResponse === 'KATILIYOR' ? 'bg-emerald-100 text-emerald-800' : item.unitResponse === 'KATILMIYOR' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
+                                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded ${item.unitResponse === 'KATILIYOR' ? 'bg-slate-100 text-slate-700' : item.unitResponse === 'KATILMIYOR' ? 'bg-slate-100 text-slate-700' : 'bg-slate-100 text-slate-700'}`}>
                                     {item.unitResponse || 'BEKLEMEDE'}
                                 </span>
                             )

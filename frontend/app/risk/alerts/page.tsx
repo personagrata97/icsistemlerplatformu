@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { AlertTriangle, CheckCircle, X, Clock, RefreshCw, MessageSquare } from 'lucide-react';
 import RefreshButton from '@/components/ui/RefreshButton';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import LoadingState from '@/components/ui/LoadingState';
 import Button from '@/components/ui/Button';
 import Pagination from '@/components/ui/Pagination';

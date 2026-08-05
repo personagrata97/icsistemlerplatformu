@@ -95,9 +95,9 @@ const formatTarget = (target: number, unit: string) => {
 
 const getStatusColor = (status: string) => {
     switch (status) {
-        case 'İyi': return 'bg-green-100 text-green-700 border-green-200';
-        case 'Uyarı': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-        case 'Kritik': return 'bg-red-100 text-red-700 border-red-200';
+        case 'İyi': return 'bg-slate-100 text-slate-700 border-green-200';
+        case 'Uyarı': return 'bg-slate-100 text-slate-700 border-yellow-200';
+        case 'Kritik': return 'bg-slate-100 text-slate-700 border-red-200';
         default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
 };

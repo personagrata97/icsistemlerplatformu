@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AuditHeader from '@/components/audit/AuditHeader';
 import StatCard from '@/components/ui/StatCard';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
 import PageHeader from '@/components/ui/PageHeader';

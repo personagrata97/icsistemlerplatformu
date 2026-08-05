@@ -286,7 +286,7 @@ const TreeNode = ({ node, units, level, canManage, onEdit, onDelete, onViewRCM, 
                             {matchingUnits.map(unit => (
                                 <div key={unit.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-white border border-gray-100 rounded-md shadow-sm hover:border-primary/40 transition-colors group">
                                     <div className="flex items-start sm:items-center gap-3 mb-2 sm:mb-0">
-                                        <div className={`p-1.5 rounded-md ${unit.riskScore && unit.riskScore >= 85 ? 'bg-rose-100 text-rose-600' : unit.riskScore && unit.riskScore >= 65 ? 'bg-red-100 text-red-600' : unit.riskScore && unit.riskScore >= 40 ? 'bg-orange-100 text-orange-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                                        <div className={`p-1.5 rounded-md ${unit.riskScore && unit.riskScore >= 85 ? 'bg-rose-100 text-rose-600' : unit.riskScore && unit.riskScore >= 65 ? 'bg-slate-100 text-slate-700' : unit.riskScore && unit.riskScore >= 40 ? 'bg-slate-100 text-slate-700' : 'bg-slate-100 text-slate-700'}`}>
                                             <Activity size={14} />
                                         </div>
                                         <div>
@@ -1781,7 +1781,7 @@ function AuditUniversePageContent() {
                                         {/* Detaylı Notlar Alanı */}
                                         <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100">
                                             <div className="flex items-center gap-2 mb-3">
-                                                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                                                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-blue-600">
                                                     <FileText size={18} />
                                                 </div>
                                                 <h4 className="font-semibold text-gray-800">Çalışma Notları</h4>

@@ -322,9 +322,9 @@ function SamplingPageContent() {
 
     const getConclusionColor = (conclusion: string) => {
         switch (conclusion) {
-            case 'Kabul': return 'bg-green-100 text-green-700';
-            case 'Red': return 'bg-red-100 text-red-700';
-            default: return 'bg-yellow-100 text-yellow-700';
+            case 'Kabul': return 'bg-slate-100 text-slate-700';
+            case 'Red': return 'bg-slate-100 text-slate-700';
+            default: return 'bg-slate-100 text-slate-700';
         }
     };
 

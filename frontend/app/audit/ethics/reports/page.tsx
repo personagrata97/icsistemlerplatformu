@@ -9,6 +9,7 @@ import {
 import { auditApi } from '@/lib/audit-api';
 import { useToast } from '@/components/Toast';
 import CodeBadge from '@/components/ui/CodeBadge';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import LoadingState from '@/components/ui/LoadingState';
 import Link from 'next/link';
 import { useAuditTitle } from '@/context/AuditTitleContext';

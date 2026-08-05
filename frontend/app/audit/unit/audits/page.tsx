@@ -4,6 +4,7 @@ import RequireRole from '@/components/auth/RequireRole';
 
 import React, { useState } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import PageToolbar from '@/components/ui/PageToolbar';
 import EmptyState from '@/components/ui/EmptyState';
 import Pagination from '@/components/ui/Pagination';

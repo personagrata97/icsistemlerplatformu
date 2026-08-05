@@ -79,7 +79,7 @@ export default function Home() {
                     {/* İç Kontrol — MAVİ */}
                     {canSeeControl && (
                         <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-7 transition-all hover:shadow-lg hover:border-blue-600 group flex flex-col h-full">
-                            <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mb-5 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                            <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-5 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                                 <Sliders size={28} />
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-2.5 font-sans tracking-tight">{TERMS.controlModule} (İç Kontrol)</h3>

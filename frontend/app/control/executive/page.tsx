@@ -1,5 +1,6 @@
 'use client';
 import UnitBadge from '@/components/ui/UnitBadge';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import PageHeader from '@/components/ui/PageHeader';
 import RequireRole from '@/components/auth/RequireRole';
 

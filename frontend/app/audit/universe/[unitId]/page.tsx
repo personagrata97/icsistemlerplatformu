@@ -31,9 +31,9 @@ const getRiskColor = (level: string | undefined) => {
     if (!level) return { bg: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-300' };
     const l = level.toLocaleLowerCase('tr-TR');
     if (l.includes('kritik')) return { bg: 'bg-rose-100', text: 'text-rose-900', border: 'border-rose-500' };
-    if (l.includes('yüksek') || l.includes('yuksek')) return { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-500' };
+    if (l.includes('yüksek') || l.includes('yuksek')) return { bg: 'bg-slate-100', text: 'text-red-700', border: 'border-red-500' };
     if (l.includes('orta')) return { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-500' };
-    if (l.includes('düşük') || l.includes('dusuk')) return { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-400' };
+    if (l.includes('düşük') || l.includes('dusuk')) return { bg: 'bg-slate-100', text: 'text-yellow-700', border: 'border-yellow-400' };
     return { bg: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-300' };
 };
 

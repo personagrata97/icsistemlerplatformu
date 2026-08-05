@@ -1,5 +1,6 @@
 'use client';
 import PersonCell from '@/components/ui/PersonCell';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 import RequireRole from '@/components/auth/RequireRole';
@@ -40,14 +41,14 @@ const PLAN_TYPE_COLORS: Record<string, string> = {
     'Yıllık Plan': 'bg-indigo-100 text-indigo-800 border-indigo-200',
     'Revizyon-1': 'bg-orange-100 text-orange-800 border-orange-200',
     'Revizyon-2': 'bg-orange-200 text-orange-900 border-orange-300',
-    'Revizyon-3': 'bg-red-100 text-red-800 border-red-200',
+    'Revizyon-3': 'bg-slate-100 text-slate-700 border-red-200',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-    'Taslak': 'bg-blue-100 text-blue-800 border-blue-200',
-    'Onay Bekliyor': 'bg-amber-100 text-amber-800 border-amber-200',
-    'Onaylandı': 'bg-green-100 text-green-800 border-green-200',
-    'İptal': 'bg-red-100 text-red-800 border-red-200',
+    'Taslak': 'bg-slate-100 text-slate-700 border-blue-200',
+    'Onay Bekliyor': 'bg-slate-100 text-slate-700 border-amber-200',
+    'Onaylandı': 'bg-slate-100 text-slate-700 border-green-200',
+    'İptal': 'bg-slate-100 text-slate-700 border-red-200',
 };
 
 function AuditPlanDetailPageContent() {
