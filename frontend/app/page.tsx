@@ -1,5 +1,4 @@
 'use client';
-
 import Link from 'next/link';
 import { Shield, FileText, ScanLine, ArrowRight, Settings, LogOut, Sliders } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';

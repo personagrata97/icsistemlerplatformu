@@ -516,10 +516,10 @@ function UnitRcmPageContent() {
             <div className="flex items-center gap-4">
                 <BackButton href="/audit/universe" label="Denetim Evrenine Dön" />
                 <div className="flex-1">
-                    <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                         <Activity className="text-primary" size={24} />
                         {unit.name}
-                    </h1>
+                    </h2>
                     <p className="text-sm text-gray-500">Risk Kontrol Matrisi (RCM) - Süreç, Risk ve Kontrol Yönetimi</p>
                 </div>
                 {canManage && (

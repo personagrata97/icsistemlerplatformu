@@ -32,6 +32,7 @@ import Button from '@/components/ui/Button';
 import TableActions from '@/components/ui/TableActions';
 import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import { clsx } from 'clsx';
 import EmptyState from '@/components/ui/EmptyState';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
@@ -282,7 +283,7 @@ function AuditPlanDetailPageContent() {
                 <BackButton href="/audit/plan" label="Planlara Dön" />
                 <div className="flex-1">
                     <div className="flex items-center gap-3 flex-wrap">
-                        <h1 className="text-2xl font-bold text-gray-900">{plan.title}</h1>
+                        <h2 className="text-2xl font-bold text-gray-900">{plan.title}</h2>
                         <StatusBadge value={plan.planType || 'Yıllık Plan'} type="plan-type" />
                         <StatusBadge value={plan.status} type="status" />
                     </div>
@@ -475,6 +476,7 @@ function AuditPlanDetailPageContent() {
                                     {
                                         key: 'name',
                                         header: 'Personel',
+            sortable: true,
                                         render: (r: any) => (
                                             <PersonCell name={r.name} />
                                         )
@@ -482,6 +484,7 @@ function AuditPlanDetailPageContent() {
                                     {
                                         key: 'title',
                                         header: 'Ünvan',
+            sortable: true,
                                         render: (r: any) => (
                                             <span className="cell-user-role">{r.title || r.role || '-'}</span>
                                         )
@@ -489,6 +492,7 @@ function AuditPlanDetailPageContent() {
                                     {
                                         key: 'days',
                                         header: 'Süre (Gün)',
+            sortable: true,
                                         width: '150px',
                                         align: 'center',
                                         render: (r: any) => (
@@ -500,6 +504,7 @@ function AuditPlanDetailPageContent() {
                                     {
                                         key: 'actions',
                                         header: 'İşlemler',
+            sortable: true,
                                         width: '100px',
                                         align: 'center',
                                         render: (r: any) => (

@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { Search, Plus, Filter, FileText, Download, MoreVertical, Eye, Share2, Printer, Archive, Trash2, CheckCircle, Clock, AlertTriangle, FileBarChart, Shield, Activity, BarChart2, Layers } from 'lucide-react';
 import Link from 'next/link';
@@ -16,6 +15,7 @@ import RefreshButton from '@/components/ui/RefreshButton';
 import EmptyState from '@/components/ui/EmptyState';
 import Tooltip from '@/components/ui/Tooltip';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import TableActions from '@/components/ui/TableActions';
 import Button from '@/components/ui/Button';
 import PageToolbar from '@/components/ui/PageToolbar';

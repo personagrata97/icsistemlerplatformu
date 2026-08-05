@@ -23,6 +23,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import EmptyState from '@/components/ui/EmptyState';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import AuditTable from '@/components/audit/AuditTable'; // Özel mantık için korunuyor
 import AuditActionButtons from '@/components/audit/AuditActionButtons';
 import PageHeader from '@/components/ui/PageHeader';

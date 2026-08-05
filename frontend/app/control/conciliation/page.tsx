@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -257,6 +258,7 @@ function ControlConciliationPageContent() {
         {
             key: 'responsibleUnit',
             header: 'Sorumlu Birim',
+            sortable: true,
             render: (row: any) => (
                 <span className="text-xs font-medium text-slate-700">{row.responsibleUnit || row.control?.department || '-'}</span>
             )
@@ -264,21 +266,25 @@ function ControlConciliationPageContent() {
         {
             key: 'severity',
             header: 'Önem Düzeyi',
+            sortable: true,
             render: (row: any) => <StatusBadge type="risk" value={row.severity} />
         },
         {
             key: 'status',
             header: 'İş Akış Durumu',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.status} />
         },
         {
             key: 'unitResponse',
             header: 'Birim Yanıtı',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.unitResponse || 'BEKLEMEDE'} />
         },
         {
             key: 'actions',
             header: 'İşlemler',
+            sortable: true,
             render: (row: any) => (
                 <TableActions
                     items={[
@@ -304,9 +310,7 @@ function ControlConciliationPageContent() {
                 title="İç Kontrol Mutabakat & Tebliğ Yönetimi"
                 subtitle="Testler sonucu oluşan kontrol eksikliklerinin birimlerle mutabakat, resmi tebliğ, aksiyon takibi ve kanıt doğrulama süreçleri."
                 actions={
-                    <Button variant="outline" size="sm" onClick={loadDeficiencies} leftIcon={<RefreshCw size={14} />}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={loadDeficiencies} />
                 }
             />
 

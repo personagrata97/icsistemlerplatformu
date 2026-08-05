@@ -18,17 +18,62 @@ interface EmptyStateProps {
     };
     variant?: 'default' | 'search' | 'error' | 'minimal';
     className?: string;
+    hasActiveFilters?: boolean;
+    onClearFilters?: () => void;
 }
 
 export default function EmptyState({
-    icon: Icon = Search,
+    icon: IconProp,
     entityType,
-    title = "Kayıt Bulunamadı",
-    description = "Görüntülenecek veri bulunamadı veya arama kriterlerinize uygun sonuç yok.",
+    title: titleProp,
+    description: descriptionProp,
     action,
     variant = 'default',
-    className = ''
+    className = '',
+    hasActiveFilters,
+    onClearFilters
 }: EmptyStateProps) {
+    const isFiltered = hasActiveFilters === true;
+
+    const Icon = IconProp || (isFiltered ? Search : FolderOpen);
+
+    let title = titleProp;
+    let description = descriptionProp;
+    let finalAction = action;
+
+    if (hasActiveFilters !== undefined) {
+        if (isFiltered) {
+            if (!titleProp || titleProp === 'Kayıt Bulunamadı') {
+                title = 'Arama kriterlerinize uygun kayıt bulunamadı';
+            }
+            if (!descriptionProp) {
+                description = 'Filtreleri temizleyerek tüm kayıtları yeniden görüntüleyebilirsiniz.';
+            }
+            if (onClearFilters) {
+                finalAction = {
+                    label: 'Filtreleri Temizle',
+                    onClick: onClearFilters
+                };
+            }
+        } else {
+            if (!titleProp || titleProp === 'Kayıt Bulunamadı' || titleProp === 'Arama kriterlerinize uygun kayıt bulunamadı') {
+                title = 'Henüz kayıt bulunmuyor';
+            }
+            if (!descriptionProp) {
+                description = 'Sistemde gösterilecek bir veri parçası henüz eklenmemiş.';
+            }
+            // If action was clear filters, suppress it when there are no active filters
+            if (finalAction && (finalAction.label.toLowerCase().includes('temizle') || finalAction.label.toLowerCase().includes('clear'))) {
+                finalAction = undefined;
+            }
+        }
+    } else {
+        // If hasActiveFilters prop is omitted but action is clear filters, check if description mentions filter
+        if (finalAction && (finalAction.label.toLowerCase().includes('temizle') || finalAction.label.toLowerCase().includes('clear'))) {
+            // Keep action as is for backward compatibility
+        }
+    }
+
     const variantStyles = {
         default: {
             container: 'py-12',
@@ -75,15 +120,15 @@ export default function EmptyState({
                     {description}
                 </p>
             )}
-            {action && (
+            {finalAction && (
                 <Button
                     variant={variant === 'search' ? 'ghost' : 'primary'}
                     size={variant === 'search' ? 'sm' : 'md'}
-                    onClick={action.onClick}
-                    leftIcon={action.icon ? <action.icon size={16} /> : undefined}
+                    onClick={finalAction.onClick}
+                    leftIcon={finalAction.icon ? <finalAction.icon size={16} /> : undefined}
                     className={variant === 'search' ? "mt-2 text-primary hover:bg-primary/5 font-bold" : "mt-4 shadow-sm"}
                 >
-                    {action.label}
+                    {finalAction.label}
                 </Button>
             )}
         </div>

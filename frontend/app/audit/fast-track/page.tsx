@@ -259,14 +259,6 @@ function FastTrackPageContent() {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-900 p-4 md:p-8 flex flex-col items-center justify-center">
             <PageHeader title="Hızlı Denetim (Fast-Track)" subtitle="Acil ve kritik konularda hızlı denetim görevi oluşturma ve yürütme" />
             
-            {/* Elegant Header */}
-            <div className="w-full max-w-4xl text-center mb-8">
-                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mb-1">
-                    TASARRUF FİNANSMAN <span className="text-[#c9a84c]">A.Ş.</span>
-                </h1>
-                <p className="text-xs uppercase tracking-widest text-[#c9a84c] font-semibold">Teftiş Kurulu Müdürlüğü • Dijital Mutabakat Sistemi (AMS)</p>
-            </div>
-
             {/* Portal Card */}
             <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300">
                 

@@ -119,12 +119,7 @@ export default function RiskSidebar() {
                                             <span>Bildirimler</span>
                                         </Link>
                                     </li>
-                                    <li className="nav-item">
-                                        <Link href="/risk/knowledge-base" className={`nav-link ${isActive('/risk/knowledge-base') ? 'active' : ''}`}>
-                                            <BookOpen size={18} />
-                                            <span>Bilgi Bankası</span>
-                                        </Link>
-                                    </li>
+
                                 </ul>
                             </li>
                         </>

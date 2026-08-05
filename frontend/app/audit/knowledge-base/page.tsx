@@ -269,6 +269,7 @@ function KnowledgeBasePageContent() {
                     {
                         key: 'title',
                         header: 'Doküman Adı',
+            sortable: true,
                         render: (doc: any) => (
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -281,6 +282,7 @@ function KnowledgeBasePageContent() {
                     {
                         key: 'size',
                         header: 'Boyut',
+            sortable: true,
                         align: 'center',
                         width: '120px',
                         render: (doc: any) => (
@@ -292,6 +294,7 @@ function KnowledgeBasePageContent() {
                     {
                         key: 'uploadedBy',
                         header: 'Yükleyen',
+            sortable: true,
                         align: 'center',
                         width: '180px',
                         render: (doc: any) => <div className="cell-user justify-center">{doc.uploadedBy || 'Sistem'}</div>
@@ -299,6 +302,7 @@ function KnowledgeBasePageContent() {
                     {
                         key: 'uploadDate',
                         header: 'Tarih',
+            sortable: true,
                         align: 'center',
                         width: '140px',
                         render: (doc: any) => (
@@ -310,6 +314,7 @@ function KnowledgeBasePageContent() {
                     {
                         key: 'actions',
                         header: 'İşlemler',
+            sortable: true,
                         align: 'center',
                         width: '220px',
                         render: (doc: any) => (

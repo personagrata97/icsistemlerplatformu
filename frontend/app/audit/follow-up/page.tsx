@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 import PageHeader from '@/components/ui/PageHeader';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 
@@ -9,6 +10,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import DurationText from '@/components/ui/DurationText';
 import EmptyState from '@/components/ui/EmptyState';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
@@ -175,9 +177,7 @@ function FollowUpPageContent() {
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 rightActions={
-                    <Button variant="secondary" leftIcon={<RefreshCw size={14} />} onClick={fetchActions} isLoading={loading}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={fetchActions} />
                 }
             />
 

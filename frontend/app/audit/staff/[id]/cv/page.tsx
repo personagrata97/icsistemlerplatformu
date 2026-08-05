@@ -113,7 +113,7 @@ function StaffOzgecmisLegacyPageContent() {
                     </div>
 
                     <div className="flex-1 text-center md:text-left relative z-10">
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">{staff.firstName} {staff.lastName}</h1>
+                        <h2 className="text-3xl font-black text-slate-900 tracking-tight">{staff.firstName} {staff.lastName}</h2>
                         <p className="text-lg text-primary font-bold mt-1 uppercase tracking-wider">{staff.title}</p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">

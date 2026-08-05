@@ -21,7 +21,6 @@ import { EthicsPageHeader } from '@/components/audit/ethics/EthicsPageHeader';
 import { EthicsActionCard } from '@/components/audit/ethics/EthicsActionCard';
 import CustomSelect from '@/components/ui/CustomSelect';
 import Tooltip from '@/components/ui/Tooltip';
-import PageHeader from '@/components/ui/PageHeader';
 import FormTextarea from '@/components/ui/FormTextarea';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
@@ -247,7 +246,7 @@ export default function PublicEthicsPortalPage() {
                     <div className="inline-flex p-5 bg-primary/10 text-primary rounded-3xl shadow-sm mb-2 mt-4">
                         <Shield size={56} strokeWidth={1.5} />
                     </div>
-                    <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Teftiş Kurulu Etik İhbar Hattı</h1>
+                    <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">Teftiş Kurulu Etik İhbar Hattı</h2>
                     <p className="text-lg text-slate-600 max-w-3xl mx-auto font-medium leading-relaxed">
                         Kurumun etik değerlerine uyum sağlamak, usulsüzlükleri önlemek ve kurumsal ilkeleri korumak adına oluşturulmuş bildirim kanalıdır. Buradan bildirim yapabilir veya mevcut bildiriminizin durumunu takip edebilirsiniz.
                     </p>
@@ -478,7 +477,7 @@ export default function PublicEthicsPortalPage() {
                 <div className="max-w-xl mx-auto px-6 mt-12">
                     <div className="bg-white rounded-[2.5rem] shadow-2xl border-0 p-12">
                         <div className="w-24 h-24 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-sm transition-transform hover:rotate-3"><Search size={56} /></div>
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Bildirim Sorgula</h1>
+                        <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Bildirim Sorgula</h2>
                         <p className="text-slate-500 font-bold text-lg mb-12 opacity-80 decoration-blue-500 decoration-2 underline-offset-4 font-poppins">Takip kodunuz ile güncel durumu kontrol edin.</p>
 
                         <form onSubmit={handleQuery} className="space-y-10">

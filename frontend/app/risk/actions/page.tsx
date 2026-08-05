@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -161,6 +162,7 @@ function RiskActionsContent() {
         {
             key: 'aksiyonTanimi',
             header: 'Aksiyon Tanımı',
+            sortable: true,
             render: (row: any) => (
                 <div className="space-y-1">
                     <span className="font-semibold text-sm text-slate-800 hover:text-teal-700 cursor-pointer" onClick={() => { setSelectedAction(row); setShowDetailModal(true); }}>
@@ -175,21 +177,25 @@ function RiskActionsContent() {
         {
             key: 'sorumluId',
             header: 'Sorumlu',
+            sortable: true,
             render: (row: any) => <PersonCell name={row.sorumluId || 'Atanmadı'} />
         },
         {
             key: 'durum',
             header: 'Durum',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.durum} />
         },
         {
             key: 'terminTarihi',
             header: 'Termin Tarihi',
+            sortable: true,
             render: (row: any) => row.terminTarihi ? <DateDisplay date={row.terminTarihi} /> : <span className="text-slate-400 font-mono text-xs">-</span>
         },
         {
             key: 'actions',
             header: 'İşlemler',
+            sortable: true,
             render: (row: any) => (
                 <TableActions
                     items={[
@@ -215,9 +221,7 @@ function RiskActionsContent() {
                 title="Risk Aksiyon Takibi & Kanıt Yönetimi"
                 subtitle={`Limit aşımı ve risk göstergeleri kaynaklı aksiyon planları, termin takibi, sorumlu birimler ve doğrulama kanıtları (${MODULE_TERMS.risk.birimKisa}).`}
                 actions={
-                    <Button variant="outline" size="sm" onClick={loadActions} leftIcon={<RefreshCw size={14} />}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={loadActions} />
                 }
             />
 

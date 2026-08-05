@@ -11,6 +11,7 @@ import Pagination from '@/components/ui/Pagination';
 
 import EmptyState from '@/components/ui/EmptyState';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import StatusBadge from '@/components/ui/StatusBadge';
 import MoneyText from '@/components/ui/MoneyText';
 import CustomSelect from '@/components/ui/CustomSelect';

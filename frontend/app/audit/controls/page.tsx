@@ -8,6 +8,7 @@ import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import PageToolbar from '@/components/ui/PageToolbar';
 import EmptyState from '@/components/ui/EmptyState';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import StatCard from '@/components/ui/StatCard';
 import { auditApi, Control } from '@/lib/audit-api';
 import { Shield, Target, AlertTriangle, ShieldCheck } from 'lucide-react';
@@ -88,11 +89,16 @@ function ControlsPageContent() {
                 onPageChange={setPage}
                 itemsPerPage={20}
                 columns={[
-                    { key: 'code', header: 'Kontrol Kodu', render: (row: any) => <span className="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">{row.code || '-'}</span> },
-                    { key: 'name', header: 'Kontrol Adı', render: (row: any) => <span className="font-medium text-gray-800">{row.name}</span> },
-                    { key: 'type', header: 'Tür', render: (row: any) => row.type || '-' },
-                    { key: 'frequency', header: 'Frekans', render: (row: any) => row.frequency || '-' },
-                    { key: 'description', header: 'Açıklama', render: (row: any) => <span className="text-gray-500 text-sm">{row.description || '-'}</span> }
+                    { key: 'code', header: 'Kontrol Kodu',
+            sortable: true, render: (row: any) => <span className="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">{row.code || '-'}</span> },
+                    { key: 'name', header: 'Kontrol Adı',
+            sortable: true, render: (row: any) => <span className="font-medium text-gray-800">{row.name}</span> },
+                    { key: 'type', header: 'Tür',
+            sortable: true, render: (row: any) => row.type || '-' },
+                    { key: 'frequency', header: 'Frekans',
+            sortable: true, render: (row: any) => row.frequency || '-' },
+                    { key: 'description', header: 'Açıklama',
+            sortable: true, render: (row: any) => <span className="text-gray-500 text-sm">{row.description || '-'}</span> }
                 ]}
             />
         </div>

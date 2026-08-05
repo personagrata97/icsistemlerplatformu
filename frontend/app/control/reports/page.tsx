@@ -87,12 +87,18 @@ function ControlReportsPageContent() {
 
             <DataTable
                 columns={[
-                    { key: 'id', header: 'Rapor Kodu', render: (item) => <CodeBadge code={item.id} /> },
-                    { key: 'ad', header: 'Rapor Başlığı / Konusu', render: (item) => <span className="font-semibold text-slate-900 hover:text-emerald-700 cursor-pointer" onClick={() => setSelectedReport(item)}>{item.ad}</span> },
-                    { key: 'birim', header: 'İlgili Birim', render: (item) => <UnitBadge name={item.birim} /> },
-                    { key: 'tarih', header: 'Tarih', render: (item) => <DateDisplay value={item.tarih} /> },
-                    { key: 'durum', header: 'Durum', render: (item) => <StatusBadge value={item.durum} type="status" /> },
-                    { key: 'actions', header: 'İşlemler', align: 'right', render: (item) => (
+                    { key: 'id', header: 'Rapor Kodu',
+            sortable: true, render: (item) => <CodeBadge code={item.id} /> },
+                    { key: 'ad', header: 'Rapor Başlığı / Konusu',
+            sortable: true, render: (item) => <span className="font-semibold text-slate-900 hover:text-emerald-700 cursor-pointer" onClick={() => setSelectedReport(item)}>{item.ad}</span> },
+                    { key: 'birim', header: 'İlgili Birim',
+            sortable: true, render: (item) => <UnitBadge name={item.birim} /> },
+                    { key: 'tarih', header: 'Tarih',
+            sortable: true, render: (item) => <DateDisplay value={item.tarih} /> },
+                    { key: 'durum', header: 'Durum',
+            sortable: true, render: (item) => <StatusBadge value={item.durum} type="status" /> },
+                    { key: 'actions', header: 'İşlemler',
+            sortable: true, align: 'right', render: (item) => (
                         <TableActions items={[
                             { label: 'Detay Göster', icon: Eye, onClick: () => setSelectedReport(item) },
                             { label: 'PDF İndir', icon: Download, onClick: () => showToast(`${item.ad} PDF indiriliyor`, 'success') },

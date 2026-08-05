@@ -17,6 +17,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import RefreshButton from '@/components/ui/RefreshButton';
 import { formatDate, formatPhone, getPhotoUrl } from '@/lib/audit-utils';
 import { useToast } from '@/components/Toast';

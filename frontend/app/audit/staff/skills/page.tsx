@@ -9,6 +9,7 @@ import { Edit2, Eye, Lock, TrendingUp, History } from 'lucide-react';
 import PageToolbar from '@/components/ui/PageToolbar';
 import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import Button from '@/components/ui/Button';
 import LoadingState from '@/components/ui/LoadingState';
 import { useToast } from '@/components/Toast';

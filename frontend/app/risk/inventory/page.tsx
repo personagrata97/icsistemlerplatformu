@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -83,6 +84,7 @@ function RiskInventoryContent() {
         {
             key: 'kpi_kodu',
             header: 'Gösterge Kodu & Tanımı',
+            sortable: true,
             render: (row: any) => (
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -96,6 +98,7 @@ function RiskInventoryContent() {
         {
             key: 'kategori',
             header: 'Kategori',
+            sortable: true,
             render: (row: any) => (
                 <span className="text-xs font-medium text-slate-700">{row.kategori || row.category || 'Likidite & Finansal'}</span>
             )
@@ -103,6 +106,7 @@ function RiskInventoryContent() {
         {
             key: 'birim',
             header: 'Sorumlu Birim',
+            sortable: true,
             render: (row: any) => (
                 <span className="text-xs text-slate-700">{row.sorumlu_birim || row.unit || 'Risk Yönetimi'}</span>
             )
@@ -110,6 +114,7 @@ function RiskInventoryContent() {
         {
             key: 'esik_deger',
             header: 'Eşik Değer',
+            sortable: true,
             render: (row: any) => (
                 <span className="font-mono text-xs font-bold text-slate-800">{row.esik_deger || row.threshold || '-'}</span>
             )
@@ -117,6 +122,7 @@ function RiskInventoryContent() {
         {
             key: 'durum',
             header: 'İzleme Durumu',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.durum || 'Aktif'} />
         }
     ];
@@ -127,9 +133,7 @@ function RiskInventoryContent() {
                 title="Risk Göstergeleri & Limit Envanteri"
                 subtitle={`İzlenen risk göstergeleri (KPI), limit eşikleri, izleme dönemleri ve sorumlu birim haritası (${MODULE_TERMS.risk.evren}).`}
                 actions={
-                    <Button variant="outline" size="sm" onClick={loadKpis} leftIcon={<RefreshCw size={14} />}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={loadKpis} />
                 }
             />
 

@@ -20,6 +20,7 @@ import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import { clsx } from 'clsx';
 import ConfirmModal from '@/components/ConfirmModal';
 
@@ -238,11 +239,13 @@ function MultiYearPlanPageContent() {
                                     {
                                         key: 'unit.name',
                                         header: 'Denetim Birimi',
+            sortable: true,
                                         render: (item: any) => <div className="cell-title">{item.unit?.name}</div>
                                     },
                                     {
                                         key: 'risk',
                                         header: 'Risk',
+            sortable: true,
                                         width: '120px',
                                         align: 'center',
                                         render: (item: any) => <StatusBadge value={item.unit?.riskLevel} type="risk" size="sm" />
@@ -250,6 +253,7 @@ function MultiYearPlanPageContent() {
                                     {
                                         key: 'year',
                                         header: 'Yıl',
+            sortable: true,
                                         width: '100px',
                                         align: 'center',
                                         render: (item: any) => <span className="text-sm font-black text-primary">{item.year}</span>
@@ -257,12 +261,14 @@ function MultiYearPlanPageContent() {
                                     {
                                         key: 'quarter',
                                         header: 'Çeyrek',
+            sortable: true,
                                         width: '100px',
                                         align: 'center'
                                     },
                                     {
                                         key: 'priority',
                                         header: 'Öncelik',
+            sortable: true,
                                         width: '120px',
                                         align: 'center',
                                         render: (item: any) => (
@@ -277,6 +283,7 @@ function MultiYearPlanPageContent() {
                                     {
                                         key: 'estimatedDays',
                                         header: 'Gün',
+            sortable: true,
                                         width: '80px',
                                         align: 'right',
                                         render: (item: any) => <span className="font-mono font-bold text-slate-700">{item.estimatedDays}</span>

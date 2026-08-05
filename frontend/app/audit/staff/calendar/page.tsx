@@ -8,6 +8,7 @@ import PageHeader from '@/components/ui/PageHeader';
 import EmptyState from '@/components/ui/EmptyState';
 import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import PageToolbar from '@/components/ui/PageToolbar';
 import StatCard from '@/components/ui/StatCard';
 import Badge from '@/components/ui/Badge';

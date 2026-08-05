@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -196,26 +197,31 @@ function RiskUnitAlertsContent() {
         {
             key: 'risk_seviyesi',
             header: 'Risk Seviyesi',
+            sortable: true,
             render: (row: any) => <StatusBadge type="risk" value={row.risk_seviyesi} />
         },
         {
             key: 'durum',
             header: 'Durum',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.durum} />
         },
         {
             key: 'birimYaniti',
             header: 'Birim Yanıtı',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.birimYaniti || 'BEKLEMEDE'} />
         },
         {
             key: 'tarih',
             header: 'Tarih',
+            sortable: true,
             render: (row: any) => <DateDisplay date={row.tarih || row.created_at} />
         },
         {
             key: 'actions',
             header: 'İşlemler',
+            sortable: true,
             render: (row: any) => (
                 <TableActions
                     items={[
@@ -241,9 +247,7 @@ function RiskUnitAlertsContent() {
                 title="Birim Risk Limit Aşımları & Yanıt Yönetimi"
                 subtitle={`Biriminizle ilgili bildirilen risk gösterge ihlalleri, mutabakat yanıtları ve aksiyon planları (${MODULE_TERMS.risk.birimKisa}).`}
                 actions={
-                    <Button variant="outline" size="sm" onClick={loadAlerts} leftIcon={<RefreshCw size={14} />}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={loadAlerts} />
                 }
             />
 

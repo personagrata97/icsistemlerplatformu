@@ -20,7 +20,7 @@ import { useToast } from '@/components/Toast';
 import { BackButton } from '@/components/ui/BackButton';
 import Button from '@/components/ui/Button';
 
-// Fotoğraf URL yardımcısı
+// Foto¦şraf URL yard¦-mc¦-s¦-
 const getPhotoUrl = (url?: string) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
@@ -61,10 +61,10 @@ function StaffProfilePageContent() {
             const data = await auditApi.getStaffProfile(id as string);
             setStaff(data);
         } catch (error: any) {
-            console.error('Personel profili yükleme hatası:', error);
+            console.error('Personel profili y+-kleme hatas¦-:', error);
             const errorMessage = error.message === 'Failed to fetch'
-                ? 'Sunucuya erişilemiyor. Lütfen internet bağlantınızı kontrol ediniz.'
-                : 'Personel profili yüklenirken bir hata oluştu.';
+                ? 'Sunucuya eri+şilemiyor. L+-tfen internet ba¦şlant¦-n¦-z¦- kontrol ediniz.'
+                : 'Personel profili y+-klenirken bir hata olu+ştu.';
             setError(errorMessage);
             showToast(errorMessage, 'error');
         } finally {
@@ -78,25 +78,25 @@ function StaffProfilePageContent() {
         }, 300);
     };
 
-    if (loading) return <LoadingState message="Özgeçmiş Hazırlanıyor..." />;
+    if (loading) return <LoadingState message="+ûzge+ğmi+ş Haz¦-rlan¦-yor..." />;
 
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-8">
-            <PageHeader title="Müfettiş Özgeçmişi" subtitle="Müfettiş mesleki deneyim ve eğitim ayrıntıları" />
+            <PageHeader title="M+-fetti+ş +ûzge+ğmi+şi" subtitle="M+-fetti+ş mesleki deneyim ve e¦şitim ayr¦-nt¦-lar¦-" />
                 <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
                     <AlertCircle size={32} className="text-red-500" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Hata Oluştu</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Hata Olu+ştu</h3>
                 <p className="text-gray-500 mb-6 max-w-md">{error}</p>
                 <Button onClick={() => router.back()} variant="secondary">
-                    Geri Dön
+                    Geri D+Ân
                 </Button>
             </div>
         );
     }
 
-    if (!staff) return <div className="p-10 text-center text-gray-500">Personel bulunamadı.</div>;
+    if (!staff) return <div className="p-10 text-center text-gray-500">Personel bulunamad¦-.</div>;
 
     const experiences = [...(staff.experiences || [])].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
     const education = [...(staff.education || [])].sort((a, b) => (Number(b.graduationYear) || 0) - (Number(a.graduationYear) || 0));
@@ -104,33 +104,33 @@ function StaffProfilePageContent() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20 print:bg-white print:pb-0 print:min-h-0 overflow-x-hidden">
-            {/* Üst Eylem Çubuğu - Yazdırmada Gizli */}
+            {/* +£st Eylem +çubu¦şu - Yazd¦-rmada Gizli */}
             <div className="bg-white border-b sticky top-0 z-30 print:hidden shadow-sm">
                 <div className="max-w-4xl mx-auto px-4 h-12 flex items-center justify-between">
-                    <BackButton href="/audit/staff" label="Personel Listesine Dön" />
+                    <BackButton href="/audit/staff" label="Personel Listesine D+Ân" />
                     <div className="flex items-center gap-3">
                         <div className="hidden md:flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full mr-2">
                             <AlertCircle size={14} />
-                            <span>Bilgileri düzenlemek için Personel Listesi üzerinden "Düzenle" butonunu kullanınız.</span>
+                            <span>Bilgileri d+-zenlemek i+ğin Personel Listesi +-zerinden "D+-zenle" butonunu kullan¦-n¦-z.</span>
                         </div>
                         <Button
                             onClick={handlePrint}
                             variant="primary"
                             leftIcon={<Printer size={18} />}
                         >
-                            Yazdır / PDF
+                            Yazd¦-r / PDF
                         </Button>
                     </div>
                 </div>
             </div>
 
-            {/* Özgeçmiş İçeriği */}
+            {/* +ûzge+ğmi+ş ¦-+ğeri¦şi */}
             <div className="max-w-4xl mx-auto mt-2 bg-white shadow-sm border border-gray-200 rounded-lg min-h-[900px] overflow-hidden print-layout-enforcer">
 
-                {/* Yazdırma Üst Boşluk */}
+                {/* Yazd¦-rma +£st Bo+şluk */}
                 <div className="print:h-[2mm] hidden print:block"></div>
 
-                {/* Başlık Bölümü */}
+                {/* Ba+şl¦-k B+Âl+-m+- */}
                 <div className="p-5 border-b border-gray-100 flex flex-col md:flex-row gap-5 items-center w-full force-print-row">
                     <div className="shrink-0 relative">
                         {staff.photoUrl ? (
@@ -144,14 +144,14 @@ function StaffProfilePageContent() {
                                 <Users size={56} />
                             </div>
                         )}
-                        {/* Rozet kaldırıldı */}
+                        {/* Rozet kald¦-r¦-ld¦- */}
                     </div>
 
                     <div className="flex-1 flex flex-col justify-center gap-2 pt-0.5">
                         <div>
-                            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight leading-none">
-                                {String(staff.firstName || '')} <span className="text-gray-900">{/* Soyisim rengi düzeltildi */}{String(staff.lastName || '')}</span>
-                            </h1>
+                            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight leading-none">
+                                {String(staff.firstName || '')} <span className="text-gray-900">{/* Soyisim rengi d+-zeltildi */}{String(staff.lastName || '')}</span>
+                            </h2>
                             <div className="flex items-center gap-2 mt-1.5">
                                 <span className="px-2 py-0.5 bg-primary text-white text-[11px] font-bold rounded-md uppercase tracking-wider">
                                     {String(staff.title || '')}
@@ -176,13 +176,13 @@ function StaffProfilePageContent() {
                     </div>
                 </div>
 
-                {/* Özet Bölümü */}
+                {/* +ûzet B+Âl+-m+- */}
                 {staff.summary && (
                     <div className="px-5 py-4 bg-slate-50/30">
                         <section>
                             <h2 className="text-[13px] font-bold text-gray-900 flex items-center gap-1.5 mb-1.5 uppercase tracking-[0.2em]">
                                 <span className="w-6 h-[2px] bg-primary"></span>
-                                ÖZET
+                                +ûZET
                             </h2>
                             <p className="text-[13px] text-gray-600 leading-relaxed font-medium text-justify">
                                 {String(staff.summary || '')}
@@ -191,38 +191,38 @@ function StaffProfilePageContent() {
                     </div>
                 )}
 
-                {/* Ana İçerik: İki Sütun */}
+                {/* Ana ¦-+ğerik: ¦-ki S+-tun */}
                 <div className="flex flex-col lg:flex-row print:flex-row print:flex-nowrap min-h-[500px] print-row">
 
-                    {/* Sol Sütun (Deneyimler) */}
+                    {/* Sol S+-tun (Deneyimler) */}
                     <div className="flex-1 p-5 space-y-4 border-r border-gray-100 print-left-col">
 
-                        {/* Deneyim Bölümü */}
+                        {/* Deneyim B+Âl+-m+- */}
                         <section className="space-y-5">
                             <h2 className="text-[13px] font-black text-gray-900 flex items-center gap-1.5 mb-2.5 uppercase tracking-[0.2em]">
                                 <span className="w-2 h-2 bg-primary rounded-full"></span>
-                                İŞ DENEYİMİ
+                                ¦-+Ş DENEY¦-M¦-
                             </h2>
 
                             <div className="space-y-6 relative">
                                 <div className="absolute left-[7px] top-2 bottom-2 w-[1px] bg-gray-100"></div>
 
-                                {/* Kurum İçi Pozisyon */}
+                                {/* Kurum ¦-+ği Pozisyon */}
                                 <div className="relative pl-7 group">
                                     <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-primary border-4 border-blue-50 z-10"></div>
                                     <div className="mb-1.5">
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <h3 className="font-bold text-gray-900 text-[14px]">Emlak Katılım Tasarruf Finansman AŞ</h3>
+                                                <h3 className="font-bold text-gray-900 text-[14px]">Emlak Kat¦-l¦-m Tasarruf Finansman A+Ş</h3>
                                                 <div className="text-[13px] font-bold text-gray-600 mt-0.5">
                                                     <span className="text-primary">{String(staff.title || '')}</span>
-                                                    <span className="text-gray-400 font-normal mx-1.5">•</span>
-                                                    <span className="text-gray-500 font-medium italic">Teftiş Kurulu</span>
+                                                    <span className="text-gray-400 font-normal mx-1.5">ÔÇó</span>
+                                                    <span className="text-gray-500 font-medium italic">Tefti+ş Kurulu</span>
                                                 </div>
                                             </div>
                                             <div className="text-right">
                                                 <span className="text-[12px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded-md block">
-                                                    {formatDate(staff.hireDate)} - Günümüz
+                                                    {formatDate(staff.hireDate)} - G+-n+-m+-z
                                                 </span>
                                                 {(() => {
                                                     const start = new Date(staff.hireDate);
@@ -231,7 +231,7 @@ function StaffProfilePageContent() {
                                                     if (months < 0) months = 0;
                                                     const years = Math.floor(months / 12);
                                                     const remainingMonths = months % 12;
-                                                    const durationStr = `${years > 0 ? `${years} Yıl ` : ''}${remainingMonths} Ay`;
+                                                    const durationStr = `${years > 0 ? `${years} Y¦-l ` : ''}${remainingMonths} Ay`;
                                                     return (
                                                         <span className="text-[11px] text-gray-400 font-medium block mt-0.5 pr-1">
                                                             ({durationStr})
@@ -258,14 +258,14 @@ function StaffProfilePageContent() {
                                                     <h3 className="font-bold text-gray-900 text-[14px]">{String(exp.companyName || '')}</h3>
                                                     <div className="text-[13px] font-bold text-gray-600 mt-0.5">
                                                         <span className="text-primary">{String(exp.position || '')}</span>
-                                                        {exp.department && <span className="text-gray-400 font-normal mx-1.5">•</span>}
+                                                        {exp.department && <span className="text-gray-400 font-normal mx-1.5">ÔÇó</span>}
                                                         {/* Birim italic */}
                                                         <span className="text-gray-500 font-medium italic">{String(exp.department || '')}</span>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
                                                     <span className="text-[12px] font-bold text-gray-400 whitespace-nowrap block">
-                                                        {formatDate(exp.startDate)} - {exp.isCurrent ? 'Günümüz' : formatDate(exp.endDate)}
+                                                        {formatDate(exp.startDate)} - {exp.isCurrent ? 'G+-n+-m+-z' : formatDate(exp.endDate)}
                                                     </span>
                                                     {(() => {
                                                         const start = new Date(exp.startDate);
@@ -274,7 +274,7 @@ function StaffProfilePageContent() {
                                                         if (months < 0) months = 0;
                                                         const years = Math.floor(months / 12);
                                                         const remainingMonths = months % 12;
-                                                        const durationStr = `${years > 0 ? `${years} Yıl ` : ''}${remainingMonths} Ay`;
+                                                        const durationStr = `${years > 0 ? `${years} Y¦-l ` : ''}${remainingMonths} Ay`;
                                                         return (
                                                             <span className="text-[11px] text-gray-300 font-medium block mt-0.5">
                                                                 ({durationStr})
@@ -289,7 +289,7 @@ function StaffProfilePageContent() {
                                                 <div className="mt-2 mb-1.5 ml-1 border-l-2 border-dashed border-gray-100 pl-2.5 space-y-1">
                                                     {exp.careerPaths.split('\n').filter((l: string) => l.trim() && l.trim() !== '[]').map((line: string, idx: number) => {
                                                         const trimmed = line.trim();
-                                                        const dateMatch = trimmed.match(/^(\d{2}\.\d{2}\.\d{4}[-–]\d{2}\.\d{2}\.\d{4})\s+(.+)$/);
+                                                        const dateMatch = trimmed.match(/^(\d{2}\.\d{2}\.\d{4}[-ÔÇô]\d{2}\.\d{2}\.\d{4})\s+(.+)$/);
                                                         if (dateMatch) {
                                                             return (
                                                                 <div key={idx} className="flex items-start gap-2">
@@ -325,14 +325,14 @@ function StaffProfilePageContent() {
                         </section>
                     </div>
 
-                    {/* Sağ Sütun (Kenar Çubuğu) */}
+                    {/* Sa¦ş S+-tun (Kenar +çubu¦şu) */}
                     <div className="w-full lg:w-1/3 bg-slate-50/40 p-5 space-y-5 shrink-0 print-right-col">
 
-                        {/* Eğitim Bölümü */}
+                        {/* E¦şitim B+Âl+-m+- */}
                         <section className="print-avoid-break education-section" id="education-section">
                             <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                                 <BookOpen size={12} className="text-primary" />
-                                EĞİTİM BİLGİLERİ
+                                E¦Ş¦-T¦-M B¦-LG¦-LER¦-
                             </h2>
                             <div className="space-y-2">
                                 {education.length > 0 ? education.map((edu: any, index: number) => (
@@ -352,12 +352,12 @@ function StaffProfilePageContent() {
                                         </div>
                                     </div>
                                 )) : (
-                                    <p className="text-[12px] text-gray-400 italic">Eğitim bilgisi bulunamadı.</p>
+                                    <p className="text-[12px] text-gray-400 italic">E¦şitim bilgisi bulunamad¦-.</p>
                                 )}
                             </div>
                         </section>
 
-                        {/* Yetenekler Bölümü */}
+                        {/* Yetenekler B+Âl+-m+- */}
                         {staff.skills && staff.skills.trim() && (
                             <section className="print-avoid-break">
                                 <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-widest mb-3 flex items-center gap-1.5">
@@ -394,14 +394,14 @@ function StaffProfilePageContent() {
                             </section>
                         )}
 
-                        {/* Mesleki Eğitimler */}
+                        {/* Mesleki E¦şitimler */}
                         <section className="print-avoid-break mt-3">
                             <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
                                 <BookOpen size={12} className="text-primary" />
-                                MESLEKİ EĞİTİMLER
+                                MESLEK¦- E¦Ş¦-T¦-MLER
                             </h2>
                             <ul className="space-y-1.5">
-                                {/* 1. Sistemden Gelen Eğitimler (AuditEducation) */}
+                                {/* 1. Sistemden Gelen E¦şitimler (AuditEducation) */}
                                 {staff.trainings && Array.isArray(staff.trainings) && staff.trainings.map((t: any, i: number) => (
                                     <li key={`auto-${i}`} className="flex flex-col gap-0.5 text-[13px]">
                                         <div className="font-bold text-gray-900">{String(t.title || '')}</div>
@@ -411,12 +411,12 @@ function StaffProfilePageContent() {
                                                 try {
                                                     if (!t.date) return null;
                                                     let dateStr = t.date;
-                                                    // YYYY-MM-DD formatını kontrol et
+                                                    // YYYY-MM-DD format¦-n¦- kontrol et
                                                     if (typeof t.date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(t.date)) {
                                                         const [y, m, d] = t.date.split('T')[0].split('-');
                                                         dateStr = `${d.trim()}.${m.trim()}.${y.trim()}`;
                                                     } else {
-                                                        // Date nesnesiyle geri dönüş
+                                                        // Date nesnesiyle geri d+Ân+-+ş
                                                         const d = new Date(t.date);
                                                         if (!isNaN(d.getTime())) dateStr = d.toLocaleDateString('tr-TR');
                                                     }
@@ -437,7 +437,7 @@ function StaffProfilePageContent() {
                             </ul>
                         </section>
 
-                        {/* Sertifikalar Bölümü */}
+                        {/* Sertifikalar B+Âl+-m+- */}
                         {
                             (() => {
                                 let certs: string[] = [];
@@ -464,7 +464,7 @@ function StaffProfilePageContent() {
                                     <section className="print-avoid-break">
                                         <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                                             <Award size={12} className="text-primary" />
-                                            SERTİFİKALAR
+                                            SERT¦-F¦-KALAR
                                         </h2>
                                         <ul className="space-y-2">
                                             {certs.map((cert, i) => (
@@ -481,13 +481,13 @@ function StaffProfilePageContent() {
                             })()
                         }
 
-                        {/* Terfi Bölümü */}
+                        {/* Terfi B+Âl+-m+- */}
                         {
                             promotions.length > 0 && (
                                 <section className="print-avoid-break">
                                     <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                                         <Shield size={12} className="text-primary" />
-                                        TERFİ VE KARİYER
+                                        TERF¦- VE KAR¦-YER
                                     </h2>
                                     <div className="space-y-4 relative ml-1">
                                         <div className="absolute left-[5px] top-2 bottom-2 w-[1px] bg-gray-200"></div>
@@ -508,13 +508,13 @@ function StaffProfilePageContent() {
                     </div>
                 </div>
 
-                {/* Alt Bilgi - Yazdırma İçin Optimize */}
+                {/* Alt Bilgi - Yazd¦-rma ¦-+ğin Optimize */}
                 <div className="p-4 bg-gray-50 border-t border-gray-100 text-center print-footer print:bg-white print:fixed print:bottom-0 print:left-0 print:right-0 print:z-[1000] print:py-3">
                     <div className="flex flex-col gap-1 px-5">
                         <p className="text-[11px] text-gray-500 italic leading-relaxed font-medium print:text-black flex items-center justify-center gap-1 flex-wrap">
-                            <span>Bu belge, İç Sistemler Platformu - Teftiş Kurulu Modülü üzerinden, {creationReason ? `"${String(creationReason)}"` : 'Yasal Mevzuat ve Kurumsal Denetim hazırlığı'} nedeniyle {String(user?.displayName || user?.username || 'Sistem Yönetici')} tarafından</span>
+                            <span>Bu belge, ¦-+ğ Sistemler Platformu - Tefti+ş Kurulu Mod+-l+- +-zerinden, {creationReason ? `"${String(creationReason)}"` : 'Yasal Mevzuat ve Kurumsal Denetim haz¦-rl¦-¦ş¦-'} nedeniyle {String(user?.displayName || user?.username || 'Sistem Y+Ânetici')} taraf¦-ndan</span>
                             <DateDisplay value={new Date()} format="datetime" className="italic font-bold" />
-                            <span>tarihinde oluşturulmuştur.</span>
+                            <span>tarihinde olu+şturulmu+ştur.</span>
                         </p>
                         <div className="flex justify-between items-center text-[10px] text-gray-400 font-mono mt-2 border-t border-gray-100 pt-1.5 print:border-gray-200">
                             <span className="hidden print:block">{currentUrl}</span>
@@ -526,7 +526,7 @@ function StaffProfilePageContent() {
 
             <style jsx global>{`
                 @media print {
-                    /* Sayfa Ayarı */
+                    /* Sayfa Ayar¦- */
                     @page {
                         margin-top: 0mm;
                         margin-bottom: 20mm;
@@ -535,12 +535,12 @@ function StaffProfilePageContent() {
                         size: A4;
                     }
 
-                    /* Kaydırma Çubuğu Gizle */
+                    /* Kayd¦-rma +çubu¦şu Gizle */
                     ::-webkit-scrollbar {
                         display: none;
                     }
 
-                    /* Genel Yazdırma Stilleri */
+                    /* Genel Yazd¦-rma Stilleri */
                     html, body {
                         width: 100% !important;
                         height: 100% !important;
@@ -556,9 +556,9 @@ function StaffProfilePageContent() {
                         box-sizing: border-box !important;
                     }
 
-                    /* Yüksek Kalite Kapsayıcı */
+                    /* Y+-ksek Kalite Kapsay¦-c¦- */
                     .print-layout-enforcer {
-                        padding: 10mm !important; /* Güvenli boşluk */
+                        padding: 10mm !important; /* G+-venli bo+şluk */
                         margin: 0 !important;
                         width: 100% !important;
                         max-width: none !important;
@@ -569,26 +569,26 @@ function StaffProfilePageContent() {
                         box-shadow: none !important;
                         background: white !important;
                         display: block !important;
-                        min-height: 100% !important; /* Tam sayfa yüksekliği */
+                        min-height: 100% !important; /* Tam sayfa y+-ksekli¦şi */
                         height: auto !important;
                         transform: none !important;
                     }
 
-                    /* Düzen Sütunları - Boyut Zorla */
+                    /* D+-zen S+-tunlar¦- - Boyut Zorla */
                     .print-left-col {
                         width: 65% !important;
                         flex: none !important;
-                        padding-right: 2rem !important; /* Ayırmayı sağla */
+                        padding-right: 2rem !important; /* Ay¦-rmay¦- sa¦şla */
                         border-right: 1px solid #f3f4f6 !important;
                     }
                     .print-right-col {
                         width: 35% !important;
                         flex: none !important;
                         padding-left: 2rem !important;
-                        background-color: #f8fafc !important; /* bg-slate-50/40 karşılığı */
+                        background-color: #f8fafc !important; /* bg-slate-50/40 kar+ş¦-l¦-¦ş¦- */
                     }
                     
-                    /* İç öğeler için kenar/dolgu sıfırlama */
+                    /* ¦-+ğ +Â¦şeler i+ğin kenar/dolgu s¦-f¦-rlama */
                     .print-row {
                         display: flex !important;
                         flex-direction: row !important;
@@ -596,7 +596,7 @@ function StaffProfilePageContent() {
                         margin: 0 !important;
                     }
 
-                    /* Sütun ve Düzen Koruma */
+                    /* S+-tun ve D+-zen Koruma */
                     .print\:hidden, .sticky, button, header, nav {
                         display: none !important;
                     }
@@ -614,7 +614,7 @@ function StaffProfilePageContent() {
                         border-radius: 0.75rem !important;
                     }
 
-                    /* Sayfa Sonu Yönetimi */
+                    /* Sayfa Sonu Y+Ânetimi */
                     .print-avoid-break {
                         break-inside: avoid !important;
                         page-break-inside: avoid !important;
@@ -624,7 +624,7 @@ function StaffProfilePageContent() {
                         margin-bottom: 6mm !important;
                     }
 
-                    /* Yazdırma Alt Bilgisi */
+                    /* Yazd¦-rma Alt Bilgisi */
                     .print-footer {
                         position: fixed !important;
                         bottom: 0 !important;
@@ -636,7 +636,7 @@ function StaffProfilePageContent() {
                         padding: 4mm !important;
                     }
                     
-                    /* Başlık Satırını Zorla */
+                    /* Ba+şl¦-k Sat¦-r¦-n¦- Zorla */
                     .force-print-row {
                         display: flex !important;
                         flex-direction: row !important;
@@ -644,7 +644,7 @@ function StaffProfilePageContent() {
                         gap: 2rem !important;
                     }
                     
-                    /* Metin Görünürlüğünü Zorla */
+                    /* Metin G+Âr+-n+-rl+-¦ş+-n+- Zorla */
                     #education-section, .education-section {
                         display: block !important;
                         visibility: visible !important;

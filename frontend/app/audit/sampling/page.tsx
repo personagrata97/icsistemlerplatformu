@@ -24,6 +24,7 @@ import LoadingState from '@/components/ui/LoadingState';
 import TableActions from '@/components/ui/TableActions';
 import EmptyState from '@/components/ui/EmptyState';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import PageToolbar from '@/components/ui/PageToolbar';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import { clsx } from 'clsx';

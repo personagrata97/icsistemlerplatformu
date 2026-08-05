@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -240,6 +241,7 @@ function RiskAlertsContent() {
         {
             key: 'birimId',
             header: 'Sorumlu Birim',
+            sortable: true,
             render: (row: any) => (
                 <span className="text-xs font-medium text-slate-700">{row.birimId || 'Atanmadı'}</span>
             )
@@ -247,21 +249,25 @@ function RiskAlertsContent() {
         {
             key: 'risk_seviyesi',
             header: 'Risk Seviyesi',
+            sortable: true,
             render: (row: any) => <StatusBadge type="risk" value={row.risk_seviyesi} />
         },
         {
             key: 'durum',
             header: 'İş Akış Durumu',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.durum} />
         },
         {
             key: 'birimYaniti',
             header: 'Birim Yanıtı',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.birimYaniti || 'BEKLEMEDE'} />
         },
         {
             key: 'actions',
             header: 'İşlemler',
+            sortable: true,
             render: (row: any) => (
                 <TableActions
                     items={[
@@ -292,9 +298,7 @@ function RiskAlertsContent() {
                 title="Risk Limit Aşımları & Akış Yönetimi"
                 subtitle={`Risk göstergelerinde oluşan limit aşımlarının birimlere atanması, mutabakat yanıtları, aksiyon ve kanıt takibi (${MODULE_TERMS.risk.birimKisa}).`}
                 actions={
-                    <Button variant="outline" size="sm" onClick={loadAlerts} leftIcon={<RefreshCw size={14} />}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={loadAlerts} />
                 }
             />
 

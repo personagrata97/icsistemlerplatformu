@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -193,26 +194,31 @@ function ControlUnitDeficienciesContent() {
         {
             key: 'severity',
             header: 'Önem Düzeyi',
+            sortable: true,
             render: (row: any) => <StatusBadge type="risk" value={row.severity} />
         },
         {
             key: 'status',
             header: 'Durum',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.status} />
         },
         {
             key: 'unitResponse',
             header: 'Birim Yanıtı',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.unitResponse || 'BEKLEMEDE'} />
         },
         {
             key: 'dueDate',
             header: 'Termin Tarihi',
+            sortable: true,
             render: (row: any) => row.dueDate ? <DateDisplay date={row.dueDate} /> : <span className="text-slate-400 font-mono text-xs">-</span>
         },
         {
             key: 'actions',
             header: 'İşlemler',
+            sortable: true,
             render: (row: any) => (
                 <TableActions
                     items={[
@@ -238,9 +244,7 @@ function ControlUnitDeficienciesContent() {
                 title="Birim Kontrol Eksiklikleri & Aksiyon Yönetimi"
                 subtitle="Biriminizle ilgili tebliğ edilen kontrol eksiklikleri, mutabakat bildirimleri, aksiyon planları ve kanıt belgeleri."
                 actions={
-                    <Button variant="outline" size="sm" onClick={loadDeficiencies} leftIcon={<RefreshCw size={14} />}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={loadDeficiencies} />
                 }
             />
 

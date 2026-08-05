@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -92,21 +93,25 @@ function ControlUnitDashboardContent() {
         {
             key: 'severity',
             header: 'Önem Düzeyi',
+            sortable: true,
             render: (row: any) => <StatusBadge type="risk" value={row.severity} />
         },
         {
             key: 'status',
             header: 'İş Akış Durumu',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.status} />
         },
         {
             key: 'unitResponse',
             header: 'Birim Yanıtı',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.unitResponse || 'BEKLEMEDE'} />
         },
         {
             key: 'actions',
             header: 'İşlem',
+            sortable: true,
             render: (row: any) => (
                 <TableActions
                     items={[
@@ -171,9 +176,7 @@ function ControlUnitDashboardContent() {
                     <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
                         Son Tebliğ Edilen Kontrol Eksiklikleri ({deficiencies.length})
                     </h3>
-                    <Button variant="ghost" size="sm" onClick={loadData} leftIcon={<RefreshCw size={14} />}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={loadData} />
                 </div>
 
                 {deficiencies.length === 0 && !loading ? (

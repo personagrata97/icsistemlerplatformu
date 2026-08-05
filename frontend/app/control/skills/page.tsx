@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import EmptyState from '@/components/ui/EmptyState';
 import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import StatCard from '@/components/ui/StatCard';
 import PageToolbar from '@/components/ui/PageToolbar';
 import Button from '@/components/ui/Button';

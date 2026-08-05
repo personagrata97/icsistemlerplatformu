@@ -8,6 +8,7 @@ import PageToolbar from '@/components/ui/PageToolbar';
 import EmptyState from '@/components/ui/EmptyState';
 import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import CodeBadge from '@/components/ui/CodeBadge';
 import { BookOpen, FileText, Scale, ShieldAlert } from 'lucide-react';
 import RequireRole from '@/components/auth/RequireRole';
@@ -45,10 +46,14 @@ function RiskKnowledgeBasePageContent() {
 
             <DataTable
                 columns={[
-                    { key: 'id', header: 'DOKÜMAN KODU', width: '150px', render: (item: any) => <CodeBadge code={item.id} /> },
-                    { key: 'title', header: 'DOKÜMAN BAŞLIĞI', render: (item: any) => <span className="font-bold text-gray-900">{item.title}</span> },
-                    { key: 'category', header: 'KATEGORİ', width: '180px' },
-                    { key: 'year', header: 'YIL', width: '100px' }
+                    { key: 'id', header: 'DOKÜMAN KODU',
+            sortable: true, width: '150px', render: (item: any) => <CodeBadge code={item.id} /> },
+                    { key: 'title', header: 'DOKÜMAN BAŞLIĞI',
+            sortable: true, render: (item: any) => <span className="font-bold text-gray-900">{item.title}</span> },
+                    { key: 'category', header: 'KATEGORİ',
+            sortable: true, width: '180px' },
+                    { key: 'year', header: 'YIL',
+            sortable: true, width: '100px' }
                 ]}
                 data={filtered}
                 searchTerm={searchTerm}

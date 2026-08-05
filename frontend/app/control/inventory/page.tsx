@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 import PageHeader from '@/components/ui/PageHeader';
 
 import React, { useState, useEffect } from 'react';
@@ -8,6 +9,7 @@ import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
 import EmptyState from '@/components/ui/EmptyState';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import StatusBadge from '@/components/ui/StatusBadge';
 import CodeBadge from '@/components/ui/CodeBadge';
 import Button from '@/components/ui/Button';
@@ -156,9 +158,7 @@ function ControlInventoryPageContent() {
                 }
                 rightActions={
                     <div className="flex items-center gap-2">
-                        <Button variant="secondary" leftIcon={<RefreshCw size={14} />} onClick={loadControls} isLoading={loading}>
-                            Yenile
-                        </Button>
+                        <RefreshButton onClick={loadControls} />
                         <Button variant="primary" leftIcon={<Plus size={16} />} onClick={() => setIsAddModalOpen(true)}>
                             Yeni Kontrol Tanımla
                         </Button>

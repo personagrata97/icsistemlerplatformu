@@ -96,6 +96,7 @@ function RiskLogsPageContent() {
                     {
                         key: 'date',
                         header: 'Tarih / Saat',
+            sortable: true,
                         width: '200px',
                         align: 'center',
                         render: (log: any) => (
@@ -111,6 +112,7 @@ function RiskLogsPageContent() {
                     {
                         key: 'action',
                         header: 'İşlem Tipi',
+            sortable: true,
                         width: '200px',
                         render: (log: any) => (
                             <div className="flex items-center gap-2">
@@ -124,6 +126,7 @@ function RiskLogsPageContent() {
                     {
                         key: 'description',
                         header: 'Açıklama',
+            sortable: true,
                         render: (log: any) => (
                             <div className="line-clamp-1 text-slate-600 font-medium text-sm">
                                 {log.description}
@@ -133,6 +136,7 @@ function RiskLogsPageContent() {
                     {
                         key: 'user',
                         header: 'Kullanıcı',
+            sortable: true,
                         width: '180px',
                         align: 'center',
                         render: (log: any) => {
@@ -150,6 +154,7 @@ function RiskLogsPageContent() {
                     {
                         key: 'actions',
                         header: 'İşlemler',
+            sortable: true,
                         width: '100px',
                         align: 'center',
                         render: (log: any) => (

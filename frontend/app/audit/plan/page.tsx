@@ -22,6 +22,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import EmptyState from '@/components/ui/EmptyState';
 import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Modal from '@/components/ui/Modal';
 import CodeBadge from '@/components/ui/CodeBadge';
@@ -416,6 +417,7 @@ function AuditPlanPageContent() {
                     {
                         key: 'planType',
                         header: 'Plan Türü',
+            sortable: true,
                         width: '160px',
                         render: (plan: any) => (
                             <CodeBadge code={plan.planType} size="sm" variant="secondary" />
@@ -424,6 +426,7 @@ function AuditPlanPageContent() {
                     {
                         key: 'title',
                         header: 'Plan Başlığı',
+            sortable: true,
                         render: (plan: any) => (
                             <div className="flex flex-col gap-0.5">
                                 <div className="cell-title">{plan.title}</div>
@@ -434,6 +437,7 @@ function AuditPlanPageContent() {
                     {
                         key: 'status',
                         header: 'Durum',
+            sortable: true,
                         width: '150px',
                         align: 'center',
                         render: (plan: any) => (
@@ -443,6 +447,7 @@ function AuditPlanPageContent() {
                     {
                         key: 'createdAt',
                         header: 'Oluşturulma',
+            sortable: true,
                         width: '180px',
                         align: 'center',
                         type: 'datetime'
@@ -450,6 +455,7 @@ function AuditPlanPageContent() {
                     {
                         key: 'actions',
                         header: 'İşlemler',
+            sortable: true,
                         width: '120px',
                         align: 'center',
                         render: (plan: any) => {

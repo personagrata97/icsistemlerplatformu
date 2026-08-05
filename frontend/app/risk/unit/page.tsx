@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -87,21 +88,25 @@ function RiskUnitDashboardContent() {
         {
             key: 'risk_seviyesi',
             header: 'Risk Seviyesi',
+            sortable: true,
             render: (row: any) => <StatusBadge type="risk" value={row.risk_seviyesi} />
         },
         {
             key: 'durum',
             header: 'Durum',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.durum} />
         },
         {
             key: 'birimYaniti',
             header: 'Birim Yanıtı',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.birimYaniti || 'BEKLEMEDE'} />
         },
         {
             key: 'actions',
             header: 'İşlem',
+            sortable: true,
             render: (row: any) => (
                 <TableActions
                     items={[
@@ -166,9 +171,7 @@ function RiskUnitDashboardContent() {
                     <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
                         Son Bildirilen Limit Aşımları ({alerts.length})
                     </h3>
-                    <Button variant="ghost" size="sm" onClick={loadData} leftIcon={<RefreshCw size={14} />}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={loadData} />
                 </div>
 
                 {alerts.length === 0 && !loading ? (

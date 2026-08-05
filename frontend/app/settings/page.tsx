@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Users, Save, Plus, ChevronRight, Trash2, RotateCcw, Clock, AlertTriangle } from 'lucide-react';
 import EmptyState from '@/components/ui/EmptyState';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import { clsx } from 'clsx';
 import Switch from '@/components/ui/Switch';
 import Button from '@/components/ui/Button';

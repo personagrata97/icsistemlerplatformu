@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect, useMemo } from 'react';
 import {
     Shield, CheckCircle, AlertTriangle, BarChart3, Calendar,
@@ -817,34 +816,42 @@ function QualityAssurancePageContent() {
                     <DataTable
                         columns={[
                             {
-                                key: 'type', header: 'Tür', width: '150px',
+                                key: 'type', header: 'Tür',
+            sortable: true, width: '150px',
                                 render: (a: any) => (
                                     <span className={clsx("text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border",
                                         a.type === 'İç' ? "bg-blue-50 text-blue-600 border-blue-100" : "bg-purple-50 text-purple-600 border-purple-100"
                                     )}>{a.type} Değerlendirme</span>
                                 )
                             },
-                            { key: 'date', header: 'Tarih', width: '150px', align: 'center', type: 'date' },
-                            { key: 'assessor', header: 'Değerlendirici', render: (a: any) => <div className="cell-title">{a.assessor}</div> },
+                            { key: 'date', header: 'Tarih',
+            sortable: true, width: '150px', align: 'center', type: 'date' },
+                            { key: 'assessor', header: 'Değerlendirici',
+            sortable: true, render: (a: any) => <div className="cell-title">{a.assessor}</div> },
                             {
-                                key: 'result', header: 'Sonuç', width: '150px', align: 'center',
+                                key: 'result', header: 'Sonuç',
+            sortable: true, width: '150px', align: 'center',
                                 render: (a: any) => <StatusBadge type="status" value={a.result} />
                             },
                             {
-                                key: 'score', header: 'Puan', width: '100px', align: 'center',
+                                key: 'score', header: 'Puan',
+            sortable: true, width: '100px', align: 'center',
                                 render: (a: any) => (
                                     <span className={clsx("text-sm font-black", a.score >= 90 ? "text-green-600" : a.score >= 70 ? "text-orange-500" : "text-red-500")}>
                                         %{a.score}
                                     </span>
                                 )
                             },
-                            { key: 'findings', header: 'Bulgular', render: (a: any) => <div className="text-xs text-slate-500 line-clamp-1 italic">{a.findings || '-'}</div> },
+                            { key: 'findings', header: 'Bulgular',
+            sortable: true, render: (a: any) => <div className="text-xs text-slate-500 line-clamp-1 italic">{a.findings || '-'}</div> },
                             {
-                                key: 'nextDueDate', header: 'Sonraki Planlanan', width: '150px', align: 'center',
+                                key: 'nextDueDate', header: 'Sonraki Planlanan',
+            sortable: true, width: '150px', align: 'center',
                                 render: (a: any) => a.nextDueDate ? <div className="cell-date justify-center opacity-70"><Calendar size={14} className="text-gray-400" />{formatDate(a.nextDueDate)}</div> : <span className="text-slate-300">-</span>
                             },
                             {
-                                key: 'actions_col', header: 'İşlemler', width: '140px', align: 'center',
+                                key: 'actions_col', header: 'İşlemler',
+            sortable: true, width: '140px', align: 'center',
                                 render: (a: any) => (
                                     <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
                                         <TableActions
@@ -879,10 +886,13 @@ function QualityAssurancePageContent() {
                     title="İyileştirme Planları"
                     description="Değerlendirmelerden kaynaklanan aksiyon ve iyileştirme planları takibi"
                     columns={[
-                        { key: 'title', header: 'Aksiyon Başlığı', render: (a: any) => <div className="cell-title">{a.title}</div> },
-                        { key: 'responsible', header: 'Sorumlu', width: '150px', render: (a: any) => <span className="text-sm text-gray-600">{a.responsible || '-'}</span> },
+                        { key: 'title', header: 'Aksiyon Başlığı',
+            sortable: true, render: (a: any) => <div className="cell-title">{a.title}</div> },
+                        { key: 'responsible', header: 'Sorumlu',
+            sortable: true, width: '150px', render: (a: any) => <span className="text-sm text-gray-600">{a.responsible || '-'}</span> },
                         {
-                            key: 'priority', header: 'Öncelik', width: '120px', align: 'center',
+                            key: 'priority', header: 'Öncelik',
+            sortable: true, width: '120px', align: 'center',
                             render: (a: any) => (
                                 <span className={clsx("text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border",
                                     a.priority === 'Yüksek' ? "bg-red-50 text-red-600 border-red-100" :
@@ -892,7 +902,8 @@ function QualityAssurancePageContent() {
                             )
                         },
                         {
-                            key: 'status', header: 'Durum', width: '140px', align: 'center',
+                            key: 'status', header: 'Durum',
+            sortable: true, width: '140px', align: 'center',
                             render: (a: any) => {
                                 const isOverdue = a.status !== 'Tamamlandı' && new Date(a.dueDate) < new Date();
                                 const displayStatus = isOverdue ? 'Gecikmiş' : a.status;
@@ -900,7 +911,8 @@ function QualityAssurancePageContent() {
                             }
                         },
                         {
-                            key: 'dueDate', header: 'Son Tarih', width: '140px', align: 'center',
+                            key: 'dueDate', header: 'Son Tarih',
+            sortable: true, width: '140px', align: 'center',
                             render: (a: any) => {
                                 const isOverdue = a.status !== 'Tamamlandı' && new Date(a.dueDate) < new Date();
                                 return a.dueDate ? (
@@ -912,13 +924,15 @@ function QualityAssurancePageContent() {
                             }
                         },
                         {
-                            key: 'assessment_ref', header: 'İlişkili Değerlendirme', width: '180px',
+                            key: 'assessment_ref', header: 'İlişkili Değerlendirme',
+            sortable: true, width: '180px',
                             render: (a: any) => a.assessment ? (
                                 <span className="text-xs text-slate-500">{a.assessment.type} - {formatDate(a.assessment.date)}</span>
                             ) : <span className="text-slate-300">-</span>
                         },
                         {
-                            key: 'actions_col', header: 'İşlemler', width: '140px', align: 'center',
+                            key: 'actions_col', header: 'İşlemler',
+            sortable: true, width: '140px', align: 'center',
                             render: (a: any) => (
                                 <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
                                     <TableActions

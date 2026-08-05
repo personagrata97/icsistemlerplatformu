@@ -14,6 +14,7 @@ import { useToast } from '@/components/Toast';
 import EmptyState from '@/components/ui/EmptyState';
 import Pagination from '@/components/ui/Pagination';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Link from 'next/link';
 import { sanctionApi } from '@/lib/sanction-api';

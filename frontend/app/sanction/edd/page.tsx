@@ -11,6 +11,7 @@ import FormInput from '@/components/ui/FormInput';
 import FormTextarea from '@/components/ui/FormTextarea';
 import PageToolbar from '@/components/ui/PageToolbar';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';

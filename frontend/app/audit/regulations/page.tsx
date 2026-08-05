@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
@@ -164,6 +163,7 @@ function CompanyDocumentManagementPage() {
         {
             key: 'kod',
             header: 'Doküman Kodu & Adı',
+            sortable: true,
             accessor: (row: any) => (
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -185,6 +185,7 @@ function CompanyDocumentManagementPage() {
         {
             key: 'tur',
             header: 'Tür',
+            sortable: true,
             accessor: (row: any) => (
                 <StatusBadge value={row.tur} type="status" />
             )
@@ -192,6 +193,7 @@ function CompanyDocumentManagementPage() {
         {
             key: 'versiyon',
             header: 'Versiyon',
+            sortable: true,
             accessor: (row: any) => (
                 <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-slate-700">
                     <Layers size={14} className="text-slate-400" />
@@ -202,6 +204,7 @@ function CompanyDocumentManagementPage() {
         {
             key: 'durum',
             header: 'Durum',
+            sortable: true,
             accessor: (row: any) => (
                 <StatusBadge value={row.durum} type="status" />
             )
@@ -209,6 +212,7 @@ function CompanyDocumentManagementPage() {
         {
             key: 'references',
             header: 'Denetim Atıfları',
+            sortable: true,
             accessor: (row: any) => (
                 <div className="flex items-center gap-1 text-xs font-medium text-slate-600">
                     <Link size={14} className="text-blue-500" />
@@ -219,6 +223,7 @@ function CompanyDocumentManagementPage() {
         {
             key: 'actions',
             header: 'İşlemler',
+            sortable: true,
             accessor: (row: any) => (
                 <div className="flex items-center gap-2">
                     <Button

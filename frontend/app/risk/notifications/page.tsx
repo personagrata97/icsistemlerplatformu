@@ -1,4 +1,5 @@
 'use client';
+import RefreshButton from '@/components/ui/RefreshButton';
 
 import React, { useState, useEffect } from 'react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -69,6 +70,7 @@ function RiskNotificationsContent() {
         {
             key: 'title',
             header: 'Bildirim Başlığı & Detay',
+            sortable: true,
             render: (row: any) => (
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -82,11 +84,13 @@ function RiskNotificationsContent() {
         {
             key: 'createdAt',
             header: 'Tarih',
+            sortable: true,
             render: (row: any) => <DateDisplay date={row.createdAt || row.created_at || new Date()} />
         },
         {
             key: 'type',
             header: 'Tip',
+            sortable: true,
             render: (row: any) => <StatusBadge type="status" value={row.type || 'Uyarı'} />
         }
     ];
@@ -97,9 +101,7 @@ function RiskNotificationsContent() {
                 title="Risk Yönetimi Bildirimleri"
                 subtitle={`Limit aşımı, senaryo uyarıları ve risk aksiyon takip bildirimleri (${MODULE_TERMS.risk.birimKisa}).`}
                 actions={
-                    <Button variant="outline" size="sm" onClick={loadNotifications} leftIcon={<RefreshCw size={14} />}>
-                        Yenile
-                    </Button>
+                    <RefreshButton onClick={loadNotifications} />
                 }
             />
 

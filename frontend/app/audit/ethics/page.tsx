@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Suspense } from 'react';
 import { Search, Filter, Eye, ChevronDown, Download, RefreshCw, Plus, X, Edit2, MessageSquare, ExternalLink, UserPlus, LayoutDashboard, List, AlertTriangle, CheckCircle, Calendar } from 'lucide-react';
 import DataTable from '@/components/ui/DataTable';
+import { DateDisplay } from '@/components/ui/DateDisplay';
 import { useToast } from '@/components/Toast';
 import { useSearchParams } from 'next/navigation';
 import { getRiskColor, formatDate } from '@/lib/audit-utils';
