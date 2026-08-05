@@ -228,12 +228,53 @@ model Uyari {
   risk_seviyesi     String
   durum             String
   mesaj             String?
+  birimId          String?
+  atananId         String?
+  birimYaniti      String?
+  yanitGerekcesi   String?
+  yanitTarihi      DateTime?
+  kapanisGerekcesi String?
   created_at        DateTime @default(now())
   senaryo           Senaryo  @relation(fields: [senaryo_kodu], references: [senaryo_kodu])
   kpi               RiskKpi  @relation(fields: [kpi_kodu], references: [kpi_kodu])
 
   @@map("uyari")
 }
+
+model RiskAction {
+  id               String               @id @default(cuid())
+  alertId          String
+  aksiyonTanimi    String
+  sorumluId        String?
+  sorumluBirimId   String?
+  terminTarihi     DateTime?
+  durum            String               @default("Planlandı")
+  tamamlanmaTarihi DateTime?
+  olusturanId      String?
+  created_at       DateTime             @default(now())
+  updated_at       DateTime             @updatedAt
+  evidences        RiskActionEvidence[]
+
+  @@map("risk_action")
+}
+
+model RiskActionEvidence {
+  id              String     @id @default(cuid())
+  actionId        String
+  action          RiskAction @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  dosyaId         String?
+  aciklama        String
+  yukleyenId      String
+  yuklemeTarihi   DateTime   @default(now())
+  onayDurumu      String     @default("BEKLEMEDE")
+  onaylayanId     String?
+  onayTarihi      DateTime?
+  rejectionReason String?
+  created_at      DateTime   @default(now())
+
+  @@map("risk_action_evidence")
+}
+
 
 model LikiditeStresSonucu {
   id            String   @id @default(cuid())
