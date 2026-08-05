@@ -1,568 +1,346 @@
 'use client';
-
-import React, { useState, useEffect } from 'react';
-import PageHeader from '@/components/ui/PageHeader';
 import FormInput from '@/components/ui/FormInput';
-import FormTextarea from '@/components/ui/FormTextarea';
-import CustomSelect from '@/components/ui/CustomSelect';
-import Button from '@/components/ui/Button';
-import DataTable from '@/components/ui/DataTable';
-import RefreshButton from '@/components/ui/RefreshButton';
 import RequireRole from '@/components/auth/RequireRole';
-import { useToast } from '@/components/Toast';
-import { auditApi } from '@/lib/audit-api';
-import {
-    FileText, Scale, Plus, AlertTriangle, Clock, RefreshCw, CheckCircle,
-    Edit3, History, Link, Search, X, ShieldAlert, Eye, Calendar, Layers
-} from 'lucide-react';
 
-export default function KnowledgeBasePage() {
-    return (
-        <RequireRole allowedRoles={['AUDIT_MANAGER', 'AUDIT_SUPERVISOR', 'AUDIT_INSPECTOR', 'AUDIT_USER']}>
-            <CompanyDocumentManagementPage />
-        </RequireRole>
-    );
+import { useState } from 'react';
+import { DateDisplay } from '@/components/ui/DateDisplay';
+import Button from '@/components/ui/Button';
+import { ShieldCheck, Building2, Scale, ClipboardList, Bot, Download, FileText, Plus, Eye, X, Filter, Trash2 } from 'lucide-react';
+import PageHeader from '@/components/ui/PageHeader';
+import SegmentedTabs from '@/components/ui/SegmentedTabs';
+import Tooltip from '@/components/ui/Tooltip';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import CustomSelect from '@/components/ui/CustomSelect';
+import RefreshButton from '@/components/ui/RefreshButton';
+import DataTable from '@/components/ui/DataTable';
+import { auditApi, API_BASE_URL } from '@/lib/audit-api';
+import TableActions from '@/components/ui/TableActions';
+import { useToast } from '@/components/Toast';
+import PageToolbar from '@/components/ui/PageToolbar';
+import { useEffect, useRef } from 'react';
+import ConfirmModal from '@/components/ConfirmModal';
+
+type DocumentType = 'TEFTIS_KURULU' | 'DIGER_BIRIMLER' | 'MEVZUAT' | 'TEMPLATES';
+
+// Doküman arayüz yapısı
+interface Document {
+    id: string;
+    title: string;
+    type: DocumentType;
+    uploadDate: string;
+    uploadedBy: string;
+    size: string;
 }
 
-function CompanyDocumentManagementPage() {
+function KnowledgeBasePageContent() {
     const { showToast } = useToast();
-
     const [documents, setDocuments] = useState<any[]>([]);
-    const [expiringDocs, setExpiringDocs] = useState<any[]>([]);
+    const [staff, setStaff] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
-    // Filters
+    const [activeTab, setActiveTab] = useState<string>('TEFTIS_KURULU');
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedType, setSelectedType] = useState<string>('ALL');
-    const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
+    const [filterUploader, setFilterUploader] = useState<string[]>([]);
+    const [filterYear, setFilterYear] = useState<string[]>([]);
+    const [confirmDeleteDoc, setConfirmDeleteDoc] = useState<any | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Modals
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [showVersionModal, setShowVersionModal] = useState(false);
-    const [showDetailModal, setShowDetailModal] = useState(false);
-    const [selectedDoc, setSelectedDoc] = useState<any | null>(null);
-
-    // Form States
-    const [ad, setAd] = useState('');
-    const [tur, setTur] = useState('Yönetmelik');
-    const [kod, setKod] = useState('');
-    const [versiyon, setVersiyon] = useState('1.0');
-    const [yururlukTarihi, setYururlukTarihi] = useState(new Date().toISOString().split('T')[0]);
-    const [gozdenGecirmePeriyodu, setGozdenGecirmePeriyodu] = useState(12);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // Version Update Form
-    const [newVersion, setNewVersion] = useState('');
-    const [newDurum, setNewDurum] = useState('Yürürlükte');
+    const tabs = [
+        { id: 'TEFTIS_KURULU', label: 'Teftiş Kurulu', icon: ShieldCheck },
+        { id: 'DIGER_BIRIMLER', label: 'Diğer Birimler', icon: Building2 },
+        { id: 'MEVZUAT', label: 'Mevzuat', icon: Scale },
+        { id: 'TEMPLATES', label: 'Denetim Şablonları', icon: ClipboardList },
+    ];
 
     useEffect(() => {
-        loadData();
+        loadStaff();
     }, []);
 
-    const loadData = async () => {
-        setLoading(true);
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
+    // Sekme değiştiğinde dokümanları yeniden yükle
+    useEffect(() => {
+        loadDocuments();
+    }, [activeTab, page]);
+
+    const loadDocuments = async (showOverlay = true) => {
         try {
-            const [docs, expiring] = await Promise.all([
-                auditApi.getCompanyDocuments(),
-                auditApi.getExpiringCompanyDocuments()
-            ]);
-            setDocuments(Array.isArray(docs) ? docs : []);
-            setExpiringDocs(Array.isArray(expiring) ? expiring : []);
+            if (showOverlay) setLoading(true);
+            // Kategoriye göre yükle
+            const data = await auditApi.getDocuments(activeTab, { page, pageSize: 10 });
+            const items = data?.items || (Array.isArray(data) ? data : []);
+            setDocuments(items);
+            setTotalItems(data?.total ?? items.length);
         } catch (error: any) {
-            console.error('Failed to load company documents:', error);
-            showToast('Dokümanlar yüklenirken hata oluştu.', 'error');
+            console.error('Doküman yükleme hatası:', error);
+            showToast('Dokümanlar yüklenirken hata oluştu: ' + error.message, 'error');
+            setDocuments([]);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleCreateDocument = async () => {
-        if (!ad.trim() || !kod.trim()) {
-            showToast('Lütfen doküman adı ve kodunu giriniz.', 'warning');
-            return;
-        }
+    const handleSearch = async (val: string) => {
+        setSearchTerm(val);
+    };
 
-        setIsSubmitting(true);
+    const loadStaff = async () => {
         try {
-            await auditApi.createCompanyDocument({
-                ad: ad.trim(),
-                tur,
-                kod: kod.trim().toUpperCase(),
-                versiyon,
-                yururlukTarihi,
-                gozdenGecirmePeriyodu: Number(gozdenGecirmePeriyodu)
-            });
-
-            showToast('Şirket dokümanı / mevzuat kaydı oluşturuldu.', 'success');
-            setShowCreateModal(false);
-            resetCreateForm();
-            loadData();
-        } catch (error: any) {
-            showToast(error.message || 'Doküman oluşturulamadı.', 'error');
-        } finally {
-            setIsSubmitting(false);
+            const data = await auditApi.getStaff();
+            const staffItems = data?.items || (Array.isArray(data) ? data : []);
+            setStaff(staffItems);
+        } catch (error) {
+            console.error('Personel listesi yükleme hatası:', error);
         }
     };
 
-    const handleUpdateVersion = async () => {
-        if (!selectedDoc || !newVersion.trim()) {
-            showToast('Lütfen yeni versiyon numarasını giriniz.', 'warning');
-            return;
-        }
+    const handleDownload = (doc: any) => {
+        // API üzerinden doğrudan indirme
+        window.open(`${API_BASE_URL}/documents/download/${doc.id}`, '_blank');
+        showToast('Doküman indirme başlatıldı.', 'success');
+    };
 
-        setIsSubmitting(true);
+    const handleView = (doc: any) => {
+        // Yeni sekmede API üzerinden görüntüleme
+        const url = `${API_BASE_URL}/documents/view/${doc.id}`;
+        window.open(url, '_blank');
+    };
+
+    const handleDelete = async () => {
+        if (!confirmDeleteDoc) return;
+
         try {
-            await auditApi.updateCompanyDocumentVersion(selectedDoc.id, {
-                versiyon: newVersion.trim(),
-                durum: newDurum,
-                sonGozdenGecirmeTarihi: new Date().toISOString()
-            });
-
-            showToast('Doküman versiyonu ve gözden geçirme tarihi güncellendi.', 'success');
-            setShowVersionModal(false);
-            setSelectedDoc(null);
-            setNewVersion('');
-            loadData();
+            setLoading(true);
+            await auditApi.deleteDocument(confirmDeleteDoc.id);
+            showToast('Doküman silindi.', 'success');
+            loadDocuments(false);
         } catch (error: any) {
-            showToast(error.message || 'Versiyon güncellenemedi.', 'error');
+            showToast('Silme hatası: ' + error.message, 'error');
         } finally {
-            setIsSubmitting(false);
+            setConfirmDeleteDoc(null);
+            setLoading(false);
         }
     };
 
-    const resetCreateForm = () => {
-        setAd('');
-        setTur('Yönetmelik');
-        setKod('');
-        setVersiyon('1.0');
-        setYururlukTarihi(new Date().toISOString().split('T')[0]);
-        setGozdenGecirmePeriyodu(12);
+    const formatFileSize = (bytes: number) => {
+        if (!bytes || bytes === 0) return '0 KB';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
-    // Filtering logic
-    const filteredDocuments = documents.filter(doc => {
-        const matchesSearch = !searchTerm ||
-            doc.ad.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            doc.kod.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesType = selectedType === 'ALL' || doc.tur === selectedType;
-        const matchesStatus = selectedStatus === 'ALL' || doc.durum === selectedStatus;
-        return matchesSearch && matchesType && matchesStatus;
+    const handleUploadClick = () => {
+        if (fileInputRef.current) fileInputRef.current.click();
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            setLoading(true);
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('category', activeTab);
+            formData.append('title', file.name.split('.').slice(0, -1).join('.'));
+
+            await auditApi.uploadDocument(formData);
+            showToast('Doküman başarıyla yüklendi.', 'success');
+            loadDocuments();
+        } catch (error: any) {
+            showToast('Yükleme hatası: ' + error.message, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filteredDocs = documents.filter(doc => {
+        // Backend Enum değerleriyle doğrudan eşleştirme
+        const docCategory = doc.category || 'TEFTIS_KURULU';
+        const matchesTab = docCategory === activeTab;
+        const title = doc.name || doc.title || '';
+        const matchesTerm = title.toLocaleLowerCase('tr-TR').includes(searchTerm.toLocaleLowerCase('tr-TR'));
+
+        const uploadedBy = doc.uploadedBy || 'Sistem';
+        const matchesUploader = filterUploader.length === 0 || filterUploader.includes(uploadedBy);
+
+        const uploadDate = doc.createdAt || doc.uploadDate || new Date().toISOString();
+        const docYear = new Date(uploadDate).getFullYear().toString();
+        const matchesYear = filterYear.length === 0 || filterYear.includes(docYear);
+
+        return matchesTab && matchesTerm && matchesUploader && matchesYear;
     });
 
-    const columns = [
-        {
-            key: 'kod',
-            header: 'Doküman Kodu & Adı',
-            accessor: (row: any) => (
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
-                            {row.kod}
-                        </span>
-                        <span className="font-semibold text-sm text-slate-800 hover:text-teal-700 cursor-pointer" onClick={() => { setSelectedDoc(row); setShowDetailModal(true); }}>
-                            {row.ad}
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
-                        <span>Yürürlük: {new Date(row.yururlukTarihi).toLocaleDateString('tr-TR')}</span>
-                        <span>•</span>
-                        <span>Periyot: {row.gozdenGecirmePeriyodu || 12} Ay</span>
-                    </div>
-                </div>
-            )
-        },
-        {
-            key: 'tur',
-            header: 'Tür',
-            accessor: (row: any) => (
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                    {row.tur}
-                </span>
-            )
-        },
-        {
-            key: 'versiyon',
-            header: 'Versiyon',
-            accessor: (row: any) => (
-                <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-slate-700">
-                    <Layers size={14} className="text-slate-400" />
-                    v{row.versiyon}
-                </div>
-            )
-        },
-        {
-            key: 'durum',
-            header: 'Durum',
-            accessor: (row: any) => {
-                let badgeStyle = 'bg-emerald-100 text-emerald-800 border-emerald-200';
-                if (row.durum === 'Revizyonda') badgeStyle = 'bg-amber-100 text-amber-800 border-amber-200';
-                if (row.durum === 'Yürürlükten Kalktı') badgeStyle = 'bg-slate-100 text-slate-600 border-slate-200';
-                return (
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${badgeStyle}`}>
-                        {row.durum}
-                    </span>
-                );
-            }
-        },
-        {
-            key: 'references',
-            header: 'Denetim Atıfları',
-            accessor: (row: any) => (
-                <div className="flex items-center gap-1 text-xs font-medium text-slate-600">
-                    <Link size={14} className="text-blue-500" />
-                    <span>{row.references?.length || 0} Atıf</span>
-                </div>
-            )
-        },
-        {
-            key: 'actions',
-            header: 'İşlemler',
-            accessor: (row: any) => (
-                <div className="flex items-center gap-2">
-                    <Button
-                        size="sm"
-                        variant="secondary"
-                        leftIcon={<Edit3 size={12} />}
-                        onClick={() => {
-                            setSelectedDoc(row);
-                            setNewVersion(row.versiyon);
-                            setNewDurum(row.durum);
-                            setShowVersionModal(true);
-                        }}
-                    >
-                        Versiyon Güncelle
-                    </Button>
-                    <Button
-                        size="sm"
-                        variant="ghost"
-                        leftIcon={<Eye size={12} />}
-                        onClick={() => {
-                            setSelectedDoc(row);
-                            setShowDetailModal(true);
-                        }}
-                    >
-                        Detay
-                    </Button>
-                </div>
-            )
-        }
-    ];
+    const uploaders = Array.from(new Set([
+        ...documents.map(d => d.uploadedBy || 'Sistem'),
+        ...staff.map(s => s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim())
+    ].filter(Boolean))).sort().map(name => ({ value: name, label: name }));
+
+    const years = Array.from(new Set(documents.map(d => new Date(d.createdAt || d.uploadDate || Date.now()).getFullYear().toString()))).sort().reverse().map(y => ({ value: y, label: y }));
 
     return (
-        <div className="space-y-6 pb-12">
+        <div className="p-6">
             <PageHeader
-                title="Şirket İçi Mevzuat ve Doküman Takibi"
-                subtitle="Denetimlerde atıf yapılan yönetmelik, prosedür, talimat ve iç mevzuat dokümanlarının versiyon ve periyodik gözden geçirme yönetimi."
-                actions={
-                    <Button variant="primary" onClick={() => setShowCreateModal(true)} leftIcon={<Plus size={16} />}>
-                        Yeni Doküman / Mevzuat Ekle
-                    </Button>
-                }
+                title="Sürekli Gelişim ve Bilgi Bankası"
+                subtitle="Denetim rehberleri, metodolojiler ve kurumsal hafıza merkezi"
             />
 
-            {/* Expiring Documents Warning Banner */}
-            {expiringDocs.length > 0 && (
-                <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-300 rounded-xl p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
-                            <ShieldAlert size={20} className="text-amber-600" />
-                            Gözden Geçirme Tarihi Yaklaşan / Dolan Şirket Dokümanları ({expiringDocs.length})
-                        </div>
-                        <span className="text-xs font-semibold text-amber-800 bg-amber-200/60 px-2.5 py-1 rounded-full">
-                            Periyodik İnceleme Uyarısı
-                        </span>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        {expiringDocs.map((doc: any) => (
-                            <div key={doc.id} className="p-3 bg-white rounded-lg border border-amber-200 shadow-xs flex justify-between items-start">
-                                <div>
-                                    <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900">
-                                        {doc.kod}
-                                    </span>
-                                    <h5 className="font-bold text-xs text-slate-800 mt-1">{doc.ad}</h5>
-                                    <p className="text-[11px] text-amber-700 mt-0.5">
-                                        Periyot: {doc.gozdenGecirmePeriyodu} Ay • v{doc.versiyon}
-                                    </p>
-                                </div>
-                                <Button
-                                    size="sm"
-                                    variant="secondary"
-                                    onClick={() => {
-                                        setSelectedDoc(doc);
-                                        setNewVersion(doc.versiyon);
-                                        setNewDurum(doc.durum);
-                                        setShowVersionModal(true);
-                                    }}
-                                >
-                                    İncele
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Filters */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                    <div className="relative flex-1 md:w-72">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <FormInput
-                            type="text"
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                            placeholder="Doküman adı veya kod arayınız..."
-                            className="pl-9 text-xs"
-                        />
-                    </div>
-                    <CustomSelect
-                        value={selectedType}
-                        onChange={val => setSelectedType(val as string)}
-                        options={[
-                            { value: 'ALL', label: 'Tüm Doküman Türleri' },
-                            { value: 'Yönetmelik', label: 'Yönetmelik' },
-                            { value: 'Prosedür', label: 'Prosedür' },
-                            { value: 'Talimat', label: 'Talimat' },
-                            { value: 'Politika', label: 'Politika' },
-                            { value: 'Form', label: 'Form / Şablon' }
-                        ]}
-                    />
-                    <CustomSelect
-                        value={selectedStatus}
-                        onChange={val => setSelectedStatus(val as string)}
-                        options={[
-                            { value: 'ALL', label: 'Tüm Durumlar' },
-                            { value: 'Yürürlükte', label: 'Yürürlükte' },
-                            { value: 'Revizyonda', label: 'Revizyonda' },
-                            { value: 'Yürürlükten Kalktı', label: 'Yürürlükten Kalktı' }
-                        ]}
-                    />
-                </div>
-                <RefreshButton onClick={loadData} loading={loading} />
+            {/* Tab Navigation - Centralized SegmentedTabs */}
+            <div className="mb-8">
+                <SegmentedTabs
+                    tabs={tabs.map(t => ({ id: t.id, label: t.label, icon: t.icon }))}
+                    activeTab={activeTab}
+                    onChange={(id) => {
+                        setActiveTab(id as DocumentType);
+                    }}
+                />
             </div>
 
-            {/* Table */}
-            <DataTable
-                data={filteredDocuments}
-                columns={columns}
-                loading={loading}
-                rowKey="id"
-                emptyTitle="Sistemde kayıtlı şirket dokümanı / mevzuat bulunamadı."
+            {/* Standardized Toolbar */}
+            <PageToolbar
+                searchPlaceholder="Belge ara..."
+                searchValue={searchTerm}
+                onSearchChange={handleSearch}
+                onRefresh={() => loadDocuments(false)}
+                showAddButton={true}
+                onAddClick={handleUploadClick}
+                addButtonText="Doküman Ekle"
+                filters={
+                    <FilterDropdown
+                        activeCount={filterUploader.length + filterYear.length}
+                        onClear={() => {
+                            setFilterUploader([]);
+                            setFilterYear([]);
+                            setSearchTerm('');
+                        }}
+                    >
+                        <CustomSelect
+                            label="Yükleyen"
+                            placeholder="Tümü"
+                            isMulti
+                            value={filterUploader}
+                            onChange={(val) => setFilterUploader(val as string[])}
+                            options={uploaders}
+                        />
+                        <CustomSelect
+                            label="Yıl"
+                            placeholder="Tümü"
+                            isMulti
+                            value={filterYear}
+                            onChange={(val) => setFilterYear(val as string[])}
+                            options={years}
+                        />
+                    </FilterDropdown>
+                }
+            />
+            <FormInput
+                type="file"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFileChange}
             />
 
-            {/* Create Document Modal */}
-            {showCreateModal && (
-                <div className="modal-overlay open" onClick={() => setShowCreateModal(false)}>
-                    <div className="modal max-w-lg" onClick={e => e.stopPropagation()}>
-                        <div className="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
-                            <h3 className="text-base font-bold text-slate-800">Yeni Şirket Dokümanı / Mevzuat Kaydı</h3>
-                            <button onClick={() => setShowCreateModal(false)} className="p-1.5 hover:bg-slate-200 rounded-full">
-                                <X size={18} />
-                            </button>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                        Doküman Kod / Referans *
-                                    </label>
-                                    <FormInput
-                                        type="text"
-                                        value={kod}
-                                        onChange={e => setKod(e.target.value)}
-                                        placeholder="Örn: YNT-KRE-001"
-                                    />
+            {/* Content Area - Using DataTable for consistency */}
+            <DataTable
+                rowKey="id"
+                data={filteredDocs}
+                loading={loading}
+                paginated={true}
+                manualPagination={true}
+                currentPage={page}
+                totalItems={totalItems}
+                onPageChange={setPage}
+                itemsPerPage={10}
+                columns={[
+                    {
+                        key: 'title',
+                        header: 'Doküman Adı',
+                        render: (doc: any) => (
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                    <FileText className="text-gray-500 w-5 h-5" />
                                 </div>
-                                <div>
-                                    <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                        Doküman Türü *
-                                    </label>
-                                    <CustomSelect
-                                        value={tur}
-                                        onChange={val => setTur(val as string)}
-                                        options={[
-                                            { value: 'Yönetmelik', label: 'Yönetmelik' },
-                                            { value: 'Prosedür', label: 'Prosedür' },
-                                            { value: 'Talimat', label: 'Talimat' },
-                                            { value: 'Politika', label: 'Politika' },
-                                            { value: 'Form', label: 'Form' }
-                                        ]}
-                                    />
-                                </div>
+                                <span className="cell-title">{doc.name || doc.title}</span>
                             </div>
-
-                            <div>
-                                <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                    Doküman Adı *
-                                </label>
-                                <FormInput
-                                    type="text"
-                                    value={ad}
-                                    onChange={e => setAd(e.target.value)}
-                                    placeholder="Örn: Kredi Tahsis ve Risk Yönetimi Yönetmeliği"
-                                />
+                        )
+                    },
+                    {
+                        key: 'size',
+                        header: 'Boyut',
+                        align: 'center',
+                        width: '120px',
+                        render: (doc: any) => (
+                            <span className="font-mono text-[11px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 border border-slate-200/60 rounded inline-block">
+                                {formatFileSize(doc.fileSize || doc.size)}
+                            </span>
+                        )
+                    },
+                    {
+                        key: 'uploadedBy',
+                        header: 'Yükleyen',
+                        align: 'center',
+                        width: '180px',
+                        render: (doc: any) => <div className="cell-user justify-center">{doc.uploadedBy || 'Sistem'}</div>
+                    },
+                    {
+                        key: 'uploadDate',
+                        header: 'Tarih',
+                        align: 'center',
+                        width: '140px',
+                        render: (doc: any) => (
+                            <div className="cell-date text-center">
+                                <DateDisplay date={doc.createdAt || doc.uploadDate || new Date().toISOString()} showIcon={false} className="justify-center" />
                             </div>
-
-                            <div className="grid grid-cols-3 gap-3">
-                                <div>
-                                    <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                        Başlangıç Versiyonu
-                                    </label>
-                                    <FormInput
-                                        type="text"
-                                        value={versiyon}
-                                        onChange={e => setVersiyon(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                        Yürürlük Tarihi *
-                                    </label>
-                                    <FormInput
-                                        type="date"
-                                        value={yururlukTarihi}
-                                        onChange={e => setYururlukTarihi(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                        Periyot (Ay)
-                                    </label>
-                                    <FormInput
-                                        type="number"
-                                        min={1}
-                                        value={gozdenGecirmePeriyodu}
-                                        onChange={e => setGozdenGecirmePeriyodu(Number(e.target.value))}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex justify-end gap-3 pt-4 border-t">
-                                <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
-                                    İptal
-                                </Button>
-                                <Button variant="primary" onClick={handleCreateDocument} disabled={isSubmitting}>
-                                    {isSubmitting ? 'Kaydediliyor...' : 'Dokümanı Kaydet'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Version Update Modal */}
-            {showVersionModal && selectedDoc && (
-                <div className="modal-overlay open" onClick={() => setShowVersionModal(false)}>
-                    <div className="modal max-w-md" onClick={e => e.stopPropagation()}>
-                        <div className="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
-                            <h3 className="text-base font-bold text-slate-800">
-                                Versiyon & Durum Güncelle: {selectedDoc.kod}
-                            </h3>
-                            <button onClick={() => setShowVersionModal(false)} className="p-1.5 hover:bg-slate-200 rounded-full">
-                                <X size={18} />
-                            </button>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            <div>
-                                <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                    Yeni Versiyon Numarası *
-                                </label>
-                                <FormInput
-                                    type="text"
-                                    value={newVersion}
-                                    onChange={e => setNewVersion(e.target.value)}
-                                    placeholder="Örn: 2.0"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="form-label font-medium text-xs text-slate-700 block mb-1">
-                                    Doküman Durumu *
-                                </label>
-                                <CustomSelect
-                                    value={newDurum}
-                                    onChange={val => setNewDurum(val as string)}
-                                    options={[
-                                        { value: 'Yürürlükte', label: 'Yürürlükte' },
-                                        { value: 'Revizyonda', label: 'Revizyonda' },
-                                        { value: 'Yürürlükten Kalktı', label: 'Yürürlükten Kalktı' }
+                        )
+                    },
+                    {
+                        key: 'actions',
+                        header: 'İşlemler',
+                        align: 'center',
+                        width: '220px',
+                        render: (doc: any) => (
+                            <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                                <TableActions
+                                    items={[
+                                        { label: 'İncele', icon: Eye, onClick: () => handleView(doc) },
+                                        { label: 'İndir', icon: Download, onClick: () => handleDownload(doc) },
+                                        { label: 'Sil', icon: Trash2, variant: 'danger' as const, onClick: () => setConfirmDeleteDoc(doc) }
                                     ]}
                                 />
                             </div>
+                        )
+                    }
+                ]}
+                emptyTitle="Doküman Bulunamadı"
+                emptyDescription="Bu kategoride veya kriterlerde listelenecek doküman bulunamadı."
+                onClearFilters={() => {
+                    setSearchTerm('');
+                    setFilterUploader([]);
+                    setFilterYear([]);
+                }}
+            />
 
-                            <div className="p-3 bg-blue-50 text-blue-800 rounded text-xs">
-                                <strong>Bilgi:</strong> Bu işlem son gözden geçirme tarihini bugüne günceller ve bir sonraki periyodik inceleme uyarısını sıfırlar.
-                            </div>
-
-                            <div className="flex justify-end gap-3 pt-4 border-t">
-                                <Button variant="secondary" onClick={() => setShowVersionModal(false)}>
-                                    İptal
-                                </Button>
-                                <Button variant="primary" onClick={handleUpdateVersion} disabled={isSubmitting}>
-                                    {isSubmitting ? 'Güncelleniyor...' : 'Versiyonu Güncelle'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Document Detail & References Modal */}
-            {showDetailModal && selectedDoc && (
-                <div className="modal-overlay open" onClick={() => setShowDetailModal(false)}>
-                    <div className="modal max-w-xl" onClick={e => e.stopPropagation()}>
-                        <div className="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
-                            <div className="flex items-center gap-2">
-                                <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-800">
-                                    {selectedDoc.kod}
-                                </span>
-                                <h3 className="text-base font-bold text-slate-800">{selectedDoc.ad}</h3>
-                            </div>
-                            <button onClick={() => setShowDetailModal(false)} className="p-1.5 hover:bg-slate-200 rounded-full">
-                                <X size={18} />
-                            </button>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl text-xs">
-                                <div><strong>Tür:</strong> {selectedDoc.tur}</div>
-                                <div><strong>Versiyon:</strong> v{selectedDoc.versiyon}</div>
-                                <div><strong>Durum:</strong> {selectedDoc.durum}</div>
-                                <div><strong>Yürürlük Tarihi:</strong> {new Date(selectedDoc.yururlukTarihi).toLocaleDateString('tr-TR')}</div>
-                                <div><strong>Son Gözden Geçirme:</strong> {selectedDoc.sonGozdenGecirmeTarihi ? new Date(selectedDoc.sonGozdenGecirmeTarihi).toLocaleDateString('tr-TR') : 'Yapılmadı'}</div>
-                                <div><strong>İnceleme Periyodu:</strong> {selectedDoc.gozdenGecirmePeriyodu || 12} Ay</div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <h4 className="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                    <Link size={14} className="text-blue-600" />
-                                    Atıf Yapılan Denetim Bulguları & Prosedürleri ({selectedDoc.references?.length || 0})
-                                </h4>
-                                {selectedDoc.references?.length === 0 ? (
-                                    <p className="text-xs text-slate-400 italic">Bu dokümana henüz herhangi bir bulgudan atıf yapılmamıştır.</p>
-                                ) : (
-                                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                                        {selectedDoc.references?.map((ref: any) => (
-                                            <div key={ref.id} className="p-3 bg-white rounded-lg border border-slate-200 text-xs flex justify-between items-center">
-                                                <div>
-                                                    <span className="font-bold text-slate-800">{ref.kaynakTuru} #{ref.kaynakId}</span>
-                                                    {ref.aciklama && <p className="text-slate-600 italic">{ref.aciklama}</p>}
-                                                </div>
-                                                <span className="text-[10px] text-slate-400">{new Date(ref.createdAt).toLocaleDateString('tr-TR')}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="flex justify-end pt-4 border-t">
-                                <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
-                                    Kapat
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Confirm Delete Modal */}
+            <ConfirmModal
+                isOpen={!!confirmDeleteDoc}
+                onClose={() => setConfirmDeleteDoc(null)}
+                onConfirm={handleDelete}
+                title="Dokümanı Sil"
+                message={`"${confirmDeleteDoc?.name || confirmDeleteDoc?.title}" dokümanını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`}
+                confirmText="Sil"
+                type="danger"
+            />
         </div>
+    );
+}
+
+
+export default function KnowledgeBasePage() {
+    return (
+        <RequireRole allowedRoles={['MUFETTIS', 'GOZETIM_SORUMLUSU', 'KURUL_BASKANI', 'ADMIN', 'SUPER_ADMIN']}>
+            <KnowledgeBasePageContent />
+        </RequireRole>
     );
 }

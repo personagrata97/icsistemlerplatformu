@@ -193,6 +193,18 @@ export default function AuditSidebar() {
                                     <span>Resmi Raporlama</span>
                                 </Link>
                             </li>
+                            <li className="nav-item">
+                                <Link href="/audit/knowledge-base" className={`nav-link ${isActive('/audit/knowledge-base') ? 'active' : ''}`}>
+                                    <FileText size={18} />
+                                    <span>Bilgi Bankası</span>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link href="/audit/regulations" className={`nav-link ${isActive('/audit/regulations') ? 'active' : ''}`}>
+                                    <Scale size={18} />
+                                    <span>Şirket İçi Mevzuat</span>
+                                </Link>
+                            </li>
 
                         </ul>
                     </li>
