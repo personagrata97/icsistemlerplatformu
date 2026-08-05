@@ -11,8 +11,9 @@ import {
     ArrowLeft, Check, Send, Eye, Download, Save, Upload, RefreshCw, Plus,
     History, ChevronDown, AlertCircle, ClipboardList, Paperclip, Calendar,
     FileText, Edit2, Trash2, X, User, Clock, CheckCircle, XCircle, RotateCcw,
-    MessageSquare, Mail, RotateCw, ExternalLink, Sparkles, BookOpen, Lightbulb
+    MessageSquare, Mail, RotateCw, ExternalLink, Sparkles, BookOpen, Lightbulb, FileCheck
 } from 'lucide-react';
+import FindingEvidenceTab from '@/components/audit/finding/FindingEvidenceTab';
 import Tooltip from '@/components/ui/Tooltip';
 import { PlayCircle, FileSearch } from 'lucide-react';
 import { auditApi } from '@/lib/audit-api';
@@ -123,7 +124,7 @@ function FindingDetailPageContent() {
     const [showResponseModal, setShowResponseModal] = useState(false);
     const [showAttachmentModal, setShowAttachmentModal] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'details' | 'conciliation' | 'history'>('details');
+    const [activeTab, setActiveTab] = useState<'details' | 'conciliation' | 'evidences' | 'history'>('details');
 
     const [pendingTransition, setPendingTransition] = useState<any>(null);
 
@@ -600,6 +601,7 @@ function FindingDetailPageContent() {
                         tabs={[
                             { id: 'details', label: 'Detaylar', icon: FileText },
                             { id: 'conciliation', label: 'Mutabakat & Yanıt', icon: MessageSquare },
+                            { id: 'evidences', label: 'Kanıtlar & Mevzuat', icon: FileCheck },
                             { id: 'history', label: 'Ekler & Geçmiş', icon: History }
                         ]}
                         activeTab={activeTab}
@@ -796,6 +798,12 @@ function FindingDetailPageContent() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                )}
+
+                {activeTab === 'evidences' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <FindingEvidenceTab findingId={findingId} findingTitle={finding.title} />
                     </div>
                 )}
 

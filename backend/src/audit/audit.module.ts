@@ -46,6 +46,10 @@ import { FollowUpController } from './follow-up.controller';
 import { ConciliationService } from './conciliation-new.service';
 import { ConciliationNewController } from './conciliation-new.controller';
 import { ControlModule } from '../control/control.module';
+import { EvidenceController } from './evidence.controller';
+import { EvidenceService } from './evidence.service';
+import { CompanyDocumentController } from './company-document.controller';
+import { CompanyDocumentService } from './company-document.service';
 
 @Module({
     imports: [EmailModule, PharosModule, RiskEngineModule, NotificationModule, ControlModule],
@@ -64,6 +68,8 @@ import { ControlModule } from '../control/control.module';
         BilgiNotuController,
         FollowUpController,
         ConciliationNewController,
+        EvidenceController,
+        CompanyDocumentController,
     ],
     providers: [
         AuditService,
@@ -92,7 +98,9 @@ import { ControlModule } from '../control/control.module';
         PartialReportService,
         FollowUpService,
         ConciliationService,
+        EvidenceService,
+        CompanyDocumentService,
     ],
-    exports: [AuditService, FindingService, AuditTrashService, AuditLogService, AuditRiskService, PdfReportService, PartialReportService],
+    exports: [AuditService, FindingService, AuditTrashService, AuditLogService, AuditRiskService, PdfReportService, PartialReportService, EvidenceService, CompanyDocumentService],
 })
 export class AuditModule { }

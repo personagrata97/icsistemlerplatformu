@@ -2543,6 +2543,92 @@ export const auditApi = {
         });
         return handleResponse(res);
     },
+
+    // Evidence API
+    attachEvidence: async (data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/evidence`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+    verifyEvidence: async (id: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/evidence/${id}/verify`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+        return handleResponse(res);
+    },
+    invalidateEvidence: async (id: string, gerekce: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/evidence/${id}/invalidate`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ gerekce })
+        });
+        return handleResponse(res);
+    },
+    getEvidenceByEntity: async (kaynakTuru: string, kaynakId: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/evidence/entity?kaynakTuru=${encodeURIComponent(kaynakTuru)}&kaynakId=${encodeURIComponent(kaynakId)}`, {
+            headers: getHeaders()
+        });
+        return handleResponse(res);
+    },
+    getEvidenceChain: async (bulguId: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/evidence/chain/${bulguId}`, {
+            headers: getHeaders()
+        });
+        return handleResponse(res);
+    },
+
+    // Company Document API
+    createCompanyDocument: async (data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/company-documents`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+    updateCompanyDocumentVersion: async (id: string, data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/company-documents/${id}/version`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+    linkDocumentToEntity: async (data: any) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/company-documents/link`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
+    },
+    getExpiringCompanyDocuments: async () => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/company-documents/expiring`, {
+            headers: getHeaders()
+        });
+        return handleResponse(res);
+    },
+    getCompanyDocuments: async (params?: { tur?: string; durum?: string; search?: string }) => {
+        const query = new URLSearchParams();
+        if (params?.tur) query.append('tur', params.tur);
+        if (params?.durum) query.append('durum', params.durum);
+        if (params?.search) query.append('search', params.search);
+
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/company-documents?${query.toString()}`, {
+            headers: getHeaders()
+        });
+        return handleResponse(res);
+    },
+    getDocumentReferences: async (kaynakTuru: string, kaynakId: string) => {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/audit/company-documents/references?kaynakTuru=${encodeURIComponent(kaynakTuru)}&kaynakId=${encodeURIComponent(kaynakId)}`, {
+            headers: getHeaders()
+        });
+        return handleResponse(res);
+    },
 };
 
 

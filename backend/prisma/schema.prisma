@@ -567,6 +567,69 @@ model QualityChecklist {
   @@map("quality_checklist")
 }
 
+model Evidence {
+  id                  String    @id @default(cuid())
+  kaynakTuru          String    // BULGU, CALISMA_KAGIDI, PROGRAM_ADIMI, AKSIYON
+  kaynakId            String
+  dosyaId             String?
+  ad                  String
+  aciklama            String?
+  kanitTuru           String    // Belge, Ekran Görüntüsü, Sistem Çıktısı, Mülakat Notu, Fotoğraf, Video
+  eldeEdilmeYontemi   String?
+  eldeEdilmeTarihi    DateTime  @default(now())
+  kaynagi             String?   // hangi birimden/kimden
+  yukleyenId          String
+  yukleyen            User      @relation("AuditEvidenceUploader", fields: [yukleyenId], references: [id])
+  dogrulandiMi        Boolean   @default(false)
+  dogrulayanId        String?
+  dogrulayan          User?     @relation("AuditEvidenceVerifier", fields: [dogrulayanId], references: [id])
+  dogrulamaTarihi     DateTime?
+  gecersizMi          Boolean   @default(false)
+  gecersizlikGerekcesi String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([kaynakTuru, kaynakId])
+  @@index([yukleyenId])
+  @@index([dogrulayanId])
+  @@map("evidence")
+}
+
+model CompanyDocument {
+  id                     String              @id @default(cuid())
+  ad                     String
+  tur                    String              // Yönetmelik, Prosedür, Talimat, Politika, Form
+  kod                    String
+  versiyon               String              @default("1.0")
+  yururlukTarihi         DateTime
+  sorumluBirimId         String?
+  dosyaId                String?
+  durum                  String              @default("Yürürlükte") // Yürürlükte, Revizyonda, Yürürlükten Kalktı
+  sonGozdenGecirmeTarihi DateTime?
+  gozdenGecirmePeriyodu  Int                 @default(12) // ay cinsinden
+  references             DocumentReference[]
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+
+  @@index([kod])
+  @@index([durum])
+  @@map("company_document")
+}
+
+model DocumentReference {
+  id         String          @id @default(cuid())
+  dokumanId  String
+  dokuman    CompanyDocument @relation(fields: [dokumanId], references: [id], onDelete: Cascade)
+  kaynakTuru String          // BULGU, DENETIM, KONTROL
+  kaynakId   String
+  aciklama   String?
+  createdAt  DateTime        @default(now())
+
+  @@index([dokumanId])
+  @@index([kaynakTuru, kaynakId])
+  @@map("document_reference")
+}
+
 model Notification {
   id          String   @id @default(cuid())
   userId      String
@@ -986,6 +1049,8 @@ model User {
   assignedAuditProgramSteps AuditProgramStep[]        @relation("StepSorumlu")
   conductedQualityReviews     QualityReview[]           @relation("ReviewerUser")
   assignedQualityReviewItems QualityReviewItem[]       @relation("ReviewItemSorumlu")
+  uploadedAuditEvidences    Evidence[]             @relation("AuditEvidenceUploader")
+  verifiedAuditEvidences    Evidence[]             @relation("AuditEvidenceVerifier")
   declarations       IndependenceDeclaration[] @relation("UserDeclarations")
   reportedEthics     EthicsReport[]            @relation("ReportedEthics")
   assignedEthics     EthicsReport[]            @relation("AssignedEthics")
