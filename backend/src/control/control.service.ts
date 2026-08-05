@@ -402,6 +402,12 @@ export class ControlService {
     }
 
     async approveEvidence(evidenceId: string, approvalStatus: 'ONAYLANDI' | 'REDDEDILDI', rejectionReason: string, userId: string) {
+        const existing = await this.prisma.controlActionEvidence.findUnique({ where: { id: evidenceId } });
+        if (!existing) throw new NotFoundException('Kanıt kaydı bulunamadı');
+        if (existing.uploadedById === userId) {
+            throw new BadRequestException('Kanıtı yükleyen kişi kendi kanıtını onaylayamaz');
+        }
+
         const evidence = await this.prisma.controlActionEvidence.update({
             where: { id: evidenceId },
             data: {

@@ -95,9 +95,14 @@ export class ControlController {
         @Query('pageSize') pageSize?: string,
         @Query('sortBy') sortBy?: string,
         @Query('sortDir') sortDir?: 'asc' | 'desc',
+        @Request() req?: any,
     ) {
+        let dept = department;
+        if (req?.user?.role === 'BIRIM_KULLANICISI' && req?.user?.department) {
+            dept = req.user.department;
+        }
         return this.controlService.getControlDeficiencies(
-            { status, severity, department },
+            { status, severity, department: dept },
             {
                 page: page ? parseInt(page) : undefined,
                 pageSize: pageSize ? parseInt(pageSize) : undefined,

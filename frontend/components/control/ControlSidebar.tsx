@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import {
     LayoutDashboard,
     Target,
@@ -15,10 +15,16 @@ import {
     Award,
     BookOpen,
     Send,
-    Shield
+    Shield,
+    Building2,
+    CheckSquare
 } from 'lucide-react';
+
 export default function ControlSidebar() {
     const pathname = usePathname();
+    const { user } = useAuth();
+    const isUnitUser = user?.roles?.includes('BIRIM_KULLANICISI');
+
     const isActive = (path: string) => pathname === path || (path !== '/control' && pathname.startsWith(path));
 
     return (
@@ -29,99 +35,123 @@ export default function ControlSidebar() {
 
             <div className="sidebar-content flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-gray-300">
                 <ul className="nav-links space-y-2 px-2 py-3">
-                    {/* 1. YÖNETİM & ANALİZ */}
+                    {/* BİRİM PORTALI */}
                     <li>
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">YÖNETİM & ANALİZ</div>
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">BİRİM PORTALI</div>
                         <ul className="space-y-1">
                             <li className="nav-item">
-                                <Link href="/control" className={`nav-link ${pathname === '/control' ? 'active' : ''}`}>
-                                    <LayoutDashboard size={18} />
-                                    <span>Ana Panel</span>
+                                <Link href="/control/unit" className={`nav-link ${pathname === '/control/unit' ? 'active' : ''}`}>
+                                    <Building2 size={18} />
+                                    <span>Birim Paneli</span>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link href="/control/executive" className={`nav-link ${isActive('/control/executive') ? 'active' : ''}`}>
-                                    <Target size={18} />
-                                    <span>Yönetici Paneli</span>
-                                </Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link href="/control/staff" className={`nav-link ${isActive('/control/staff') ? 'active' : ''}`}>
-                                    <Users size={18} />
-                                    <span>Denetçi Kadrosu (BKS)</span>
+                                <Link href="/control/unit/deficiencies" className={`nav-link ${isActive('/control/unit/deficiencies') ? 'active' : ''}`}>
+                                    <CheckSquare size={18} />
+                                    <span>Birim Eksiklikleri & Aksiyonlar</span>
                                 </Link>
                             </li>
                         </ul>
                     </li>
 
-                    {/* 2. KONTROL ÇERÇEVESİ & İZLEME */}
-                    <li className="pt-2 border-t border-slate-100">
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">KONTROL ÇERÇEVESİ & İZLEME</div>
-                        <ul className="space-y-1">
-                            <li className="nav-item">
-                                <Link href="/control/inventory" className={`nav-link ${isActive('/control/inventory') ? 'active' : ''}`}>
-                                    <Layers size={18} />
-                                    <span>Süreç & Kontrol Envanteri</span>
-                                </Link>
+                    {/* Show remaining management menus if NOT pure BIRIM_KULLANICISI */}
+                    {!isUnitUser && (
+                        <>
+                            {/* 1. YÖNETİM & ANALİZ */}
+                            <li className="pt-2 border-t border-slate-100">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">YÖNETİM & ANALİZ</div>
+                                <ul className="space-y-1">
+                                    <li className="nav-item">
+                                        <Link href="/control" className={`nav-link ${pathname === '/control' ? 'active' : ''}`}>
+                                            <LayoutDashboard size={18} />
+                                            <span>Ana Panel</span>
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link href="/control/executive" className={`nav-link ${isActive('/control/executive') ? 'active' : ''}`}>
+                                            <Target size={18} />
+                                            <span>Yönetici Paneli</span>
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link href="/control/staff" className={`nav-link ${isActive('/control/staff') ? 'active' : ''}`}>
+                                            <Users size={18} />
+                                            <span>Denetçi Kadrosu (BKS)</span>
+                                        </Link>
+                                    </li>
+                                </ul>
                             </li>
-                            <li className="nav-item">
-                                <Link href="/control/rcsa" className={`nav-link ${isActive('/control/rcsa') ? 'active' : ''}`}>
-                                    <FileCheck size={18} />
-                                    <span>Birim Öz Değerlendirmeleri</span>
-                                </Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link href="/control/testing" className={`nav-link ${isActive('/control/testing') ? 'active' : ''}`}>
-                                    <ShieldCheck size={18} />
-                                    <span>Kontrol Testleri & Saha</span>
-                                </Link>
-                            </li>
-                        </ul>
-                    </li>
 
-                    {/* 3. EKSİKLİK, MUTABAKAT & AKSİYONLAR */}
-                    <li className="pt-2 border-t border-slate-100">
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">EKSİKLİK & AKSİYONLAR</div>
-                        <ul className="space-y-1">
-                            <li className="nav-item">
-                                <Link href="/control/deficiencies" className={`nav-link ${isActive('/control/deficiencies') ? 'active' : ''}`}>
-                                    <AlertOctagon size={18} />
-                                    <span>Eksiklik Takibi</span>
-                                </Link>
+                            {/* 2. KONTROL ÇERÇEVESİ & İZLEME */}
+                            <li className="pt-2 border-t border-slate-100">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">KONTROL ÇERÇEVESİ & İZLEME</div>
+                                <ul className="space-y-1">
+                                    <li className="nav-item">
+                                        <Link href="/control/inventory" className={`nav-link ${isActive('/control/inventory') ? 'active' : ''}`}>
+                                            <Layers size={18} />
+                                            <span>Süreç & Kontrol Envanteri</span>
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link href="/control/rcsa" className={`nav-link ${isActive('/control/rcsa') ? 'active' : ''}`}>
+                                            <FileCheck size={18} />
+                                            <span>Birim Öz Değerlendirmeleri</span>
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link href="/control/testing" className={`nav-link ${isActive('/control/testing') ? 'active' : ''}`}>
+                                            <ShieldCheck size={18} />
+                                            <span>Kontrol Testleri & Saha</span>
+                                        </Link>
+                                    </li>
+                                </ul>
                             </li>
-                            <li className="nav-item">
-                                <Link href="/control/conciliation" className={`nav-link ${isActive('/control/conciliation') ? 'active' : ''}`}>
-                                    <Send size={18} />
-                                    <span>Mutabakat ve Tebliğ</span>
-                                </Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link href="/control/reports" className={`nav-link ${isActive('/control/reports') ? 'active' : ''}`}>
-                                    <FileBarChart size={18} />
-                                    <span>Raporlar</span>
-                                </Link>
-                            </li>
-                        </ul>
-                    </li>
 
-                    {/* 4. EĞİTİM & YETKİNLİK */}
-                    <li className="pt-2 border-t border-slate-100">
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">EĞİTİM & YETKİNLİK</div>
-                        <ul className="space-y-1">
-                            <li className="nav-item">
-                                <Link href="/control/skills" className={`nav-link ${isActive('/control/skills') ? 'active' : ''}`}>
-                                    <Shield size={18} />
-                                    <span>Yetkinlik Matrisi & Kalite</span>
-                                </Link>
+                            {/* 3. EKSİKLİK, MUTABAKAT & AKSİYONLAR */}
+                            <li className="pt-2 border-t border-slate-100">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">EKSİKLİK & AKSİYONLAR</div>
+                                <ul className="space-y-1">
+                                    <li className="nav-item">
+                                        <Link href="/control/deficiencies" className={`nav-link ${isActive('/control/deficiencies') ? 'active' : ''}`}>
+                                            <AlertOctagon size={18} />
+                                            <span>Eksiklik Takibi</span>
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link href="/control/conciliation" className={`nav-link ${isActive('/control/conciliation') ? 'active' : ''}`}>
+                                            <Send size={18} />
+                                            <span>Mutabakat ve Tebliğ</span>
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link href="/control/reports" className={`nav-link ${isActive('/control/reports') ? 'active' : ''}`}>
+                                            <FileBarChart size={18} />
+                                            <span>Raporlar</span>
+                                        </Link>
+                                    </li>
+                                </ul>
                             </li>
-                            <li className="nav-item">
-                                <Link href="/control/training" className={`nav-link ${isActive('/control/training') ? 'active' : ''}`}>
-                                    <BookOpen size={18} />
-                                    <span>Eğitim Kataloğu & CPE</span>
-                                </Link>
+
+                            {/* 4. EĞİTİM & YETKİNLİK */}
+                            <li className="pt-2 border-t border-slate-100">
+                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-2">EĞİTİM & YETKİNLİK</div>
+                                <ul className="space-y-1">
+                                    <li className="nav-item">
+                                        <Link href="/control/skills" className={`nav-link ${isActive('/control/skills') ? 'active' : ''}`}>
+                                            <Shield size={18} />
+                                            <span>Yetkinlik Matrisi & Kalite</span>
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link href="/control/training" className={`nav-link ${isActive('/control/training') ? 'active' : ''}`}>
+                                            <BookOpen size={18} />
+                                            <span>Eğitim Kataloğu & CPE</span>
+                                        </Link>
+                                    </li>
+                                </ul>
                             </li>
-                        </ul>
-                    </li>
+                        </>
+                    )}
                 </ul>
             </div>
         </aside>
